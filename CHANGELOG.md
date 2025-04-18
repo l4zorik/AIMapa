@@ -6,7 +6,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 ### Vylepšeno
 - Kompletní redesign tlačítka pro zavření popup okna klubu Alexa
-- Vylepšená pozice křížku pro zavření popup okna, aby se nepřekrýval s VIP odznakem
+- Vylepšená pozice křížku pro zavření popup okna, výrazně posunutého doprava, aby se nepřekrýval s VIP odznakem
 - Přidán efekt rotace při najetí myší na křížek
 - Vylepšený vzhled popup okna s novým stínem a zaoblením
 - Vylepšený vzhled tlačítka "Rezervovat" s animací při najetí myší
