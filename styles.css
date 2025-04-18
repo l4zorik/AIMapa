@@ -919,7 +919,7 @@ body[data-theme="dark"] .place-popup h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 5px;
+    margin-right: 40px;
 }
 
 .club-image-container {
@@ -1427,11 +1427,11 @@ body[data-theme="dark"] .place-info p {
     width: 280px !important;
 }
 
-/* Úprava pozice křížku pro zavření popup okna */
-.club-popup .leaflet-popup-close-button {
+/* Vlastní tlačítko pro zavření popup okna */
+.custom-close-button {
     position: absolute;
     top: 10px;
-    right: 70px;
+    right: 10px;
     color: #9c27b0;
     font-size: 18px;
     font-weight: bold;
@@ -1446,21 +1446,22 @@ body[data-theme="dark"] .place-info p {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     z-index: 1000;
+    cursor: pointer;
 }
 
-.club-popup .leaflet-popup-close-button:hover {
+.custom-close-button:hover {
     background: white;
     color: #7b1fa2;
     transform: rotate(90deg);
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
-body[data-theme="dark"] .club-popup .leaflet-popup-close-button {
+body[data-theme="dark"] .custom-close-button {
     background: rgba(40, 44, 52, 0.8);
     color: #ba68c8;
 }
 
-body[data-theme="dark"] .club-popup .leaflet-popup-close-button:hover {
+body[data-theme="dark"] .custom-close-button:hover {
     background: #2d3748;
     color: #ce93d8;
 }
@@ -1607,7 +1608,7 @@ body[data-theme="dark"] .club-popup .popup-title {
     margin-bottom: 8px;
     padding-bottom: 8px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     border-bottom: 1px solid rgba(156, 39, 176, 0.15);
     position: relative;

@@ -1229,6 +1229,7 @@ function showRohatecClub() {
             <div class="popup-header">
                 <div class="popup-title">Klub Alexa</div>
                 <div class="club-badge">VIP</div>
+                <div class="custom-close-button" onclick="map.closePopup()">×</div>
             </div>
             <div class="club-image-container">
                 <img src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=600&auto=format&fit=crop" alt="Klub Alexa" class="club-image" loading="lazy">
@@ -1258,7 +1259,7 @@ function showRohatecClub() {
         autoPan: true, // Zapneme autoPan, aby se mapa posouvala při otevření popup
         keepInView: true,
         className: 'club-popup',
-        closeButton: true,
+        closeButton: false, // Vypneme standardní tlačítko pro zavření, použijeme vlastní
         closeOnClick: false,
         autoClose: false,
         maxWidth: 280,
