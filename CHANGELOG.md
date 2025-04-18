@@ -34,11 +34,13 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementovat pokročilé 3D vizualizace terénu a budov
 
 ## Technologické inovace
-- Využití neuronových sítí pro predikci dopravních situací
-- Implementace pokročilých algoritmů pro optimalizaci tras
-- Využití strojového učení pro personalizaci uživatelského rozhraní
-- Integrace blockchain technologie pro bezpečné sdílení dat
-- Vývoj vlastních algoritmů pro zpracování geografických dat
+- Využití pokročilé umělé inteligence k usnadnění navigace člověka na planetě
+- Vytvoření inovativního uživatelského prostředí plného AI nástrojů
+- Integrace mapového AI systému pro intuitivní a efektivní navigaci
+- Implementace pokročilých algoritmů pro predikci a optimalizaci tras
+- Využití strojového učení pro adaptaci systému na potřeby uživatele
+- Vývoj AI asistentů pro různé typy navigace (městská, přírodní, turistická)
+- Implementace pokročilé analýzy geografických dat v reálném čase
 
 ## Uživatelský zážitek
 - Intuitivní a přehledné rozhraní přizpůsobené všem věkovým kategoriím
