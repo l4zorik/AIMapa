@@ -17,6 +17,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Upraven poměr sloupců pro čtvercovější tvar mapy
 - Přidán příkaz "seznam bodů" nebo "ukaž body" pro zobrazení všech bodů a jejich příkazů
 - Vylepšena funkce pro vymazání mapy, aby resetovala také pole markerProperties
+- Aktualizovány souřadnice nočního klubu Alexa v Rohatci na přesnou adresu: Na Kopci 1055/54
 
 ## [0.0.1] - 2025-04-18
 

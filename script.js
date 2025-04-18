@@ -852,8 +852,8 @@ function navigateToMarker(index) {
 
 // Funkce pro zobrazení nočního klubu v Rohatci
 function showRohatecClub() {
-    // Souřadnice nočního klubu v Rohatci
-    const rohatecLocation = L.latLng(48.8783, 17.1857);
+    // Přesné souřadnice nočního klubu Alexa v Rohatci (ulice Na Kopci 1055/54)
+    const rohatecLocation = L.latLng(48.8830, 17.1830);
 
     // Vytvoření markeru pro klub
     const clubMarker = L.marker(rohatecLocation, {
@@ -881,7 +881,7 @@ function showRohatecClub() {
             <div class="place-info">
                 <p><strong>Hodnocení:</strong> 4.9/5 <span class="rating-stars">★★★★★</span></p>
                 <p><strong>Otevíraci doba:</strong> 20:00 - 05:00</p>
-                <p><strong>Adresa:</strong> Rohatec 123, 696 01</p>
+                <p><strong>Adresa:</strong> Na Kopci 1055/54, 696 01 Rohatec</p>
                 <p>Exkluzivní noční klub s VIP servisem a profesionálními tanečnicemi.</p>
             </div>
             <div class="popup-actions club-actions">
