@@ -1,5 +1,11 @@
 // Inicializace mapy
-const map = L.map('map').setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
+const map = L.map('map', {
+    zoomAnimation: true, // Povolit animaci zoomu
+    markerZoomAnimation: true, // Povolit animaci markerů při zoomu
+    fadeAnimation: true, // Povolit animaci přechodů
+    zoomSnap: 0.5, // Jemnější zoom
+    wheelPxPerZoomLevel: 120 // Jemnější zoom kolečkem myši
+}).setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
 
 // Přidání OpenStreetMap podkladu
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -266,7 +272,15 @@ function addMarkerToMap(latlng) {
     };
 
     // Přidání popup s formulářem
-    marker.bindPopup(createPopupContent(marker, markerIndex));
+    marker.bindPopup(createPopupContent(marker, markerIndex), {
+        className: 'marker-popup',
+        maxWidth: 350,
+        minWidth: 250,
+        autoPan: true,
+        autoPanPadding: [50, 50],
+        closeOnClick: false,
+        autoClose: false
+    });
 
     // Přidání zprávy do chatu
     addMessage(`Přidán bod "${markerProperties[markerIndex].name}" na souřadnicích [${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}]. Klikněte na bod pro úpravu.`, false);
@@ -354,6 +368,23 @@ map.on('click', (e) => {
     if (isAddingPoints) {
         addMarkerToMap(e.latlng);
     }
+});
+
+// Event listener pro zoom, aby se popup okna lépe chovaly při zoomu
+map.on('zoomstart', () => {
+    // Přidání třídy pro animaci při zoomu
+    document.querySelectorAll('.leaflet-popup').forEach(popup => {
+        popup.classList.add('zooming');
+    });
+});
+
+map.on('zoomend', () => {
+    // Odstranění třídy po dokončení zoomu
+    setTimeout(() => {
+        document.querySelectorAll('.leaflet-popup').forEach(popup => {
+            popup.classList.remove('zooming');
+        });
+    }, 300);
 });
 
 // Event listeners pro tlačítka
@@ -858,7 +889,7 @@ function navigateToMarker(index) {
 // Funkce pro zobrazení nočního klubu v Rohatci
 function showRohatecClub() {
     // Přesné souřadnice nočního klubu Alexa v Rohatci (ulice Na Kopci 1055/54)
-    const rohatecLocation = L.latLng(48.8830, 17.1830);
+    const rohatecLocation = L.latLng(48.8871713, 17.1931988);
 
     // Vytvoření markeru pro klub
     const clubMarker = L.marker(rohatecLocation, {
@@ -895,54 +926,53 @@ function showRohatecClub() {
         </div>
     `;
 
-    // Přidání popup k markeru s pevnou velikostí
-    const popup = L.popup({
-        autoPan: true,
-        autoPanPadding: [50, 50],
+    // Vytvoření popup okna přímo na markeru
+    clubMarker.bindPopup(popupContent, {
+        autoPan: true, // Zapneme autoPan, aby se mapa posouvala při otevření popup
         keepInView: true,
         className: 'club-popup',
         closeButton: true,
         closeOnClick: false,
-        autoClose: false
-    })
-    .setLatLng(rohatecLocation)
-    .setContent(popupContent);
-
-    // Otevření popup na mapě
-    map.openPopup(popup);
-
-    // Připojení popup k markeru pro budoucí kliknutí
-    clubMarker.bindPopup(popupContent, {
-        className: 'club-popup',
-        closeButton: true,
-        closeOnClick: false
+        autoClose: false,
+        maxWidth: 350,
+        minWidth: 320
     });
 
-    // Přiblížení mapy na oblast kolem klubu, ne přímo na klub
-    // Použijeme menší zoom a offset, aby popup nebyl přímo ve středu
-    const offsetPoint = map.project(rohatecLocation).add([150, 0]);  // Offset doprava
-    const offsetLatLng = map.unproject(offsetPoint);
-
-    map.setView(offsetLatLng, 14, {
+    // Přiblížení mapy na oblast kolem klubu a vycentrování popup okna uprostřed mapy
+    map.setView(rohatecLocation, 14, {
         animate: true,
-        duration: 1.2
+        duration: 1
     });
 
-    // Odstraníme event listener pro zoomend, aby se popup neotevíral automaticky při každém zoomu
-    map.off('zoomend');
+    // Počkáme na dokončení animace a pak otevřeme popup
+    setTimeout(() => {
+        // Otevřeme popup
+        clubMarker.openPopup();
 
-    // Přidáme lepší event listener, který zajistí, že popup bude vidět pouze když je potřeba
-    map.on('zoomend', function() {
-        // Pokud je zoom příliš malý nebo velký, upravit pohled
-        const currentZoom = map.getZoom();
-        if (currentZoom < 12) {
-            // Při příliš malém zoomu zavřeme popup
-            map.closePopup(popup);
-        } else if (map.getBounds().contains(rohatecLocation) && !map.hasLayer(popup)) {
-            // Pokud je klub v zobrazené oblasti a popup není otevřený, otevřeme ho
-            map.openPopup(popup);
-        }
-    });
+        // Skryjeme marker, aby byl vidět pouze popup
+        clubMarker.setOpacity(0);
+
+        // Přidáme listener na zavření popupu, aby se marker znovu zobrazil
+        map.on('popupclose', function() {
+            clubMarker.setOpacity(1);
+        });
+
+        // Přidáme event listener pro zavření popup
+        map.once('popupclose', function() {
+            // Odstraníme marker po zavření popup, pokud uživatel nechce s klubem dále pracovat
+            setTimeout(() => {
+                if (!clubMarker.isPopupOpen()) {
+                    map.removeLayer(clubMarker);
+                }
+            }, 500);
+        });
+
+        // Přidáme event listener pro kliknutí na marker
+        clubMarker.on('click', function() {
+            // Otevřeme popup přímo u markeru
+            clubMarker.openPopup();
+        });
+    }, 500);
 
     return `Nalezen Klub Alexa v Rohatci. Otevíraci doba: 20:00 - 05:00. Klikněte na tlačítko "Zarezervovat tanečnici" pro rezervaci.`;
 }
@@ -1088,13 +1118,17 @@ function showOpeningHours() {
         </div>
     `;
 
-    // Vytvoření popup okna ve středu mapy
+    // Vytvoření popup okna ve středu mapy s lepším nastavením
     L.popup({
         className: 'store-popup',
         closeButton: true,
         closeOnClick: false,
         autoClose: false,
-        maxWidth: 400
+        maxWidth: 400,
+        minWidth: 300,
+        autoPan: true,
+        autoPanPadding: [50, 50],
+        keepInView: true
     })
     .setLatLng(map.getCenter())
     .setContent(storeSelectionContent)
@@ -1238,8 +1272,21 @@ function showStoreDetails(storeIndex) {
         </div>
     `;
 
-    // Aktualizace obsahu popup okna
-    map.openPopup(storeDetailsContent, map.getCenter());
+    // Aktualizace obsahu popup okna s lepším nastavením
+    L.popup({
+        className: 'store-popup store-details-popup',
+        closeButton: true,
+        closeOnClick: false,
+        autoClose: false,
+        maxWidth: 450,
+        minWidth: 320,
+        autoPan: true,
+        autoPanPadding: [50, 50],
+        keepInView: true
+    })
+    .setLatLng(map.getCenter())
+    .setContent(storeDetailsContent)
+    .openOn(map);
 
     // Vytvoření zprávy v chatu
     let message = `Otevírací doba: ${store.name}\n`;
@@ -1319,8 +1366,22 @@ function showStoreOnMap(storeIndex) {
         </div>
     `;
 
-    // Přidání popup k markeru
-    storeMarker.bindPopup(markerPopupContent).openPopup();
+    // Přidání popup k markeru s lepším nastavením
+    storeMarker.bindPopup(markerPopupContent, {
+        className: 'store-marker-popup',
+        maxWidth: 350,
+        minWidth: 250,
+        autoPan: true,
+        autoPanPadding: [50, 50],
+        closeOnClick: false
+    }).openPopup();
+
+    // Přidání event listeneru pro zoom
+    storeMarker.on('popupopen', () => {
+        // Aktualizace velikosti popup okna při otevření
+        const popupContent = storeMarker.getPopup().getContent();
+        storeMarker.setPopupContent(popupContent);
+    });
 
     // Přiblížení mapy na obchod s offsetem
     const offsetPoint = map.project(store.location).add([100, 0]);

@@ -525,8 +525,10 @@ input:checked + .slider:before {
 
 /* Popup styly */
 .popup-content {
-    min-width: 220px;
+    min-width: 250px;
+    max-width: 350px;
     transition: background-color 0.3s, color 0.3s;
+    padding: 5px;
 }
 
 .popup-header {
@@ -572,11 +574,121 @@ body[data-theme="dark"] .popup-countdown {
 }
 
 .leaflet-popup-content-wrapper {
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
 }
 
 .leaflet-popup-tip {
     transition: background-color 0.3s;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Zajistí, že popup okna mají konzistentní velikost při různých úrovních zoomu */
+.leaflet-popup {
+    margin-bottom: 20px;
+}
+
+.leaflet-popup-content {
+    margin: 12px 15px;
+    line-height: 1.5;
+}
+
+/* Přidání animace pro plynulejší otevírání popup oken */
+.leaflet-fade-anim .leaflet-popup {
+    opacity: 0;
+    transition: opacity 0.25s linear, transform 0.25s ease-out;
+    transform: scale(0.8);
+}
+
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Styly pro popup okna při zoomu */
+.leaflet-popup.zooming {
+    transition: none !important;
+    pointer-events: none;
+}
+
+/* Styly pro popup okna při různých úrovních zoomu */
+@media (max-width: 768px), (max-height: 600px) {
+    .leaflet-popup-content-wrapper {
+        font-size: 0.9rem;
+    }
+
+    .popup-title {
+        font-size: 1.1rem;
+    }
+
+    .popup-form {
+        max-height: 300px;
+    }
+
+    .hours-table th, .hours-table td {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Styly pro popup okna při velmi malém zoomu */
+@media (max-width: 480px), (max-height: 400px) {
+    .leaflet-popup-content-wrapper {
+        font-size: 0.85rem;
+    }
+
+    .popup-title {
+        font-size: 1rem;
+    }
+
+    .popup-form {
+        max-height: 250px;
+    }
+
+    .hours-table th, .hours-table td {
+        padding: 4px 6px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Styly pro popup okna markerů */
+.marker-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme="dark"] .marker-popup .leaflet-popup-content-wrapper {
+    background-color: rgba(40, 44, 52, 0.95);
+}
+
+.marker-popup .leaflet-popup-tip {
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .marker-popup .leaflet-popup-tip {
+    background-color: rgba(40, 44, 52, 0.95);
+}
+
+/* Styly pro popup klubu */
+.club-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.98);
+    max-width: 350px;
+    min-width: 320px;
+}
+
+.club-popup .leaflet-popup-content {
+    margin: 12px 15px;
+    width: auto !important;
+    max-width: 320px;
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-content-wrapper {
+    background-color: rgba(40, 44, 52, 0.98);
 }
 
 body[data-theme="dark"] .leaflet-popup-content-wrapper {
@@ -589,7 +701,9 @@ body[data-theme="dark"] .leaflet-popup-tip {
 }
 
 .popup-form {
-    padding: 5px 0;
+    padding: 8px 0;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .form-group {
@@ -637,21 +751,35 @@ body[data-theme="dark"] .coordinates {
 .popup-actions {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    margin-top: 15px;
+    gap: 10px;
 }
 
 .popup-btn {
-    padding: 5px 10px;
+    padding: 8px 12px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: background-color 0.3s;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    text-align: center;
+}
+
+.popup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .save-btn {
     background-color: #4CAF50;
     color: white;
+}
+
+.save-btn:hover {
+    background-color: #45a049;
 }
 
 body[data-theme="dark"] .save-btn:hover {
@@ -661,6 +789,10 @@ body[data-theme="dark"] .save-btn:hover {
 .delete-btn {
     background-color: #f44336;
     color: white;
+}
+
+.delete-btn:hover {
+    background-color: #e53935;
 }
 
 body[data-theme="dark"] .delete-btn:hover {
@@ -766,7 +898,18 @@ body[data-theme="dark"] .reserve-dancer-btn:hover {
 }
 
 .store-popup .leaflet-popup-content-wrapper {
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+.store-popup .leaflet-popup-content {
+    margin: 15px;
+    font-size: 14px;
+}
+
+/* Zajistí, že popup okna obchodů zůstanou čitelná při různých úrovních zoomu */
+.store-popup.leaflet-popup {
+    font-size: 14px !important;
 }
 
 .store-list {
@@ -775,24 +918,31 @@ body[data-theme="dark"] .reserve-dancer-btn:hover {
 }
 
 .store-item {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
     background-color: rgba(0, 0, 0, 0.05);
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid transparent;
 }
 
 .store-item:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
 }
 
 body[data-theme="dark"] .store-item {
     background-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 body[data-theme="dark"] .store-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .store-name {
@@ -824,14 +974,38 @@ body[data-theme="dark"] .store-item:hover {
 .hours-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .hours-table th, .hours-table td {
-    padding: 6px;
+    padding: 10px 12px;
     text-align: left;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     font-size: 0.9rem;
+}
+
+.hours-table th {
+    background-color: rgba(0, 0, 0, 0.05);
+    font-weight: bold;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.hours-table tr:last-child td {
+    border-bottom: none;
+}
+
+.hours-table tr:hover td {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+body[data-theme="dark"] .hours-table th {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 body[data-theme="dark"] .hours-table th,
@@ -839,8 +1013,8 @@ body[data-theme="dark"] .hours-table td {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.hours-table th {
-    font-weight: bold;
+body[data-theme="dark"] .hours-table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .back-button {
@@ -849,13 +1023,22 @@ body[data-theme="dark"] .hours-table td {
     color: var(--primary-color);
     cursor: pointer;
     font-size: 0.9rem;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.back-button::before {
+    content: '\2190'; /* Šipka doleva */
+    font-size: 14px;
 }
 
 .back-button:hover {
     background-color: rgba(0, 0, 0, 0.05);
+    transform: translateX(-3px);
 }
 
 body[data-theme="dark"] .back-button:hover {
@@ -865,19 +1048,74 @@ body[data-theme="dark"] .back-button:hover {
 .show-on-map-btn, .details-btn {
     background-color: var(--primary-color);
     color: white;
-    padding: 8px 16px;
+    padding: 10px 16px;
     font-weight: bold;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
     width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.show-on-map-btn::before {
+    content: '\1F4CD'; /* Emoji špendlíku */
+    font-size: 16px;
+}
+
+.details-btn::before {
+    content: '\1F4C3'; /* Emoji dokumentu */
+    font-size: 16px;
 }
 
 .show-on-map-btn:hover, .details-btn:hover {
     background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .place-icon.store {
     background-color: #2196f3;
     color: white;
+    box-shadow: 0 3px 10px rgba(33, 150, 243, 0.4);
+    border: 2px solid white;
+    transition: all 0.3s ease;
+}
+
+.place-icon.store:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.6);
+}
+
+/* Styly pro popup okna obchodů na mapě */
+.store-marker-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(33, 150, 243, 0.3);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme="dark"] .store-marker-popup .leaflet-popup-content-wrapper {
+    background-color: rgba(40, 44, 52, 0.95);
+}
+
+.store-marker-popup .leaflet-popup-tip {
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 3px 10px rgba(33, 150, 243, 0.3);
+}
+
+body[data-theme="dark"] .store-marker-popup .leaflet-popup-tip {
+    background-color: rgba(40, 44, 52, 0.95);
+}
+
+.store-marker-popup .popup-title {
+    color: #2196f3;
+    font-weight: bold;
+}
+
+.store-details-popup .hours-table {
+    box-shadow: 0 2px 10px rgba(33, 150, 243, 0.2);
 }
 
 /* Dancer Reservation Modal Styles */

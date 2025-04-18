@@ -4,12 +4,22 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 ## [0.0.3] - 2025-04-18
 
+### Opraveno
+- Aktualizovány přesné souřadnice klubu Alexa v Rohatci na 48.8871713, 17.1931988
+- Opraveno zobrazení popup okna klubu Alexa - nyní se zobrazuje na přesných souřadnicích klubu a zároveň je vycentrováno uprostřed mapy
+
 ### Přidáno
 - Nový příkaz "oteviracidoba" pro zobrazení otevíracích dob obchodů v Hodoníně
 - Podpora pro 2 pobočky Kaufland a 2 pobočky Albert v Hodoníně
 - Zobrazení běžných otevíracích dob a speciálních otevíracích dob o svátcích 2025
 - Možnost zobrazení obchodů na mapě s přesnými souřadnicemi
 - Interaktivní popup okna s detaily o otevíracích dobách
+
+### Vylepšeno
+- Optimalizováno zobrazení popup okna pro příkaz "alexa"
+- Skrytí markeru při zobrazení popup okna pro lepší vizualizaci
+- Automatické zobrazení markeru po zavření popup okna
+- Vylepšeno zobrazení popup okna klubu Alexa - nyní se zobrazuje na přesných souřadnicích klubu a zároveň je vycentrováno uprostřed mapy
 
 ## [0.0.2] - 2025-04-18
 
