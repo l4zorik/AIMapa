@@ -11,6 +11,9 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Ukládání nastavení aplikace (tmavý režim, barevné schéma, design)
 
 ### Vylepšeno
+- Kompletní redesign popup okna klubu Alexa pro lepší estetický dojem
+- Přidány ikony pro jednotlivé informace (hodnocení, otevírací doba, adresa)
+- Sjednocené barevné schéma v celém popup okně
 - Optimalizováno chování popup oken při pohybu mapy
 - Popup okna nyní zůstávají na svých pozicích při posunu mapy
 - Vylepšena responzivita popup oken při změně velikosti obrazovky

@@ -725,6 +725,7 @@ body[data-theme="dark"] .marker-popup .leaflet-popup-tip {
     background-color: rgba(255, 255, 255, 0.98);
     max-width: 350px;
     min-width: 320px;
+    transform: translateY(-20px); /* Posun popup okna více nahoru pro lepší vycentrování */
 }
 
 .club-popup .leaflet-popup-content {
@@ -733,8 +734,23 @@ body[data-theme="dark"] .marker-popup .leaflet-popup-tip {
     max-width: 320px;
 }
 
+.club-popup .leaflet-popup-tip-container {
+    margin-top: -1px; /* Lepší napojení šipky na popup okno */
+}
+
+.club-popup .leaflet-popup-tip {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
 body[data-theme="dark"] .club-popup .leaflet-popup-content-wrapper {
-    background-color: rgba(40, 44, 52, 0.98);
+    background-color: rgba(30, 34, 42, 0.98);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-tip {
+    background-color: rgba(30, 34, 42, 0.98);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
 }
 
 body[data-theme="dark"] .leaflet-popup-content-wrapper {
@@ -894,10 +910,15 @@ body[data-theme="dark"] .place-popup h3 {
     background-color: #9c27b0;
     color: white;
     padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 0.8rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
     font-weight: bold;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(156, 39, 176, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .club-image-container {
@@ -919,23 +940,36 @@ body[data-theme="dark"] .place-popup h3 {
 }
 
 .reserve-dancer-btn {
-    background-color: #e91e63;
+    background-color: #9c27b0;
     color: white;
-    padding: 8px 16px;
+    padding: 6px 12px;
     font-weight: bold;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    box-shadow: 0 3px 8px rgba(156, 39, 176, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 .reserve-dancer-btn:hover {
-    background-color: #c2185b;
+    background-color: #7b1fa2;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(156, 39, 176, 0.5);
 }
 
 body[data-theme="dark"] .reserve-dancer-btn {
-    background-color: #e91e63;
+    background-color: #ba68c8;
+    box-shadow: 0 4px 10px rgba(186, 104, 200, 0.4);
 }
 
 body[data-theme="dark"] .reserve-dancer-btn:hover {
-    background-color: #ad1457;
+    background-color: #8e24aa;
+    box-shadow: 0 6px 15px rgba(186, 104, 200, 0.5);
 }
 
 /* Styly pro obchody a otevírací doby */
@@ -1285,10 +1319,19 @@ body[data-theme="dark"] .reservation-terms {
 .rating-stars {
     color: #f59e0b;
     margin-left: 5px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 body[data-theme="dark"] .rating-stars {
     color: #fbbf24;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.club-popup .rating-stars {
+    font-size: 1.1rem;
+    display: inline-block;
+    margin-top: 2px;
 }
 
 textarea.popup-input {
@@ -1359,59 +1402,154 @@ body[data-theme="dark"] .place-info p {
 
 /* Styly pro popup okno klubu */
 .club-popup {
-    max-height: 500px !important;
-    max-width: 320px !important;
-    width: 320px !important;
+    max-height: 350px !important;
+    max-width: 280px !important;
+    width: 280px !important;
 }
 
 .club-popup .leaflet-popup-content-wrapper {
-    border-radius: 8px;
-    width: 320px !important;
-    max-width: 320px !important;
-    max-height: 500px !important;
+    border-radius: 12px;
+    width: 280px !important;
+    max-width: 280px !important;
+    max-height: 350px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 .club-popup .leaflet-popup-content {
-    margin: 10px;
-    width: 300px !important;
-    max-width: 300px !important;
-    overflow-y: auto;
-    max-height: 480px;
+    margin: 8px;
+    width: 260px !important;
+    max-width: 260px !important;
+    overflow: hidden;
 }
 
 .club-popup .club-image-container {
-    max-height: 150px;
+    max-height: 110px;
     overflow: hidden;
-    margin: 5px 0;
+    margin: 4px 0 8px 0;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 .club-popup .club-image {
     width: 100%;
     height: auto;
-    max-height: 150px;
+    display: block;
+    transition: transform 0.5s ease;
+    max-height: 110px;
     object-fit: cover;
 }
 
-.club-popup .place-info {
-    font-size: 0.9rem;
-    line-height: 1.4;
+.club-popup .club-image-container:hover .club-image {
+    transform: scale(1.05);
 }
 
-.club-popup .place-info p {
+.club-popup .place-info {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    padding: 0 5px;
+    margin: 0 auto;
+}
+
+.club-popup .info-row {
+    display: flex;
+    align-items: center;
     margin: 5px 0;
+    gap: 8px;
+}
+
+.club-popup .info-icon {
+    font-size: 0.9rem;
+    width: 18px;
+    text-align: center;
+    color: #9c27b0;
+}
+
+.club-popup .info-content {
+    flex: 1;
+}
+
+.club-popup .info-content strong {
+    margin-right: 4px;
+    color: #666;
+}
+
+body[data-theme="dark"] .club-popup .info-content strong {
+    color: #aaa;
+}
+
+.club-popup .rating-value {
+    font-weight: bold;
+    color: #333;
+}
+
+.club-popup .rating-stars {
+    color: #ffc107;
+    margin-left: 3px;
+    font-size: 0.75rem;
+}
+
+body[data-theme="dark"] .club-popup .rating-value {
+    color: #eee;
+}
+
+.club-popup .opening-hours {
+    font-weight: bold;
+    color: #e91e63;
+}
+
+.club-popup .address {
+    color: #333;
+}
+
+body[data-theme="dark"] .club-popup .address {
+    color: #eee;
+}
+
+.club-popup .description {
+    margin-top: 8px !important;
+    font-style: italic;
+    color: #555;
+    line-height: 1.3;
+}
+
+body[data-theme="dark"] .club-popup .description {
+    color: #bbb;
 }
 
 .club-popup .popup-title {
     font-size: 1.1rem;
+    font-weight: bold;
+    color: #9c27b0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] .club-popup .popup-title {
+    color: #ce93d8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .club-popup .popup-header {
-    margin-bottom: 5px;
-    padding-bottom: 5px;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(156, 39, 176, 0.15);
+}
+
+body[data-theme="dark"] .club-popup .popup-header {
+    border-bottom: 1px solid rgba(186, 104, 200, 0.2);
 }
 
 .club-popup .club-actions {
-    margin-top: 10px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(156, 39, 176, 0.15);
+}
+
+body[data-theme="dark"] .club-popup .club-actions {
+    border-top: 1px solid rgba(186, 104, 200, 0.2);
 }
 
 /* Responzivní úpravy pro různé velikosti obrazovky */

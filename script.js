@@ -1231,16 +1231,24 @@ function showRohatecClub() {
                 <div class="club-badge">VIP</div>
             </div>
             <div class="club-image-container">
-                <img src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=800&auto=format&fit=crop" alt="Klub Alexa" class="club-image" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=600&auto=format&fit=crop" alt="Klub Alexa" class="club-image" loading="lazy">
             </div>
             <div class="place-info">
-                <p><strong>Hodnocení:</strong> 4.9/5 <span class="rating-stars">★★★★★</span></p>
-                <p><strong>Otevíraci doba:</strong> 20:00 - 05:00</p>
-                <p><strong>Adresa:</strong> Na Kopci 1055/54, 696 01 Rohatec</p>
-                <p>Exkluzivní noční klub s VIP servisem a profesionálními tanečnicemi.</p>
+                <div class="info-row">
+                    <div class="info-icon">⭐</div>
+                    <div class="info-content"><strong>Hodnocení:</strong> <span class="rating-value">4.9</span></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon">🕒</div>
+                    <div class="info-content"><strong>Otevřeno:</strong> <span class="opening-hours">20:00-05:00</span></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon">📍</div>
+                    <div class="info-content"><strong>Adresa:</strong> <span class="address">Na Kopci 1055, Rohatec</span></div>
+                </div>
             </div>
             <div class="popup-actions club-actions">
-                <button class="popup-btn reserve-dancer-btn" onclick="showDancerReservationModal()">Zarezervovat tanečnici</button>
+                <button class="popup-btn reserve-dancer-btn" onclick="showDancerReservationModal()">Rezervovat</button>
             </div>
         </div>
     `;
@@ -1253,12 +1261,16 @@ function showRohatecClub() {
         closeButton: true,
         closeOnClick: false,
         autoClose: false,
-        maxWidth: 350,
-        minWidth: 320
+        maxWidth: 280,
+        minWidth: 280
     });
 
     // Přiblížení mapy na oblast kolem klubu a vycentrování popup okna uprostřed mapy
-    map.setView(rohatecLocation, 14, {
+    // Vytvoření offsetu pro lepší vycentrování popup okna
+    const offsetPoint = map.project(rohatecLocation).subtract([0, 100]);  // Offset nahoru pro lepší vycentrování
+    const offsetLatLng = map.unproject(offsetPoint);
+
+    map.setView(offsetLatLng, 14, {
         animate: true,
         duration: 1
     });
@@ -1267,6 +1279,13 @@ function showRohatecClub() {
     setTimeout(() => {
         // Otevřeme popup
         clubMarker.openPopup();
+
+        // Upravit pozici popup okna pro lepší vycentrování
+        const popup = clubMarker.getPopup();
+        if (popup && popup._container) {
+            // Aplikujeme CSS transform pro lepší pozici
+            popup._container.style.transform = popup._container.style.transform + ' translateY(-20px)';
+        }
 
         // Skryjeme marker, aby byl vidět pouze popup
         clubMarker.setOpacity(0);
@@ -1293,7 +1312,7 @@ function showRohatecClub() {
         });
     }, 500);
 
-    return `Nalezen Klub Alexa v Rohatci. Otevíraci doba: 20:00 - 05:00. Klikněte na tlačítko "Zarezervovat tanečnici" pro rezervaci.`;
+    return `Nalezen Klub Alexa v Rohatci. Otevíraci doba: 20:00 - 05:00.`;
 }
 
 // Funkce pro zpracování rezervace
