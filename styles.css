@@ -909,7 +909,7 @@ body[data-theme="dark"] .place-popup h3 {
 .club-badge {
     background-color: #9c27b0;
     color: white;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 12px;
     font-size: 0.7rem;
     font-weight: bold;
@@ -919,6 +919,7 @@ body[data-theme="dark"] .place-popup h3 {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-right: 5px;
 }
 
 .club-image-container {
@@ -942,24 +943,43 @@ body[data-theme="dark"] .place-popup h3 {
 .reserve-dancer-btn {
     background-color: #9c27b0;
     color: white;
-    padding: 6px 12px;
+    padding: 8px 16px;
     font-weight: bold;
     transition: all 0.3s ease;
-    border-radius: 20px;
-    box-shadow: 0 3px 8px rgba(156, 39, 176, 0.4);
+    border-radius: 24px;
+    box-shadow: 0 4px 10px rgba(156, 39, 176, 0.4);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.75rem;
+    letter-spacing: 0.8px;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.reserve-dancer-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+    z-index: -1;
 }
 
 .reserve-dancer-btn:hover {
     background-color: #7b1fa2;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(156, 39, 176, 0.5);
+}
+
+.reserve-dancer-btn:hover::before {
+    left: 100%;
 }
 
 body[data-theme="dark"] .reserve-dancer-btn {
@@ -1407,16 +1427,70 @@ body[data-theme="dark"] .place-info p {
     width: 280px !important;
 }
 
+/* Úprava pozice křížku pro zavření popup okna */
+.club-popup .leaflet-popup-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #9c27b0;
+    font-size: 18px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.club-popup .leaflet-popup-close-button:hover {
+    background: white;
+    color: #7b1fa2;
+    transform: rotate(90deg);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-close-button {
+    background: rgba(40, 44, 52, 0.8);
+    color: #ba68c8;
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-close-button:hover {
+    background: #2d3748;
+    color: #ce93d8;
+}
+
 .club-popup .leaflet-popup-content-wrapper {
-    border-radius: 12px;
+    border-radius: 16px;
     width: 280px !important;
     max-width: 280px !important;
     max-height: 350px !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 10px 30px rgba(156, 39, 176, 0.2), 0 8px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.club-popup .leaflet-popup-tip {
+    background-color: white;
+    box-shadow: 0 3px 10px rgba(156, 39, 176, 0.2);
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-tip {
+    background-color: #2d3748;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-content-wrapper {
+    background-color: #2d3748;
+    box-shadow: 0 10px 30px rgba(186, 104, 200, 0.2), 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .club-popup .leaflet-popup-content {
-    margin: 8px;
+    margin: 10px;
     width: 260px !important;
     max-width: 260px !important;
     overflow: hidden;
@@ -1530,12 +1604,13 @@ body[data-theme="dark"] .club-popup .popup-title {
 }
 
 .club-popup .popup-header {
-    margin-bottom: 6px;
-    padding-bottom: 6px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid rgba(156, 39, 176, 0.15);
+    position: relative;
 }
 
 body[data-theme="dark"] .club-popup .popup-header {

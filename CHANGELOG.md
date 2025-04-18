@@ -2,6 +2,17 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.0.5] - 2025-04-18
+
+### Vylepšeno
+- Kompletní redesign tlačítka pro zavření popup okna klubu Alexa
+- Vylepšená pozice křížku pro zavření popup okna
+- Přidán efekt rotace při najetí myší na křížek
+- Vylepšený vzhled popup okna s novým stínem a zaoblením
+- Vylepšený vzhled tlačítka "Rezervovat" s animací při najetí myší
+- Optimalizace pro tmavý režim s konzistentními barvami
+- Vylepšené mezery a zarovnání všech prvků pro lepší symetrii
+
 ## [0.0.4] - 2025-04-18
 
 ### Přidáno
