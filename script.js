@@ -177,6 +177,9 @@ function saveMarkerProperties(index) {
 
         // Zavření popup po uložení
         marker.closePopup();
+
+        // Uložení stavu aplikace po změně vlastností markeru
+        saveAppState();
     }
 }
 
@@ -246,6 +249,9 @@ function removeMarker(index) {
             routeDistanceElement.textContent = '-';
             routeTimeElement.textContent = '-';
         }
+
+        // Uložení stavu aplikace po odstranění markeru
+        saveAppState();
     }
 }
 
@@ -360,6 +366,9 @@ function addMarkerToMap(latlng) {
         calculateRouteFunction();
     }
 
+    // Uložení stavu aplikace po přidání nového bodu
+    saveAppState();
+
     return marker;
 }
 
@@ -385,6 +394,23 @@ map.on('zoomend', () => {
             popup.classList.remove('zooming');
         });
     }, 300);
+});
+
+// Event listenery pro pohyb mapy, aby se popup okna lépe chovaly při pohybu mapy
+map.on('movestart', () => {
+    // Přidání třídy pro animaci při pohybu mapy
+    document.querySelectorAll('.leaflet-popup').forEach(popup => {
+        popup.classList.add('moving');
+    });
+});
+
+map.on('moveend', () => {
+    // Odstranění třídy po dokončení pohybu mapy
+    setTimeout(() => {
+        document.querySelectorAll('.leaflet-popup').forEach(popup => {
+            popup.classList.remove('moving');
+        });
+    }, 100);
 });
 
 // Event listeners pro tlačítka
@@ -452,6 +478,9 @@ function calculateRouteFunction() {
         if (routes[0].coordinates && routes[0].coordinates.length > 0) {
             map.fitBounds(L.latLngBounds(routes[0].coordinates), {padding: [50, 50]});
         }
+
+        // Uložení stavu aplikace po výpočtu trasy
+        saveAppState();
     });
 
     // Poslech na událost 'routingerror' pro případ chyby při výpočtu trasy
@@ -534,6 +563,9 @@ document.getElementById('clearMap').addEventListener('click', () => {
 
     // Informace pro uživatele
     addMessage('Mapa byla vyčištěna. Všechny body a trasy byly odstraněny.', false);
+
+    // Uložení stavu aplikace po vymazání mapy
+    saveAppState();
 });
 
 // Tlačítko pro tisk mapy
@@ -623,9 +655,24 @@ function processUserInput(input) {
         if (route) {
             map.removeLayer(route);
         }
+
+        // Vymazání trasy vytvořené pomocí Leaflet Routing Machine
+        if (routeControl) {
+            map.removeControl(routeControl);
+            routeControl = null;
+        }
+
         markers = [];
         markerProperties = [];
         route = null;
+
+        // Reset informací o trase
+        routeDistanceElement.textContent = '-';
+        routeTimeElement.textContent = '-';
+
+        // Uložení stavu aplikace po vymazání mapy
+        saveAppState();
+
         return 'Mapa byla vyčištěna.';
     } else if (lowercaseInput.includes('seznam bodů') || lowercaseInput.includes('ukaž body')) {
         if (markers.length === 0) {
@@ -723,6 +770,9 @@ colorOptions.forEach(option => {
         }
 
         document.documentElement.style.setProperty('--primary-color', colorValue);
+
+        // Uložení stavu aplikace po změně barevného schématu
+        saveAppState();
     });
 });
 
@@ -745,6 +795,9 @@ darkModeToggle.addEventListener('change', () => {
     // Aktualizace mapy po změně režimu
     setTimeout(() => {
         map.invalidateSize();
+
+        // Uložení stavu aplikace po změně tmavého režimu
+        saveAppState();
     }, 100);
 });
 
@@ -761,10 +814,15 @@ showApiKeyButton.addEventListener('click', () => {
 
 // Uložení nastavení
 saveSettingsButton.addEventListener('click', () => {
-    // Zde by bylo ukládání nastavení do localStorage nebo na server
+    // Uložení stavu aplikace včetně nastavení
+    const saved = saveAppState();
 
     // Přidání zprávy do chatu o uložení nastavení
-    addMessage('Nastavení byla úspěšně uložena.');
+    if (saved) {
+        addMessage('Nastavení byla úspěšně uložena.');
+    } else {
+        addMessage('Při ukládání nastavení došlo k chybě. Zkuste to prosím znovu.');
+    }
 
     // Zavření modálního okna
     settingsModal.style.display = 'none';
@@ -778,6 +836,258 @@ cancelSettingsButton.addEventListener('click', () => {
     settingsModal.style.display = 'none';
 });
 
+// Funkce pro uložení stavu aplikace do localStorage
+function saveAppState() {
+    // Uložení markerů a jejich vlastností
+    const markersData = [];
+    for (let i = 0; i < markers.length; i++) {
+        const marker = markers[i];
+        const props = markerProperties[i] || { name: `Bod ${i + 1}`, command: `bod${i + 1}` };
+        markersData.push({
+            lat: marker.getLatLng().lat,
+            lng: marker.getLatLng().lng,
+            properties: props
+        });
+    }
+
+    // Uložení nastavení aplikace
+    const settings = {
+        darkMode: document.getElementById('darkModeToggle').checked,
+        colorScheme: document.querySelector('.color-option.active').getAttribute('data-color'),
+        design: document.getElementById('designSelect').value
+    };
+
+    // Uložení stavu mapy
+    const mapState = {
+        center: {
+            lat: map.getCenter().lat,
+            lng: map.getCenter().lng
+        },
+        zoom: map.getZoom()
+    };
+
+    // Vytvoření objektu s kompletním stavem aplikace
+    const appState = {
+        markers: markersData,
+        settings: settings,
+        mapState: mapState,
+        lastSaved: new Date().toISOString()
+    };
+
+    // Uložení do localStorage
+    try {
+        localStorage.setItem('aiMapAppState', JSON.stringify(appState));
+        console.log('Stav aplikace byl úspěšně uložen:', appState);
+        return true;
+    } catch (error) {
+        console.error('Chyba při ukládání stavu aplikace:', error);
+        return false;
+    }
+}
+
+// Funkce pro načtení stavu aplikace z localStorage
+function loadAppState() {
+    try {
+        const savedState = localStorage.getItem('aiMapAppState');
+        if (!savedState) {
+            console.log('Nenalezen žádný uložený stav aplikace.');
+            return false;
+        }
+
+        const appState = JSON.parse(savedState);
+        console.log('Načten stav aplikace:', appState);
+
+        // Načtení nastavení aplikace
+        if (appState.settings) {
+            // Nastavení tmavého režimu
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (darkModeToggle) {
+                darkModeToggle.checked = appState.settings.darkMode;
+                // Aplikace nastavení tmavého režimu
+                if (appState.settings.darkMode) {
+                    document.documentElement.style.setProperty('--dark-bg', '#1a1b26');
+                    document.documentElement.style.setProperty('--card-bg', '#1F2937');
+                    document.documentElement.style.setProperty('--text-color', '#fff');
+                    document.body.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.style.setProperty('--dark-bg', '#f3f4f6');
+                    document.documentElement.style.setProperty('--card-bg', '#ffffff');
+                    document.documentElement.style.setProperty('--text-color', '#1F2937');
+                    document.body.removeAttribute('data-theme');
+                }
+            }
+
+            // Nastavení barevného schématu
+            if (appState.settings.colorScheme) {
+                const colorOptions = document.querySelectorAll('.color-option');
+                colorOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if (option.getAttribute('data-color') === appState.settings.colorScheme) {
+                        option.classList.add('active');
+                        // Aplikace barevného schématu
+                        let colorValue;
+                        switch(appState.settings.colorScheme) {
+                            case 'blue':
+                                colorValue = '#8B5CF6';
+                                break;
+                            case 'purple':
+                                colorValue = '#9333EA';
+                                break;
+                            case 'green':
+                                colorValue = '#10B981';
+                                break;
+                            case 'orange':
+                                colorValue = '#F59E0B';
+                                break;
+                            default:
+                                colorValue = '#8B5CF6';
+                        }
+                        document.documentElement.style.setProperty('--primary-color', colorValue);
+                    }
+                });
+            }
+
+            // Nastavení designu
+            if (appState.settings.design) {
+                const designSelect = document.getElementById('designSelect');
+                if (designSelect) {
+                    designSelect.value = appState.settings.design;
+                }
+            }
+        }
+
+        // Načtení stavu mapy
+        if (appState.mapState) {
+            map.setView(
+                [appState.mapState.center.lat, appState.mapState.center.lng],
+                appState.mapState.zoom
+            );
+        }
+
+        // Načtení markerů
+        if (appState.markers && appState.markers.length > 0) {
+            // Odstranění všech stávajících markerů
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            markerProperties = [];
+
+            // Přidání uložených markerů
+            appState.markers.forEach(markerData => {
+                const marker = L.marker([markerData.lat, markerData.lng], {
+                    draggable: true,
+                    title: markerData.properties.name
+                }).addTo(map);
+
+                const markerIndex = markers.length;
+                markers.push(marker);
+                markerProperties[markerIndex] = markerData.properties;
+
+                // Přidání popup s formulářem
+                marker.bindPopup(createPopupContent(marker, markerIndex), {
+                    className: 'marker-popup',
+                    maxWidth: 350,
+                    minWidth: 250,
+                    autoPan: true,
+                    autoPanPadding: [50, 50],
+                    closeOnClick: false,
+                    autoClose: false
+                });
+
+                // Přidání event listenerů pro marker
+                setupMarkerEventListeners(marker, markerIndex);
+            });
+
+            // Pokud máme alespoň dva body, vypočítáme trasu
+            if (markers.length >= 2) {
+                calculateRouteFunction();
+            }
+
+            addMessage(`Načteno ${markers.length} bodů z předchozího sezení.`, false);
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Chyba při načítání stavu aplikace:', error);
+        return false;
+    }
+}
+
+// Funkce pro nastavení event listenerů pro marker
+function setupMarkerEventListeners(marker, markerIndex) {
+    // Přidání event listeneru pro přesunutí markeru
+    marker.on('dragend', function() {
+        const newPos = marker.getLatLng();
+
+        // Aktualizace souřadnic v properties
+        if (markerProperties[markerIndex]) {
+            markerProperties[markerIndex].lat = newPos.lat.toFixed(4);
+            markerProperties[markerIndex].lng = newPos.lng.toFixed(4);
+        }
+
+        // Aktualizace popup obsahu
+        marker.setPopupContent(createPopupContent(marker, markerIndex));
+
+        // Pokud máme alespoň dva body, přepočítáme trasu
+        if (markers.length >= 2) {
+            calculateRouteFunction();
+        }
+
+        // Uložení stavu aplikace po přesunutí markeru
+        saveAppState();
+    });
+
+    // Přidání event listeneru pro kliknutí na marker
+    marker.on('click', function() {
+        // Zrušení předchozího časovače, pokud existuje
+        if (popupTimers[markerIndex]) {
+            clearTimeout(popupTimers[markerIndex]);
+        }
+
+        // Nastavení nového časovače
+        popupTimers[markerIndex] = setTimeout(() => {
+            if (marker.isPopupOpen()) {
+                marker.closePopup();
+            }
+            delete popupTimers[markerIndex];
+        }, 35000); // 35 sekund
+    });
+
+    // Přidání event listeneru pro otevření popup okna
+    marker.on('popupopen', function() {
+        // Zrušení všech předchozích intervalů pro odpočet
+        Object.keys(countdownIntervals).forEach(key => {
+            if (key.startsWith(`countdown-${markerIndex}-`)) {
+                clearInterval(countdownIntervals[key]);
+                delete countdownIntervals[key];
+            }
+        });
+
+        // Spuštění odpočtu
+        const countdownId = `countdown-${markerIndex}-${Date.now()}`;
+        const countdownElement = document.getElementById(countdownId);
+        if (countdownElement) {
+            startCountdown(countdownId, 35);
+        }
+    });
+
+    // Přidání event listeneru pro zavření popup okna
+    marker.on('popupclose', function() {
+        // Zrušení časovače při manuálním zavření popup okna
+        if (popupTimers[markerIndex]) {
+            clearTimeout(popupTimers[markerIndex]);
+            delete popupTimers[markerIndex];
+        }
+
+        // Zrušení všech intervalů pro odpočet
+        Object.keys(countdownIntervals).forEach(key => {
+            if (key.startsWith(`countdown-${markerIndex}-`)) {
+                clearInterval(countdownIntervals[key]);
+                delete countdownIntervals[key];
+            }
+        });
+    });
+}
+
 // Inicializace chatu
 window.addEventListener('load', () => {
     // Vyčištění předem definovaných zpráv
@@ -786,12 +1096,17 @@ window.addEventListener('load', () => {
     // Přidání uvítací zprávy
     addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?');
 
-    // Aktivace režimu přidávání bodů
-    document.getElementById('addActivity').classList.add('active');
-    addMessage('Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.', false);
+    // Pokus o načtení stavu aplikace
+    const stateLoaded = loadAppState();
 
-    // Načtení uložených nastavení (simulace)
-    // V reálné aplikaci by zde bylo načítání z localStorage nebo ze serveru
+    if (!stateLoaded) {
+        // Pokud se nepodařilo načíst stav, aktivujeme režim přidávání bodů
+        document.getElementById('addActivity').classList.add('active');
+        addMessage('Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.', false);
+    } else {
+        // Pokud se podařilo načíst stav, informujeme uživatele
+        addMessage('Stav aplikace byl úspěšně načten z předchozího sezení.', false);
+    }
 
     // Nastavení výchozího data pro rezervaci tanečnice
     const tomorrow = new Date();
@@ -800,6 +1115,10 @@ window.addEventListener('load', () => {
 
     // Event listenery pro modální okno rezervace tanečnice
     setupDancerReservationModal();
+
+    // Nastavení automatického ukládání stavu aplikace při změnách
+    map.on('moveend', saveAppState); // Ukládání při posunu mapy
+    map.on('zoomend', saveAppState); // Ukládání při změně zoomu
 });
 
 // Nastavení event listenerů pro modální okno rezervace tanečnice

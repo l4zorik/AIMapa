@@ -599,6 +599,7 @@ body[data-theme="dark"] .popup-countdown {
     opacity: 0;
     transition: opacity 0.25s linear, transform 0.25s ease-out;
     transform: scale(0.8);
+    will-change: transform, opacity; /* Optimalizace pro hardwarovou akceleraci */
 }
 
 .leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
@@ -610,6 +611,29 @@ body[data-theme="dark"] .popup-countdown {
 .leaflet-popup.zooming {
     transition: none !important;
     pointer-events: none;
+}
+
+/* Styly pro popup okna při pohybu mapy */
+.leaflet-popup.moving {
+    transition: transform 0.1s linear !important;
+    pointer-events: none;
+}
+
+/* Optimalizace pro popup okna při pohybu mapy */
+.leaflet-popup {
+    transform-origin: bottom center; /* Zajišťuje lepší chování při změně velikosti */
+    backface-visibility: hidden; /* Optimalizace pro hardwarovou akceleraci */
+    perspective: 1000px; /* Optimalizace pro hardwarovou akceleraci */
+}
+
+.leaflet-popup-content-wrapper {
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+    will-change: transform, opacity; /* Optimalizace pro hardwarovou akceleraci */
+}
+
+.leaflet-popup-tip {
+    transition: transform 0.1s ease-out;
+    will-change: transform; /* Optimalizace pro hardwarovou akceleraci */
 }
 
 /* Styly pro popup okna při různých úrovních zoomu */
@@ -630,6 +654,28 @@ body[data-theme="dark"] .popup-countdown {
         padding: 6px 8px;
         font-size: 0.8rem;
     }
+}
+
+/* Optimalizace pro různé úrovně zoomu */
+.leaflet-zoom-animated {
+    transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1);
+}
+
+/* Zajištění stabilní velikosti popup při různých úrovních zoomu */
+.leaflet-container .leaflet-popup {
+    margin-bottom: 10px !important; /* Konzistentní odsazení */
+}
+
+/* Optimalizace pro různé úrovně zoomu - zajištění čitelnosti */
+.leaflet-zoom-anim .leaflet-zoom-animated {
+    will-change: transform; /* Optimalizace pro hardwarovou akceleraci */
+}
+
+/* Zajištění stabilní velikosti obsahu popup při různých úrovních zoomu */
+.leaflet-popup-content {
+    margin: 12px 15px !important; /* Konzistentní vnitřní okraje */
+    line-height: 1.5 !important; /* Konzistentní výška řádků */
+    font-size: 14px !important; /* Konzistentní velikost písma */
 }
 
 /* Styly pro popup okna při velmi malém zoomu */

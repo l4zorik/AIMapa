@@ -2,6 +2,20 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.0.4] - 2025-04-18
+
+### Přidáno
+- Ukládání stavu aplikace do localStorage
+- Automatické načtení posledního stavu při opětovném otevření aplikace
+- Ukládání všech bodů na mapě včetně jejich vlastností
+- Ukládání nastavení aplikace (tmavý režim, barevné schéma, design)
+
+### Vylepšeno
+- Optimalizováno chování popup oken při pohybu mapy
+- Popup okna nyní zůstávají na svých pozicích při posunu mapy
+- Vylepšena responzivita popup oken při změně velikosti obrazovky
+- Optimalizováno zobrazení popup oken při různých úrovních zoomu
+
 ## [0.0.3] - 2025-04-18
 
 ### Opraveno
