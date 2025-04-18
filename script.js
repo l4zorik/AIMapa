@@ -565,6 +565,11 @@ function processUserInput(input) {
         return showRohatecClub();
     }
 
+    // Kontrola příkazu "oteviracidoba"
+    if (lowercaseInput === 'oteviracidoba' || lowercaseInput.includes('otevíraci doba') || lowercaseInput.includes('oteviraci doba')) {
+        return showOpeningHours();
+    }
+
     // Kontrola příkazů pro body
     for (let i = 0; i < markerProperties.length; i++) {
         if (markerProperties[i] && lowercaseInput === markerProperties[i].command.toLowerCase()) {
@@ -973,6 +978,364 @@ function makeReservation(placeName) {
     addMessage(message, false);
 
     return true;
+}
+
+// Funkce pro zobrazení otevíracích dob obchodů v Hodoníně
+function showOpeningHours() {
+    // Data o obchodech
+    const stores = [
+        {
+            name: "Kaufland Hodonín, Dvořákova",
+            address: "Dvořákova 4115/6, 695 01 Hodonín",
+            location: L.latLng(48.8553, 17.1225),
+            regularHours: "7:00 - 22:00",
+            holidayHours: {
+                "1.1.2025": "zavřeno",
+                "10.4.2025": "zavřeno", // Velký pátek
+                "13.4.2025": "zavřeno", // Velikonoční pondělí
+                "1.5.2025": "zavřeno",
+                "8.5.2025": "zavřeno",
+                "5.7.2025": "zavřeno",
+                "6.7.2025": "zavřeno",
+                "28.9.2025": "zavřeno",
+                "28.10.2025": "zavřeno",
+                "17.11.2025": "zavřeno",
+                "24.12.2025": "7:00 - 11:30",
+                "25.12.2025": "zavřeno",
+                "26.12.2025": "zavřeno"
+            }
+        },
+        {
+            name: "Kaufland Hodonín, Konečná",
+            address: "Konečná 4010/4, 695 01 Hodonín",
+            location: L.latLng(48.8483, 17.1356),
+            regularHours: "7:00 - 22:00",
+            holidayHours: {
+                "1.1.2025": "zavřeno",
+                "10.4.2025": "zavřeno", // Velký pátek
+                "13.4.2025": "zavřeno", // Velikonoční pondělí
+                "1.5.2025": "zavřeno",
+                "8.5.2025": "zavřeno",
+                "5.7.2025": "zavřeno",
+                "6.7.2025": "zavřeno",
+                "28.9.2025": "zavřeno",
+                "28.10.2025": "zavřeno",
+                "17.11.2025": "zavřeno",
+                "24.12.2025": "7:00 - 11:30",
+                "25.12.2025": "zavřeno",
+                "26.12.2025": "zavřeno"
+            }
+        },
+        {
+            name: "Albert Hypermarket Hodonín, Krátká",
+            address: "Krátká 4088/2, 695 01 Hodonín",
+            location: L.latLng(48.8512, 17.1298),
+            regularHours: "7:00 - 21:00",
+            holidayHours: {
+                "1.1.2025": "zavřeno",
+                "10.4.2025": "zavřeno", // Velký pátek
+                "13.4.2025": "zavřeno", // Velikonoční pondělí
+                "1.5.2025": "zavřeno",
+                "8.5.2025": "zavřeno",
+                "5.7.2025": "zavřeno",
+                "6.7.2025": "zavřeno",
+                "28.9.2025": "zavřeno",
+                "28.10.2025": "zavřeno",
+                "17.11.2025": "zavřeno",
+                "24.12.2025": "7:00 - 12:00",
+                "25.12.2025": "zavřeno",
+                "26.12.2025": "zavřeno"
+            }
+        },
+        {
+            name: "Albert Supermarket Hodonín, Masarykovo nám.",
+            address: "Masarykovo nám. 257/16, 695 85 Hodonín",
+            location: L.latLng(48.8489, 17.1256),
+            regularHours: "7:00 - 20:00",
+            holidayHours: {
+                "1.1.2025": "zavřeno",
+                "10.4.2025": "zavřeno", // Velký pátek
+                "13.4.2025": "zavřeno", // Velikonoční pondělí
+                "1.5.2025": "zavřeno",
+                "8.5.2025": "zavřeno",
+                "5.7.2025": "zavřeno",
+                "6.7.2025": "zavřeno",
+                "28.9.2025": "zavřeno",
+                "28.10.2025": "zavřeno",
+                "17.11.2025": "zavřeno",
+                "24.12.2025": "7:00 - 11:30",
+                "25.12.2025": "zavřeno",
+                "26.12.2025": "zavřeno"
+            }
+        }
+    ];
+
+    // Vytvoření popup okna s výběrem obchodů
+    const storeSelectionContent = `
+        <div class="popup-content store-selection-popup">
+            <div class="popup-header">
+                <div class="popup-title">Otevírací doba obchodů v Hodoníně</div>
+            </div>
+            <div class="store-list">
+                ${stores.map((store, index) => `
+                    <div class="store-item" onclick="showStoreDetails(${index})">
+                        <div class="store-name">${store.name}</div>
+                        <div class="store-address">${store.address}</div>
+                        <div class="store-hours">Běžná otevírací doba: ${store.regularHours}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    // Vytvoření popup okna ve středu mapy
+    L.popup({
+        className: 'store-popup',
+        closeButton: true,
+        closeOnClick: false,
+        autoClose: false,
+        maxWidth: 400
+    })
+    .setLatLng(map.getCenter())
+    .setContent(storeSelectionContent)
+    .openOn(map);
+
+    // Vytvoření zprávy v chatu
+    let message = "Otevírací doba obchodů v Hodoníně:\n\n";
+    stores.forEach(store => {
+        message += `${store.name}\n`;
+        message += `Adresa: ${store.address}\n`;
+        message += `Běžná otevírací doba: ${store.regularHours}\n\n`;
+    });
+    message += "Pro zobrazení podrobných informací o otevírací době včetně svátků klikněte na obchod v popup okně.";
+
+    return message;
+}
+
+// Funkce pro zobrazení detailů o otevírací době konkrétního obchodu
+function showStoreDetails(storeIndex) {
+    // Data o obchodech (stejná jako ve funkci showOpeningHours)
+    const stores = [
+        {
+            name: "Kaufland Hodonín, Dvořákova",
+            address: "Dvořákova 4115/6, 695 01 Hodonín",
+            location: L.latLng(48.8553, 17.1225),
+            regularHours: "7:00 - 22:00",
+            holidayHours: {
+                "1.1.2025": "zavřeno",
+                "10.4.2025": "zavřeno", // Velký pátek
+                "13.4.2025": "zavřeno", // Velikonoční pondělí
+                "1.5.2025": "zavřeno",
+                "8.5.2025": "zavřeno",
+                "5.7.2025": "zavřeno",
+                "6.7.2025": "zavřeno",
+                "28.9.2025": "zavřeno",
+                "28.10.2025": "zavřeno",
+                "17.11.2025": "zavřeno",
+                "24.12.2025": "7:00 - 11:30",
+                "25.12.2025": "zavřeno",
+                "26.12.2025": "zavřeno"
+            }
+        },
+        {
+            name: "Kaufland Hodonín, Konečná",
+            address: "Konečná 4010/4, 695 01 Hodonín",
+            location: L.latLng(48.8483, 17.1356),
+            regularHours: "7:00 - 22:00",
+            holidayHours: {
+                "1.1.2025": "zavřeno",
+                "10.4.2025": "zavřeno", // Velký pátek
+                "13.4.2025": "zavřeno", // Velikonoční pondělí
+                "1.5.2025": "zavřeno",
+                "8.5.2025": "zavřeno",
+                "5.7.2025": "zavřeno",
+                "6.7.2025": "zavřeno",
+                "28.9.2025": "zavřeno",
+                "28.10.2025": "zavřeno",
+                "17.11.2025": "zavřeno",
+                "24.12.2025": "7:00 - 11:30",
+                "25.12.2025": "zavřeno",
+                "26.12.2025": "zavřeno"
+            }
+        },
+        {
+            name: "Albert Hypermarket Hodonín, Krátká",
+            address: "Krátká 4088/2, 695 01 Hodonín",
+            location: L.latLng(48.8512, 17.1298),
+            regularHours: "7:00 - 21:00",
+            holidayHours: {
+                "1.1.2025": "zavřeno",
+                "10.4.2025": "zavřeno", // Velký pátek
+                "13.4.2025": "zavřeno", // Velikonoční pondělí
+                "1.5.2025": "zavřeno",
+                "8.5.2025": "zavřeno",
+                "5.7.2025": "zavřeno",
+                "6.7.2025": "zavřeno",
+                "28.9.2025": "zavřeno",
+                "28.10.2025": "zavřeno",
+                "17.11.2025": "zavřeno",
+                "24.12.2025": "7:00 - 12:00",
+                "25.12.2025": "zavřeno",
+                "26.12.2025": "zavřeno"
+            }
+        },
+        {
+            name: "Albert Supermarket Hodonín, Masarykovo nám.",
+            address: "Masarykovo nám. 257/16, 695 85 Hodonín",
+            location: L.latLng(48.8489, 17.1256),
+            regularHours: "7:00 - 20:00",
+            holidayHours: {
+                "1.1.2025": "zavřeno",
+                "10.4.2025": "zavřeno", // Velký pátek
+                "13.4.2025": "zavřeno", // Velikonoční pondělí
+                "1.5.2025": "zavřeno",
+                "8.5.2025": "zavřeno",
+                "5.7.2025": "zavřeno",
+                "6.7.2025": "zavřeno",
+                "28.9.2025": "zavřeno",
+                "28.10.2025": "zavřeno",
+                "17.11.2025": "zavřeno",
+                "24.12.2025": "7:00 - 11:30",
+                "25.12.2025": "zavřeno",
+                "26.12.2025": "zavřeno"
+            }
+        }
+    ];
+
+    // Získání vybraného obchodu
+    const store = stores[storeIndex];
+
+    // Vytvoření obsahu popup okna s detaily o otevírací době
+    const storeDetailsContent = `
+        <div class="popup-content store-details-popup">
+            <div class="popup-header">
+                <div class="popup-title">${store.name}</div>
+                <button class="back-button" onclick="showOpeningHours()">Zpět</button>
+            </div>
+            <div class="store-details">
+                <div class="store-address">${store.address}</div>
+                <div class="store-hours-section">
+                    <h4>Běžná otevírací doba:</h4>
+                    <div class="regular-hours">${store.regularHours}</div>
+
+                    <h4>Otevírací doba o svátcích 2025:</h4>
+                    <div class="holiday-hours">
+                        <table class="hours-table">
+                            <tr><th>Datum</th><th>Otevírací doba</th></tr>
+                            ${Object.entries(store.holidayHours).map(([date, hours]) => `
+                                <tr>
+                                    <td>${date}</td>
+                                    <td>${hours}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="store-actions">
+                <button class="popup-btn show-on-map-btn" onclick="showStoreOnMap(${storeIndex})">Zobrazit na mapě</button>
+            </div>
+        </div>
+    `;
+
+    // Aktualizace obsahu popup okna
+    map.openPopup(storeDetailsContent, map.getCenter());
+
+    // Vytvoření zprávy v chatu
+    let message = `Otevírací doba: ${store.name}\n`;
+    message += `Adresa: ${store.address}\n`;
+    message += `Běžná otevírací doba: ${store.regularHours}\n\n`;
+    message += "Otevírací doba o svátcích 2025:\n";
+
+    Object.entries(store.holidayHours).forEach(([date, hours]) => {
+        message += `${date}: ${hours}\n`;
+    });
+
+    message += "\nPro zobrazení obchodu na mapě klikněte na tlačítko 'Zobrazit na mapě' v popup okně.";
+
+    addMessage(message, false);
+}
+
+// Funkce pro zobrazení obchodu na mapě
+function showStoreOnMap(storeIndex) {
+    // Data o obchodech (stejná jako ve funkci showOpeningHours)
+    const stores = [
+        {
+            name: "Kaufland Hodonín, Dvořákova",
+            address: "Dvořákova 4115/6, 695 01 Hodonín",
+            location: L.latLng(48.8553, 17.1225),
+            regularHours: "7:00 - 22:00",
+            holidayHours: {/* ... */}
+        },
+        {
+            name: "Kaufland Hodonín, Konečná",
+            address: "Konečná 4010/4, 695 01 Hodonín",
+            location: L.latLng(48.8483, 17.1356),
+            regularHours: "7:00 - 22:00",
+            holidayHours: {/* ... */}
+        },
+        {
+            name: "Albert Hypermarket Hodonín, Krátká",
+            address: "Krátká 4088/2, 695 01 Hodonín",
+            location: L.latLng(48.8512, 17.1298),
+            regularHours: "7:00 - 21:00",
+            holidayHours: {/* ... */}
+        },
+        {
+            name: "Albert Supermarket Hodonín, Masarykovo nám.",
+            address: "Masarykovo nám. 257/16, 695 85 Hodonín",
+            location: L.latLng(48.8489, 17.1256),
+            regularHours: "7:00 - 20:00",
+            holidayHours: {/* ... */}
+        }
+    ];
+
+    // Získání vybraného obchodu
+    const store = stores[storeIndex];
+
+    // Vytvoření markeru pro obchod
+    const storeMarker = L.marker(store.location, {
+        icon: L.divIcon({
+            className: 'store-marker',
+            html: `<div class="place-icon store"><i class="icon">🛍️</i></div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        })
+    }).addTo(map);
+
+    // Vytvoření obsahu popup okna pro marker
+    const markerPopupContent = `
+        <div class="popup-content store-marker-popup">
+            <div class="popup-header">
+                <div class="popup-title">${store.name}</div>
+            </div>
+            <div class="store-details">
+                <div class="store-address">${store.address}</div>
+                <div class="store-hours">Běžná otevírací doba: ${store.regularHours}</div>
+            </div>
+            <div class="store-actions">
+                <button class="popup-btn details-btn" onclick="showStoreDetails(${storeIndex})">Zobrazit detaily</button>
+            </div>
+        </div>
+    `;
+
+    // Přidání popup k markeru
+    storeMarker.bindPopup(markerPopupContent).openPopup();
+
+    // Přiblížení mapy na obchod s offsetem
+    const offsetPoint = map.project(store.location).add([100, 0]);
+    const offsetLatLng = map.unproject(offsetPoint);
+
+    map.setView(offsetLatLng, 15, {
+        animate: true,
+        duration: 1
+    });
+
+    // Zavření předchozího popup okna
+    map.closePopup();
+
+    // Informace pro uživatele
+    addMessage(`Zobrazen obchod: ${store.name}\nAdresa: ${store.address}\nBěžná otevírací doba: ${store.regularHours}`, false);
 }
 
 // Funkce pro zobrazení modálního okna pro rezervaci tanečnice

@@ -2,6 +2,15 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.0.3] - 2025-04-18
+
+### Přidáno
+- Nový příkaz "oteviracidoba" pro zobrazení otevíracích dob obchodů v Hodoníně
+- Podpora pro 2 pobočky Kaufland a 2 pobočky Albert v Hodoníně
+- Zobrazení běžných otevíracích dob a speciálních otevíracích dob o svátcích 2025
+- Možnost zobrazení obchodů na mapě s přesnými souřadnicemi
+- Interaktivní popup okna s detaily o otevíracích dobách
+
 ## [0.0.2] - 2025-04-18
 
 ### Vylepšeno
