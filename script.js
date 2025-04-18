@@ -823,7 +823,7 @@ function showRohatecClub() {
     // Vytvoření unikátního ID pro popup
     const popupId = `club-popup-${Date.now()}`;
 
-    // Vytvoření popup obsahu s informacemi o klubu
+    // Vytvoření popup obsahu s informacemi o klubu - stručnější verze
     const popupContent = `
         <div class="popup-content place-popup" id="${popupId}">
             <div class="popup-header">
@@ -837,7 +837,7 @@ function showRohatecClub() {
                 <p><strong>Hodnocení:</strong> 4.9/5 <span class="rating-stars">★★★★★</span></p>
                 <p><strong>Otevíraci doba:</strong> 20:00 - 05:00</p>
                 <p><strong>Adresa:</strong> Rohatec 123, 696 01</p>
-                <p>Exkluzivní noční klub s VIP servisem, živou hudbou a profesionálními tanečnicemi. Nejlepší zábava v regionu!</p>
+                <p>Exkluzivní noční klub s VIP servisem a profesionálními tanečnicemi.</p>
             </div>
             <div class="popup-actions club-actions">
                 <button class="popup-btn reserve-dancer-btn" onclick="showDancerReservationModal()">Zarezervovat tanečnici</button>
@@ -845,27 +845,41 @@ function showRohatecClub() {
         </div>
     `;
 
-    // Přidání popup k markeru s lepším zarovnáním a responzivní velikostí
+    // Přidání popup k markeru s pevnou velikostí
     const popup = L.popup({
-        minWidth: 300,
-        maxWidth: 350,
-        maxHeight: 400,
         autoPan: true,
         autoPanPadding: [50, 50],
         keepInView: true,
-        className: 'club-popup'
+        className: 'club-popup',
+        closeButton: true,
+        closeOnClick: false,
+        autoClose: false
     })
     .setLatLng(rohatecLocation)
-    .setContent(popupContent)
-    .openOn(map);
+    .setContent(popupContent);
+
+    // Otevření popup na mapě
+    map.openPopup(popup);
 
     // Připojení popup k markeru pro budoucí kliknutí
-    clubMarker.bindPopup(popup);
+    clubMarker.bindPopup(popupContent, {
+        className: 'club-popup',
+        closeButton: true,
+        closeOnClick: false
+    });
 
     // Přiblížení mapy na klub s lepším zarovnáním
-    map.setView(rohatecLocation, 16, {
+    // Použijeme menší zoom, aby bylo vidět více kontextu
+    map.setView(rohatecLocation, 15, {
         animate: true,
         duration: 1
+    });
+
+    // Zajistíme, že popup bude vidět i při změně zoomu
+    map.on('zoomend', function() {
+        if (!map.hasLayer(popup)) {
+            map.openPopup(popup);
+        }
     });
 
     return `Nalezen Klub Alexa v Rohatci. Otevíraci doba: 20:00 - 05:00. Klikněte na tlačítko "Zarezervovat tanečnici" pro rezervaci.`;

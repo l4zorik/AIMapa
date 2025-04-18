@@ -2,6 +2,16 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.0.2] - 2025-04-18
+
+### Vylepšeno
+- Optimalizováno zobrazení popup okna pro příkaz "alexa"
+- Pevná velikost popup okna (320px šířka) pro lepší čitelnost při různých úrovních zoomu
+- Zlepšeno zarovnání popup okna na středu mapy
+- Optimalizace obsahu popup okna pro lepší čitelnost
+- Přidán event listener pro udržení popup okna viditelného při změně zoomu
+- Responzivní design pro mobilní zařízení (280px šířka)
+
 ## [0.0.1] - 2025-04-18
 
 ### Přidáno

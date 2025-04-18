@@ -953,49 +953,78 @@ body[data-theme="dark"] .place-info p {
 
 /* Styly pro popup okno klubu */
 .club-popup {
-    max-height: 80vh !important;
-    overflow-y: auto;
-}
-
-.club-popup .leaflet-popup-content {
-    margin: 12px;
-    overflow-y: auto;
-    max-height: calc(80vh - 40px);
+    max-height: 500px !important;
+    max-width: 320px !important;
+    width: 320px !important;
 }
 
 .club-popup .leaflet-popup-content-wrapper {
     border-radius: 8px;
+    width: 320px !important;
+    max-width: 320px !important;
+    max-height: 500px !important;
+}
+
+.club-popup .leaflet-popup-content {
+    margin: 10px;
+    width: 300px !important;
+    max-width: 300px !important;
+    overflow-y: auto;
+    max-height: 480px;
 }
 
 .club-popup .club-image-container {
-    max-height: 200px;
+    max-height: 150px;
     overflow: hidden;
+    margin: 5px 0;
 }
 
 .club-popup .club-image {
     width: 100%;
     height: auto;
-    max-height: 200px;
+    max-height: 150px;
     object-fit: cover;
 }
 
+.club-popup .place-info {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.club-popup .place-info p {
+    margin: 5px 0;
+}
+
+.club-popup .popup-title {
+    font-size: 1.1rem;
+}
+
+.club-popup .popup-header {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+}
+
+.club-popup .club-actions {
+    margin-top: 10px;
+}
+
 /* Responzivní úpravy pro různé velikosti obrazovky */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
     .club-popup {
-        max-width: 90vw !important;
+        max-width: 280px !important;
+        width: 280px !important;
+    }
+
+    .club-popup .leaflet-popup-content-wrapper {
+        width: 280px !important;
+        max-width: 280px !important;
     }
 
     .club-popup .leaflet-popup-content {
-        max-height: calc(80vh - 30px);
-        padding: 0;
+        width: 260px !important;
+        max-width: 260px !important;
     }
 
-    .club-popup .club-image-container {
-        max-height: 150px;
-    }
-}
-
-@media (max-width: 480px) {
     .club-popup .club-image-container {
         max-height: 120px;
     }
@@ -1005,7 +1034,8 @@ body[data-theme="dark"] .place-info p {
     }
 
     .club-popup .place-info p {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        margin: 4px 0;
     }
 }
 
