@@ -2,7 +2,7 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.0.1] - 2024-04-18
+## [0.0.1] - 2025-04-18
 
 ### Přidáno
 - Základní mapové rozhraní s využitím Leaflet.js
