@@ -951,6 +951,64 @@ body[data-theme="dark"] .place-info p {
     color: #e2e8f0;
 }
 
+/* Styly pro popup okno klubu */
+.club-popup {
+    max-height: 80vh !important;
+    overflow-y: auto;
+}
+
+.club-popup .leaflet-popup-content {
+    margin: 12px;
+    overflow-y: auto;
+    max-height: calc(80vh - 40px);
+}
+
+.club-popup .leaflet-popup-content-wrapper {
+    border-radius: 8px;
+}
+
+.club-popup .club-image-container {
+    max-height: 200px;
+    overflow: hidden;
+}
+
+.club-popup .club-image {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
+}
+
+/* Responzivní úpravy pro různé velikosti obrazovky */
+@media (max-width: 768px) {
+    .club-popup {
+        max-width: 90vw !important;
+    }
+
+    .club-popup .leaflet-popup-content {
+        max-height: calc(80vh - 30px);
+        padding: 0;
+    }
+
+    .club-popup .club-image-container {
+        max-height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .club-popup .club-image-container {
+        max-height: 120px;
+    }
+
+    .club-popup .popup-title {
+        font-size: 1rem;
+    }
+
+    .club-popup .place-info p {
+        font-size: 0.9rem;
+    }
+}
+
 /* Leaflet Routing Machine přizpůsobení */
 .leaflet-routing-container {
     display: none !important; /* Skrytí postraního panelu s instrukcemi */
