@@ -55,8 +55,9 @@ header h1 {
 
 main {
     display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 20px;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
 }
 
 .map-container {
@@ -86,9 +87,10 @@ main {
 }
 
 #map {
-    height: 400px;
-    border-radius: 5px;
+    height: 600px;
+    border-radius: 8px;
     width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .map-control-btn {
@@ -231,7 +233,7 @@ body[data-theme="dark"] .btn:hover {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: 400px;
+    max-height: 500px;
     transition: background-color 0.3s;
 }
 

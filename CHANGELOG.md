@@ -11,6 +11,12 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Optimalizace obsahu popup okna pro lepší čitelnost
 - Přidán event listener pro udržení popup okna viditelného při změně zoomu
 - Responzivní design pro mobilní zařízení (280px šířka)
+- Implementována funkce pro navigaci na body pomocí příkazů v chatu
+- Vylepšeno zobrazení kamery při navigaci na body (offset pro lepší viditelnost popup oken)
+- Zvětšena mapa na výšku 600px pro více prostoru
+- Upraven poměr sloupců pro čtvercovější tvar mapy
+- Přidán příkaz "seznam bodů" nebo "ukaž body" pro zobrazení všech bodů a jejich příkazů
+- Vylepšena funkce pro vymazání mapy, aby resetovala také pole markerProperties
 
 ## [0.0.1] - 2025-04-18
 

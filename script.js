@@ -560,6 +560,19 @@ function processUserInput(input) {
     // Jednoduchá simulace AI odpovědí
     const lowercaseInput = input.toLowerCase();
 
+    // Kontrola příkazu "alexa"
+    if (lowercaseInput === 'alexa') {
+        return showRohatecClub();
+    }
+
+    // Kontrola příkazů pro body
+    for (let i = 0; i < markerProperties.length; i++) {
+        if (markerProperties[i] && lowercaseInput === markerProperties[i].command.toLowerCase()) {
+            return navigateToMarker(i);
+        }
+    }
+
+    // Kontrola obecných příkazů
     if (lowercaseInput.includes('ahoj') || lowercaseInput.includes('čau') || lowercaseInput.includes('dobrý den')) {
         return 'Dobrý den! Jak vám mohu pomoci s plánováním vašich aktivit?';
     } else if (lowercaseInput.includes('trasa') || lowercaseInput.includes('cesta')) {
@@ -575,8 +588,19 @@ function processUserInput(input) {
             map.removeLayer(route);
         }
         markers = [];
+        markerProperties = [];
         route = null;
         return 'Mapa byla vyčištěna.';
+    } else if (lowercaseInput.includes('seznam bodů') || lowercaseInput.includes('ukaž body')) {
+        if (markers.length === 0) {
+            return 'Na mapě nejsou žádné body.';
+        }
+
+        let response = 'Seznam bodů na mapě:\n';
+        markerProperties.forEach((prop, index) => {
+            response += `${index + 1}. ${prop.name} - příkaz: "${prop.command}"\n`;
+        });
+        return response;
     } else {
         return 'Omlouvám se, nerozumím vašemu požadavku. Můžete se zeptat na přidání aktivit, výpočet trasy nebo tisk mapy.';
     }
@@ -793,12 +817,33 @@ function navigateToMarker(index) {
     if (index < markers.length) {
         const marker = markers[index];
         const markerName = markerProperties[index]?.name || `Bod ${index + 1}`;
+        const markerLocation = marker.getLatLng();
 
-        // Otevření popup okna
-        marker.openPopup();
+        // Přiblížení mapy na bod s offsetem, aby popup nebyl přímo ve středu
+        const offsetPoint = map.project(markerLocation).add([100, 0]);  // Offset doprava
+        const offsetLatLng = map.unproject(offsetPoint);
 
-        // Přiblížení mapy na bod
-        map.setView(marker.getLatLng(), 15); // Zoom level 15 je dobrý pro detailní pohled
+        map.setView(offsetLatLng, 15, {
+            animate: true,
+            duration: 1
+        });
+
+        // Počkáme na dokončení animace a pak otevřeme popup
+        setTimeout(() => {
+            marker.openPopup();
+
+            // Nastavení časovače pro automatické zavření popup okna po 35 sekundách
+            if (popupTimers[index]) {
+                clearTimeout(popupTimers[index]);
+            }
+
+            popupTimers[index] = setTimeout(() => {
+                if (marker.isPopupOpen()) {
+                    marker.closePopup();
+                }
+                delete popupTimers[index];
+            }, 35000); // 35 sekund
+        }, 500);
 
         return `Navigace na bod "${markerName}".`;
     }
@@ -868,16 +913,28 @@ function showRohatecClub() {
         closeOnClick: false
     });
 
-    // Přiblížení mapy na klub s lepším zarovnáním
-    // Použijeme menší zoom, aby bylo vidět více kontextu
-    map.setView(rohatecLocation, 15, {
+    // Přiblížení mapy na oblast kolem klubu, ne přímo na klub
+    // Použijeme menší zoom a offset, aby popup nebyl přímo ve středu
+    const offsetPoint = map.project(rohatecLocation).add([150, 0]);  // Offset doprava
+    const offsetLatLng = map.unproject(offsetPoint);
+
+    map.setView(offsetLatLng, 14, {
         animate: true,
-        duration: 1
+        duration: 1.2
     });
 
-    // Zajistíme, že popup bude vidět i při změně zoomu
+    // Odstraníme event listener pro zoomend, aby se popup neotevíral automaticky při každém zoomu
+    map.off('zoomend');
+
+    // Přidáme lepší event listener, který zajistí, že popup bude vidět pouze když je potřeba
     map.on('zoomend', function() {
-        if (!map.hasLayer(popup)) {
+        // Pokud je zoom příliš malý nebo velký, upravit pohled
+        const currentZoom = map.getZoom();
+        if (currentZoom < 12) {
+            // Při příliš malém zoomu zavřeme popup
+            map.closePopup(popup);
+        } else if (map.getBounds().contains(rohatecLocation) && !map.hasLayer(popup)) {
+            // Pokud je klub v zobrazené oblasti a popup není otevřený, otevřeme ho
             map.openPopup(popup);
         }
     });
