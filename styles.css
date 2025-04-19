@@ -2978,6 +2978,36 @@ body.fullscreen-mode {
     background-color: #000000 !important;
 }
 
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2000;
+    color: white;
+    font-size: 18px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 .cesium-viewer-bottom,
 .cesium-viewer-timelineContainer,
 .cesium-viewer-animationContainer,
@@ -3029,6 +3059,10 @@ body.fullscreen-mode {
     display: block !important;
     z-index: 1000 !important;
     visibility: visible !important;
+}
+
+.map-globe-mode .loading-overlay {
+    display: flex !important;
 }
 
 .map-globe-mode .leaflet-container {

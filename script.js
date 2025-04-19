@@ -1568,6 +1568,12 @@ function toggleGlobeMode() {
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
 
+        // Zobrazit loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'flex';
+        }
+
         // Uložení aktuálního středu mapy
         const center = map.getCenter();
         console.log('Střed mapy:', center);
@@ -1580,8 +1586,8 @@ function toggleGlobeMode() {
                 throw new Error('Knihovna Cesium není dostupná. Zkontrolujte připojení k internetu.');
             }
 
-            // Nastavení přístupového tokenu pro Cesium ion - použijeme veřejný token
-            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0YjNhYzRkYS1hNDJlLTRjZDUtYmY5Ni1jZmU4ZGJmNzY2ZDMiLCJpZCI6MTc5NDk5LCJpYXQiOjE2OTg2MDI5ODl9.WgFtOXkfzVPp8S1UZ_-Xc_-3BzR2k1s2LQY3aNdpNdw';
+            // Nastavení přístupového tokenu pro Cesium ion
+            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc3MzMsImlhdCI6MTYyMjg0MTU3Mn0.XcKpgANiY22ZtIiqSWFmj2XlPQd5HGDA-9N2FAB_5_4';
             console.log('Cesium token nastaven');
 
             // Odstranění předchozího Cesium Vieweru, pokud existuje
@@ -1616,7 +1622,7 @@ function toggleGlobeMode() {
             cesiumContainer.style.backgroundColor = '#000';
             console.log('Styly Cesium kontejneru byly nastaveny');
 
-            // Vytvoření nového Cesium Vieweru s jednodušší konfigurací
+            // Vytvoření nového Cesium Vieweru
             console.log('Vytvářím nový Cesium Viewer...');
             cesiumViewer = new Cesium.Viewer('cesiumContainer', {
                 animation: false,
@@ -1630,27 +1636,43 @@ function toggleGlobeMode() {
                 timeline: false,
                 navigationHelpButton: false,
                 navigationInstructionsInitiallyVisible: false,
-                // Použijeme OpenStreetMap jako základní mapovou vrstvu
-                imageryProvider: new Cesium.OpenStreetMapImageryProvider({
-                    url: 'https://a.tile.openstreetmap.org/'
+                // Použijeme Bing Maps jako základní mapovou vrstvu
+                imageryProvider: new Cesium.BingMapsImageryProvider({
+                    url: 'https://dev.virtualearth.net',
+                    key: 'AhbIRlUQ5NzgKaTXxE6Zf4_ReceZbw7TPkxVoF_C_rPmDU6bPBRQ1SxkQQFW0PO9',
+                    mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
                 }),
-                // Vypnutí terénu pro lepší výkon
-                terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+                // Použijeme terén pro lepší vzhled
+                terrainProvider: Cesium.createWorldTerrain({
+                    requestWaterMask: true,
+                    requestVertexNormals: true
+                }),
                 // Nastavení pro lepší výkon
                 requestRenderMode: false,
-                maximumRenderTimeChange: Infinity
+                maximumRenderTimeChange: Infinity,
+                // Nastavení pro lepší vzhled
+                skyBox: new Cesium.SkyBox({
+                    sources: {
+                        positiveX: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_px.jpg',
+                        negativeX: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_mx.jpg',
+                        positiveY: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_py.jpg',
+                        negativeY: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_my.jpg',
+                        positiveZ: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_pz.jpg',
+                        negativeZ: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_mz.jpg'
+                    }
+                })
             });
 
             console.log('Cesium Viewer byl úspěšně vytvořen');
 
             // Nastavení scény
-            cesiumViewer.scene.skyBox.show = false;
-            cesiumViewer.scene.sun.show = false;
-            cesiumViewer.scene.moon.show = false;
-            cesiumViewer.scene.skyAtmosphere.show = true;
             cesiumViewer.scene.globe.enableLighting = true;
+            cesiumViewer.scene.skyAtmosphere.show = true;
             cesiumViewer.scene.fog.enabled = false;
-            cesiumViewer.scene.globe.depthTestAgainstTerrain = false;
+            cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
+            cesiumViewer.scene.globe.maximumScreenSpaceError = 2.0; // Lepší kvalita zobrazení
+            cesiumViewer.scene.sun.show = true;
+            cesiumViewer.scene.moon.show = true;
             console.log('Scéna byla nastavena');
 
             // Odstranění výchozího loga Cesium
@@ -1667,15 +1689,116 @@ function toggleGlobeMode() {
                     pitch: -0.5,
                     roll: 0.0
                 },
-                duration: 0,
+                duration: 2.0,
                 complete: function() {
                     console.log('Kamera byla nastavena');
+                    // Skrytí loading overlay po dokončení animace
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'none';
+                    }
                     // Vynucení překreslení scény
                     cesiumViewer.scene.requestRender();
                 }
             });
 
             console.log('Výchozí pohled byl nastaven');
+
+            // Přidání ovládacích prvků pro rotaci glóbusu
+            const viewerContainer = cesiumViewer.container;
+            const rotationControls = document.createElement('div');
+            rotationControls.className = 'cesium-rotation-controls';
+            rotationControls.innerHTML = `
+                <button class="cesium-button" id="rotateLeft" title="Rotovat doleva">←</button>
+                <button class="cesium-button" id="rotateUp" title="Rotovat nahoru">↑</button>
+                <button class="cesium-button" id="rotateDown" title="Rotovat dolů">↓</button>
+                <button class="cesium-button" id="rotateRight" title="Rotovat doprava">→</button>
+                <button class="cesium-button" id="zoomIn" title="Přiblížit">+</button>
+                <button class="cesium-button" id="zoomOut" title="Oddálit">-</button>
+            `;
+            viewerContainer.appendChild(rotationControls);
+
+            // Přidání event listenerů pro ovládací prvky
+            document.getElementById('rotateLeft').addEventListener('click', function() {
+                rotateGlobe(-0.1, 0);
+            });
+            document.getElementById('rotateRight').addEventListener('click', function() {
+                rotateGlobe(0.1, 0);
+            });
+            document.getElementById('rotateUp').addEventListener('click', function() {
+                rotateGlobe(0, -0.1);
+            });
+            document.getElementById('rotateDown').addEventListener('click', function() {
+                rotateGlobe(0, 0.1);
+            });
+            document.getElementById('zoomIn').addEventListener('click', function() {
+                zoomGlobe(0.5);
+            });
+            document.getElementById('zoomOut').addEventListener('click', function() {
+                zoomGlobe(2.0);
+            });
+
+            // Přidání CSS stylů pro ovládací prvky
+            const style = document.createElement('style');
+            style.textContent = `
+                .cesium-rotation-controls {
+                    position: absolute;
+                    bottom: 30px;
+                    right: 30px;
+                    background-color: rgba(0, 0, 0, 0.7);
+                    padding: 10px;
+                    border-radius: 5px;
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    grid-gap: 5px;
+                    z-index: 1000;
+                }
+                .cesium-button {
+                    width: 40px;
+                    height: 40px;
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border: none;
+                    color: white;
+                    font-size: 20px;
+                    cursor: pointer;
+                    border-radius: 3px;
+                }
+                .cesium-button:hover {
+                    background-color: rgba(255, 255, 255, 0.4);
+                }
+                #rotateUp {
+                    grid-column: 2;
+                    grid-row: 1;
+                }
+                #rotateLeft {
+                    grid-column: 1;
+                    grid-row: 2;
+                }
+                #rotateDown {
+                    grid-column: 2;
+                    grid-row: 3;
+                }
+                #rotateRight {
+                    grid-column: 3;
+                    grid-row: 2;
+                }
+                #zoomIn {
+                    grid-column: 3;
+                    grid-row: 1;
+                }
+                #zoomOut {
+                    grid-column: 3;
+                    grid-row: 3;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Přidání markerů na glóbus
+            setTimeout(() => {
+                addMarkersToGlobe();
+                addRoutesToGlobe();
+            }, 1000);
+
         } catch (error) {
             console.error('Chyba při inicializaci Cesium Vieweru:', error);
             addMessage('Nepodařilo se inicializovat 3D glóbus. Zkuste to prosím znovu. Chyba: ' + error.message, true);
@@ -1684,6 +1807,12 @@ function toggleGlobeMode() {
                 toggleGlobeBtn.classList.remove('active');
             }
             document.getElementById('map').classList.remove('map-globe-mode');
+
+            // Skrytí loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
 
             // Skrytí Cesium kontejneru v případě chyby
             const cesiumContainer = document.getElementById('cesiumContainer');
@@ -2024,11 +2153,62 @@ function addGlobeControls() {
     document.getElementById('map').appendChild(controlsContainer);
 }
 
+// Funkce pro rotaci glóbusu
+function rotateGlobe(headingChange, pitchChange) {
+    if (!cesiumViewer) return;
+
+    const camera = cesiumViewer.camera;
+    const heading = camera.heading + headingChange;
+    const pitch = camera.pitch + pitchChange;
+
+    camera.setView({
+        orientation: {
+            heading: heading,
+            pitch: pitch,
+            roll: camera.roll
+        }
+    });
+}
+
+// Funkce pro zoom glóbusu
+function zoomGlobe(factor) {
+    if (!cesiumViewer) return;
+
+    const camera = cesiumViewer.camera;
+    const cameraPosition = camera.position;
+    const cameraDirection = camera.direction;
+
+    // Výpočet nové pozice kamery
+    const newPosition = Cesium.Cartesian3.multiplyByScalar(
+        cameraDirection,
+        -factor * 1000000,
+        new Cesium.Cartesian3()
+    );
+    Cesium.Cartesian3.add(cameraPosition, newPosition, newPosition);
+
+    camera.flyTo({
+        destination: newPosition,
+        orientation: {
+            heading: camera.heading,
+            pitch: camera.pitch,
+            roll: camera.roll
+        },
+        duration: 1.0
+    });
+}
+
 // Funkce pro odstranění ovládacích prvků pro glóbus
 function removeGlobeControls() {
+    // Odstranění ovládacích prvků pro glóbus, pokud existují
     const controlsContainer = document.getElementById('mapGlobeControls');
     if (controlsContainer) {
         controlsContainer.remove();
+    }
+
+    // Odstranění rotace ovládacích prvků
+    const rotationControls = document.querySelector('.cesium-rotation-controls');
+    if (rotationControls) {
+        rotationControls.remove();
     }
 }
 

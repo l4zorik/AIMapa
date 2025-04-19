@@ -12,9 +12,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <!-- OSM Buildings CSS -->
     <link rel="stylesheet" href="https://cdn.osmbuildings.org/4.1.1/OSMBuildings.css">
-    <!-- Cesium CSS a JS - použijeme CDN pro lepší dostupnost -->
-    <link href="https://cdn.jsdelivr.net/npm/cesium@1.111.0/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/cesium@1.111.0/Build/Cesium/Cesium.js"></script>
+    <!-- Cesium CSS a JS - použijeme nejnovější verzi z CDN -->
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
+
+    <!-- Přidáme také jQuery pro lepší manipulaci s DOM -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -36,6 +39,10 @@
                 <div class="map-wrapper">
                     <div id="map"></div>
                     <div id="cesiumContainer" class="cesium-container"></div>
+                    <div id="loadingOverlay" class="loading-overlay">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Načítání 3D glóbusu...</div>
+                    </div>
                     <button id="fullscreenButton" class="map-control-btn" title="Fullscreen režim">
                         <i class="icon">⛶</i>
                     </button>
