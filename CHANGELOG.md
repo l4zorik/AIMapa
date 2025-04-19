@@ -25,6 +25,41 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.2.4] - 2025-04-18
+
+### Opraveno
+- Opraven závažný problém s nefunkční mapou po předchozích úpravách
+- Návrat k funkční verzi 0.2.2 bez externího cesium-handler.js modulu
+- Zachována funkčnost 3D glóbus režimu v původní implementaci
+- Vylepšeno ošetření chyb při inicializaci a používání Cesium
+- Optimalizována funkce `toggleGlobeMode` pro spolehlivější přepínání režimů
+- Implementováno automatické zobrazení/skrytí Cesium containeru při přepínání režimů
+- Vylepšena kontrola stavu Cesium Vieweru před jeho použitím
+- Optimalizována práce s DOM elementy pro lepší výkon a stabilitu
+
+## [0.2.3] - 2025-04-18
+
+### Přepracováno
+- Kompletní přepracování 3D glóbus režimu s interaktivními ovládacími prvky
+- Přidání loading overlay pro lepší uživatelský zážitek při načítání glóbusu
+- Implementace interaktivních ovládacích prvků pro rotaci a zoom glóbusu
+- Použití Bing Maps s lepší kvalitou zobrazení
+- Přidání terénu pro realističtější vzhled planety
+- Přidání hvězdné oblohy a atmosféry pro lepší vizuální dojem
+- Optimalizace CSS stylů pro správné zobrazení všech komponent
+- Implementace funkcí pro rotaci a zoom glóbusu
+
+## [0.2.2] - 2025-04-18
+
+### Přepracováno
+- Kompletní přepracování inicializace glóbus režimu pro správné zobrazení planety
+- Použití CDN pro lepší dostupnost Cesium.js knihovny
+- Vylepšené ošetření chyb při inicializaci Cesium Vieweru
+- Přidání testovacího markeru pro ověření funkčnosti glóbusu
+- Použití jednodušších bodů místo billboardů pro lepší výkon
+- Optimalizace CSS stylů pro správné zobrazení glóbusu
+- Vynucení překreslení scény po dokončení animace
+
 ## [0.2.1] - 2025-04-18
 
 ### Opraveno
