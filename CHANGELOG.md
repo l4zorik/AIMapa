@@ -56,6 +56,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Příkazy v chatu nyní fungují i po smazání bodů
 - Možnost obnovení smazaných bodů při navigaci na jejich původní pozici
 - Dva režimy zobrazení popup oken bodů: režim úprav a režim prohlížení
+- Viditelný odpočet 35 sekund v popup oknech s automatickým zavřením po vypršení času
 
 ### Vylepšeno
 - Po uložení bodu se popup okno přepne do prohlížecího režimu místo zavření
@@ -63,6 +64,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidáno tlačítko "Upravit" pro přepnutí zpět do režimu úprav
 - Zobrazení názvu bodu v hlavičce popup okna místo generického "Bod X"
 - Vylepšený design popup oken pro lepší uživatelský zážitek
+- Vylepšený odpočet v popup oknech s animací a barevným zvýrazněním při nízkém čase
 
 ## [0.0.5] - 2025-04-18
 
