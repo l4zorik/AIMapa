@@ -25,6 +25,21 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.1.0] - 2025-04-18
+
+### Přidáno
+- Implementováno omezení zoomu mapy pro zabránění příliš velkému oddálení
+- Nastavení minimální úrovně zoomu (minZoom: 2) pro zabránění zobrazení prázdných oblastí
+- Nastavení maximální úrovně zoomu (maxZoom: 18) pro optimalizaci zobrazení
+- Implementováno omezení pohybu mapy (maxBounds) na celý svět
+- Nastavení maxBoundsViscosity na 1.0 pro zabránění posunu mimo hranice mapy
+- Optimalizace zobrazení dlaždic s parametrem noWrap pro zabránění opakování mapy horizontálně
+
+### Vylepšeno
+- Zlepšená vizualizace mapy při různých úrovních zoomu
+- Odstranění prázdných pruhů na okrajích mapy při maximálním oddálení
+- Konzistentní zobrazení mapy při všech úrovních zoomu
+
 ## [0.0.9] - 2025-04-18
 
 ### Přidáno
@@ -39,24 +54,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přepínač pro zapnutí/vypnutí animací a efektů bodů
 - Ukládání a načítání nastavení bodů při spuštění aplikace
 
-### Vylepšeno
-- Interaktivita bodů s pokročilými animacemi při kliknutí:
-  - Záblesk (flash) při kliknutí pro okamžitou zpětnou vazbu
-  - Rotace a zvětšení s plynulým přechodem
-  - Zlatý okraj pro zvýraznění aktivního bodu
-  - Pulzující záře pro zvýraznění vybraného bodu
-- Interaktivita bodů při přesunutí:
-  - Efekt vznesení (levitace) při přesunutí bodu
-  - Dynamický stín pod přesouvaným bodem
-  - Plynulé přechody mezi stavy s jemným odskočením
-  - Postupný návrat do původního stavu po dokončení přesunutí
-- Barevné rozlišení bodů s pokročilými gradienty a stíny
-- Zobrazení čísel bodů s lepším kontrastem a čitelností
-- Optimalizace animací pro plynulý chod i při větším počtu bodů
-- Průhledné pozadí s efektem rozmazání pro modální okno nastavení
-- Vylepšené styly pro hlavičku, tlačítka a další prvky v nastavení
-- Animace a přechodové efekty pro lepší uživatelský zážitek v nastavení
-- Speciální animace pro každý typ bodu (rotace hvězdy, vznášení diamantu, atd.)
+### Odstraněno
+- Odstraněna nefunkční sekce "Design aplikace" z nastavení
 
 ## [0.0.8] - 2025-04-18
 
@@ -65,143 +64,6 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 ### Změněno
 - Změněn název aplikace z "AI Map - Časový Manažer" na "AI Map - Into the known"
-
-# Vize a plán vývoje AIMapa - Nejlepší AI Mapový Systém na světě
-
-## Hlavní cíle
-- Vytvořit nejintuitivnější a nejpokročilejší AI mapový systém na světě
-- Integrovat nejmodernější technologie umělé inteligence pro prediktivní navigaci
-- Nabídnout bezkonkurenční uživatelský zážitek s důrazem na jednoduchost a efektivitu
-- Vyvinout systém, který se adaptuje na potřeby uživatele a učí se z jeho chování
-
-## Plán vývoje
-
-### Krátkodobé cíle (0-6 měsíců)
-- Dokončit základní funkce mapového rozhraní s intuitivním ovládáním
-- Vylepšit design všech komponent pro profesionální vzhled
-- Implementovat pokročilé chatovací rozhraní s podporou přirozené komunikace
-- Optimalizovat výkon aplikace pro všechna zařízení
-- Rozšířit databázi bodů zájmu s detailními informacemi
-
-### Střednědobé cíle (6-12 měsíců)
-- Implementovat pokročilé AI algoritmy pro predikci tras a dopravních situací
-- Vyvinout systém pro automatické rozpoznávání a kategorizaci bodů zájmu
-- Integrovat hlasové ovládání s podporou českého jazyka
-- Vytvořit systém pro personalizované doporučení míst na základě preferencí uživatele
-- Implementovat rozšířenou realitu pro vizualizaci navigačních pokynů
-
-### Dlouhodobé cíle (1-3 roky)
-- Vyvinout komplexní ekosystém propojený s dalšími službami (rezervace, recenze, sociální sítě)
-- Implementovat autonomní plánování tras s ohledem na počasí, dopravní situaci a preference uživatele
-- Vytvořit komunitní platformu pro sdílení bodů zájmu a tras
-- Rozšířit podporu pro další jazyky a regiony
-- Implementovat pokročilé 3D vizualizace terénu a budov
-
-## Podrobný plán vývoje (Roadmap)
-
-### Verze 0.1.0 (Květen 2025)
-#### Mapové funkce
-- Implementace pokročilého vyhledávání míst s automatickým doplňováním
-- Přidání možnosti importu a exportu bodů ve formátech GPX, KML a GeoJSON
-- Implementace měření vzdáleností a ploch pomocí nástroje pro kreslení
-- Přidání vrstev pro zobrazení počasí, dopravních informací a turistických tras
-- Optimalizace výpočtu tras pro různé typy dopravy (auto, kolo, pěšky)
-
-#### Uživatelské rozhraní
-- Kompletní redesign hlavního menu s intuitivními ikonami
-- Implementace postranního panelu pro rychlý přístup k oblíbeným místům
-- Vylepšení responzivity pro mobilní zařízení a tablety
-- Přidání možnosti přizpůsobení uživatelského rozhraní (barvy, velikost písma, rozložení)
-- Implementace animací pro plynulejší přechody mezi obrazovkami
-
-#### Chatovací rozhraní
-- Rozšíření sady příkazů pro interakci s mapou
-- Implementace kontextového rozpoznávání dotazů v přirozeném jazyce
-- Přidání historie konverzací s možností návratu k předchozím dotazům
-- Implementace nápovědy pro dostupné příkazy a funkce
-- Vylepšení algoritmu pro rozpoznávání záměru uživatele
-
-### Verze 0.2.0 (Srpen 2025)
-#### Pokročilé funkce pro práci s body
-- Implementace kategorizace bodů s možností filtrování
-- Přidání možnosti přidávat fotografie k bodům
-- Implementace hodnocení a recenzí pro body zájmu
-- Vytvoření systému pro sdílení bodů mezi uživateli
-- Implementace časových štítků pro sledování změn v čase
-
-#### Navigace a trasy
-- Vylepšení algoritmu pro výpočet optimální trasy
-- Implementace alternativních tras s možností porovnání
-- Přidání hlasové navigace s pokyny v českém jazyce
-- Implementace režimu navigace pro různé typy aktivit (turistika, cyklistika, běh)
-- Přidání informací o převýšení a náročnosti trasy
-
-#### Integrace dat
-- Propojení s veřejnými databázemi bodů zájmu
-- Implementace API pro získávání aktuálních informací o počasí
-- Integrace s kalendářem pro plánování cest
-- Přidání informací o veřejné dopravě v reálném čase
-- Implementace geolokačních služeb pro přesnější určení polohy
-
-### Verze 0.3.0 (Listopad 2025)
-#### AI asistent
-- Implementace pokročilého AI asistenta pro navigaci
-- Vytvoření systému pro predikci cílů na základě historie uživatele
-- Implementace personalizovaných doporučení míst
-- Přidání kontextového rozpoznávání situace (např. dopravní zácpa, špatné počasí)
-- Vytvoření systému pro automatické plánování výletů
-
-#### Offline režim
-- Implementace stahování map pro použití offline
-- Optimalizace ukládání dat pro minimalizaci využití paměti
-- Implementace synchronizace dat po opětovném připojení k internetu
-- Přidání offline navigace s omezenými funkcemi
-- Vytvoření systému pro prioritizaci dat při stahování
-
-#### Rozšířená realita (AR)
-- Implementace základních funkcí AR pro vizualizaci bodů zájmu
-- Přidání AR navigace s šipkami v reálném prostředí
-- Implementace rozpoznávání objektů pomocí kamery
-- Vytvoření systému pro zobrazení informací o budovách a památkách
-- Optimalizace AR pro různé světelné podmínky
-
-### Verze 1.0.0 (Březen 2026)
-#### Komunitní funkce
-- Implementace uživatelských profilů a přátelství
-- Vytvoření systému pro sdílení tras a bodů zájmu
-- Implementace hodnocení a recenzí míst od komunity
-- Přidání možnosti vytvářet veřejné a soukromé skupiny
-- Implementace systému pro organizaci skupinových výletů
-
-#### Pokročilá analýza dat
-- Implementace statistik o pohybu a aktivitách uživatele
-- Vytvoření systému pro analýzu populárních tras a míst
-- Implementace prediktivních modelů pro dopravní situace
-- Přidání nástrojů pro analýzu výkonů při sportovních aktivitách
-- Vytvoření systému pro optimalizaci tras na základě historických dat
-
-#### Ekosystém služeb
-- Implementace rezervačního systému pro restaurace, hotely a atrakce
-- Integrace s platebními systémy pro nákup vstupenek a služeb
-- Vytvoření API pro vývojáře třetích stran
-- Implementace pluginů pro rozšíření funkcionality
-- Vytvoření systému pro synchronizaci dat mezi různými zařízeními
-
-## Technologické inovace
-- Využití pokročilé umělé inteligence k usnadnění navigace člověka na planetě
-- Vytvoření inovativního uživatelského prostředí plného AI nástrojů
-- Integrace mapového AI systému pro intuitivní a efektivní navigaci
-- Implementace pokročilých algoritmů pro predikci a optimalizaci tras
-- Využití strojového učení pro adaptaci systému na potřeby uživatele
-- Vývoj AI asistentů pro různé typy navigace (městská, přírodní, turistická)
-- Implementace pokročilé analýzy geografických dat v reálném čase
-
-## Uživatelský zážitek
-- Intuitivní a přehledné rozhraní přizpůsobené všem věkovým kategoriím
-- Plynulé přechody mezi různými funkcemi aplikace
-- Minimalistický design s důrazem na funkčnost
-- Adaptivní rozhraní, které se přizpůsobuje potřebám uživatele
-- Bezproblémová integrace s dalšími aplikacemi a službami
 
 ## [0.0.7] - 2025-04-18
 
@@ -320,3 +182,159 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - První funkční verze aplikace
 - Základní funkcionalita pro práci s mapou a body
 - Implementace speciálních funkcí pro noční klub v Rohatci
+
+### Vylepšeno
+- Interaktivita bodů s pokročilými animacemi při kliknutí:
+  - Záblesk (flash) při kliknutí pro okamžitou zpětnou vazbu
+  - Rotace a zvětšení s plynulým přechodem
+  - Zlatý okraj pro zvýraznění aktivního bodu
+  - Pulzující záře pro zvýraznění vybraného bodu
+- Interaktivita bodů při přesunutí:
+  - Efekt vznesení (levitace) při přesunutí bodu
+  - Dynamický stín pod přesouvaným bodem
+  - Plynulé přechody mezi stavy s jemným odskočením
+  - Postupný návrat do původního stavu po dokončení přesunutí
+- Barevné rozlišení bodů s pokročilými gradienty a stíny
+- Zobrazení čísel bodů s lepším kontrastem a čitelností
+- Optimalizace animací pro plynulý chod i při větším počtu bodů
+- Průhledné pozadí s efektem rozmazání pro modální okno nastavení
+- Vylepšené styly pro hlavičku, tlačítka a další prvky v nastavení
+- Animace a přechodové efekty pro lepší uživatelský zážitek v nastavení
+- Speciální animace pro každý typ bodu (rotace hvězdy, vznášení diamantu, atd.)
+
+# Vize a plán vývoje AIMapa - Nejlepší AI Mapový Systém na světě
+
+## Hlavní cíle
+- Vytvořit nejintuitivnější a nejpokročilejší AI mapový systém na světě
+- Integrovat nejmodernější technologie umělé inteligence pro prediktivní navigaci
+- Nabídnout bezkonkurenční uživatelský zážitek s důrazem na jednoduchost a efektivitu
+- Vyvinout systém, který se adaptuje na potřeby uživatele a učí se z jeho chování
+
+## Plán vývoje
+
+### Krátkodobé cíle (0-6 měsíců)
+- Dokončit základní funkce mapového rozhraní s intuitivním ovládáním
+- Vylepšit design všech komponent pro profesionální vzhled
+- Implementovat pokročilé chatovací rozhraní s podporou přirozené komunikace
+- Optimalizovat výkon aplikace pro všechna zařízení
+- Rozšířit databázi bodů zájmu s detailními informacemi
+
+### Střednědobé cíle (6-12 měsíců)
+- Implementovat pokročilé AI algoritmy pro predikci tras a dopravních situací
+- Vyvinout systém pro automatické rozpoznávání a kategorizaci bodů zájmu
+- Integrovat hlasové ovládání s podporou českého jazyka
+- Vytvořit systém pro personalizované doporučení míst na základě preferencí uživatele
+- Implementovat rozšířenou realitu pro vizualizaci navigačních pokynů
+
+### Dlouhodobé cíle (1-3 roky)
+- Vyvinout komplexní ekosystém propojený s dalšími službami (rezervace, recenze, sociální sítě)
+- Implementovat autonomní plánování tras s ohledem na počasí, dopravní situaci a preference uživatele
+- Vytvořit komunitní platformu pro sdílení bodů zájmu a tras
+- Rozšířit podporu pro další jazyky a regiony
+- Implementovat pokročilé 3D vizualizace terénu a budov
+
+## Podrobný plán vývoje (Roadmap)
+
+### Verze 0.1.0 (Duben 2025)
+#### Mapové funkce
+- Implementace omezení zoomu mapy pro zabránění příliš velkému oddálení
+- Optimalizace zobrazení mapy při různých úrovních zoomu
+- Odstranění prázdných pruhů na okrajích mapy při maximálním oddálení
+- Nastavení hranic mapy pro konzistentní uživatelský zážitek
+- Optimalizace zobrazení dlaždic s parametrem noWrap
+
+#### Plánované funkce pro verzi 0.2.0 (Květen 2025)
+- Implementace pokročilého vyhledávání míst s automatickým doplňováním
+- Přidání možnosti importu a exportu bodů ve formátech GPX, KML a GeoJSON
+- Implementace měření vzdáleností a ploch pomocí nástroje pro kreslení
+- Přidání vrstev pro zobrazení počasí, dopravních informací a turistických tras
+- Optimalizace výpočtu tras pro různé typy dopravy (auto, kolo, pěšky)
+- Kompletní redesign hlavního menu s intuitivními ikonami
+- Implementace postranního panelu pro rychlý přístup k oblíbeným místům
+- Vylepšení responzivity pro mobilní zařízení a tablety
+- Rozšíření sady příkazů pro interakci s mapou
+- Implementace kontextového rozpoznávání dotazů v přirozeném jazyce
+
+### Verze 0.2.0 (Srpen 2025)
+#### Pokročilé funkce pro práci s body
+- Implementace kategorizace bodů s možností filtrování
+- Přidání možnosti přidávat fotografie k bodům
+- Implementace hodnocení a recenzí pro body zájmu
+- Vytvoření systému pro sdílení bodů mezi uživateli
+- Implementace časových štítků pro sledování změn v čase
+
+#### Navigace a trasy
+- Vylepšení algoritmu pro výpočet optimální trasy
+- Implementace alternativních tras s možností porovnání
+- Přidání hlasové navigace s pokyny v českém jazyce
+- Implementace režimu navigace pro různé typy aktivit (turistika, cyklistika, běh)
+- Přidání informací o převýšení a náročnosti trasy
+
+#### Integrace dat
+- Propojení s veřejnými databázemi bodů zájmu
+- Implementace API pro získávání aktuálních informací o počasí
+- Integrace s kalendářem pro plánování cest
+- Přidání informací o veřejné dopravě v reálném čase
+- Implementace geolokačních služeb pro přesnější určení polohy
+
+### Verze 0.3.0 (Listopad 2025)
+#### AI asistent
+- Implementace pokročilého AI asistenta pro navigaci
+- Vytvoření systému pro predikci cílů na základě historie uživatele
+- Implementace personalizovaných doporučení míst
+- Přidání kontextového rozpoznávání situace (např. dopravní zácpa, špatné počasí)
+- Vytvoření systému pro automatické plánování výletů
+
+#### Offline režim
+- Implementace stahování map pro použití offline
+- Optimalizace ukládání dat pro minimalizaci využití paměti
+- Implementace synchronizace dat po opětovném připojení k internetu
+- Přidání offline navigace s omezenými funkcemi
+- Vytvoření systému pro prioritizaci dat při stahování
+
+#### Rozšířená realita (AR)
+- Implementace základních funkcí AR pro vizualizaci bodů zájmu
+- Přidání AR navigace s šipkami v reálném prostředí
+- Implementace rozpoznávání objektů pomocí kamery
+- Vytvoření systému pro zobrazení informací o budovách a památkách
+- Optimalizace AR pro různé světelné podmínky
+
+### Verze 1.0.0 (Březen 2026)
+#### Komunitní funkce
+- Implementace uživatelských profilů a přátelství
+- Vytvoření systému pro sdílení tras a bodů zájmu
+- Implementace hodnocení a recenzí míst od komunity
+- Přidání možnosti vytvářet veřejné a soukromé skupiny
+- Implementace systému pro organizaci skupinových výletů
+
+#### Pokročilá analýza dat
+- Implementace statistik o pohybu a aktivitách uživatele
+- Vytvoření systému pro analýzu populárních tras a míst
+- Implementace prediktivních modelů pro dopravní situace
+- Přidání nástrojů pro analýzu výkonů při sportovních aktivitách
+- Vytvoření systému pro optimalizaci tras na základě historických dat
+
+#### Ekosystém služeb
+- Implementace rezervačního systému pro restaurace, hotely a atrakce
+- Integrace s platebními systémy pro nákup vstupenek a služeb
+- Vytvoření API pro vývojáře třetích stran
+- Implementace pluginů pro rozšíření funkcionality
+- Vytvoření systému pro synchronizaci dat mezi různými zařízeními
+
+## Technologické inovace
+- Využití pokročilé umělé inteligence k usnadnění navigace člověka na planetě
+- Vytvoření inovativního uživatelského prostředí plného AI nástrojů
+- Integrace mapového AI systému pro intuitivní a efektivní navigaci
+- Implementace pokročilých algoritmů pro predikci a optimalizaci tras
+- Využití strojového učení pro adaptaci systému na potřeby uživatele
+- Vývoj AI asistentů pro různé typy navigace (městská, přírodní, turistická)
+- Implementace pokročilé analýzy geografických dat v reálném čase
+
+## Uživatelský zážitek
+- Intuitivní a přehledné rozhraní přizpůsobené všem věkovým kategoriím
+- Plynulé přechody mezi různými funkcemi aplikace
+- Minimalistický design s důrazem na funkčnost
+- Adaptivní rozhraní, které se přizpůsobuje potřebám uživatele
+- Bezproblémová integrace s dalšími aplikacemi a službami
+
+

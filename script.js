@@ -4,12 +4,20 @@ const map = L.map('map', {
     markerZoomAnimation: true, // Povolit animaci markerů při zoomu
     fadeAnimation: true, // Povolit animaci přechodů
     zoomSnap: 0.5, // Jemnější zoom
-    wheelPxPerZoomLevel: 120 // Jemnější zoom kolečkem myši
+    wheelPxPerZoomLevel: 120, // Jemnější zoom kolečkem myši
+    minZoom: 2, // Minimální úroveň zoomu - zabrání příliš velkému oddálení
+    maxZoom: 18, // Maximální úroveň zoomu
+    maxBounds: [[-90, -180], [90, 180]], // Omezení pohybu mapy na celý svět
+    maxBoundsViscosity: 1.0 // Zajistí, že mapa nebude moci být posunuta mimo hranice
 }).setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
 
 // Přidání OpenStreetMap podkladu
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+    attribution: '© OpenStreetMap contributors',
+    minZoom: 2, // Minimální úroveň zoomu pro dlaždice
+    maxZoom: 18, // Maximální úroveň zoomu pro dlaždice
+    noWrap: true, // Zabrání opakování dlaždic horizontálně
+    bounds: [[-90, -180], [90, 180]] // Omezení dlaždic na celý svět
 }).addTo(map);
 
 // Inicializace ukazatele souřadnic
