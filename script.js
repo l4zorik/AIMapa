@@ -385,15 +385,45 @@ function removeMarker(index, event) {
 // Proměnná pro ukládání časovačů popup oken
 let popupTimers = {};
 
+// Globální nastavení pro markery
+let markerStyle = 'circle'; // Výchozí styl: circle, square, diamond, pin, star
+let markerEffectsEnabled = true; // Výchozí nastavení: efekty povoleny
+
 // Funkce pro vytvoření vlastního HTML markeru s číslem a pokročilými efekty
 function createCustomMarkerIcon(number, colorIndex) {
     // Omezení barevných tříd na 1-5
     const colorClass = `color-${(colorIndex % 5) + 1}`;
 
+    // Získání aktuálního stylu markeru
+    const styleClass = markerStyle || 'circle';
+
+    // Získání třídy pro efekty
+    const effectsClass = markerEffectsEnabled ? 'with-effects' : 'no-effects';
+
+    // Vytvoření HTML pro různé styly markerů
+    let markerHtml = '';
+
+    switch(styleClass) {
+        case 'square':
+            markerHtml = `<div class="custom-marker ${colorClass} ${effectsClass} square-style"><span>${number}</span></div>`;
+            break;
+        case 'diamond':
+            markerHtml = `<div class="custom-marker ${colorClass} ${effectsClass} diamond-style"><span>${number}</span></div>`;
+            break;
+        case 'pin':
+            markerHtml = `<div class="custom-marker ${colorClass} ${effectsClass} pin-style"><span>${number}</span></div>`;
+            break;
+        case 'star':
+            markerHtml = `<div class="custom-marker ${colorClass} ${effectsClass} star-style"><span>${number}</span></div>`;
+            break;
+        default: // circle
+            markerHtml = `<div class="custom-marker ${colorClass} ${effectsClass}"><span>${number}</span></div>`;
+    }
+
     // Vytvoření HTML elementu pro marker s pokročilými efekty
     const icon = L.divIcon({
         className: 'custom-marker-container', // Kontejner pro marker
-        html: `<div class="custom-marker ${colorClass}"><span>${number}</span></div>`,
+        html: markerHtml,
         iconSize: [40, 40],
         iconAnchor: [20, 20]
     });
@@ -1148,7 +1178,9 @@ function saveAppState() {
     const settings = {
         darkMode: document.getElementById('darkModeToggle').checked,
         colorScheme: document.querySelector('.color-option.active').getAttribute('data-color'),
-        design: document.getElementById('designSelect').value
+        design: document.getElementById('designSelect').value,
+        markerStyle: markerStyle,
+        markerEffectsEnabled: markerEffectsEnabled
     };
 
     // Uložení stavu mapy
@@ -1247,6 +1279,31 @@ function loadAppState() {
                 const designSelect = document.getElementById('designSelect');
                 if (designSelect) {
                     designSelect.value = appState.settings.design;
+                }
+            }
+
+            // Nastavení stylu markerů
+            if (appState.settings.markerStyle) {
+                markerStyle = appState.settings.markerStyle;
+
+                // Aktualizace aktivního stylu v UI
+                const markerStyleOptions = document.querySelectorAll('.marker-style-option');
+                markerStyleOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if (option.getAttribute('data-marker-style') === markerStyle) {
+                        option.classList.add('active');
+                    }
+                });
+            }
+
+            // Nastavení efektů markerů
+            if (appState.settings.markerEffectsEnabled !== undefined) {
+                markerEffectsEnabled = appState.settings.markerEffectsEnabled;
+
+                // Aktualizace přepínače v UI
+                const markerEffectsToggle = document.getElementById('markerEffectsToggle');
+                if (markerEffectsToggle) {
+                    markerEffectsToggle.checked = markerEffectsEnabled;
                 }
             }
         }
@@ -1399,6 +1456,70 @@ function setupMarkerEventListeners(marker, markerIndex) {
     });
 }
 
+// Event listenery pro nastavení markerů
+function setupMarkerStyleOptions() {
+    // Získání všech možností stylů markerů
+    const markerStyleOptions = document.querySelectorAll('.marker-style-option');
+
+    // Přidání event listenerů pro každou možnost
+    markerStyleOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Odstranění aktivní třídy ze všech možností
+            markerStyleOptions.forEach(opt => opt.classList.remove('active'));
+
+            // Přidání aktivní třídy na vybranou možnost
+            option.classList.add('active');
+
+            // Získání vybraného stylu
+            const selectedStyle = option.getAttribute('data-marker-style');
+
+            // Aktualizace globálního nastavení
+            markerStyle = selectedStyle;
+
+            // Aktualizace všech existujících markerů
+            updateAllMarkers();
+
+            // Uložení stavu aplikace
+            saveAppState();
+
+            // Informace pro uživatele
+            addMessage(`Styl bodů na mapě byl změněn na "${selectedStyle}".`, false);
+        });
+    });
+
+    // Přidání event listeneru pro přepínač efektů
+    const markerEffectsToggle = document.getElementById('markerEffectsToggle');
+    if (markerEffectsToggle) {
+        markerEffectsToggle.addEventListener('change', () => {
+            // Aktualizace globálního nastavení
+            markerEffectsEnabled = markerEffectsToggle.checked;
+
+            // Aktualizace všech existujících markerů
+            updateAllMarkers();
+
+            // Uložení stavu aplikace
+            saveAppState();
+
+            // Informace pro uživatele
+            const message = markerEffectsEnabled ?
+                'Efekty bodů na mapě byly zapnuty.' :
+                'Efekty bodů na mapě byly vypnuty.';
+            addMessage(message, false);
+        });
+    }
+}
+
+// Funkce pro aktualizaci všech markerů na mapě
+function updateAllMarkers() {
+    markers.forEach((marker, index) => {
+        // Vytvoření nového ikony s aktuálním stylem
+        const newIcon = createCustomMarkerIcon(index + 1, index);
+
+        // Aktualizace ikony markeru
+        marker.setIcon(newIcon);
+    });
+}
+
 // Inicializace chatu
 window.addEventListener('load', () => {
     // Vyčištění předem definovaných zpráv
@@ -1426,6 +1547,9 @@ window.addEventListener('load', () => {
 
     // Event listenery pro modální okno rezervace tanečnice
     setupDancerReservationModal();
+
+    // Nastavení event listenerů pro styly markerů
+    setupMarkerStyleOptions();
 
     // Nastavení automatického ukládání stavu aplikace při změnách
     map.on('moveend', saveAppState); // Ukládání při posunu mapy

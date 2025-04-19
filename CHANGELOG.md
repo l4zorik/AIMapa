@@ -34,7 +34,10 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Efekt záře (glow) kolem bodů s pulzováním pro lepší viditelnost
 - Efekt lesku (shine) uvnitř bodů pro realističtější vzhled
 - Efekt vlny (ripple) kolem bodů pro zvýraznění jejich pozice
-- Speciální efekty pro smazané body s rotujícím kruhem a otázníkem
+- Nová sekce v nastavení pro výběr stylu bodů na mapě
+- 5 různých stylů bodů: kruh, čtverec, diamant, pin a hvězda
+- Přepínač pro zapnutí/vypnutí animací a efektů bodů
+- Ukládání a načítání nastavení bodů při spuštění aplikace
 
 ### Vylepšeno
 - Interaktivita bodů s pokročilými animacemi při kliknutí:
@@ -50,6 +53,10 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Barevné rozlišení bodů s pokročilými gradienty a stíny
 - Zobrazení čísel bodů s lepším kontrastem a čitelností
 - Optimalizace animací pro plynulý chod i při větším počtu bodů
+- Průhledné pozadí s efektem rozmazání pro modální okno nastavení
+- Vylepšené styly pro hlavičku, tlačítka a další prvky v nastavení
+- Animace a přechodové efekty pro lepší uživatelský zážitek v nastavení
+- Speciální animace pro každý typ bodu (rotace hvězdy, vznášení diamantu, atd.)
 
 ## [0.0.8] - 2025-04-18
 
