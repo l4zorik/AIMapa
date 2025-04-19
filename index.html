@@ -12,8 +12,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <!-- OSM Buildings CSS -->
     <link rel="stylesheet" href="https://cdn.osmbuildings.org/4.1.1/OSMBuildings.css">
-    <!-- Cesium CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/cesium@1.128.0/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <!-- Cesium CSS a JS -->
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
 </head>
 <body>
     <div class="container">
@@ -34,7 +35,7 @@
                 <h2>Mapa aktivit</h2>
                 <div class="map-wrapper">
                     <div id="map"></div>
-                <div id="cesiumContainer"></div>
+                    <div id="cesiumContainer" class="cesium-container"></div>
                     <button id="fullscreenButton" class="map-control-btn" title="Fullscreen režim">
                         <i class="icon">⛶</i>
                     </button>
@@ -303,8 +304,7 @@
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <!-- OSM Buildings JS pro 3D budovy -->
     <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
-    <!-- Cesium JS pro 3D glóbus -->
-    <script src="https://cdn.jsdelivr.net/npm/cesium@1.128.0/Build/Cesium/Cesium.js"></script>
+    <!-- Cesium JS je již načten v hlavičce -->
     <script src="script.js"></script>
 </body>
 </html>
