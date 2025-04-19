@@ -145,11 +145,75 @@ body[data-theme="dark"] .coordinates-display {
     height: 100%;
     z-index: 1000;
     background-color: var(--dark-bg);
+    transition: all 0.3s ease-in-out;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
 .map-fullscreen #map {
     height: 100%;
+    width: 100%;
     border-radius: 0;
+    box-shadow: none;
+}
+
+.map-fullscreen .coordinates-display {
+    bottom: 20px;
+    left: 20px;
+    font-size: 14px;
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+}
+
+.map-fullscreen .map-control-btn {
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    transition: all 0.2s ease;
+}
+
+.map-fullscreen .map-control-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.map-fullscreen .map-control-btn .icon {
+    color: white;
+    font-size: 22px;
+}
+
+/* Přidání fullscreen overlay pro lepší přechod */
+.fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.map-fullscreen + .fullscreen-overlay {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .route-info {
@@ -2585,6 +2649,222 @@ body[data-theme="dark"] .saved-marker .info-content strong {
     transform: translateY(-2px);
 }
 
+/* Styly pro fullscreen režim */
+body.fullscreen-mode {
+    overflow: hidden;
+}
+
+/* Zobrazení ovládacích prvků v fullscreen režimu */
+.map-fullscreen .leaflet-control-container .leaflet-top,
+.map-fullscreen .leaflet-control-container .leaflet-bottom {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
+
+.map-fullscreen .leaflet-control-container .leaflet-top {
+    top: 20px;
+}
+
+.map-fullscreen .leaflet-control-container .leaflet-bottom {
+    bottom: 20px;
+}
+
+/* Zobrazení popup oken v fullscreen režimu */
+.map-fullscreen .leaflet-popup-content-wrapper {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.map-fullscreen .leaflet-popup-tip {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Tlačítko pro rychlý návrat z fullscreen režimu */
+.exit-fullscreen-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.exit-fullscreen-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.exit-fullscreen-btn .icon {
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+/* Styly pro plovoucí chat v režimu celé obrazovky */
+.floating-chat-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    max-height: 500px;
+    background-color: rgba(31, 41, 55, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Pozice chatu vlevo/vpravo */
+.floating-chat-container.chat-left {
+    left: 20px;
+    right: auto;
+}
+
+.floating-chat-container.chat-right {
+    right: 20px;
+    left: auto;
+}
+
+/* Hlavička chatu */
+.floating-chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: move;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.chat-title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.chat-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.chat-control-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.chat-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Obsah chatu */
+.floating-chat-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: calc(500px - 48px);
+}
+
+/* Zprávy v chatu */
+.floating-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 350px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Vstupní pole pro chat */
+.floating-chat-input {
+    display: flex;
+    padding: 10px;
+    gap: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.floating-chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.floating-send-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.floating-send-btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+/* Minimalizovaný chat */
+.floating-chat-container.minimized {
+    height: 48px;
+    max-height: 48px;
+}
+
+/* Optimalizace pro mobilní zařízení */
+@media (max-width: 768px) {
+    .exit-fullscreen-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .floating-chat-container {
+        width: 280px;
+        max-height: 400px;
+    }
+
+    .floating-chat-messages {
+        max-height: 250px;
+    }
+}
+
 /* Responzivní úpravy pro různé velikosti obrazovky */
 @media (max-width: 480px) {
     .club-popup {
@@ -2613,6 +2893,21 @@ body[data-theme="dark"] .saved-marker .info-content strong {
     .club-popup .place-info p {
         font-size: 0.85rem;
         margin: 4px 0;
+    }
+
+    /* Optimalizace pro mobilní zařízení v fullscreen režimu */
+    .map-fullscreen .coordinates-display {
+        bottom: 10px;
+        left: 10px;
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .map-fullscreen .map-control-btn {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
     }
 }
 

@@ -907,18 +907,49 @@ document.getElementById('printMap').addEventListener('click', () => {
 // Fullscreen režim pro mapu
 const fullscreenButton = document.getElementById('fullscreenButton');
 const mapWrapper = document.querySelector('.map-wrapper');
+const fullscreenOverlay = document.querySelector('.fullscreen-overlay');
 
-fullscreenButton.addEventListener('click', () => {
+// Funkce pro přepnutí fullscreen režimu
+function toggleFullscreen() {
     isFullscreen = !isFullscreen;
 
     if (isFullscreen) {
         mapWrapper.classList.add('map-fullscreen');
         fullscreenButton.innerHTML = '<i class="icon">⛵</i>'; // Symbol pro exit fullscreen
         document.body.style.overflow = 'hidden'; // Zabrání scrollování stránky
+
+        // Přidání třídy pro lepší zobrazení mapy
+        document.body.classList.add('fullscreen-mode');
+
+        // Přidání tlačítka pro rychlý návrat z fullscreen režimu
+        const exitFullscreenButton = document.createElement('button');
+        exitFullscreenButton.id = 'exitFullscreenButton';
+        exitFullscreenButton.className = 'exit-fullscreen-btn';
+        exitFullscreenButton.innerHTML = 'Zavřít celou obrazovku <i class="icon">⛵</i>';
+        exitFullscreenButton.addEventListener('click', toggleFullscreen);
+        mapWrapper.appendChild(exitFullscreenButton);
+
+        // Přidání plovoucího chatu do fullscreen režimu
+        createFloatingChat();
+
+        // Zobrazení informace o fullscreen režimu
+        addMessage('Mapa je nyní v režimu celé obrazovky. Pro návrat stiskněte klávesu ESC nebo klikněte na tlačítko v pravém horním rohu.', false);
     } else {
         mapWrapper.classList.remove('map-fullscreen');
         fullscreenButton.innerHTML = '<i class="icon">⛶</i>'; // Symbol pro fullscreen
         document.body.style.overflow = ''; // Obnovení scrollování
+
+        // Odstranění třídy pro lepší zobrazení mapy
+        document.body.classList.remove('fullscreen-mode');
+
+        // Odstranění tlačítka pro rychlý návrat z fullscreen režimu
+        const exitFullscreenButton = document.getElementById('exitFullscreenButton');
+        if (exitFullscreenButton) {
+            exitFullscreenButton.remove();
+        }
+
+        // Odstranění plovoucího chatu
+        removeFloatingChat();
     }
 
     // Aktualizace velikosti mapy po změně režimu
@@ -927,8 +958,194 @@ fullscreenButton.addEventListener('click', () => {
         if (route) {
             map.fitBounds(route.getBounds(), {padding: [50, 50]});
         }
-    }, 100);
+    }, 300); // Zvýšení času pro lepší přechod
+}
+
+// Přidání event listeneru pro tlačítko fullscreen
+fullscreenButton.addEventListener('click', toggleFullscreen);
+
+// Přidání event listeneru pro klávesu ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isFullscreen) {
+        toggleFullscreen();
+    }
 });
+
+// Přidání event listeneru pro overlay (kliknutí mimo mapu)
+fullscreenOverlay.addEventListener('click', () => {
+    if (isFullscreen) {
+        toggleFullscreen();
+    }
+});
+
+// Funkce pro vytvoření plovoucího chatu v režimu celé obrazovky
+function createFloatingChat() {
+    // Získání reference na originální chat
+    const originalChatMessages = document.getElementById('chatMessages');
+    const originalChatInput = document.querySelector('.chat-input');
+
+    // Vytvoření kontejneru pro plovoucí chat
+    const floatingChatContainer = document.createElement('div');
+    floatingChatContainer.id = 'floatingChatContainer';
+    floatingChatContainer.className = 'floating-chat-container';
+
+    // Vytvoření hlavičky chatu s možností minimalizace
+    const chatHeader = document.createElement('div');
+    chatHeader.className = 'floating-chat-header';
+    chatHeader.innerHTML = `
+        <div class="chat-title">AI Asistent</div>
+        <div class="chat-controls">
+            <button id="minimizeChat" class="chat-control-btn minimize-btn" title="Minimalizovat chat">−</button>
+            <button id="toggleChatPosition" class="chat-control-btn position-btn" title="Přesunout chat">⇅</button>
+        </div>
+    `;
+
+    // Vytvoření obsahu chatu
+    const chatContent = document.createElement('div');
+    chatContent.className = 'floating-chat-content';
+
+    // Vytvoření kontejneru pro zprávy
+    const chatMessages = document.createElement('div');
+    chatMessages.id = 'floatingChatMessages';
+    chatMessages.className = 'floating-chat-messages';
+
+    // Zkopírování zpráv z originálního chatu
+    chatMessages.innerHTML = originalChatMessages.innerHTML;
+
+    // Vytvoření vstupního pole pro chat
+    const chatInputContainer = document.createElement('div');
+    chatInputContainer.className = 'floating-chat-input';
+    chatInputContainer.innerHTML = `
+        <input type="text" id="floatingMessageInput" placeholder="Napište zprávu...">
+        <button class="floating-send-btn" id="floatingSendMessage">➞</button>
+    `;
+
+    // Přidání všech částí do kontejneru
+    chatContent.appendChild(chatMessages);
+    chatContent.appendChild(chatInputContainer);
+
+    floatingChatContainer.appendChild(chatHeader);
+    floatingChatContainer.appendChild(chatContent);
+
+    // Přidání kontejneru do mapy
+    mapWrapper.appendChild(floatingChatContainer);
+
+    // Přidání event listenerů pro ovládací prvky chatu
+    document.getElementById('minimizeChat').addEventListener('click', toggleChatMinimize);
+    document.getElementById('toggleChatPosition').addEventListener('click', toggleChatPosition);
+    document.getElementById('floatingSendMessage').addEventListener('click', sendFloatingChatMessage);
+    document.getElementById('floatingMessageInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendFloatingChatMessage();
+        }
+    });
+
+    // Přidání možnosti přesouvat chat
+    makeChatDraggable(floatingChatContainer, chatHeader);
+}
+
+// Funkce pro odstranění plovoucího chatu
+function removeFloatingChat() {
+    const floatingChatContainer = document.getElementById('floatingChatContainer');
+    if (floatingChatContainer) {
+        floatingChatContainer.remove();
+    }
+}
+
+// Funkce pro přepnutí minimalizace chatu
+function toggleChatMinimize() {
+    const floatingChatContainer = document.getElementById('floatingChatContainer');
+    const chatContent = floatingChatContainer.querySelector('.floating-chat-content');
+    const minimizeBtn = document.getElementById('minimizeChat');
+
+    if (chatContent.style.display === 'none') {
+        // Maximalzovat chat
+        chatContent.style.display = 'flex';
+        minimizeBtn.textContent = '−'; // Symbol minus
+        floatingChatContainer.classList.remove('minimized');
+    } else {
+        // Minimalizovat chat
+        chatContent.style.display = 'none';
+        minimizeBtn.textContent = '+'; // Symbol plus
+        floatingChatContainer.classList.add('minimized');
+    }
+}
+
+// Funkce pro přepnutí pozice chatu (vlevo/vpravo)
+function toggleChatPosition() {
+    const floatingChatContainer = document.getElementById('floatingChatContainer');
+
+    if (floatingChatContainer.classList.contains('chat-right')) {
+        floatingChatContainer.classList.remove('chat-right');
+        floatingChatContainer.classList.add('chat-left');
+    } else if (floatingChatContainer.classList.contains('chat-left')) {
+        floatingChatContainer.classList.remove('chat-left');
+        floatingChatContainer.classList.add('chat-right');
+    } else {
+        // Výchozí pozice je vpravo
+        floatingChatContainer.classList.add('chat-right');
+    }
+}
+
+// Funkce pro odeslání zprávy z plovoucího chatu
+function sendFloatingChatMessage() {
+    const floatingMessageInput = document.getElementById('floatingMessageInput');
+    const messageText = floatingMessageInput.value.trim();
+
+    if (messageText) {
+        // Použití existující funkce pro zpracování zprávy
+        processMessage(messageText);
+
+        // Aktualizace obsahu plovoucího chatu
+        const originalChatMessages = document.getElementById('chatMessages');
+        const floatingChatMessages = document.getElementById('floatingChatMessages');
+        floatingChatMessages.innerHTML = originalChatMessages.innerHTML;
+
+        // Scrollování na konec chatu
+        floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+
+        // Vyčištění vstupního pole
+        floatingMessageInput.value = '';
+    }
+}
+
+// Funkce pro přidání možnosti přesouvat chat
+function makeChatDraggable(element, handle) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+    handle.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e.preventDefault();
+        // Získání pozice kurzoru při spuštění
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // Volat funkci při pohybu myši
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e.preventDefault();
+        // Výpočet nové pozice
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // Nastavení nové pozice elementu
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+
+        // Odstranění tříd pro pozici, pokud jsou přítomny
+        element.classList.remove('chat-left', 'chat-right');
+    }
+
+    function closeDragElement() {
+        // Zastavení pohybu při uvolnění tlačítka myši
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
 
 // Funkce pro AI chat
 const chatMessages = document.getElementById('chatMessages');
@@ -941,6 +1158,18 @@ function addMessage(message, isUser = false) {
     messageDiv.textContent = message;
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Aktualizace plovoucího chatu, pokud existuje
+    updateFloatingChat();
+}
+
+// Funkce pro aktualizaci obsahu plovoucího chatu
+function updateFloatingChat() {
+    const floatingChatMessages = document.getElementById('floatingChatMessages');
+    if (floatingChatMessages && isFullscreen) {
+        floatingChatMessages.innerHTML = chatMessages.innerHTML;
+        floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+    }
 }
 
 // Funkce pro zpracování uživatelského vstupu

@@ -34,11 +34,18 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementováno omezení pohybu mapy (maxBounds) na celý svět
 - Nastavení maxBoundsViscosity na 1.0 pro zabránění posunu mimo hranice mapy
 - Optimalizace zobrazení dlaždic s parametrem noWrap pro zabránění opakování mapy horizontálně
+- Přidán plovoucí chat do fullscreen režimu s možností minimalizace a přesunutí
+- Přidáno tlačítko pro rychlý návrat z fullscreen režimu
+- Přidána klávesová zkratka ESC pro opuštění fullscreen režimu
+- Implementována synchronizace zpráv mezi hlavním a plovoucím chatem
 
 ### Vylepšeno
 - Zlepšená vizualizace mapy při různých úrovních zoomu
 - Odstranění prázdných pruhů na okrajích mapy při maximálním oddálení
 - Konzistentní zobrazení mapy při všech úrovních zoomu
+- Vylepšený fullscreen režim s plynulými přechody a lepším uživatelským zážitkem
+- Optimalizace ovládacích prvků v režimu celé obrazovky
+- Vylepšené zobrazení popup oken v režimu celé obrazovky
 
 ## [0.0.9] - 2025-04-18
 
@@ -242,6 +249,14 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Odstranění prázdných pruhů na okrajích mapy při maximálním oddálení
 - Nastavení hranic mapy pro konzistentní uživatelský zážitek
 - Optimalizace zobrazení dlaždic s parametrem noWrap
+
+#### Fullscreen režim
+- Vylepšený fullscreen režim s plynulými přechody
+- Přidán plovoucí chat do fullscreen režimu
+- Možnost minimalizace a přesunutí chatu v režimu celé obrazovky
+- Tlačítko pro rychlý návrat z fullscreen režimu
+- Klávesová zkratka ESC pro opuštění fullscreen režimu
+- Optimalizace ovládacích prvků v režimu celé obrazovky
 
 #### Plánované funkce pro verzi 0.2.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
