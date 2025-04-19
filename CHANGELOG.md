@@ -20,6 +20,11 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Koupit si auto
 - Koupit si počítač, který zvládne AI jakobynic
 
+## Úkol 4
+- Nastoupit ve středu 23.4.2025 do práce
+- Vyřídit papíry na úřad práce (příspěvek na bydlení)
+- Domluvit si výplatu před 10.5.2025 (den platby nájmu)
+
 ## [0.0.8] - 2025-04-18
 
 ### Přidáno
