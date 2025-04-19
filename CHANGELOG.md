@@ -25,6 +25,16 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.1.4] - 2025-04-18
+
+### Přidáno
+- Implementován experimentální 3D režim s vizualizací budov pomocí OSM Buildings
+- Přidáno tlačítko pro přepínání mezi 2D a 3D režimem
+- Přidány ovládací prvky pro rotaci a náklon v 3D režimu
+- Implementována podpora pro 3D režim v chatu pomocí příkazů "3d" nebo "budovy"
+- Přidáno tlačítko pro 3D režim do fullscreen módu
+- Optimalizováno zobrazení 3D budov pro různé úrovně zoomu
+
 ## [0.1.3] - 2025-04-18
 
 ### Přidáno
@@ -307,6 +317,15 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementována synchronizace stavu mezi tlačítky v normálním a fullscreen režimu
 - Optimalizováno zobrazení tlačítek pro různé velikosti obrazovky
 - Vylepšena uživatelská přívětivost při práci s mapou v režimu celé obrazovky
+
+### Verze 0.1.4 (Duben 2025)
+#### Experimentální 3D režim
+- Implementován 3D režim s vizualizací budov pomocí OSM Buildings
+- Přidány ovládací prvky pro rotaci a náklon v 3D režimu
+- Optimalizováno zobrazení 3D budov pro různé úrovně zoomu
+- Implementována podpora pro 3D režim v chatu pomocí příkazů
+- Přidáno tlačítko pro 3D režim do hlavního rozhraní i fullscreen módu
+- Vylepšena vizualizace mapy s 3D budovami pro lepší orientaci v prostoru
 
 #### Plánované funkce pro verzi 0.2.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním

@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+    <!-- OSM Buildings CSS -->
+    <link rel="stylesheet" href="https://cdn.osmbuildings.org/4.1.1/OSMBuildings.css">
 </head>
 <body>
     <div class="container">
@@ -60,6 +62,9 @@
                     </button>
                     <button class="btn" id="printMap">
                         <i class="icon">🖨️</i> Vytisknout mapu
+                    </button>
+                    <button class="btn" id="toggle3DMode">
+                        <i class="icon">🏘️</i> 3D režim
                     </button>
                 </div>
             </div>
@@ -296,6 +301,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- OpenRouteService API pro přesné směrování po silnicích -->
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <!-- OSM Buildings JS pro 3D budovy -->
+    <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

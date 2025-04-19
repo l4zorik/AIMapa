@@ -44,6 +44,8 @@ let route = null;
 let routeControl = null; // Pro Leaflet Routing Machine
 let isAddingPoints = true; // Výchozí stav - přidávání bodů je aktivní
 let isFullscreen = false;
+let is3DMode = false; // Výchozí stav - 3D režim je deaktivovaný
+let osmb = null; // Proměnná pro OSM Buildings
 
 // Konfigurace pro Leaflet Routing Machine
 const routingOptions = {
@@ -794,6 +796,9 @@ document.getElementById('addActivity').addEventListener('click', () => {
     }
 });
 
+// Event listener pro tlačítko 3D režimu
+document.getElementById('toggle3DMode').addEventListener('click', toggle3DMode);
+
 // Funkce pro výpočet trasy s použitím Leaflet Routing Machine
 function calculateRouteFunction() {
     if (markers.length < 2) {
@@ -1050,9 +1055,21 @@ function toggleFullscreen() {
             saveAppState();
         });
 
+        // Tlačítko pro 3D režim
+        const toggle3DFsBtn = document.createElement('button');
+        toggle3DFsBtn.className = 'fs-btn';
+        toggle3DFsBtn.innerHTML = '<i class="icon">🏘️</i> 3D režim';
+        toggle3DFsBtn.addEventListener('click', toggle3DMode);
+
+        // Nastavení aktivního stavu tlačítka pro 3D režim podle aktuálního stavu
+        if (is3DMode) {
+            toggle3DFsBtn.classList.add('active');
+        }
+
         // Přidání tlačítek do kontejneru
         fullscreenControls.appendChild(addActivityFsBtn);
         fullscreenControls.appendChild(clearMapFsBtn);
+        fullscreenControls.appendChild(toggle3DFsBtn);
 
         // Přidání kontejneru do mapy
         mapWrapper.appendChild(fullscreenControls);
@@ -1311,6 +1328,150 @@ function updateFloatingChat() {
     if (floatingChatMessages && isFullscreen) {
         floatingChatMessages.innerHTML = chatMessages.innerHTML;
         floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+    }
+}
+
+// Funkce pro přepnutí 3D režimu
+function toggle3DMode() {
+    const toggle3DBtn = document.getElementById('toggle3DMode');
+    is3DMode = !is3DMode;
+
+    if (is3DMode) {
+        // Aktivace 3D režimu
+        toggle3DBtn.classList.add('active');
+
+        // Přidání třídy pro 3D režim
+        document.getElementById('map').classList.add('map-3d-mode');
+
+        // Inicializace OSM Buildings, pokud ještě nebyla vytvořena
+        if (!osmb) {
+            osmb = new OSMBuildings(map);
+            osmb.load('https://{s}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json');
+        } else {
+            // Pokud již existuje, přidáme ji zpět na mapu
+            osmb.load('https://{s}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json');
+        }
+
+        // Přidání ovládacích prvků pro 3D režim
+        add3DControls();
+
+        // Nastavení výchozího úhlu pohledu
+        osmb.setRotation(10); // Mírné natočení
+        osmb.setTilt(45); // Mírný sklon
+
+        // Informace pro uživatele
+        addMessage('3D režim byl aktivován. Nyní můžete vidět budovy ve 3D. Použijte ovládací prvky pro rotaci a náklon.', false);
+    } else {
+        // Deaktivace 3D režimu
+        toggle3DBtn.classList.remove('active');
+
+        // Odstranění třídy pro 3D režim
+        document.getElementById('map').classList.remove('map-3d-mode');
+
+        // Odstranění OSM Buildings z mapy
+        if (osmb) {
+            osmb.unload();
+        }
+
+        // Odstranění ovládacích prvků pro 3D režim
+        remove3DControls();
+
+        // Informace pro uživatele
+        addMessage('3D režim byl deaktivován. Mapa je nyní v klasickém 2D zobrazení.', false);
+    }
+
+    // Aktualizace velikosti mapy po změně režimu
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 300);
+}
+
+// Funkce pro přidání ovládacích prvků pro 3D režim
+function add3DControls() {
+    // Odstranění existujících ovládacích prvků, pokud existují
+    remove3DControls();
+
+    // Vytvoření kontejneru pro ovládací prvky
+    const controlsContainer = document.createElement('div');
+    controlsContainer.id = 'map3DControls';
+    controlsContainer.className = 'map-3d-controls';
+
+    // Tlačítko pro rotaci doleva
+    const rotateLeftBtn = document.createElement('button');
+    rotateLeftBtn.className = 'map-3d-control-btn';
+    rotateLeftBtn.innerHTML = '↶';
+    rotateLeftBtn.title = 'Rotovat doleva';
+    rotateLeftBtn.addEventListener('click', () => {
+        if (osmb) {
+            const currentRotation = osmb.getRotation() || 0;
+            osmb.setRotation(currentRotation - 10);
+        }
+    });
+
+    // Tlačítko pro rotaci doprava
+    const rotateRightBtn = document.createElement('button');
+    rotateRightBtn.className = 'map-3d-control-btn';
+    rotateRightBtn.innerHTML = '↷';
+    rotateRightBtn.title = 'Rotovat doprava';
+    rotateRightBtn.addEventListener('click', () => {
+        if (osmb) {
+            const currentRotation = osmb.getRotation() || 0;
+            osmb.setRotation(currentRotation + 10);
+        }
+    });
+
+    // Tlačítko pro zvýšení náklonu
+    const tiltUpBtn = document.createElement('button');
+    tiltUpBtn.className = 'map-3d-control-btn';
+    tiltUpBtn.innerHTML = '↑';
+    tiltUpBtn.title = 'Zvýšit náklon';
+    tiltUpBtn.addEventListener('click', () => {
+        if (osmb) {
+            const currentTilt = osmb.getTilt() || 0;
+            osmb.setTilt(Math.min(currentTilt + 10, 60)); // Maximum 60 stupňů
+        }
+    });
+
+    // Tlačítko pro snížení náklonu
+    const tiltDownBtn = document.createElement('button');
+    tiltDownBtn.className = 'map-3d-control-btn';
+    tiltDownBtn.innerHTML = '↓';
+    tiltDownBtn.title = 'Snížit náklon';
+    tiltDownBtn.addEventListener('click', () => {
+        if (osmb) {
+            const currentTilt = osmb.getTilt() || 0;
+            osmb.setTilt(Math.max(currentTilt - 10, 0)); // Minimum 0 stupňů
+        }
+    });
+
+    // Tlačítko pro reset pohledu
+    const resetViewBtn = document.createElement('button');
+    resetViewBtn.className = 'map-3d-control-btn';
+    resetViewBtn.innerHTML = '⟲';
+    resetViewBtn.title = 'Resetovat pohled';
+    resetViewBtn.addEventListener('click', () => {
+        if (osmb) {
+            osmb.setRotation(0);
+            osmb.setTilt(0);
+        }
+    });
+
+    // Přidání tlačítek do kontejneru
+    controlsContainer.appendChild(rotateLeftBtn);
+    controlsContainer.appendChild(rotateRightBtn);
+    controlsContainer.appendChild(tiltUpBtn);
+    controlsContainer.appendChild(tiltDownBtn);
+    controlsContainer.appendChild(resetViewBtn);
+
+    // Přidání kontejneru do mapy
+    document.getElementById('map').appendChild(controlsContainer);
+}
+
+// Funkce pro odstranění ovládacích prvků pro 3D režim
+function remove3DControls() {
+    const controlsContainer = document.getElementById('map3DControls');
+    if (controlsContainer) {
+        controlsContainer.remove();
     }
 }
 
@@ -2906,6 +3067,9 @@ processUserInput = function(input) {
         isFullscreen = !isFullscreen;
         fullscreenButton.click();
         return isFullscreen ? 'Přepínám mapu do režimu celé obrazovky.' : 'Vracím mapu do normálního režimu.';
+    } else if (lowercaseInput.includes('3d') || lowercaseInput.includes('3d režim') || lowercaseInput.includes('budovy')) {
+        toggle3DMode();
+        return is3DMode ? 'Aktivuji 3D režim s budovami. Použijte ovládací prvky pro rotaci a náklon.' : 'Deaktivuji 3D režim a vracím se do 2D zobrazení.';
     } else if (lowercaseInput.includes('přidat bod') || lowercaseInput.includes('přidat aktivitu')) {
         isAddingPoints = true;
         document.getElementById('addActivity').classList.add('active');
