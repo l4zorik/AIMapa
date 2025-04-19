@@ -20,6 +20,11 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Koupit si auto
 - Koupit si počítač, který zvládne AI jakobynic
 
+## [0.0.8] - 2025-04-18
+
+### Přidáno
+- Přidán nový favicon pro lepší identifikaci aplikace v prohlížeči
+
 # Vize a plán vývoje AIMapa - Nejlepší AI Mapový Systém na světě
 
 ## Hlavní cíle
