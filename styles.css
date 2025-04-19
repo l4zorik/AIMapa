@@ -2975,10 +2975,24 @@ body.fullscreen-mode {
     overflow: hidden;
     z-index: 10;
     display: none;
+    background-color: #000;
 }
 
-.cesium-viewer-bottom {
-    display: none;
+.cesium-viewer-bottom,
+.cesium-viewer-timelineContainer,
+.cesium-viewer-animationContainer,
+.cesium-viewer-fullscreenContainer,
+.cesium-viewer-toolbar,
+.cesium-viewer-geocoderContainer {
+    display: none !important;
+}
+
+.cesium-widget-credits {
+    display: none !important;
+}
+
+.map-globe-mode .map-globe-controls {
+    z-index: 1000;
 }
 
 .map-3d-mode .leaflet-control-container {

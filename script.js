@@ -681,6 +681,12 @@ function addMarkerToMap(latlng) {
         calculateRouteFunction();
     }
 
+    // Aktualizace glóbusu, pokud je aktivní
+    if (isGlobeMode && cesiumViewer) {
+        addMarkersToGlobe();
+        addRoutesToGlobe();
+    }
+
     // Uložení stavu aplikace po přidání nového bodu
     saveAppState();
 
@@ -1511,9 +1517,8 @@ function toggleGlobeMode() {
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
 
-        // Uložení aktuálního středu a zoomu mapy
+        // Uložení aktuálního středu mapy
         const center = map.getCenter();
-        const zoom = map.getZoom();
 
         // Skrytí Leaflet mapy
         document.querySelector('.leaflet-container').style.display = 'none';
@@ -1526,21 +1531,39 @@ function toggleGlobeMode() {
             // Nastavení přístupového tokenu pro Cesium ion
             Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc3MzMsImlhdCI6MTYyMjg0MTI2OH0.XcKpgANiY22ZtIiqaCYrnMoN7oacG4Y0_S64z0t8YrQ';
 
-            // Vytvoření Cesium Viewer
-            cesiumViewer = new Cesium.Viewer('cesiumContainer', {
-                terrainProvider: Cesium.createWorldTerrain(),
-                animation: false,
-                baseLayerPicker: false,
-                fullscreenButton: false,
-                geocoder: false,
-                homeButton: false,
-                infoBox: false,
-                sceneModePicker: false,
-                selectionIndicator: false,
-                timeline: false,
-                navigationHelpButton: false,
-                navigationInstructionsInitiallyVisible: false
-            });
+            try {
+                // Vytvoření Cesium Viewer
+                cesiumViewer = new Cesium.Viewer('cesiumContainer', {
+                    terrainProvider: Cesium.createWorldTerrain(),
+                    animation: false,
+                    baseLayerPicker: false,
+                    fullscreenButton: false,
+                    geocoder: false,
+                    homeButton: false,
+                    infoBox: false,
+                    sceneModePicker: false,
+                    selectionIndicator: false,
+                    timeline: false,
+                    navigationHelpButton: false,
+                    navigationInstructionsInitiallyVisible: false,
+                    imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+                        url: 'https://a.tile.openstreetmap.org/'
+                    })
+                });
+
+                // Logování úspěšné inicializace
+                console.log('Cesium Viewer byl úspěšně inicializován');
+            } catch (error) {
+                // Logování chyby při inicializaci
+                console.error('Chyba při inicializaci Cesium Viewer:', error);
+                addMessage('Nepodařilo se inicializovat 3D glóbus. Zkuste to prosím znovu.', true);
+                isGlobeMode = false;
+                toggleGlobeBtn.classList.remove('active');
+                document.getElementById('map').classList.remove('map-globe-mode');
+                document.getElementById('cesiumContainer').style.display = 'none';
+                document.querySelector('.leaflet-container').style.display = 'block';
+                return;
+            }
 
             // Nastavení atmosféry a oblohy
             cesiumViewer.scene.skyAtmosphere.show = true;
@@ -1562,6 +1585,9 @@ function toggleGlobeMode() {
 
         // Přidání markerů na glóbus
         addMarkersToGlobe();
+
+        // Přidání tras mezi body na glóbusu
+        addRoutesToGlobe();
 
         // Přidání ovládacích prvků pro glóbus
         addGlobeControls();
@@ -1597,45 +1623,77 @@ function toggleGlobeMode() {
 
 // Funkce pro přidání markerů na glóbus
 function addMarkersToGlobe() {
-    // Vyčištění předchozích markerů
-    globeMarkers.forEach(marker => {
-        cesiumViewer.entities.remove(marker);
-    });
-    globeMarkers = [];
+    try {
+        // Vyčištění předchozích markerů
+        if (globeMarkers.length > 0) {
+            globeMarkers.forEach(marker => {
+                if (marker && cesiumViewer) {
+                    cesiumViewer.entities.remove(marker);
+                }
+            });
+        }
+        globeMarkers = [];
 
-    // Přidání markerů z Leaflet mapy na glóbus
-    markers.forEach((marker, index) => {
-        const position = marker.getLatLng();
+        // Přidání markerů z Leaflet mapy na glóbus
+        if (markers.length > 0 && cesiumViewer) {
+            markers.forEach((marker, index) => {
+                const position = marker.getLatLng();
 
-        // Vytvoření entity pro marker
-        const globeMarker = cesiumViewer.entities.add({
-            name: markerProperties[index] && markerProperties[index].name ? markerProperties[index].name : `Bod ${index + 1}`,
-            position: Cesium.Cartesian3.fromDegrees(position.lng, position.lat),
-            billboard: {
-                image: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-                width: 25,
-                height: 41,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM
-            },
-            label: {
-                text: `${index + 1}`,
-                font: '14pt sans-serif',
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                outlineWidth: 2,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                pixelOffset: new Cesium.Cartesian2(0, -41),
-                fillColor: Cesium.Color.WHITE,
-                outlineColor: Cesium.Color.BLACK,
-                showBackground: true,
-                backgroundColor: new Cesium.Color(0, 0, 0, 0.7)
-            },
-            description: markerProperties[index] && markerProperties[index].name ?
-                `<h3>${markerProperties[index].name}</h3><p>Bod ${index + 1}</p>` :
-                `<h3>Bod ${index + 1}</h3>`
-        });
+                // Vytvoření entity pro marker
+                const markerName = markerProperties[index] && markerProperties[index].name ?
+                    markerProperties[index].name : `Bod ${index + 1}`;
 
-        globeMarkers.push(globeMarker);
-    });
+                // Vytvoření entity pro marker
+                const globeMarker = cesiumViewer.entities.add({
+                    name: markerName,
+                    position: Cesium.Cartesian3.fromDegrees(position.lng, position.lat, 0),
+                    point: {
+                        pixelSize: 15,
+                        color: Cesium.Color.fromCssColorString('#3388ff'),
+                        outlineColor: Cesium.Color.WHITE,
+                        outlineWidth: 2,
+                        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                    },
+                    label: {
+                        text: `${index + 1}`,
+                        font: '14pt sans-serif',
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        outlineWidth: 2,
+                        verticalOrigin: Cesium.VerticalOrigin.CENTER,
+                        pixelOffset: new Cesium.Cartesian2(0, 0),
+                        fillColor: Cesium.Color.WHITE,
+                        outlineColor: Cesium.Color.BLACK,
+                        showBackground: true,
+                        backgroundColor: new Cesium.Color(0, 0, 0, 0.7),
+                        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                    },
+                    description: `<h3>${markerName}</h3><p>Bod ${index + 1}</p>`
+                });
+
+                globeMarkers.push(globeMarker);
+            });
+
+            // Pokud existují markery, přiblížíme kameru k prvnímu z nich
+            if (markers.length > 0) {
+                const firstPosition = markers[0].getLatLng();
+                cesiumViewer.camera.flyTo({
+                    destination: Cesium.Cartesian3.fromDegrees(firstPosition.lng, firstPosition.lat, 500000),
+                    orientation: {
+                        heading: Cesium.Math.toRadians(0),
+                        pitch: Cesium.Math.toRadians(-45),
+                        roll: 0
+                    },
+                    duration: 2
+                });
+            }
+
+            console.log(`Přidáno ${globeMarkers.length} markerů na glóbus`);
+        } else {
+            console.log('Nejsou žádné markery k přidání na glóbus nebo Cesium Viewer není inicializován');
+        }
+    } catch (error) {
+        console.error('Chyba při přidávání markerů na glóbus:', error);
+    }
 }
 
 // Funkce pro přidání ovládacích prvků pro glóbus
@@ -1783,6 +1841,45 @@ function removeGlobeControls() {
     const controlsContainer = document.getElementById('mapGlobeControls');
     if (controlsContainer) {
         controlsContainer.remove();
+    }
+}
+
+// Funkce pro přidání tras mezi body na glóbusu
+function addRoutesToGlobe() {
+    try {
+        // Pokud nemáme alespoň dva body, nemůžeme vytvořit trasu
+        if (markers.length < 2 || !cesiumViewer) {
+            console.log('Není dostatek bodů pro vytvoření trasy nebo Cesium Viewer není inicializován');
+            return;
+        }
+
+        // Vytvoření pole souřadnic pro trasu
+        const positions = [];
+        markers.forEach(marker => {
+            const position = marker.getLatLng();
+            positions.push(position.lng, position.lat, 0);
+        });
+
+        // Přidání entity pro trasu
+        const routeEntity = cesiumViewer.entities.add({
+            name: 'Trasa',
+            polyline: {
+                positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
+                width: 3,
+                material: new Cesium.PolylineGlowMaterialProperty({
+                    glowPower: 0.2,
+                    color: Cesium.Color.BLUE
+                }),
+                clampToGround: true
+            }
+        });
+
+        // Přidání entity do pole markerů, aby byla odstraněna při vyčištění
+        globeMarkers.push(routeEntity);
+
+        console.log('Trasa byla úspěšně přidána na glóbus');
+    } catch (error) {
+        console.error('Chyba při přidávání trasy na glóbus:', error);
     }
 }
 
@@ -2236,6 +2333,12 @@ function setupMarkerEventListeners(marker, markerIndex) {
         // Pokud máme alespoň dva body, přepočítáme trasu
         if (markers.length >= 2) {
             calculateRouteFunction();
+        }
+
+        // Aktualizace glóbusu, pokud je aktivní
+        if (isGlobeMode && cesiumViewer) {
+            addMarkersToGlobe();
+            addRoutesToGlobe();
         }
 
         // Uložení stavu aplikace po přesunutí markeru
