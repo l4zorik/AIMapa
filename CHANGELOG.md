@@ -2,6 +2,11 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+# Můj osobní plán na vývoj
+
+## Úkol 1
+-
+
 # Vize a plán vývoje AIMapa - Nejlepší AI Mapový Systém na světě
 
 ## Hlavní cíle
