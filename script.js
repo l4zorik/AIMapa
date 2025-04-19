@@ -1353,12 +1353,38 @@ function updateFloatingChat() {
 
 // Funkce pro přepnutí 3D režimu
 function toggle3DMode() {
-    const toggle3DBtn = document.getElementById('toggle3DMode');
+    console.log('toggle3DMode funkce byla volána');
+
+    // Získání reference na tlačítko podle kontextu (fullscreen nebo normální režim)
+    let toggle3DBtn;
+
+    if (isFullscreen) {
+        // Ve fullscreen režimu hledáme tlačítko v kontejneru fullscreenControls
+        const fullscreenControls = document.getElementById('fullscreenControls');
+        if (fullscreenControls) {
+            // Hledáme tlačítko s textem '3D režim'
+            const buttons = fullscreenControls.querySelectorAll('button');
+            for (const btn of buttons) {
+                if (btn.innerHTML.includes('3D režim')) {
+                    toggle3DBtn = btn;
+                    break;
+                }
+            }
+        }
+    } else {
+        // V normálním režimu použijeme ID
+        toggle3DBtn = document.getElementById('toggle3DMode');
+    }
+
+    console.log('Tlačítko pro 3D režim:', toggle3DBtn);
+
     is3DMode = !is3DMode;
 
     if (is3DMode) {
         // Aktivace 3D režimu
-        toggle3DBtn.classList.add('active');
+        if (toggle3DBtn) {
+            toggle3DBtn.classList.add('active');
+        }
 
         // Přidání třídy pro 3D režim
         document.getElementById('map').classList.add('map-3d-mode');
@@ -1383,7 +1409,9 @@ function toggle3DMode() {
         addMessage('3D režim byl aktivován. Nyní můžete vidět budovy ve 3D. Použijte ovládací prvky pro rotaci a náklon.', false);
     } else {
         // Deaktivace 3D režimu
-        toggle3DBtn.classList.remove('active');
+        if (toggle3DBtn) {
+            toggle3DBtn.classList.remove('active');
+        }
 
         // Odstranění třídy pro 3D režim
         document.getElementById('map').classList.remove('map-3d-mode');
@@ -1497,7 +1525,30 @@ function remove3DControls() {
 
 // Funkce pro přepnutí glóbus režimu
 function toggleGlobeMode() {
-    const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+    console.log('toggleGlobeMode funkce byla volána');
+
+    // Získání reference na tlačítko podle kontextu (fullscreen nebo normální režim)
+    let toggleGlobeBtn;
+
+    if (isFullscreen) {
+        // Ve fullscreen režimu hledáme tlačítko v kontejneru fullscreenControls
+        const fullscreenControls = document.getElementById('fullscreenControls');
+        if (fullscreenControls) {
+            // Hledáme tlačítko s textem 'Glóbus'
+            const buttons = fullscreenControls.querySelectorAll('button');
+            for (const btn of buttons) {
+                if (btn.innerHTML.includes('Glóbus')) {
+                    toggleGlobeBtn = btn;
+                    break;
+                }
+            }
+        }
+    } else {
+        // V normálním režimu použijeme ID
+        toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+    }
+
+    console.log('Tlačítko pro glóbus režim:', toggleGlobeBtn);
 
     // Pokud je aktivní 3D režim, nejprve ho deaktivujeme
     if (is3DMode) {
@@ -1510,7 +1561,9 @@ function toggleGlobeMode() {
         console.log('Aktivace glóbus režimu');
 
         // Aktivace glóbus režimu
-        toggleGlobeBtn.classList.add('active');
+        if (toggleGlobeBtn) {
+            toggleGlobeBtn.classList.add('active');
+        }
 
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
@@ -1630,7 +1683,9 @@ function toggleGlobeMode() {
         console.log('Deaktivace glóbus režimu');
 
         // Deaktivace glóbus režimu
-        toggleGlobeBtn.classList.remove('active');
+        if (toggleGlobeBtn) {
+            toggleGlobeBtn.classList.remove('active');
+        }
 
         // Odstranění třídy pro glóbus režim
         document.getElementById('map').classList.remove('map-globe-mode');
