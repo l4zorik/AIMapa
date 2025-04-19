@@ -7,6 +7,13 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 ## Úkol 1
 - Naučit se pracovat s WordPressem - základy tvorby webů, instalace pluginů, úprava šablon a práce s redakčním systémem
 
+## Úkol 2
+- Dohnat vzdělání v matematice - algebra, geometrie, diferenciální a integrovaný počet
+- Dohnat vzdělání ve fyzice - mechanika, elektromagnetismus, termodynamika, kvantová fyzika
+- Dohnat vzdělání v chemii - anorganická a organická chemie, biochemie
+- Prostudovat programovací jazyky - JavaScript, Python, C++, Java
+- Prohloubit znalosti v oblasti IT - databáze, sítě, bezpečnost, cloud computing, umělá inteligence
+
 # Vize a plán vývoje AIMapa - Nejlepší AI Mapový Systém na světě
 
 ## Hlavní cíle
