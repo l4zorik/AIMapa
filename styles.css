@@ -2975,8 +2975,9 @@ body.fullscreen-mode {
     overflow: hidden !important;
     z-index: 10 !important;
     display: none;
-    background-color: transparent !important;
+    background-color: #000000 !important;
     visibility: visible !important;
+    pointer-events: auto !important;
 }
 
 .cesium-viewer-bottom,
@@ -2995,7 +2996,8 @@ body.fullscreen-mode {
     width: 100% !important;
     height: 100% !important;
     visibility: visible !important;
-    background-color: transparent !important;
+    background-color: #000000 !important;
+    pointer-events: auto !important;
 }
 
 .cesium-viewer-cesiumWidgetContainer {
@@ -3015,6 +3017,7 @@ body.fullscreen-mode {
     width: 100% !important;
     height: 100% !important;
     position: relative !important;
+    background-color: #000000 !important;
 }
 
 .cesium-widget canvas {
@@ -3022,6 +3025,10 @@ body.fullscreen-mode {
     height: 100% !important;
     touch-action: none !important;
     display: block !important;
+    background-color: #000000 !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
 }
 
 .cesium-widget-credits {

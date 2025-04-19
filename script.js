@@ -805,11 +805,7 @@ document.getElementById('addActivity').addEventListener('click', () => {
     }
 });
 
-// Event listener pro tlačítko 3D režimu
-document.getElementById('toggle3DMode').addEventListener('click', toggle3DMode);
-
-// Event listener pro tlačítko glóbusu
-document.getElementById('toggleGlobeMode').addEventListener('click', toggleGlobeMode);
+// Event listenery pro tlačítka 3D a glóbus režimu jsou nyní pouze ve fullscreen módu
 
 // Funkce pro výpočet trasy s použitím Leaflet Routing Machine
 function calculateRouteFunction() {
@@ -1560,7 +1556,11 @@ function toggleGlobeMode() {
                         url: 'https://dev.virtualearth.net',
                         key: 'AhbIRlUQ5NzgKaTXxE6Zf4_ReceZbw7TPkxVoF_C_rPmDU6bPBRQ1SxkQQFW0PO9',
                         mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
-                    })
+                    }),
+                    // Nastavení pro lepší výkon a zobrazení
+                    requestRenderMode: false,
+                    maximumRenderTimeChange: Infinity,
+                    targetFrameRate: 60
                 });
 
                 // Nastavení výchozího pohledu na Evropu
@@ -1573,11 +1573,18 @@ function toggleGlobeMode() {
                     }
                 });
 
-                // Vypnutí hvězd a oblohy
+                // Nastavení scény pro lepší zobrazení
                 cesiumViewer.scene.skyBox.show = false;
                 cesiumViewer.scene.sun.show = false;
                 cesiumViewer.scene.moon.show = false;
                 cesiumViewer.scene.skyAtmosphere.show = true;
+                cesiumViewer.scene.globe.show = true;
+                cesiumViewer.scene.globe.enableLighting = true;
+                cesiumViewer.scene.globe.maximumScreenSpaceError = 1.0; // Lepší kvalita zobrazení
+                cesiumViewer.scene.fog.enabled = false;
+                cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
+                cesiumViewer.scene.logarithmicDepthBuffer = false;
+                cesiumViewer.scene.useWebVR = false;
 
                 // Přidání terénu až po úspěšné inicializaci
                 setTimeout(() => {
