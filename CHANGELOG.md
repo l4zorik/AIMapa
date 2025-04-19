@@ -25,6 +25,14 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.2.1] - 2025-04-18
+
+### Opraveno
+- Opravena funkčnost tlačítek 3D a glóbus režimu ve fullscreen módu
+- Přidáno podrobné logování pro diagnostiku problémů s tlačítky
+- Implementováno inteligentní vyhledávání tlačítek podle kontextu (fullscreen nebo normální režim)
+- Zlepšena odolnost kódu proti chybám při práci s tlačítky
+
 ## [0.2.0] - 2025-04-18
 
 ### Přepracováno
@@ -460,7 +468,14 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Optimalizována práce s Cesium entitami pro lepší výkon
 - Implementováno správné čištění zdrojů při deaktivaci glóbus režimu
 
-#### Plánované funkce pro verzi 0.2.1 (Květen 2025)
+### Verze 0.2.1 (Duben 2025)
+#### Oprava funkčnosti tlačítek
+- Opravena funkčnost tlačítek 3D a glóbus režimu ve fullscreen módu
+- Přidáno podrobné logování pro diagnostiku problémů s tlačítky
+- Implementováno inteligentní vyhledávání tlačítek podle kontextu (fullscreen nebo normální režim)
+- Zlepšena odolnost kódu proti chybám při práci s tlačítky
+
+#### Plánované funkce pro verzi 0.2.2 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
 - Přidání možnosti importu a exportu bodů ve formátech GPX, KML a GeoJSON
 - Implementace měření vzdáleností a ploch pomocí nástroje pro kreslení
