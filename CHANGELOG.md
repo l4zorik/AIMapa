@@ -33,6 +33,96 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Rozšířit podporu pro další jazyky a regiony
 - Implementovat pokročilé 3D vizualizace terénu a budov
 
+## Podrobný plán vývoje (Roadmap)
+
+### Verze 0.1.0 (Květen 2025)
+#### Mapové funkce
+- Implementace pokročilého vyhledávání míst s automatickým doplňováním
+- Přidání možnosti importu a exportu bodů ve formátech GPX, KML a GeoJSON
+- Implementace měření vzdáleností a ploch pomocí nástroje pro kreslení
+- Přidání vrstev pro zobrazení počasí, dopravních informací a turistických tras
+- Optimalizace výpočtu tras pro různé typy dopravy (auto, kolo, pěšky)
+
+#### Uživatelské rozhraní
+- Kompletní redesign hlavního menu s intuitivními ikonami
+- Implementace postranního panelu pro rychlý přístup k oblíbeným místům
+- Vylepšení responzivity pro mobilní zařízení a tablety
+- Přidání možnosti přizpůsobení uživatelského rozhraní (barvy, velikost písma, rozložení)
+- Implementace animací pro plynulejší přechody mezi obrazovkami
+
+#### Chatovací rozhraní
+- Rozšíření sady příkazů pro interakci s mapou
+- Implementace kontextového rozpoznávání dotazů v přirozeném jazyce
+- Přidání historie konverzací s možností návratu k předchozím dotazům
+- Implementace nápovědy pro dostupné příkazy a funkce
+- Vylepšení algoritmu pro rozpoznávání záměru uživatele
+
+### Verze 0.2.0 (Srpen 2025)
+#### Pokročilé funkce pro práci s body
+- Implementace kategorizace bodů s možností filtrování
+- Přidání možnosti přidávat fotografie k bodům
+- Implementace hodnocení a recenzí pro body zájmu
+- Vytvoření systému pro sdílení bodů mezi uživateli
+- Implementace časových štítků pro sledování změn v čase
+
+#### Navigace a trasy
+- Vylepšení algoritmu pro výpočet optimální trasy
+- Implementace alternativních tras s možností porovnání
+- Přidání hlasové navigace s pokyny v českém jazyce
+- Implementace režimu navigace pro různé typy aktivit (turistika, cyklistika, běh)
+- Přidání informací o převýšení a náročnosti trasy
+
+#### Integrace dat
+- Propojení s veřejnými databázemi bodů zájmu
+- Implementace API pro získávání aktuálních informací o počasí
+- Integrace s kalendářem pro plánování cest
+- Přidání informací o veřejné dopravě v reálném čase
+- Implementace geolokačních služeb pro přesnější určení polohy
+
+### Verze 0.3.0 (Listopad 2025)
+#### AI asistent
+- Implementace pokročilého AI asistenta pro navigaci
+- Vytvoření systému pro predikci cílů na základě historie uživatele
+- Implementace personalizovaných doporučení míst
+- Přidání kontextového rozpoznávání situace (např. dopravní zácpa, špatné počasí)
+- Vytvoření systému pro automatické plánování výletů
+
+#### Offline režim
+- Implementace stahování map pro použití offline
+- Optimalizace ukládání dat pro minimalizaci využití paměti
+- Implementace synchronizace dat po opětovném připojení k internetu
+- Přidání offline navigace s omezenými funkcemi
+- Vytvoření systému pro prioritizaci dat při stahování
+
+#### Rozšířená realita (AR)
+- Implementace základních funkcí AR pro vizualizaci bodů zájmu
+- Přidání AR navigace s šipkami v reálném prostředí
+- Implementace rozpoznávání objektů pomocí kamery
+- Vytvoření systému pro zobrazení informací o budovách a památkách
+- Optimalizace AR pro různé světelné podmínky
+
+### Verze 1.0.0 (Březen 2026)
+#### Komunitní funkce
+- Implementace uživatelských profilů a přátelství
+- Vytvoření systému pro sdílení tras a bodů zájmu
+- Implementace hodnocení a recenzí míst od komunity
+- Přidání možnosti vytvářet veřejné a soukromé skupiny
+- Implementace systému pro organizaci skupinových výletů
+
+#### Pokročilá analýza dat
+- Implementace statistik o pohybu a aktivitách uživatele
+- Vytvoření systému pro analýzu populárních tras a míst
+- Implementace prediktivních modelů pro dopravní situace
+- Přidání nástrojů pro analýzu výkonů při sportovních aktivitách
+- Vytvoření systému pro optimalizaci tras na základě historických dat
+
+#### Ekosystém služeb
+- Implementace rezervačního systému pro restaurace, hotely a atrakce
+- Integrace s platebními systémy pro nákup vstupenek a služeb
+- Vytvoření API pro vývojáře třetích stran
+- Implementace pluginů pro rozšíření funkcionality
+- Vytvoření systému pro synchronizaci dat mezi různými zařízeními
+
 ## Technologické inovace
 - Využití pokročilé umělé inteligence k usnadnění navigace člověka na planetě
 - Vytvoření inovativního uživatelského prostředí plného AI nástrojů
