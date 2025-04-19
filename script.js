@@ -57,13 +57,16 @@ const routingOptions = {
         ],
         addWaypoints: false,
         extendToWaypoints: true,
-        missingRouteTolerance: 0
+        missingRouteTolerance: 0,
+        smoothFactor: 1 // Vyhlazení trasy pro lepší vzhled
     },
     show: false, // Nezobrazovat instrukce pro trasu
     showAlternatives: false,
     fitSelectedRoutes: false,
     draggableWaypoints: false,
-    createMarker: function() { return null; } // Nepoužívat výchozí markery
+    createMarker: function() { return null; }, // Nepoužívat výchozí markery
+    routeWhileDragging: false, // Zabrání přepočítávání trasy při přesouvní mapy
+    useZoomParameter: false // Zabrání přepočítávání trasy při změně zoomu
 };
 
 // Reference na HTML elementy pro informace o trase
@@ -432,8 +435,8 @@ function createCustomMarkerIcon(number, colorIndex) {
     const icon = L.divIcon({
         className: 'custom-marker-container', // Kontejner pro marker
         html: markerHtml,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20]
+        iconSize: [32, 32], // Zmenšeno z 40x40 na 32x32
+        iconAnchor: [16, 16] // Upraveno podle nové velikosti
     });
 
     return icon;
@@ -572,10 +575,10 @@ function addMarkerToMap(latlng) {
             // Přidání třídy 'active' pro aktivaci speciálních efektů
             markerElement.classList.add('active');
 
-            // Přidání pokročilých stylů pro rotaci a záření
-            markerElement.style.transform = 'scale(1.4) rotate(360deg)';
-            markerElement.style.boxShadow = '0 0 25px rgba(139, 92, 246, 1), 0 0 50px rgba(139, 92, 246, 0.8)';
-            markerElement.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            // Přidání pokročilých stylů pro rotaci a záření - mírnější efekt
+            markerElement.style.transform = 'scale(1.3) rotate(360deg)'; // Zmenšeno z 1.4
+            markerElement.style.boxShadow = '0 0 15px rgba(139, 92, 246, 0.9), 0 0 30px rgba(139, 92, 246, 0.6)';
+            markerElement.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             markerElement.style.borderColor = '#FFD700'; // Zlatý okraj pro zvýraznění aktivního bodu
 
             // Vytvoření efektu záblesku
@@ -704,12 +707,21 @@ map.on('click', (e) => {
     }
 });
 
-// Event listener pro zoom, aby se popup okna lépe chovaly při zoomu
+// Event listener pro zoom, aby se popup okna a trasy lépe chovaly při zoomu
 map.on('zoomstart', () => {
     // Přidání třídy pro animaci při zoomu
     document.querySelectorAll('.leaflet-popup').forEach(popup => {
         popup.classList.add('zooming');
     });
+
+    // Optimalizace trasy při zoomu
+    const routingPane = document.querySelector('.leaflet-overlay-pane');
+    if (routingPane) {
+        routingPane.classList.add('zooming');
+    }
+
+    // Pozastavení animací pro lepší výkon při zoomu
+    document.body.classList.add('map-zooming');
 });
 
 map.on('zoomend', () => {
@@ -718,15 +730,36 @@ map.on('zoomend', () => {
         document.querySelectorAll('.leaflet-popup').forEach(popup => {
             popup.classList.remove('zooming');
         });
+
+        // Obnovení trasy po dokončení zoomu
+        const routingPane = document.querySelector('.leaflet-overlay-pane');
+        if (routingPane) {
+            routingPane.classList.remove('zooming');
+        }
+
+        // Obnovení animací po dokončení zoomu
+        document.body.classList.remove('map-zooming');
+
+        // Aktualizace velikosti mapy pro správné vykreslení trasy
+        map.invalidateSize();
     }, 300);
 });
 
-// Event listenery pro pohyb mapy, aby se popup okna lépe chovaly při pohybu mapy
+// Event listenery pro pohyb mapy, aby se popup okna a trasy lépe chovaly při pohybu mapy
 map.on('movestart', () => {
     // Přidání třídy pro animaci při pohybu mapy
     document.querySelectorAll('.leaflet-popup').forEach(popup => {
         popup.classList.add('moving');
     });
+
+    // Optimalizace trasy při pohybu mapy
+    const routingPane = document.querySelector('.leaflet-overlay-pane');
+    if (routingPane) {
+        routingPane.classList.add('moving');
+    }
+
+    // Pozastavení animací pro lepší výkon při pohybu mapy
+    document.body.classList.add('map-moving');
 });
 
 map.on('moveend', () => {
@@ -735,6 +768,15 @@ map.on('moveend', () => {
         document.querySelectorAll('.leaflet-popup').forEach(popup => {
             popup.classList.remove('moving');
         });
+
+        // Obnovení trasy po dokončení pohybu mapy
+        const routingPane = document.querySelector('.leaflet-overlay-pane');
+        if (routingPane) {
+            routingPane.classList.remove('moving');
+        }
+
+        // Obnovení animací po dokončení pohybu mapy
+        document.body.classList.remove('map-moving');
     }, 100);
 });
 
@@ -770,10 +812,26 @@ function calculateRouteFunction() {
 
     // Vytvoření nové trasy s použitím Leaflet Routing Machine
     // Toto používá OSRM (Open Source Routing Machine) pro výpočet trasy po skutečných silnicích
+
+    // Odstranění tříd pro optimalizaci před vytvořením nové trasy
+    document.body.classList.remove('map-zooming', 'map-moving');
+    const routingPane = document.querySelector('.leaflet-overlay-pane');
+    if (routingPane) {
+        routingPane.classList.remove('zooming', 'moving');
+    }
+
+    // Vytvoření nové trasy s optimalizovanými nastaveními
     routeControl = L.Routing.control({
         ...routingOptions,
         waypoints: points
     }).addTo(map);
+
+    // Pozastavení animací při vytváření trasy pro lepší výkon
+    const routingLayer = document.querySelector('.leaflet-routing-layer');
+    if (routingLayer) {
+        routingLayer.style.transition = 'none';
+        routingLayer.style.willChange = 'transform';
+    }
 
     // Poslech na událost 'routesfound' pro získání informací o trase
     routeControl.on('routesfound', function(e) {
@@ -982,7 +1040,6 @@ fullscreenOverlay.addEventListener('click', () => {
 function createFloatingChat() {
     // Získání reference na originální chat
     const originalChatMessages = document.getElementById('chatMessages');
-    const originalChatInput = document.querySelector('.chat-input');
 
     // Vytvoření kontejneru pro plovoucí chat
     const floatingChatContainer = document.createElement('div');

@@ -369,18 +369,18 @@ body[data-theme="dark"] .chat-input input {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: radial-gradient(circle, var(--primary-color) 0%, var(--primary-color-dark) 70%);
     color: white;
     font-weight: bold;
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 20px rgba(139, 92, 246, 0.4);
-    border: 3px solid white;
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.6), 0 0 16px rgba(139, 92, 246, 0.3);
+    border: 2px solid white;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: float 3s ease-in-out infinite;
-    font-size: 16px;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    animation: none; /* Odstranění levitace */
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
     z-index: 500;
     position: relative;
     overflow: hidden;
@@ -416,8 +416,8 @@ body[data-theme="dark"] .chat-input input {
 }
 
 .custom-marker:hover {
-    transform: scale(1.3) translateY(-5px);
-    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.8), 0 10px 30px rgba(139, 92, 246, 0.4);
+    transform: scale(1.2); /* Zmenšeno z 1.3 a odstraněno translateY */
+    box-shadow: 0 3px 10px rgba(139, 92, 246, 0.7), 0 5px 15px rgba(139, 92, 246, 0.3);
     animation-play-state: paused;
 }
 
@@ -431,19 +431,19 @@ body[data-theme="dark"] .chat-input input {
     z-index: 2;
 }
 
-/* Floating animation */
+/* Floating animation - minimalizována */
 @keyframes float {
     0% {
         transform: translateY(0px);
-        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4), 0 10px 30px rgba(139, 92, 246, 0.2);
+        box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4), 0 5px 15px rgba(139, 92, 246, 0.2);
     }
     50% {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 20px rgba(139, 92, 246, 0.3), 0 20px 40px rgba(139, 92, 246, 0.1);
+        transform: translateY(-2px); /* Minimalizováno z -5px na -2px */
+        box-shadow: 0 5px 10px rgba(139, 92, 246, 0.3), 0 8px 20px rgba(139, 92, 246, 0.1);
     }
     100% {
         transform: translateY(0px);
-        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4), 0 10px 30px rgba(139, 92, 246, 0.2);
+        box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4), 0 5px 15px rgba(139, 92, 246, 0.2);
     }
 }
 
@@ -513,7 +513,7 @@ body[data-theme="dark"] .chat-input input {
 .custom-marker.diamond-style {
     transform: rotate(45deg);
     border-radius: 4px;
-    animation: float-diamond 3s ease-in-out infinite;
+    animation: none; /* Odstranění levitace */
 }
 
 .custom-marker.diamond-style span {
@@ -530,7 +530,7 @@ body[data-theme="dark"] .chat-input input {
         transform: rotate(45deg) translateY(0);
     }
     50% {
-        transform: rotate(45deg) translateY(-10px);
+        transform: rotate(45deg) translateY(-2px); /* Minimalizováno z -10px na -2px */
     }
     100% {
         transform: rotate(45deg) translateY(0);
@@ -541,7 +541,7 @@ body[data-theme="dark"] .chat-input input {
 .custom-marker.pin-style {
     border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg);
-    animation: float-pin 3s ease-in-out infinite;
+    animation: none; /* Odstranění levitace */
 }
 
 .custom-marker.pin-style span {
@@ -558,7 +558,7 @@ body[data-theme="dark"] .chat-input input {
         transform: rotate(-45deg) translateY(0);
     }
     50% {
-        transform: rotate(-45deg) translateY(-10px);
+        transform: rotate(-45deg) translateY(-2px); /* Minimalizováno z -10px na -2px */
     }
     100% {
         transform: rotate(-45deg) translateY(0);
@@ -569,9 +569,9 @@ body[data-theme="dark"] .chat-input input {
 .custom-marker.star-style {
     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
     border: none;
-    width: 45px;
-    height: 45px;
-    animation: rotate-star 6s linear infinite, float 3s ease-in-out infinite;
+    width: 36px; /* Zmenšeno z 45px na 36px */
+    height: 36px; /* Zmenšeno z 45px na 36px */
+    animation: rotate-star 6s linear infinite; /* Odstraněna levitace */
 }
 
 .custom-marker.star-style::after {
@@ -640,8 +640,8 @@ body[data-theme="dark"] .chat-input input {
 
 /* Active marker state */
 .custom-marker.active {
-    transform: scale(1.4);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 1), 0 0 40px rgba(139, 92, 246, 0.6);
+    transform: scale(1.3); /* Zmenšeno z 1.4 */
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.9), 0 0 30px rgba(139, 92, 246, 0.5);
     animation: pulse 1s infinite;
 }
 
@@ -1483,6 +1483,28 @@ body[data-theme="dark"] .popup-countdown {
 .leaflet-popup.moving {
     transition: transform 0.1s linear !important;
     pointer-events: none;
+}
+
+/* Styly pro trasy při zoomu a pohybu mapy */
+.leaflet-overlay-pane.zooming,
+.leaflet-overlay-pane.moving {
+    transition: none !important;
+    pointer-events: none;
+}
+
+/* Optimalizace pro zoomování a pohyb mapy */
+.map-zooming .leaflet-routing-layer,
+.map-moving .leaflet-routing-layer {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Optimalizace pro vykreslování trasy */
+.map-zooming .leaflet-overlay-pane path,
+.map-moving .leaflet-overlay-pane path {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
 }
 
 /* Optimalizace pro popup okna při pohybu mapy */
@@ -2924,6 +2946,30 @@ body.fullscreen-mode {
 
 .leaflet-routing-container-hide {
     display: none !important;
+}
+
+/* Optimalizace trasy při zoomování */
+.leaflet-routing-layer {
+    will-change: transform;
+    transform-origin: center center;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    transition: none !important;
+}
+
+/* Optimalizace pro vykreslované trasy */
+.leaflet-overlay-pane {
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Stabilizace trasy při zoomování */
+.leaflet-overlay-pane svg,
+.leaflet-overlay-pane path {
+    pointer-events: none;
+    transition: none !important;
+    vector-effect: non-scaling-stroke;
 }
 
 /* Responsive design */

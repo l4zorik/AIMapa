@@ -38,6 +38,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidáno tlačítko pro rychlý návrat z fullscreen režimu
 - Přidána klávesová zkratka ESC pro opuštění fullscreen režimu
 - Implementována synchronizace zpráv mezi hlavním a plovoucím chatem
+- Optimalizace vykreslované trasy pro stabilní zobrazení při zoomování
 
 ### Vylepšeno
 - Zlepšená vizualizace mapy při různých úrovních zoomu
@@ -46,6 +47,10 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vylepšený fullscreen režim s plynulými přechody a lepším uživatelským zážitkem
 - Optimalizace ovládacích prvků v režimu celé obrazovky
 - Vylepšené zobrazení popup oken v režimu celé obrazovky
+- Zmenšení velikosti bodů na mapě z 40x40px na 32x32px pro čistší vzhled
+- Odstranění efektu levitace bodů pro profesionálnější vzhled
+- Optimalizace animací a efektů pro lepší výkon a vizualizaci
+- Stabilizace trasy při zoomování a pohybu mapy
 
 ## [0.0.9] - 2025-04-18
 
@@ -249,6 +254,9 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Odstranění prázdných pruhů na okrajích mapy při maximálním oddálení
 - Nastavení hranic mapy pro konzistentní uživatelský zážitek
 - Optimalizace zobrazení dlaždic s parametrem noWrap
+- Stabilizace trasy při zoomování a pohybu mapy
+- Zmenšení velikosti bodů na mapě pro čistší vzhled
+- Odstranění efektu levitace bodů pro profesionálnější vzhled
 
 #### Fullscreen režim
 - Vylepšený fullscreen režim s plynulými přechody
@@ -257,6 +265,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Tlačítko pro rychlý návrat z fullscreen režimu
 - Klávesová zkratka ESC pro opuštění fullscreen režimu
 - Optimalizace ovládacích prvků v režimu celé obrazovky
+- Vylepšené zobrazení popup oken v režimu celé obrazovky
 
 #### Plánované funkce pro verzi 0.2.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
