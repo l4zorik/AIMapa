@@ -805,7 +805,21 @@ document.getElementById('addActivity').addEventListener('click', () => {
     }
 });
 
-// Event listenery pro tlačítka 3D a glóbus režimu jsou nyní pouze ve fullscreen módu
+// Přidání tlačítka pro glóbus režim do hlavního dokumentu
+const globeButton = document.createElement('button');
+globeButton.id = 'toggleGlobeMode';
+globeButton.className = 'map-control-btn globe-btn';
+globeButton.innerHTML = '<i class="icon">🌎</i>';
+globeButton.title = 'Glóbus režim';
+globeButton.addEventListener('click', toggleGlobeMode);
+
+// Přidání tlačítka do mapy
+mapWrapper.appendChild(globeButton);
+
+// Nastavení aktivního stavu tlačítka podle aktuálního stavu
+if (isGlobeMode) {
+    globeButton.classList.add('active');
+}
 
 // Funkce pro výpočet trasy s použitím Leaflet Routing Machine
 function calculateRouteFunction() {
@@ -3461,8 +3475,8 @@ processUserInput = function(input) {
         fullscreenButton.click();
         return isFullscreen ? 'Přepínám mapu do režimu celé obrazovky.' : 'Vracím mapu do normálního režimu.';
     } else if (lowercaseInput.includes('3d') || lowercaseInput.includes('3d režim') || lowercaseInput.includes('budovy')) {
-        toggle3DMode();
-        return is3DMode ? 'Aktivuji 3D režim s budovami. Použijte ovládací prvky pro rotaci a náklon.' : 'Deaktivuji 3D režim a vracím se do 2D zobrazení.';
+        // 3D režim byl odstraněn v verzi 0.2.5
+        return 'Funkce 3D režimu byla odstraněna. Použijte prosím glóbus režim pro 3D zobrazení.';
     } else if (lowercaseInput.includes('glóbus') || lowercaseInput.includes('koule') || lowercaseInput.includes('země') || lowercaseInput.includes('planeta')) {
         toggleGlobeMode();
         return isGlobeMode ? 'Aktivuji režim glóbusu. Nyní můžete vidět Zemi jako 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.' : 'Deaktivuji režim glóbusu a vracím se do 2D zobrazení.';

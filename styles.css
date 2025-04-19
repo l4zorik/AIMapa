@@ -110,6 +110,16 @@ main {
     z-index: 500;
 }
 
+.globe-btn {
+    top: 60px; /* Umístění pod tlačítkem pro fullscreen */
+    right: 10px;
+}
+
+.map-control-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
 .map-control-btn .icon {
     margin: 0;
     font-size: 18px;
