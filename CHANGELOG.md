@@ -25,7 +25,19 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
-## [0.3.0] - 2025-04-18
+## [0.2.4] - 2025-04-18
+
+### Opraveno
+- Opraven závažný problém s nefunkční mapou po předchozích úpravách
+- Návrat k funkční verzi bez externího cesium-handler.js modulu
+- Zachována funkčnost 3D glóbus režimu v původní implementaci
+- Vylepšeno ošetření chyb při inicializaci a používání Cesium
+- Optimalizována funkce `toggleGlobeMode` pro spolehlivější přepínání režimů
+- Implementováno automatické zobrazení/skrytí Cesium containeru při přepínání režimů
+- Vylepšena kontrola stavu Cesium Vieweru před jeho použitím
+- Optimalizována práce s DOM elementy pro lepší výkon a stabilitu
+
+## [0.2.3] - 2025-04-18
 
 ### Přepracováno
 - Kompletní přepracování 3D glóbus režimu s interaktivními ovládacími prvky
