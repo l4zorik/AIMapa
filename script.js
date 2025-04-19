@@ -1144,6 +1144,18 @@ function toggleChatPosition() {
     }
 }
 
+// Funkce pro zpracování zprávy z chatu
+function processMessage(message) {
+    // Přidání zprávy uživatele do chatu
+    addMessage(message, true);
+
+    // Simulace odpovědi AI
+    setTimeout(() => {
+        const response = processUserInput(message);
+        addMessage(response);
+    }, 500);
+}
+
 // Funkce pro odeslání zprávy z plovoucího chatu
 function sendFloatingChatMessage() {
     const floatingMessageInput = document.getElementById('floatingMessageInput');
@@ -1152,14 +1164,6 @@ function sendFloatingChatMessage() {
     if (messageText) {
         // Použití existující funkce pro zpracování zprávy
         processMessage(messageText);
-
-        // Aktualizace obsahu plovoucího chatu
-        const originalChatMessages = document.getElementById('chatMessages');
-        const floatingChatMessages = document.getElementById('floatingChatMessages');
-        floatingChatMessages.innerHTML = originalChatMessages.innerHTML;
-
-        // Scrollování na konec chatu
-        floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
 
         // Vyčištění vstupního pole
         floatingMessageInput.value = '';
@@ -1310,14 +1314,8 @@ function processUserInput(input) {
 sendButton.addEventListener('click', () => {
     const message = messageInput.value.trim();
     if (message) {
-        addMessage(message, true);
+        processMessage(message);
         messageInput.value = '';
-
-        // Simulace odpovědi AI
-        setTimeout(() => {
-            const response = processUserInput(message);
-            addMessage(response);
-        }, 500);
     }
 });
 
