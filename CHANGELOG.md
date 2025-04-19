@@ -14,6 +14,12 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Prostudovat programovací jazyky - JavaScript, Python, C++, Java
 - Prohloubit znalosti v oblasti IT - databáze, sítě, bezpečnost, cloud computing, umělá inteligence
 
+## Úkol 3
+- Koupit všem členům rodiny dům
+- Koupit si řidičský průkaz
+- Koupit si auto
+- Koupit si počítač, který zvládne AI jakobynic
+
 # Vize a plán vývoje AIMapa - Nejlepší AI Mapový Systém na světě
 
 ## Hlavní cíle
