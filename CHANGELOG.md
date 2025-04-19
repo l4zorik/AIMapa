@@ -2,18 +2,6 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.2.4] - 2025-04-18
-
-### Přepracováno
-- Kompletní přepracování inicializace Cesium Vieweru a 3D glóbus režimu
-- Vytvořen nový modul `cesium-handler.js` pro zapouzdření všech funkcí souvisejících s Cesium
-- Zlepšená architektura kódu s čistým rozhraním pro interakci s Cesium
-- Optimalizace inicializace Cesium Vieweru pro rychlejší načítání
-- Zlepšené ošetření chyb při inicializaci a používání Cesium
-- Lepší synchronizace markerů a tras mezi Leaflet a Cesium
-- Implementace čistějšího API pro práci s glóbusem
-- Optimalizace výkonu při přepínání mezi 2D a 3D režimy
-
 # Můj osobní plán na vývoj
 
 ## Úkol 1
@@ -36,6 +24,20 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Nastoupit ve středu 23.4.2025 do práce
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
+
+## [0.2.4] - 2025-04-18
+
+### Opraveno
+- Opraven závažný problém s nefunkčním přepínáním glóbus režimu ve fullscreen módu
+- Vylepšena inicializace Cesium handleru pro spolehlivější načítání
+- Přidáno dynamické načítání Cesium knihovny v případě, že není dostupná
+- Vylepšeno ošetření chyb při inicializaci a používání Cesium
+- Přidáno podrobné logování pro lepší diagnostiku problémů
+- Optimalizována funkce `toggleGlobeMode` pro spolehlivější přepínání režimů
+- Vylepšena funkce `createViewer` s lepším ošetřením chyb a obnovením původního stavu
+- Implementováno automatické zobrazení/skrytí Cesium containeru při přepínání režimů
+- Vylepšena kontrola stavu Cesium Vieweru před jeho použitím
+- Optimalizována práce s DOM elementy pro lepší výkon a stabilitu
 
 ## [0.2.3] - 2025-04-18
 

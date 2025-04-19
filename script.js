@@ -12,11 +12,32 @@ const map = L.map('map', {
 }).setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
 
 // Inicializace Cesium handleru
-if (window.CesiumHandler) {
-    window.CesiumHandler.initialize(map).catch(error => {
-        console.error('Chyba při inicializaci Cesium handleru:', error);
-    });
+function initializeCesiumHandler() {
+    console.log('Inicializace Cesium handleru...');
+    if (typeof Cesium === 'undefined') {
+        console.error('Cesium knihovna není dostupná. Zkontrolujte připojení k internetu.');
+        return Promise.reject(new Error('Cesium knihovna není dostupná'));
+    }
+
+    if (window.CesiumHandler) {
+        return window.CesiumHandler.initialize(map).catch(error => {
+            console.error('Chyba při inicializaci Cesium handleru:', error);
+            return Promise.reject(error);
+        });
+    } else {
+        console.error('Cesium handler není dostupný. Zkontrolujte, zda je soubor cesium-handler.js správně načten.');
+        return Promise.reject(new Error('Cesium handler není dostupný'));
+    }
 }
+
+// Inicializace Cesium handleru po načtení stránky
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCesiumHandler().then(() => {
+        console.log('Cesium handler byl úspěšně inicializován');
+    }).catch(error => {
+        console.error('Nepodařilo se inicializovat Cesium handler:', error);
+    });
+});
 
 // Přidání OpenStreetMap podkladu
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1532,18 +1553,26 @@ function remove3DControls() {
 
 // Funkce pro přepnutí glóbus režimu
 function toggleGlobeMode() {
+    console.log('toggleGlobeMode funkce byla volána, isFullscreen:', isFullscreen);
+
     // Získání reference na tlačítko podle kontextu (fullscreen nebo normální režim)
     let toggleGlobeBtn;
 
     if (isFullscreen) {
         // Ve fullscreen režimu hledáme tlačítko v kontejneru fullscreenControls
         const fullscreenControls = document.getElementById('fullscreenControls');
+        console.log('fullscreenControls:', fullscreenControls);
+
         if (fullscreenControls) {
             // Hledáme tlačítko s textem 'Glóbus'
             const buttons = fullscreenControls.querySelectorAll('button');
+            console.log('Nalezeno tlačítek ve fullscreen:', buttons.length);
+
             for (const btn of buttons) {
+                console.log('Tlačítko HTML:', btn.innerHTML);
                 if (btn.innerHTML.includes('Glóbus')) {
                     toggleGlobeBtn = btn;
+                    console.log('Nalezeno tlačítko pro glóbus ve fullscreen');
                     break;
                 }
             }
@@ -1551,50 +1580,53 @@ function toggleGlobeMode() {
     } else {
         // V normálním režimu použijeme ID
         toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+        console.log('Tlačítko pro glóbus v normálním režimu:', toggleGlobeBtn);
     }
 
     // Pokud je aktivní 3D režim, nejprve ho deaktivujeme
     if (is3DMode) {
+        console.log('Deaktivace 3D režimu před aktivací glóbus režimu');
         toggle3DMode();
     }
 
-    // Přepnutí stavu glóbus režimu
+    // Přepínání stavu glóbus režimu
     isGlobeMode = !isGlobeMode;
+    console.log('Nový stav isGlobeMode:', isGlobeMode);
 
     if (isGlobeMode) {
+        console.log('Aktivace glóbus režimu');
+
         // Aktivace tlačítka
         if (toggleGlobeBtn) {
             toggleGlobeBtn.classList.add('active');
+            console.log('Tlačítko pro glóbus označeno jako aktivní');
         }
 
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
 
-        // Aktivace glóbus režimu pomocí Cesium handleru
-        if (window.CesiumHandler) {
-            window.CesiumHandler.activateGlobeMode(markers, addMessage)
-                .catch(error => {
-                    console.error('Chyba při aktivaci glóbus režimu:', error);
-                    // Obnovení původního stavu v případě chyby
-                    isGlobeMode = false;
-                    if (toggleGlobeBtn) {
-                        toggleGlobeBtn.classList.remove('active');
-                    }
-                    document.getElementById('map').classList.remove('map-globe-mode');
-                });
+        // Kontrola, zda je Cesium handler inicializován
+        if (!window.CesiumHandler) {
+            console.log('Cesium handler není dostupný, pokus o inicializaci...');
+            // Pokus o inicializaci Cesium handleru
+            initializeCesiumHandler().then(() => {
+                console.log('Cesium handler byl úspěšně inicializován, aktivace glóbus režimu...');
+                activateGlobeMode();
+            }).catch(error => {
+                console.error('Nepodařilo se inicializovat Cesium handler:', error);
+                handleGlobeModeError('Nepodařilo se inicializovat Cesium handler: ' + error.message);
+            });
         } else {
-            // Pokud není Cesium handler dostupný
-            addMessage('Nepodařilo se aktivovat glóbus režim. Cesium handler není dostupný.', true);
-            isGlobeMode = false;
-            if (toggleGlobeBtn) {
-                toggleGlobeBtn.classList.remove('active');
-            }
-            document.getElementById('map').classList.remove('map-globe-mode');
+            console.log('Cesium handler je dostupný, aktivace glóbus režimu...');
+            activateGlobeMode();
         }
     } else {
+        console.log('Deaktivace glóbus režimu');
+
         // Deaktivace tlačítka
         if (toggleGlobeBtn) {
             toggleGlobeBtn.classList.remove('active');
+            console.log('Tlačítko pro glóbus označeno jako neaktivní');
         }
 
         // Odstranění třídy pro glóbus režim
@@ -1602,10 +1634,51 @@ function toggleGlobeMode() {
 
         // Deaktivace glóbus režimu pomocí Cesium handleru
         if (window.CesiumHandler) {
+            console.log('Deaktivace glóbus režimu pomocí Cesium handleru');
             window.CesiumHandler.deactivateGlobeMode(addMessage)
                 .catch(error => {
                     console.error('Chyba při deaktivaci glóbus režimu:', error);
                 });
+        } else {
+            console.log('Cesium handler není dostupný, nelze deaktivovat glóbus režim');
+        }
+    }
+
+    // Pomocná funkce pro aktivaci glóbus režimu
+    function activateGlobeMode() {
+        // Aktivace glóbus režimu pomocí Cesium handleru
+        window.CesiumHandler.activateGlobeMode(markers, addMessage)
+            .then(() => {
+                console.log('Glóbus režim byl úspěšně aktivován');
+                // Zajistíme, že Cesium container je viditelný
+                const cesiumContainer = document.getElementById('cesiumContainer');
+                if (cesiumContainer) {
+                    cesiumContainer.style.display = 'block';
+                    console.log('Cesium container byl zobrazen');
+                }
+            })
+            .catch(error => {
+                console.error('Chyba při aktivaci glóbus režimu:', error);
+                handleGlobeModeError('Chyba při aktivaci glóbus režimu: ' + error.message);
+            });
+    }
+
+    // Pomocná funkce pro zpracování chyby při aktivaci glóbus režimu
+    function handleGlobeModeError(errorMessage) {
+        // Obnovení původního stavu v případě chyby
+        isGlobeMode = false;
+        if (toggleGlobeBtn) {
+            toggleGlobeBtn.classList.remove('active');
+        }
+        document.getElementById('map').classList.remove('map-globe-mode');
+
+        // Zobrazení chybové zprávy uživateli
+        addMessage(errorMessage, true);
+
+        // Skrytí loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
         }
     }
 }

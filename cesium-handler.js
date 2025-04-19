@@ -1,6 +1,6 @@
 /**
  * Cesium Handler Module
- * 
+ *
  * This module encapsulates all Cesium-related functionality for the AIMapa application.
  * It provides a clean interface for initializing and controlling the 3D globe mode.
  */
@@ -26,19 +26,60 @@ let mapReference = null;
 function initialize(map) {
     return new Promise((resolve, reject) => {
         try {
+            console.log('Inicializace Cesium modulu...');
+
             // Store reference to the map
             mapReference = map;
-            
+
+            // Check if Cesium is already initialized
+            if (isInitialized && cesiumViewer) {
+                console.log('Cesium modul je již inicializován');
+                resolve();
+                return;
+            }
+
             // Check if Cesium is available
             if (typeof Cesium === 'undefined') {
-                throw new Error('Knihovna Cesium není dostupná. Zkontrolujte připojení k internetu.');
+                console.error('Knihovna Cesium není dostupná. Pokus o načtení...');
+
+                // Try to load Cesium dynamically
+                const cesiumScript = document.createElement('script');
+                cesiumScript.src = 'https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Cesium.js';
+                cesiumScript.async = true;
+
+                const cesiumCss = document.createElement('link');
+                cesiumCss.rel = 'stylesheet';
+                cesiumCss.href = 'https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Widgets/widgets.css';
+
+                document.head.appendChild(cesiumCss);
+
+                cesiumScript.onload = function() {
+                    console.log('Cesium knihovna byla úspěšně načtena');
+                    // Set Cesium ion access token
+                    Cesium.Ion.defaultAccessToken = CESIUM_TOKEN;
+
+                    // Mark as initialized
+                    isInitialized = true;
+                    resolve();
+                };
+
+                cesiumScript.onerror = function() {
+                    const error = new Error('Nepodařilo se načíst knihovnu Cesium. Zkontrolujte připojení k internetu.');
+                    console.error(error);
+                    reject(error);
+                };
+
+                document.head.appendChild(cesiumScript);
+                return;
             }
-            
+
             // Set Cesium ion access token
+            console.log('Nastavení Cesium ion access tokenu');
             Cesium.Ion.defaultAccessToken = CESIUM_TOKEN;
-            
+
             // Mark as initialized
             isInitialized = true;
+            console.log('Cesium modul byl úspěšně inicializován');
             resolve();
         } catch (error) {
             console.error('Chyba při inicializaci Cesium modulu:', error);
@@ -54,13 +95,37 @@ function initialize(map) {
 function createViewer() {
     return new Promise((resolve, reject) => {
         try {
+            console.log('Vytváření Cesium Vieweru...');
+
+            // Check if Cesium is available
+            if (typeof Cesium === 'undefined') {
+                console.error('Knihovna Cesium není dostupná. Pokus o inicializaci...');
+                // Try to initialize Cesium first
+                return initialize(mapReference)
+                    .then(() => createViewer())
+                    .then(resolve)
+                    .catch(reject);
+            }
+
             // Check if already initialized
             if (!isInitialized) {
-                throw new Error('Cesium modul nebyl inicializován. Zavolejte nejprve initialize().');
+                console.warn('Cesium modul není inicializován. Pokus o inicializaci...');
+                return initialize(mapReference)
+                    .then(() => createViewer())
+                    .then(resolve)
+                    .catch(reject);
             }
-            
-            // Clean up existing viewer if it exists
+
+            // Check if viewer already exists and is valid
+            if (cesiumViewer && !cesiumViewer.isDestroyed()) {
+                console.log('Cesium Viewer již existuje, použiju existující instanci');
+                resolve(cesiumViewer);
+                return;
+            }
+
+            // Clean up existing viewer if it exists but is in a bad state
             if (cesiumViewer) {
+                console.log('Odstraňuji existující Cesium Viewer...');
                 try {
                     cesiumViewer.destroy();
                 } catch (e) {
@@ -68,16 +133,17 @@ function createViewer() {
                 }
                 cesiumViewer = null;
             }
-            
+
             // Get reference to the Cesium container
             const cesiumContainer = document.getElementById('cesiumContainer');
             if (!cesiumContainer) {
                 throw new Error('Cesium kontejner nebyl nalezen v DOM.');
             }
-            
+
+            console.log('Cesium container nalezen, připravuji...');
             // Clear the container
             cesiumContainer.innerHTML = '';
-            
+
             // Set container styles
             cesiumContainer.style.display = 'block';
             cesiumContainer.style.width = '100%';
@@ -87,46 +153,69 @@ function createViewer() {
             cesiumContainer.style.left = '0';
             cesiumContainer.style.zIndex = '1000';
             cesiumContainer.style.backgroundColor = '#000';
-            
-            // Create the Cesium Viewer with optimized settings
-            cesiumViewer = new Cesium.Viewer('cesiumContainer', {
-                animation: false,
-                baseLayerPicker: false,
-                fullscreenButton: false,
-                geocoder: false,
-                homeButton: false,
-                infoBox: false,
-                sceneModePicker: false,
-                selectionIndicator: false,
-                timeline: false,
-                navigationHelpButton: false,
-                navigationInstructionsInitiallyVisible: false,
-                imageryProvider: new Cesium.BingMapsImageryProvider({
-                    url: 'https://dev.virtualearth.net',
-                    key: BING_MAPS_KEY,
-                    mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
-                }),
-                terrainProvider: Cesium.createWorldTerrain({
-                    requestWaterMask: true,
-                    requestVertexNormals: true
-                }),
-                contextOptions: {
-                    webgl: {
-                        alpha: false,
-                        antialias: true,
-                        preserveDrawingBuffer: true,
-                        failIfMajorPerformanceCaveat: false,
-                        depth: true,
-                        stencil: false
-                    }
-                },
-                orderIndependentTranslucency: true,
-                shadows: false,
-                targetFrameRate: 60,
-                useBrowserRecommendedResolution: true,
-                automaticallyTrackDataSourceClocks: false
-            });
-            
+
+            // Hide the Leaflet container
+            const leafletContainer = document.querySelector('.leaflet-container');
+            if (leafletContainer) {
+                console.log('Skrývám Leaflet container');
+                leafletContainer.style.display = 'none';
+            }
+
+            console.log('Vytvářím novou instanci Cesium Vieweru...');
+            try {
+                // Create the Cesium Viewer with optimized settings
+                cesiumViewer = new Cesium.Viewer('cesiumContainer', {
+                    animation: false,
+                    baseLayerPicker: false,
+                    fullscreenButton: false,
+                    geocoder: false,
+                    homeButton: false,
+                    infoBox: false,
+                    sceneModePicker: false,
+                    selectionIndicator: false,
+                    timeline: false,
+                    navigationHelpButton: false,
+                    navigationInstructionsInitiallyVisible: false,
+                    imageryProvider: new Cesium.BingMapsImageryProvider({
+                        url: 'https://dev.virtualearth.net',
+                        key: BING_MAPS_KEY,
+                        mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
+                    }),
+                    terrainProvider: Cesium.createWorldTerrain({
+                        requestWaterMask: true,
+                        requestVertexNormals: true
+                    }),
+                    contextOptions: {
+                        webgl: {
+                            alpha: false,
+                            antialias: true,
+                            preserveDrawingBuffer: true,
+                            failIfMajorPerformanceCaveat: false,
+                            depth: true,
+                            stencil: false
+                        }
+                    },
+                    orderIndependentTranslucency: true,
+                    shadows: false,
+                    targetFrameRate: 60,
+                    useBrowserRecommendedResolution: true,
+                    automaticallyTrackDataSourceClocks: false
+                });
+            } catch (error) {
+                console.error('Chyba při vytváření Cesium Vieweru:', error);
+
+                // Show Leaflet container again
+                if (leafletContainer) {
+                    leafletContainer.style.display = 'block';
+                }
+
+                // Hide Cesium container
+                cesiumContainer.style.display = 'none';
+
+                throw error;
+            }
+
+            console.log('Konfigurace Cesium Vieweru...');
             // Configure scene for better performance and visuals
             cesiumViewer.scene.globe.enableLighting = true;
             cesiumViewer.scene.skyAtmosphere.show = true;
@@ -135,12 +224,12 @@ function createViewer() {
             cesiumViewer.scene.globe.maximumScreenSpaceError = 2.0;
             cesiumViewer.scene.sun.show = true;
             cesiumViewer.scene.moon.show = true;
-            
+
             // Hide Cesium credits
             if (cesiumViewer.cesiumWidget && cesiumViewer.cesiumWidget.creditContainer) {
                 cesiumViewer.cesiumWidget.creditContainer.style.display = 'none';
             }
-            
+
             // Add event listeners for better performance
             cesiumViewer.scene.preRender.addEventListener(() => {
                 // This ensures the scene is rendered only when needed
@@ -148,10 +237,34 @@ function createViewer() {
                     cesiumViewer.scene.requestRender();
                 }
             });
-            
+
+            console.log('Cesium Viewer byl úspěšně vytvořen');
             resolve(cesiumViewer);
         } catch (error) {
             console.error('Chyba při vytváření Cesium Vieweru:', error);
+
+            // Try to clean up in case of error
+            if (cesiumViewer) {
+                try {
+                    cesiumViewer.destroy();
+                } catch (e) {
+                    console.warn('Chyba při odstraňování Cesium Vieweru po chybě:', e);
+                }
+                cesiumViewer = null;
+            }
+
+            // Show Leaflet container again
+            const leafletContainer = document.querySelector('.leaflet-container');
+            if (leafletContainer) {
+                leafletContainer.style.display = 'block';
+            }
+
+            // Hide Cesium container
+            const container = document.getElementById('cesiumContainer');
+            if (container) {
+                container.style.display = 'none';
+            }
+
             reject(error);
         }
     });
@@ -171,15 +284,15 @@ function activateGlobeMode(markers, addMessageCallback) {
             if (loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
             }
-            
+
             // Create viewer if it doesn't exist
             if (!cesiumViewer) {
                 await createViewer();
             }
-            
+
             // Get current map center
             const center = mapReference.getCenter();
-            
+
             // Set initial camera position
             cesiumViewer.camera.flyTo({
                 destination: Cesium.Cartesian3.fromDegrees(center.lng, center.lat, 2000000),
@@ -194,42 +307,42 @@ function activateGlobeMode(markers, addMessageCallback) {
                     if (loadingOverlay) {
                         loadingOverlay.style.display = 'none';
                     }
-                    
+
                     // Add controls
                     addGlobeControls();
-                    
+
                     // Add markers and routes
                     addMarkersToGlobe(markers);
                     addRoutesToGlobe(markers);
-                    
+
                     // Set globe mode flag
                     isGlobeMode = true;
-                    
+
                     // Force render
                     cesiumViewer.scene.requestRender();
-                    
+
                     // Display message to user
                     if (addMessageCallback) {
                         addMessageCallback('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
                     }
-                    
+
                     resolve();
                 }
             });
         } catch (error) {
             console.error('Chyba při aktivaci glóbus režimu:', error);
-            
+
             // Hide loading overlay
             const loadingOverlay = document.getElementById('loadingOverlay');
             if (loadingOverlay) {
                 loadingOverlay.style.display = 'none';
             }
-            
+
             // Display error message
             if (addMessageCallback) {
                 addMessageCallback('Nepodařilo se aktivovat glóbus režim. Chyba: ' + error.message, true);
             }
-            
+
             reject(error);
         }
     });
@@ -245,48 +358,48 @@ function deactivateGlobeMode(addMessageCallback) {
         try {
             // Remove controls
             removeGlobeControls();
-            
+
             // Clear entities
             if (cesiumViewer) {
                 cesiumViewer.entities.removeAll();
                 globeMarkers = [];
                 globeRoutes = [];
             }
-            
+
             // Hide Cesium container
             const cesiumContainer = document.getElementById('cesiumContainer');
             if (cesiumContainer) {
                 cesiumContainer.style.display = 'none';
             }
-            
+
             // Show Leaflet container
             const leafletContainer = document.querySelector('.leaflet-container');
             if (leafletContainer) {
                 leafletContainer.style.display = 'block';
             }
-            
+
             // Update map size
             if (mapReference) {
                 mapReference.invalidateSize();
             }
-            
+
             // Set globe mode flag
             isGlobeMode = false;
-            
+
             // Display message to user
             if (addMessageCallback) {
                 addMessageCallback('Glóbus režim byl deaktivován. Mapa je nyní v klasickém 2D zobrazení.', false);
             }
-            
+
             resolve();
         } catch (error) {
             console.error('Chyba při deaktivaci glóbus režimu:', error);
-            
+
             // Display error message
             if (addMessageCallback) {
                 addMessageCallback('Nepodařilo se deaktivovat glóbus režim. Chyba: ' + error.message, true);
             }
-            
+
             reject(error);
         }
     });
@@ -301,20 +414,20 @@ function addMarkersToGlobe(markers) {
         console.error('Cesium Viewer není inicializován');
         return;
     }
-    
+
     try {
         // Clear existing markers
         globeMarkers.forEach(entityId => {
             cesiumViewer.entities.removeById(entityId);
         });
         globeMarkers = [];
-        
+
         // Add new markers
         markers.forEach((marker, index) => {
             const position = marker.getLatLng();
             const properties = marker.properties || {};
             const name = properties.name || `Bod ${index + 1}`;
-            
+
             // Create point entity
             const entity = cesiumViewer.entities.add({
                 id: `marker-${index}`,
@@ -340,7 +453,7 @@ function addMarkersToGlobe(markers) {
                     disableDepthTestDistance: Number.POSITIVE_INFINITY
                 }
             });
-            
+
             globeMarkers.push(entity.id);
         });
     } catch (error) {
@@ -357,26 +470,26 @@ function addRoutesToGlobe(markers) {
         console.error('Cesium Viewer není inicializován');
         return;
     }
-    
+
     try {
         // Clear existing routes
         globeRoutes.forEach(entityId => {
             cesiumViewer.entities.removeById(entityId);
         });
         globeRoutes = [];
-        
+
         // If we don't have at least two markers, we can't create a route
         if (markers.length < 2) {
             return;
         }
-        
+
         // Create positions array for the route
         const positions = [];
         markers.forEach(marker => {
             const position = marker.getLatLng();
             positions.push(position.lng, position.lat, 0);
         });
-        
+
         // Create route entity
         const routeEntity = cesiumViewer.entities.add({
             id: 'route',
@@ -391,7 +504,7 @@ function addRoutesToGlobe(markers) {
                 clampToGround: true
             }
         });
-        
+
         globeRoutes.push(routeEntity.id);
     } catch (error) {
         console.error('Chyba při přidávání tras na glóbus:', error);
@@ -404,12 +517,12 @@ function addRoutesToGlobe(markers) {
 function addGlobeControls() {
     // Remove existing controls
     removeGlobeControls();
-    
+
     // Create controls container
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'mapGlobeControls';
     controlsContainer.className = 'map-globe-controls';
-    
+
     // Create zoom in button
     const zoomInBtn = document.createElement('button');
     zoomInBtn.className = 'map-globe-control-btn';
@@ -420,7 +533,7 @@ function addGlobeControls() {
             cesiumViewer.camera.zoomIn(1000000);
         }
     });
-    
+
     // Create zoom out button
     const zoomOutBtn = document.createElement('button');
     zoomOutBtn.className = 'map-globe-control-btn';
@@ -431,7 +544,7 @@ function addGlobeControls() {
             cesiumViewer.camera.zoomOut(1000000);
         }
     });
-    
+
     // Create rotate left button
     const rotateLeftBtn = document.createElement('button');
     rotateLeftBtn.className = 'map-globe-control-btn';
@@ -440,7 +553,7 @@ function addGlobeControls() {
     rotateLeftBtn.addEventListener('click', () => {
         rotateGlobe(-0.1, 0);
     });
-    
+
     // Create rotate right button
     const rotateRightBtn = document.createElement('button');
     rotateRightBtn.className = 'map-globe-control-btn';
@@ -449,7 +562,7 @@ function addGlobeControls() {
     rotateRightBtn.addEventListener('click', () => {
         rotateGlobe(0.1, 0);
     });
-    
+
     // Create tilt up button
     const tiltUpBtn = document.createElement('button');
     tiltUpBtn.className = 'map-globe-control-btn';
@@ -458,7 +571,7 @@ function addGlobeControls() {
     tiltUpBtn.addEventListener('click', () => {
         rotateGlobe(0, 0.1);
     });
-    
+
     // Create tilt down button
     const tiltDownBtn = document.createElement('button');
     tiltDownBtn.className = 'map-globe-control-btn';
@@ -467,7 +580,7 @@ function addGlobeControls() {
     tiltDownBtn.addEventListener('click', () => {
         rotateGlobe(0, -0.1);
     });
-    
+
     // Create reset view button
     const resetViewBtn = document.createElement('button');
     resetViewBtn.className = 'map-globe-control-btn';
@@ -487,7 +600,7 @@ function addGlobeControls() {
             });
         }
     });
-    
+
     // Add buttons to container
     controlsContainer.appendChild(zoomInBtn);
     controlsContainer.appendChild(zoomOutBtn);
@@ -496,7 +609,7 @@ function addGlobeControls() {
     controlsContainer.appendChild(tiltUpBtn);
     controlsContainer.appendChild(tiltDownBtn);
     controlsContainer.appendChild(resetViewBtn);
-    
+
     // Add container to map
     document.getElementById('map').appendChild(controlsContainer);
 }
@@ -510,7 +623,7 @@ function removeGlobeControls() {
     if (controlsContainer) {
         controlsContainer.remove();
     }
-    
+
     // Remove rotation controls
     const rotationControls = document.querySelector('.cesium-rotation-controls');
     if (rotationControls) {
@@ -525,11 +638,11 @@ function removeGlobeControls() {
  */
 function rotateGlobe(headingChange, pitchChange) {
     if (!cesiumViewer) return;
-    
+
     const camera = cesiumViewer.camera;
     const heading = camera.heading + headingChange;
     const pitch = camera.pitch + pitchChange;
-    
+
     camera.setView({
         orientation: {
             heading: heading,
@@ -546,15 +659,15 @@ function rotateGlobe(headingChange, pitchChange) {
  */
 function updateGlobeMarker(index, marker) {
     if (!cesiumViewer || !isGlobeMode) return;
-    
+
     try {
         const position = marker.getLatLng();
         const properties = marker.properties || {};
         const name = properties.name || `Bod ${index + 1}`;
-        
+
         // Find existing entity
         const entity = cesiumViewer.entities.getById(`marker-${index}`);
-        
+
         if (entity) {
             // Update existing entity
             entity.position = Cesium.Cartesian3.fromDegrees(position.lng, position.lat, 0);
@@ -585,10 +698,10 @@ function updateGlobeMarker(index, marker) {
                     disableDepthTestDistance: Number.POSITIVE_INFINITY
                 }
             });
-            
+
             globeMarkers.push(newEntity.id);
         }
-        
+
         // Update routes
         addRoutesToGlobe(markers);
     } catch (error) {
@@ -624,7 +737,7 @@ function cleanup() {
         }
         cesiumViewer = null;
     }
-    
+
     isInitialized = false;
     isGlobeMode = false;
     globeMarkers = [];
