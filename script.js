@@ -987,11 +987,86 @@ function toggleFullscreen() {
         exitFullscreenButton.addEventListener('click', toggleFullscreen);
         mapWrapper.appendChild(exitFullscreenButton);
 
+        // Přidání ovládacích tlačítek do fullscreen režimu
+        const fullscreenControls = document.createElement('div');
+        fullscreenControls.id = 'fullscreenControls';
+        fullscreenControls.className = 'fullscreen-controls';
+
+        // Tlačítko pro přidání aktivity
+        const addActivityFsBtn = document.createElement('button');
+        addActivityFsBtn.className = 'fs-btn';
+        addActivityFsBtn.innerHTML = '<i class="icon">📍</i> Přidat aktivitu';
+        addActivityFsBtn.addEventListener('click', () => {
+            isAddingPoints = !isAddingPoints;
+            if (isAddingPoints) {
+                addActivityFsBtn.classList.add('active');
+                addMessage('Režim přidávání bodů je aktivní. Dvojklikněte na mapu pro přidání bodu.', false);
+            } else {
+                addActivityFsBtn.classList.remove('active');
+                addMessage('Režim přidávání bodů byl deaktivován.', false);
+            }
+
+            // Synchronizace s hlavním tlačítkem
+            const mainAddActivityBtn = document.getElementById('addActivity');
+            if (isAddingPoints) {
+                mainAddActivityBtn.classList.add('active');
+            } else {
+                mainAddActivityBtn.classList.remove('active');
+            }
+        });
+
+        // Tlačítko pro vymazání mapy
+        const clearMapFsBtn = document.createElement('button');
+        clearMapFsBtn.className = 'fs-btn';
+        clearMapFsBtn.innerHTML = '<i class="icon">🗑️</i> Vymazat mapu';
+        clearMapFsBtn.addEventListener('click', () => {
+            // Vymazání všech bodů
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            // Reset vlastností markerů
+            markerProperties = [];
+
+            // Vymazání trasy vytvořené pomocí Leaflet Routing Machine
+            if (routeControl) {
+                map.removeControl(routeControl);
+                routeControl = null;
+            }
+
+            // Vymazání záložní trasy (přímá čára), pokud existuje
+            if (route) {
+                map.removeLayer(route);
+                route = null;
+            }
+
+            // Reset informací o trase
+            routeDistanceElement.textContent = '-';
+            routeTimeElement.textContent = '-';
+
+            // Informace pro uživatele
+            addMessage('Mapa byla vyčištěna. Všechny body a trasy byly odstraněny.', false);
+
+            // Uložení stavu aplikace po vymazání mapy
+            saveAppState();
+        });
+
+        // Přidání tlačítek do kontejneru
+        fullscreenControls.appendChild(addActivityFsBtn);
+        fullscreenControls.appendChild(clearMapFsBtn);
+
+        // Přidání kontejneru do mapy
+        mapWrapper.appendChild(fullscreenControls);
+
         // Přidání plovoucího chatu do fullscreen režimu
         createFloatingChat();
 
         // Zobrazení informace o fullscreen režimu
         addMessage('Mapa je nyní v režimu celé obrazovky. Pro návrat stiskněte klávesu ESC nebo klikněte na tlačítko v pravém horním rohu.', false);
+
+        // Nastavení aktivního stavu tlačítka pro přidávání bodů podle aktuálního stavu
+        if (isAddingPoints) {
+            addActivityFsBtn.classList.add('active');
+        }
     } else {
         mapWrapper.classList.remove('map-fullscreen');
         fullscreenButton.innerHTML = '<i class="icon">⛶</i>'; // Symbol pro fullscreen
@@ -1004,6 +1079,12 @@ function toggleFullscreen() {
         const exitFullscreenButton = document.getElementById('exitFullscreenButton');
         if (exitFullscreenButton) {
             exitFullscreenButton.remove();
+        }
+
+        // Odstranění ovládacích tlačítek z fullscreen režimu
+        const fullscreenControls = document.getElementById('fullscreenControls');
+        if (fullscreenControls) {
+            fullscreenControls.remove();
         }
 
         // Odstranění plovoucího chatu
