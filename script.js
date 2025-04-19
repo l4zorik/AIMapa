@@ -1178,7 +1178,6 @@ function saveAppState() {
     const settings = {
         darkMode: document.getElementById('darkModeToggle').checked,
         colorScheme: document.querySelector('.color-option.active').getAttribute('data-color'),
-        design: document.getElementById('designSelect').value,
         markerStyle: markerStyle,
         markerEffectsEnabled: markerEffectsEnabled
     };
@@ -1274,13 +1273,7 @@ function loadAppState() {
                 });
             }
 
-            // Nastavení designu
-            if (appState.settings.design) {
-                const designSelect = document.getElementById('designSelect');
-                if (designSelect) {
-                    designSelect.value = appState.settings.design;
-                }
-            }
+
 
             // Nastavení stylu markerů
             if (appState.settings.markerStyle) {
