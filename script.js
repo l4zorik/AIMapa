@@ -108,8 +108,8 @@ function createPopupContent(marker, index) {
                     </div>
                 </div>
                 <div class="popup-actions">
-                    <button class="popup-btn edit-btn" onclick="editMarker(${index})">Upravit</button>
-                    <button class="popup-btn delete-btn" onclick="removeMarker(${index})">Odstranit</button>
+                    <button class="popup-btn edit-btn" onclick="editMarker(${index}, event)">Upravit</button>
+                    <button class="popup-btn delete-btn" onclick="removeMarker(${index}, event)">Odstranit</button>
                 </div>
             </div>
         `;
@@ -132,8 +132,8 @@ function createPopupContent(marker, index) {
                     </div>
                     <p class="coordinates">Souřadnice: ${markerProp.lat}, ${markerProp.lng}</p>
                     <div class="popup-actions">
-                        <button class="popup-btn save-btn" onclick="saveMarkerProperties(${index})">Uložit</button>
-                        <button class="popup-btn delete-btn" onclick="removeMarker(${index})">Odstranit bod</button>
+                        <button class="popup-btn save-btn" onclick="saveMarkerProperties(${index}, event)">Uložit</button>
+                        <button class="popup-btn delete-btn" onclick="removeMarker(${index}, event)">Odstranit bod</button>
                     </div>
                 </div>
             </div>
@@ -217,7 +217,12 @@ function startCountdown(elementId, seconds) {
 }
 
 // Funkce pro uložení vlastností markeru
-function saveMarkerProperties(index) {
+function saveMarkerProperties(index, event) {
+    // Zastavení propagace události, aby se nezavřelo popup okno
+    if (event) {
+        event.stopPropagation();
+    }
+
     const nameInput = document.getElementById(`markerName${index}`);
     const commandInput = document.getElementById(`markerCommand${index}`);
 
@@ -260,7 +265,12 @@ function saveMarkerProperties(index) {
 }
 
 // Funkce pro přepnutí markeru do režimu úprav
-function editMarker(index) {
+function editMarker(index, event) {
+    // Zastavení propagace události, aby se nezavřelo popup okno
+    if (event) {
+        event.stopPropagation();
+    }
+
     if (index < markers.length) {
         const marker = markers[index];
 
@@ -271,13 +281,23 @@ function editMarker(index) {
         // Aktualizace popup obsahu
         marker.setPopupContent(createPopupContent(marker, index));
 
+        // Znovu otevřeme popup, pokud bylo zavřeno
+        if (!marker.isPopupOpen()) {
+            marker.openPopup();
+        }
+
         // Informace pro uživatele
         addMessage(`Bod "${tempProperties.name}" je nyní v režimu úprav.`, false);
     }
 }
 
 // Funkce pro odstranění markeru
-function removeMarker(index) {
+function removeMarker(index, event) {
+    // Zastavení propagace události, aby se nezavřelo popup okno předčasně
+    if (event) {
+        event.stopPropagation();
+    }
+
     if (index < markers.length) {
         const marker = markers[index];
         const markerName = markerProperties[index]?.name || `Bod ${index + 1}`;
@@ -500,9 +520,18 @@ map.on('dblclick', (e) => {
 map.doubleClickZoom.disable();
 
 // Přidání event listeneru pro kliknutí na mapu - zavře všechna popup okna
-map.on('click', () => {
-    // Zavření všech popup oken při kliknutí na mapu
-    map.closePopup();
+map.on('click', (e) => {
+    // Kontrola, zda kliknutí nebylo na popup okno nebo jeho obsah
+    const clickedElement = e.originalEvent.target;
+    const isPopupClick = clickedElement.closest('.leaflet-popup') ||
+                        clickedElement.closest('.popup-content') ||
+                        clickedElement.closest('.popup-actions') ||
+                        clickedElement.closest('.popup-btn');
+
+    // Zavření všech popup oken při kliknutí na mapu (mimo popup okno)
+    if (!isPopupClick) {
+        map.closePopup();
+    }
 });
 
 // Event listener pro zoom, aby se popup okna lépe chovaly při zoomu

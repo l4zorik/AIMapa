@@ -49,6 +49,13 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Adaptivní rozhraní, které se přizpůsobuje potřebám uživatele
 - Bezproblémová integrace s dalšími aplikacemi a službami
 
+## [0.0.7] - 2025-04-18
+
+### Opraveno
+- Opraveno chování popup oken při kliknutí na tlačítka - popup okna se nyní nezavírají při kliknutí na tlačítka "Upravit", "Uložit" nebo "Odstranit"
+- Vylepšena detekce kliknutí na popup okno a jeho obsah - popup okna se nyní nezavírají při kliknutí kamkoliv do jejich obsahu
+- Opraveno chování při přepnutí do režimu úprav - popup okno zůstává otevřené
+
 ## [0.0.6] - 2025-04-18
 
 ### Přidáno
