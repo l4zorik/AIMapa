@@ -45,7 +45,10 @@ let routeControl = null; // Pro Leaflet Routing Machine
 let isAddingPoints = true; // Výchozí stav - přidávání bodů je aktivní
 let isFullscreen = false;
 let is3DMode = false; // Výchozí stav - 3D režim je deaktivovaný
+let isGlobeMode = false; // Výchozí stav - glóbus režim je deaktivovaný
 let osmb = null; // Proměnná pro OSM Buildings
+let earth = null; // Proměnná pro WebGL Earth
+let globeMarkers = []; // Proměnná pro markery na glóbusu
 
 // Konfigurace pro Leaflet Routing Machine
 const routingOptions = {
@@ -799,6 +802,9 @@ document.getElementById('addActivity').addEventListener('click', () => {
 // Event listener pro tlačítko 3D režimu
 document.getElementById('toggle3DMode').addEventListener('click', toggle3DMode);
 
+// Event listener pro tlačítko glóbusu
+document.getElementById('toggleGlobeMode').addEventListener('click', toggleGlobeMode);
+
 // Funkce pro výpočet trasy s použitím Leaflet Routing Machine
 function calculateRouteFunction() {
     if (markers.length < 2) {
@@ -1066,10 +1072,22 @@ function toggleFullscreen() {
             toggle3DFsBtn.classList.add('active');
         }
 
+        // Tlačítko pro glóbus režim
+        const toggleGlobeFsBtn = document.createElement('button');
+        toggleGlobeFsBtn.className = 'fs-btn';
+        toggleGlobeFsBtn.innerHTML = '<i class="icon">🌎</i> Glóbus';
+        toggleGlobeFsBtn.addEventListener('click', toggleGlobeMode);
+
+        // Nastavení aktivního stavu tlačítka pro glóbus režim podle aktuálního stavu
+        if (isGlobeMode) {
+            toggleGlobeFsBtn.classList.add('active');
+        }
+
         // Přidání tlačítek do kontejneru
         fullscreenControls.appendChild(addActivityFsBtn);
         fullscreenControls.appendChild(clearMapFsBtn);
         fullscreenControls.appendChild(toggle3DFsBtn);
+        fullscreenControls.appendChild(toggleGlobeFsBtn);
 
         // Přidání kontejneru do mapy
         mapWrapper.appendChild(fullscreenControls);
@@ -1470,6 +1488,234 @@ function add3DControls() {
 // Funkce pro odstranění ovládacích prvků pro 3D režim
 function remove3DControls() {
     const controlsContainer = document.getElementById('map3DControls');
+    if (controlsContainer) {
+        controlsContainer.remove();
+    }
+}
+
+// Funkce pro přepnutí glóbus režimu
+function toggleGlobeMode() {
+    const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+
+    // Pokud je aktivní 3D režim, nejprve ho deaktivujeme
+    if (is3DMode) {
+        toggle3DMode();
+    }
+
+    isGlobeMode = !isGlobeMode;
+
+    if (isGlobeMode) {
+        // Aktivace glóbus režimu
+        toggleGlobeBtn.classList.add('active');
+
+        // Přidání třídy pro glóbus režim
+        document.getElementById('map').classList.add('map-globe-mode');
+
+        // Uložení aktuálního středu a zoomu mapy
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+
+        // Skrytí Leaflet mapy
+        document.querySelector('.leaflet-container').style.display = 'none';
+
+        // Vytvoření kontejneru pro glóbus
+        const globeContainer = document.createElement('div');
+        globeContainer.id = 'globeContainer';
+        globeContainer.style.width = '100%';
+        globeContainer.style.height = '100%';
+        globeContainer.style.position = 'absolute';
+        globeContainer.style.top = '0';
+        globeContainer.style.left = '0';
+        document.getElementById('map').appendChild(globeContainer);
+
+        // Inicializace WebGL Earth
+        earth = new WE.map('globeContainer', {
+            atmosphere: true,
+            sky: true
+        });
+
+        // Přidání mapové vrstvy
+        WE.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(earth);
+
+        // Nastavení pohledu na stejnou pozici jako v Leaflet mapě
+        earth.setView([center.lat, center.lng], zoom);
+
+        // Přidání markerů na glóbus
+        addMarkersToGlobe();
+
+        // Přidání ovládacích prvků pro glóbus
+        addGlobeControls();
+
+        // Informace pro uživatele
+        addMessage('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
+    } else {
+        // Deaktivace glóbus režimu
+        toggleGlobeBtn.classList.remove('active');
+
+        // Odstranění třídy pro glóbus režim
+        document.getElementById('map').classList.remove('map-globe-mode');
+
+        // Odstranění kontejneru pro glóbus
+        const globeContainer = document.getElementById('globeContainer');
+        if (globeContainer) {
+            globeContainer.remove();
+        }
+
+        // Zobrazení Leaflet mapy
+        document.querySelector('.leaflet-container').style.display = 'block';
+
+        // Odstranění ovládacích prvků pro glóbus
+        removeGlobeControls();
+
+        // Vyčištění markerů na glóbusu
+        globeMarkers = [];
+
+        // Aktualizace velikosti mapy
+        map.invalidateSize();
+
+        // Informace pro uživatele
+        addMessage('Glóbus režim byl deaktivován. Mapa je nyní v klasickém 2D zobrazení.', false);
+    }
+}
+
+// Funkce pro přidání markerů na glóbus
+function addMarkersToGlobe() {
+    // Vyčištění předchozích markerů
+    globeMarkers.forEach(marker => {
+        earth.removeMarker(marker);
+    });
+    globeMarkers = [];
+
+    // Přidání markerů z Leaflet mapy na glóbus
+    markers.forEach((marker, index) => {
+        const position = marker.getLatLng();
+        const globeMarker = WE.marker([position.lat, position.lng]).addTo(earth);
+
+        // Přidání popup okna s informacemi
+        if (markerProperties[index] && markerProperties[index].name) {
+            globeMarker.bindPopup(`<b>${markerProperties[index].name}</b><br>Bod ${index + 1}`);
+        } else {
+            globeMarker.bindPopup(`Bod ${index + 1}`);
+        }
+
+        globeMarkers.push(globeMarker);
+    });
+}
+
+// Funkce pro přidání ovládacích prvků pro glóbus
+function addGlobeControls() {
+    // Odstranění existujících ovládacích prvků, pokud existují
+    removeGlobeControls();
+
+    // Vytvoření kontejneru pro ovládací prvky
+    const controlsContainer = document.createElement('div');
+    controlsContainer.id = 'mapGlobeControls';
+    controlsContainer.className = 'map-globe-controls';
+
+    // Tlačítko pro zvětšení (zoom in)
+    const zoomInBtn = document.createElement('button');
+    zoomInBtn.className = 'map-globe-control-btn';
+    zoomInBtn.innerHTML = '+';
+    zoomInBtn.title = 'Přiblížit';
+    zoomInBtn.addEventListener('click', () => {
+        if (earth) {
+            const currentZoom = earth.getZoom();
+            earth.setZoom(currentZoom + 1);
+        }
+    });
+
+    // Tlačítko pro zmenšení (zoom out)
+    const zoomOutBtn = document.createElement('button');
+    zoomOutBtn.className = 'map-globe-control-btn';
+    zoomOutBtn.innerHTML = '-';
+    zoomOutBtn.title = 'Oddálit';
+    zoomOutBtn.addEventListener('click', () => {
+        if (earth) {
+            const currentZoom = earth.getZoom();
+            earth.setZoom(Math.max(currentZoom - 1, 0));
+        }
+    });
+
+    // Tlačítko pro rotaci doleva
+    const rotateLeftBtn = document.createElement('button');
+    rotateLeftBtn.className = 'map-globe-control-btn';
+    rotateLeftBtn.innerHTML = '↶';
+    rotateLeftBtn.title = 'Rotovat doleva';
+    rotateLeftBtn.addEventListener('click', () => {
+        if (earth) {
+            const center = earth.getCenter();
+            earth.panTo([center[0], center[1] - 15]);
+        }
+    });
+
+    // Tlačítko pro rotaci doprava
+    const rotateRightBtn = document.createElement('button');
+    rotateRightBtn.className = 'map-globe-control-btn';
+    rotateRightBtn.innerHTML = '↷';
+    rotateRightBtn.title = 'Rotovat doprava';
+    rotateRightBtn.addEventListener('click', () => {
+        if (earth) {
+            const center = earth.getCenter();
+            earth.panTo([center[0], center[1] + 15]);
+        }
+    });
+
+    // Tlačítko pro posun nahoru
+    const panUpBtn = document.createElement('button');
+    panUpBtn.className = 'map-globe-control-btn';
+    panUpBtn.innerHTML = '↑';
+    panUpBtn.title = 'Posunout nahoru';
+    panUpBtn.addEventListener('click', () => {
+        if (earth) {
+            const center = earth.getCenter();
+            earth.panTo([center[0] + 15, center[1]]);
+        }
+    });
+
+    // Tlačítko pro posun dolů
+    const panDownBtn = document.createElement('button');
+    panDownBtn.className = 'map-globe-control-btn';
+    panDownBtn.innerHTML = '↓';
+    panDownBtn.title = 'Posunout dolů';
+    panDownBtn.addEventListener('click', () => {
+        if (earth) {
+            const center = earth.getCenter();
+            earth.panTo([center[0] - 15, center[1]]);
+        }
+    });
+
+    // Tlačítko pro reset pohledu
+    const resetViewBtn = document.createElement('button');
+    resetViewBtn.className = 'map-globe-control-btn';
+    resetViewBtn.innerHTML = '⟲';
+    resetViewBtn.title = 'Resetovat pohled';
+    resetViewBtn.addEventListener('click', () => {
+        if (earth) {
+            // Získání středu Leaflet mapy
+            const center = map.getCenter();
+            const zoom = map.getZoom();
+            earth.setView([center.lat, center.lng], zoom);
+        }
+    });
+
+    // Přidání tlačítek do kontejneru
+    controlsContainer.appendChild(zoomInBtn);
+    controlsContainer.appendChild(zoomOutBtn);
+    controlsContainer.appendChild(rotateLeftBtn);
+    controlsContainer.appendChild(rotateRightBtn);
+    controlsContainer.appendChild(panUpBtn);
+    controlsContainer.appendChild(panDownBtn);
+    controlsContainer.appendChild(resetViewBtn);
+
+    // Přidání kontejneru do mapy
+    document.getElementById('map').appendChild(controlsContainer);
+}
+
+// Funkce pro odstranění ovládacích prvků pro glóbus
+function removeGlobeControls() {
+    const controlsContainer = document.getElementById('mapGlobeControls');
     if (controlsContainer) {
         controlsContainer.remove();
     }
@@ -3070,6 +3316,9 @@ processUserInput = function(input) {
     } else if (lowercaseInput.includes('3d') || lowercaseInput.includes('3d režim') || lowercaseInput.includes('budovy')) {
         toggle3DMode();
         return is3DMode ? 'Aktivuji 3D režim s budovami. Použijte ovládací prvky pro rotaci a náklon.' : 'Deaktivuji 3D režim a vracím se do 2D zobrazení.';
+    } else if (lowercaseInput.includes('glóbus') || lowercaseInput.includes('koule') || lowercaseInput.includes('země') || lowercaseInput.includes('planeta')) {
+        toggleGlobeMode();
+        return isGlobeMode ? 'Aktivuji režim glóbusu. Nyní můžete vidět Zemi jako 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.' : 'Deaktivuji režim glóbusu a vracím se do 2D zobrazení.';
     } else if (lowercaseInput.includes('přidat bod') || lowercaseInput.includes('přidat aktivitu')) {
         isAddingPoints = true;
         document.getElementById('addActivity').classList.add('active');

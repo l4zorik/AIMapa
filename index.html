@@ -12,6 +12,16 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <!-- OSM Buildings CSS -->
     <link rel="stylesheet" href="https://cdn.osmbuildings.org/4.1.1/OSMBuildings.css">
+    <!-- WebGL Earth CSS -->
+    <style>
+        .we-pm-icon {
+            background-image: url(https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png);
+            width: 25px;
+            height: 41px;
+            margin-left: -12px;
+            margin-top: -41px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -65,6 +75,9 @@
                     </button>
                     <button class="btn" id="toggle3DMode">
                         <i class="icon">🏘️</i> 3D režim
+                    </button>
+                    <button class="btn" id="toggleGlobeMode">
+                        <i class="icon">🌎</i> Glóbus
                     </button>
                 </div>
             </div>
@@ -303,6 +316,8 @@
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <!-- OSM Buildings JS pro 3D budovy -->
     <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
+    <!-- WebGL Earth JS pro 3D glóbus -->
+    <script src="https://www.webglearth.com/v2/api.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

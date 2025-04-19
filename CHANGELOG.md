@@ -25,6 +25,18 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.1.5] - 2025-04-18
+
+### Přidáno
+- Implementován pokročilý 3D glóbus režim s možností rotace a manipulace s 3D koulí Země
+- Přidáno tlačítko pro přepínání do režimu glóbusu
+- Implementovány pokročilé ovládací prvky pro rotaci, náklon a zoom glóbusu
+- Přidána podpora pro glóbus režim v chatu pomocí příkazů "glóbus", "koule", "země" nebo "planeta"
+- Automatické přenášení bodů z 2D mapy na 3D glóbus s popup okny
+- Přidáno tlačítko pro glóbus režim do fullscreen módu
+- Implementována atmosféra a obloha pro realističtější vzhled glóbusu
+- Optimalizováno zobrazení glóbusu pro různé velikosti obrazovky
+
 ## [0.1.4] - 2025-04-18
 
 ### Přidáno
@@ -326,6 +338,16 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementována podpora pro 3D režim v chatu pomocí příkazů
 - Přidáno tlačítko pro 3D režim do hlavního rozhraní i fullscreen módu
 - Vylepšena vizualizace mapy s 3D budovami pro lepší orientaci v prostoru
+
+### Verze 0.1.5 (Duben 2025)
+#### Pokročilý 3D glóbus
+- Implementován pokročilý 3D glóbus režim s možností rotace a manipulace s 3D koulí Země
+- Implementovány pokročilé ovládací prvky pro rotaci, náklon a zoom glóbusu
+- Přidána podpora pro glóbus režim v chatu pomocí příkazů
+- Automatické přenášení bodů z 2D mapy na 3D glóbus s popup okny
+- Implementována atmosféra a obloha pro realističtější vzhled glóbusu
+- Optimalizováno zobrazení glóbusu pro různé velikosti obrazovky
+- Přidáno tlačítko pro glóbus režim do hlavního rozhraní i fullscreen módu
 
 #### Plánované funkce pro verzi 0.2.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
