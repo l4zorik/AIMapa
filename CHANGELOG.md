@@ -25,7 +25,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
-## [0.3.0] - 2025-04-18
+## [0.2.3] - 2025-04-18
 
 ### Přepracováno
 - Kompletní přepracování 3D glóbus režimu s interaktivními ovládacími prvky
@@ -508,7 +508,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Optimalizace CSS stylů pro správné zobrazení glóbusu
 - Vynucení překreslení scény po dokončení animace
 
-### Verze 0.3.0 (Duben 2025)
+### Verze 0.2.3 (Duben 2025)
 #### Interaktivní 3D glóbus
 - Kompletní přepracování 3D glóbus režimu s interaktivními ovládacími prvky
 - Přidání loading overlay pro lepší uživatelský zážitek při načítání glóbusu
@@ -519,7 +519,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Optimalizace CSS stylů pro správné zobrazení všech komponent
 - Implementace funkcí pro rotaci a zoom glóbusu
 
-#### Plánované funkce pro verzi 0.3.1 (Květen 2025)
+#### Plánované funkce pro verzi 0.3.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
 - Přidání možnosti importu a exportu bodů ve formátech GPX, KML a GeoJSON
 - Implementace měření vzdáleností a ploch pomocí nástroje pro kreslení
