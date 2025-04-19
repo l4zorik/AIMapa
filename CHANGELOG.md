@@ -25,6 +25,9 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 ### Přidáno
 - Přidán nový favicon pro lepší identifikaci aplikace v prohlížeči
 
+### Změněno
+- Změněn název aplikace z "AI Map - Časový Manažer" na "AI Map - Into the known"
+
 # Vize a plán vývoje AIMapa - Nejlepší AI Mapový Systém na světě
 
 ## Hlavní cíle
