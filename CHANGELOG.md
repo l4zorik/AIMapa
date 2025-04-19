@@ -28,13 +28,11 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 ## [0.2.4] - 2025-04-18
 
 ### Opraveno
-- Opraven závažný problém s nefunkčním přepínáním glóbus režimu ve fullscreen módu
-- Vylepšena inicializace Cesium handleru pro spolehlivější načítání
-- Přidáno dynamické načítání Cesium knihovny v případě, že není dostupná
+- Opraven závažný problém s nefunkční mapou po předchozích úpravách
+- Návrat k funkční verzi bez externího cesium-handler.js modulu
+- Zachována funkčnost 3D glóbus režimu v původní implementaci
 - Vylepšeno ošetření chyb při inicializaci a používání Cesium
-- Přidáno podrobné logování pro lepší diagnostiku problémů
 - Optimalizována funkce `toggleGlobeMode` pro spolehlivější přepínání režimů
-- Vylepšena funkce `createViewer` s lepším ošetřením chyb a obnovením původního stavu
 - Implementováno automatické zobrazení/skrytí Cesium containeru při přepínání režimů
 - Vylepšena kontrola stavu Cesium Vieweru před jeho použitím
 - Optimalizována práce s DOM elementy pro lepší výkon a stabilitu
