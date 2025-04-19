@@ -1529,6 +1529,13 @@ function toggleGlobeMode() {
         cesiumContainer.style.visibility = 'visible';
         cesiumContainer.style.zIndex = '1000';
 
+        // Ujistíme se, že kontejner má správnou velikost
+        cesiumContainer.style.width = '100%';
+        cesiumContainer.style.height = '100%';
+        cesiumContainer.style.position = 'absolute';
+        cesiumContainer.style.top = '0';
+        cesiumContainer.style.left = '0';
+
         // Inicializace Cesium Viewer, pokud ještě nebyl vytvořen
         if (!cesiumViewer) {
             // Nastavení přístupového tokenu pro Cesium ion - použijeme veřejný token
@@ -1548,10 +1555,29 @@ function toggleGlobeMode() {
                     timeline: false,
                     navigationHelpButton: false,
                     navigationInstructionsInitiallyVisible: false,
-                    imageryProvider: new Cesium.OpenStreetMapImageryProvider({
-                        url: 'https://a.tile.openstreetmap.org/'
+                    // Použijeme Bing Maps jako základní mapovou vrstvu
+                    imageryProvider: new Cesium.BingMapsImageryProvider({
+                        url: 'https://dev.virtualearth.net',
+                        key: 'AhbIRlUQ5NzgKaTXxE6Zf4_ReceZbw7TPkxVoF_C_rPmDU6bPBRQ1SxkQQFW0PO9',
+                        mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
                     })
                 });
+
+                // Nastavení výchozího pohledu na Evropu
+                cesiumViewer.camera.setView({
+                    destination: Cesium.Cartesian3.fromDegrees(15.0, 50.0, 10000000),
+                    orientation: {
+                        heading: 0.0,
+                        pitch: -Cesium.Math.PI_OVER_TWO,
+                        roll: 0.0
+                    }
+                });
+
+                // Vypnutí hvězd a oblohy
+                cesiumViewer.scene.skyBox.show = false;
+                cesiumViewer.scene.sun.show = false;
+                cesiumViewer.scene.moon.show = false;
+                cesiumViewer.scene.skyAtmosphere.show = true;
 
                 // Přidání terénu až po úspěšné inicializaci
                 setTimeout(() => {
@@ -1579,6 +1605,10 @@ function toggleGlobeMode() {
             // Nastavení atmosféry a oblohy
             cesiumViewer.scene.skyAtmosphere.show = true;
             cesiumViewer.scene.globe.enableLighting = true;
+            cesiumViewer.scene.globe.show = true; // Ujistíme se, že glóbus je viditelný
+            cesiumViewer.scene.globe.maximumScreenSpaceError = 2.0; // Lepší kvalita zobrazení
+            cesiumViewer.scene.fog.enabled = false; // Vypneme mlhu pro lepší viditelnost
+            cesiumViewer.scene.globe.depthTestAgainstTerrain = true; // Správné vykreslování terénu
 
             // Odstranění výchozího loga Cesium
             cesiumViewer.cesiumWidget.creditContainer.style.display = 'none';
@@ -1586,11 +1616,20 @@ function toggleGlobeMode() {
 
         // Nastavení pohledu na stejnou pozici jako v Leaflet mapě
         cesiumViewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(center.lng, center.lat, 1000000),
+            destination: Cesium.Cartesian3.fromDegrees(center.lng, center.lat, 2000000),
             orientation: {
                 heading: Cesium.Math.toRadians(0),
-                pitch: Cesium.Math.toRadians(-90),
+                pitch: Cesium.Math.toRadians(-45),
                 roll: 0
+            },
+            duration: 1.5,
+            complete: function() {
+                // Po dokončení animace se ujistíme, že glóbus je viditelný
+                if (cesiumViewer && cesiumViewer.scene) {
+                    cesiumViewer.scene.globe.show = true;
+                    // Vynucení překreslení scény
+                    cesiumViewer.scene.requestRender();
+                }
             }
         });
 
@@ -1602,6 +1641,15 @@ function toggleGlobeMode() {
 
         // Přidání ovládacích prvků pro glóbus
         addGlobeControls();
+
+        // Vynucení překreslení glóbusu po krátké prodlevě
+        setTimeout(() => {
+            if (cesiumViewer && cesiumViewer.scene) {
+                cesiumViewer.scene.globe.show = true;
+                cesiumViewer.scene.requestRender();
+                console.log('Vynuceno překreslení glóbusu');
+            }
+        }, 500);
 
         // Informace pro uživatele
         addMessage('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
@@ -1658,6 +1706,13 @@ function addMarkersToGlobe() {
                 const globeMarker = cesiumViewer.entities.add({
                     name: markerName,
                     position: Cesium.Cartesian3.fromDegrees(position.lng, position.lat, 0),
+                    billboard: {
+                        image: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
+                        width: 25,
+                        height: 41,
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                    },
                     point: {
                         pixelSize: 15,
                         color: Cesium.Color.fromCssColorString('#3388ff'),
@@ -1876,7 +1931,7 @@ function addRoutesToGlobe() {
             name: 'Trasa',
             polyline: {
                 positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
-                width: 3,
+                width: 5,
                 material: new Cesium.PolylineGlowMaterialProperty({
                     glowPower: 0.2,
                     color: Cesium.Color.BLUE
@@ -1884,6 +1939,22 @@ function addRoutesToGlobe() {
                 clampToGround: true
             }
         });
+
+        // Přidání entity pro trasu s průhledností pro lepší viditelnost
+        const routeOutlineEntity = cesiumViewer.entities.add({
+            name: 'Trasa obrys',
+            polyline: {
+                positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
+                width: 8,
+                material: new Cesium.PolylineMaterialProperty({
+                    color: Cesium.Color.WHITE.withAlpha(0.5)
+                }),
+                clampToGround: true
+            }
+        });
+
+        // Přidání obou entit do pole markerů
+        globeMarkers.push(routeOutlineEntity);
 
         // Přidání entity do pole markerů, aby byla odstraněna při vyčištění
         globeMarkers.push(routeEntity);
