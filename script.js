@@ -81,8 +81,8 @@ function createPopupContent(marker, index) {
         saved: false // Přidání příznak, zda je bod uložený
     };
 
-    // Vytvoření unikátního ID pro odpočet
-    const countdownId = `countdown-${index}-${Date.now()}`;
+    // Vytvoření unikátního ID pro odpočet - použijeme fixní ID pro každý marker
+    const countdownId = `countdown-${index}`;
 
     // Kontrola, zda je bod uložený nebo nově vytvořený
     if (markerProp.saved) {
@@ -144,7 +144,10 @@ function createPopupContent(marker, index) {
 // Funkce pro spuštění odpočtu
 function startCountdown(elementId, seconds) {
     const countdownElement = document.getElementById(elementId);
-    if (!countdownElement) return;
+    if (!countdownElement) {
+        console.error('Countdown element not found in startCountdown:', elementId);
+        return;
+    }
 
     // Zrušení předchozího intervalu, pokud existuje
     if (countdownIntervals[elementId]) {
@@ -153,28 +156,38 @@ function startCountdown(elementId, seconds) {
 
     let remainingSeconds = seconds;
 
-    // Aktualizace počátečního zobrazení
+    // Aktualizace počátečního zobrazení - skrytý odpočet
     countdownElement.textContent = `${remainingSeconds}s`;
-    countdownElement.style.display = 'block'; // Zajistíme, že je odpočet viditelný
+    // countdownElement.style.display = 'none'; // Skryjeme odpočet
+    countdownElement.classList.remove('countdown-warning', 'countdown-danger'); // Reset tříd
 
     // Získání indexu markeru z ID elementu
     const idParts = elementId.split('-');
     const markerIndex = parseInt(idParts[1]);
 
+    console.log(`Starting countdown for marker ${markerIndex}, element ID: ${elementId}, seconds: ${seconds}`);
+
     // Aktualizace odpočtu každou sekundu
     countdownIntervals[elementId] = setInterval(() => {
         remainingSeconds--;
 
-        if (countdownElement) {
-            countdownElement.textContent = `${remainingSeconds}s`;
+        // Kontrola, zda element stále existuje v DOM
+        const updatedElement = document.getElementById(elementId);
+        if (updatedElement) {
+            updatedElement.textContent = `${remainingSeconds}s`;
 
-            // Změna barvy při nízkém čase
-            if (remainingSeconds <= 10) {
-                countdownElement.classList.add('countdown-warning');
-            }
-            if (remainingSeconds <= 5) {
-                countdownElement.classList.add('countdown-danger');
-            }
+            // Skryté změny barvy při nízkém čase - pouze pro ladění
+            // if (remainingSeconds <= 10) {
+            //     updatedElement.classList.add('countdown-warning');
+            // }
+            // if (remainingSeconds <= 5) {
+            //     updatedElement.classList.add('countdown-danger');
+            // }
+        } else {
+            console.error('Countdown element disappeared during countdown');
+            clearInterval(countdownIntervals[elementId]);
+            delete countdownIntervals[elementId];
+            return;
         }
 
         // Ukončení intervalu a zavření popup okna po vypršení času
@@ -186,6 +199,7 @@ function startCountdown(elementId, seconds) {
             if (!isNaN(markerIndex) && markerIndex < markers.length) {
                 const marker = markers[markerIndex];
                 if (marker && marker.isPopupOpen()) {
+                    console.log(`Closing popup for marker ${markerIndex} after countdown`);
                     marker.closePopup();
                 }
 
@@ -197,6 +211,9 @@ function startCountdown(elementId, seconds) {
             }
         }
     }, 1000);
+
+    // Uložení intervalu do globální proměnné
+    return countdownIntervals[elementId];
 }
 
 // Funkce pro uložení vlastností markeru
@@ -374,8 +391,8 @@ function addMarkerToMap(latlng) {
         minWidth: 250,
         autoPan: true,
         autoPanPadding: [50, 50],
-        closeOnClick: false,
-        autoClose: false
+        closeOnClick: true, // Zavřít při kliknutí mimo popup
+        autoClose: true // Automaticky zavřít při kliknutí mimo popup
     });
 
     // Přidání zprávy do chatu
@@ -413,20 +430,35 @@ function addMarkerToMap(latlng) {
 
     // Přidání event listeneru pro otevření popup okna
     marker.on('popupopen', function() {
+        console.log(`Popup opened for marker ${markerIndex}`);
+
         // Zrušení všech předchozích intervalů pro odpočet
         Object.keys(countdownIntervals).forEach(key => {
-            if (key.startsWith(`countdown-${markerIndex}-`)) {
-                clearInterval(countdownIntervals[key]);
-                delete countdownIntervals[key];
-            }
+            clearInterval(countdownIntervals[key]);
+            delete countdownIntervals[key];
         });
 
-        // Spuštění odpočtu
-        const countdownId = `countdown-${markerIndex}-${Date.now()}`;
-        const countdownElement = document.getElementById(countdownId);
-        if (countdownElement) {
-            startCountdown(countdownId, 35);
-        }
+        // Spuštění odpočtu - počkáme na vykreslení DOM
+        setTimeout(() => {
+            // Použijeme přímý selektor pro nalezení elementu odpočtu v aktuálním popup okně
+            const popupElement = marker.getPopup().getElement();
+            if (popupElement) {
+                const countdownElement = popupElement.querySelector('.popup-countdown');
+                if (countdownElement) {
+                    // Nastavíme ID pro element odpočtu
+                    const countdownId = `countdown-${markerIndex}`;
+                    countdownElement.id = countdownId;
+
+                    // Spuštění odpočtu
+                    console.log(`Starting countdown for marker ${markerIndex} with element:`, countdownElement);
+                    startCountdown(countdownId, 35);
+                } else {
+                    console.error('Countdown element not found in popup');
+                }
+            } else {
+                console.error('Popup element not found');
+            }
+        }, 300); // Počkáme 300ms na vykreslení DOM
     });
 
     // Přidání event listeneru pro zavření popup okna
@@ -466,6 +498,12 @@ map.on('dblclick', (e) => {
 
 // Deaktivace standardního chování dvojkliku (zoom)
 map.doubleClickZoom.disable();
+
+// Přidání event listeneru pro kliknutí na mapu - zavře všechna popup okna
+map.on('click', () => {
+    // Zavření všech popup oken při kliknutí na mapu
+    map.closePopup();
+});
 
 // Event listener pro zoom, aby se popup okna lépe chovaly při zoomu
 map.on('zoomstart', () => {
@@ -1292,6 +1330,13 @@ function navigateToMarker(index) {
 
         // Počkáme na dokončení animace a pak otevřeme popup
         setTimeout(() => {
+            // Zrušení všech předchozích intervalů pro odpočet
+            Object.keys(countdownIntervals).forEach(key => {
+                clearInterval(countdownIntervals[key]);
+                delete countdownIntervals[key];
+            });
+
+            // Otevření popup okna
             marker.openPopup();
 
             // Zrušení předchozího časovače, pokud existuje
