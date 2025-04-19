@@ -1575,21 +1575,35 @@ function toggleGlobeMode() {
         try {
             console.log('Inicializace Cesium Vieweru');
 
-            // Nastavení přístupového tokenu pro Cesium ion
-            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc3MzMsImlhdCI6MTYyMjg0MTU3Mn0.XcKpgANiY22ZtIiqSWFmj2XlPQd5HGDA-9N2FAB_5_4';
+            // Kontrola, zda je Cesium dostupný
+            if (typeof Cesium === 'undefined') {
+                throw new Error('Knihovna Cesium není dostupná. Zkontrolujte připojení k internetu.');
+            }
+
+            // Nastavení přístupového tokenu pro Cesium ion - použijeme veřejný token
+            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0YjNhYzRkYS1hNDJlLTRjZDUtYmY5Ni1jZmU4ZGJmNzY2ZDMiLCJpZCI6MTc5NDk5LCJpYXQiOjE2OTg2MDI5ODl9.WgFtOXkfzVPp8S1UZ_-Xc_-3BzR2k1s2LQY3aNdpNdw';
+            console.log('Cesium token nastaven');
 
             // Odstranění předchozího Cesium Vieweru, pokud existuje
             if (cesiumViewer) {
-                cesiumViewer.destroy();
+                try {
+                    cesiumViewer.destroy();
+                } catch (e) {
+                    console.warn('Chyba při odstraňování předchozího Cesium Vieweru:', e);
+                }
                 cesiumViewer = null;
                 console.log('Předchozí Cesium Viewer byl odstraněn');
             }
 
             // Získání reference na Cesium kontejner
             const cesiumContainer = document.getElementById('cesiumContainer');
+            if (!cesiumContainer) {
+                throw new Error('Cesium kontejner nebyl nalezen v DOM.');
+            }
 
             // Ujistíme se, že kontejner je prázdný
             cesiumContainer.innerHTML = '';
+            console.log('Cesium kontejner byl vyčištěn');
 
             // Nastavení stylu kontejneru
             cesiumContainer.style.display = 'block';
@@ -1599,8 +1613,11 @@ function toggleGlobeMode() {
             cesiumContainer.style.top = '0';
             cesiumContainer.style.left = '0';
             cesiumContainer.style.zIndex = '1000';
+            cesiumContainer.style.backgroundColor = '#000';
+            console.log('Styly Cesium kontejneru byly nastaveny');
 
-            // Vytvoření nového Cesium Vieweru
+            // Vytvoření nového Cesium Vieweru s jednodušší konfigurací
+            console.log('Vytvářím nový Cesium Viewer...');
             cesiumViewer = new Cesium.Viewer('cesiumContainer', {
                 animation: false,
                 baseLayerPicker: false,
@@ -1613,22 +1630,33 @@ function toggleGlobeMode() {
                 timeline: false,
                 navigationHelpButton: false,
                 navigationInstructionsInitiallyVisible: false,
-                imageryProvider: new Cesium.IonImageryProvider({ assetId: 3 }),
-                terrainProvider: Cesium.createWorldTerrain(),
+                // Použijeme OpenStreetMap jako základní mapovou vrstvu
+                imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+                    url: 'https://a.tile.openstreetmap.org/'
+                }),
+                // Vypnutí terénu pro lepší výkon
+                terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+                // Nastavení pro lepší výkon
                 requestRenderMode: false,
                 maximumRenderTimeChange: Infinity
             });
 
-            console.log('Cesium Viewer byl vytvořen');
+            console.log('Cesium Viewer byl úspěšně vytvořen');
 
             // Nastavení scény
-            cesiumViewer.scene.globe.enableLighting = true;
+            cesiumViewer.scene.skyBox.show = false;
+            cesiumViewer.scene.sun.show = false;
+            cesiumViewer.scene.moon.show = false;
             cesiumViewer.scene.skyAtmosphere.show = true;
+            cesiumViewer.scene.globe.enableLighting = true;
             cesiumViewer.scene.fog.enabled = false;
-            cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
+            cesiumViewer.scene.globe.depthTestAgainstTerrain = false;
+            console.log('Scéna byla nastavena');
 
             // Odstranění výchozího loga Cesium
-            cesiumViewer.cesiumWidget.creditContainer.style.display = 'none';
+            if (cesiumViewer.cesiumWidget && cesiumViewer.cesiumWidget.creditContainer) {
+                cesiumViewer.cesiumWidget.creditContainer.style.display = 'none';
+            }
 
             // Nastavení výchozího pohledu
             const center = map.getCenter();
@@ -1639,16 +1667,36 @@ function toggleGlobeMode() {
                     pitch: -0.5,
                     roll: 0.0
                 },
-                duration: 0
+                duration: 0,
+                complete: function() {
+                    console.log('Kamera byla nastavena');
+                    // Vynucení překreslení scény
+                    cesiumViewer.scene.requestRender();
+                }
             });
 
             console.log('Výchozí pohled byl nastaven');
         } catch (error) {
             console.error('Chyba při inicializaci Cesium Vieweru:', error);
-            addMessage('Nepodařilo se inicializovat 3D glóbus. Zkuste to prosím znovu.', true);
+            addMessage('Nepodařilo se inicializovat 3D glóbus. Zkuste to prosím znovu. Chyba: ' + error.message, true);
             isGlobeMode = false;
-            toggleGlobeBtn.classList.remove('active');
+            if (toggleGlobeBtn) {
+                toggleGlobeBtn.classList.remove('active');
+            }
             document.getElementById('map').classList.remove('map-globe-mode');
+
+            // Skrytí Cesium kontejneru v případě chyby
+            const cesiumContainer = document.getElementById('cesiumContainer');
+            if (cesiumContainer) {
+                cesiumContainer.style.display = 'none';
+            }
+
+            // Zobrazení Leaflet mapy
+            const leafletContainer = document.querySelector('.leaflet-container');
+            if (leafletContainer) {
+                leafletContainer.style.display = 'block';
+            }
+
             return;
         }
 
@@ -1746,6 +1794,33 @@ function addMarkersToGlobe() {
         // Kontrola, zda existují markery k přidání
         if (markers.length === 0) {
             console.log('Nejsou žádné markery k přidání na glóbus');
+
+            // Přidání testovacího markeru pro ověření funkčnosti
+            const testMarker = cesiumViewer.entities.add({
+                name: 'Testovací bod',
+                position: Cesium.Cartesian3.fromDegrees(15.0, 50.0, 0),
+                point: {
+                    pixelSize: 15,
+                    color: Cesium.Color.RED,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 2
+                },
+                label: {
+                    text: 'Test',
+                    font: '14pt sans-serif',
+                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    outlineWidth: 2,
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    pixelOffset: new Cesium.Cartesian2(0, -10),
+                    fillColor: Cesium.Color.WHITE,
+                    outlineColor: Cesium.Color.BLACK,
+                    showBackground: true,
+                    backgroundColor: new Cesium.Color(0, 0, 0, 0.7)
+                }
+            });
+
+            globeMarkers.push(testMarker);
+            console.log('Přidán testovací marker pro ověření funkčnosti');
             return;
         }
 
@@ -1757,16 +1832,15 @@ function addMarkersToGlobe() {
             const markerName = markerProperties[index] && markerProperties[index].name ?
                 markerProperties[index].name : `Bod ${index + 1}`;
 
-            // Vytvoření entity pro marker
+            // Vytvoření entity pro marker - použijeme jednodušší bod místo billboardu
             const globeMarker = cesiumViewer.entities.add({
                 name: markerName,
                 position: Cesium.Cartesian3.fromDegrees(position.lng, position.lat, 0),
-                billboard: {
-                    image: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-                    width: 25,
-                    height: 41,
-                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                point: {
+                    pixelSize: 15,
+                    color: Cesium.Color.BLUE,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 2
                 },
                 label: {
                     text: `${index + 1}`,
@@ -1774,12 +1848,11 @@ function addMarkersToGlobe() {
                     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
                     outlineWidth: 2,
                     verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                    pixelOffset: new Cesium.Cartesian2(0, -42),
+                    pixelOffset: new Cesium.Cartesian2(0, -10),
                     fillColor: Cesium.Color.WHITE,
                     outlineColor: Cesium.Color.BLACK,
                     showBackground: true,
-                    backgroundColor: new Cesium.Color(0, 0, 0, 0.7),
-                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                    backgroundColor: new Cesium.Color(0, 0, 0, 0.7)
                 }
             });
 
@@ -1799,7 +1872,11 @@ function addMarkersToGlobe() {
                     pitch: -0.5,
                     roll: 0.0
                 },
-                duration: 1.5
+                duration: 1.5,
+                complete: function() {
+                    // Vynucení překreslení scény po dokončení animace
+                    cesiumViewer.scene.requestRender();
+                }
             });
         }
     } catch (error) {
