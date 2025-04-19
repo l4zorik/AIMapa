@@ -1524,17 +1524,19 @@ function toggleGlobeMode() {
         document.querySelector('.leaflet-container').style.display = 'none';
 
         // Zobrazení Cesium kontejneru
-        document.getElementById('cesiumContainer').style.display = 'block';
+        const cesiumContainer = document.getElementById('cesiumContainer');
+        cesiumContainer.style.display = 'block';
+        cesiumContainer.style.visibility = 'visible';
+        cesiumContainer.style.zIndex = '1000';
 
         // Inicializace Cesium Viewer, pokud ještě nebyl vytvořen
         if (!cesiumViewer) {
-            // Nastavení přístupového tokenu pro Cesium ion
-            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc3MzMsImlhdCI6MTYyMjg0MTI2OH0.XcKpgANiY22ZtIiqaCYrnMoN7oacG4Y0_S64z0t8YrQ';
+            // Nastavení přístupového tokenu pro Cesium ion - použijeme veřejný token
+            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0YjNhYzRkYS1hNDJlLTRjZDUtYmY5Ni1jZmU4ZGJmNzY2ZDMiLCJpZCI6MTc5NDk5LCJpYXQiOjE2OTg2MDI5ODl9.WgFtOXkfzVPp8S1UZ_-Xc_-3BzR2k1s2LQY3aNdpNdw';
 
             try {
-                // Vytvoření Cesium Viewer
+                // Vytvoření Cesium Viewer s jednodušší konfigurací
                 cesiumViewer = new Cesium.Viewer('cesiumContainer', {
-                    terrainProvider: Cesium.createWorldTerrain(),
                     animation: false,
                     baseLayerPicker: false,
                     fullscreenButton: false,
@@ -1550,6 +1552,15 @@ function toggleGlobeMode() {
                         url: 'https://a.tile.openstreetmap.org/'
                     })
                 });
+
+                // Přidání terénu až po úspěšné inicializaci
+                setTimeout(() => {
+                    try {
+                        cesiumViewer.terrainProvider = Cesium.createWorldTerrain();
+                    } catch (error) {
+                        console.error('Chyba při nastavení terénu:', error);
+                    }
+                }, 1000);
 
                 // Logování úspěšné inicializace
                 console.log('Cesium Viewer byl úspěšně inicializován');

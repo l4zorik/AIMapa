@@ -2976,6 +2976,7 @@ body.fullscreen-mode {
     z-index: 10;
     display: none;
     background-color: #000;
+    visibility: visible !important;
 }
 
 .cesium-viewer-bottom,
@@ -2985,6 +2986,20 @@ body.fullscreen-mode {
 .cesium-viewer-toolbar,
 .cesium-viewer-geocoderContainer {
     display: none !important;
+}
+
+.cesium-viewer {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    visibility: visible !important;
+}
+
+.cesium-viewer canvas {
+    display: block !important;
+    visibility: visible !important;
 }
 
 .cesium-widget-credits {
