@@ -25,6 +25,17 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.2.2] - 2025-04-18
+
+### Přepracováno
+- Kompletní přepracování inicializace glóbus režimu pro správné zobrazení planety
+- Použití CDN pro lepší dostupnost Cesium.js knihovny
+- Vylepšené ošetření chyb při inicializaci Cesium Vieweru
+- Přidání testovacího markeru pro ověření funkčnosti glóbusu
+- Použití jednodušších bodů místo billboardů pro lepší výkon
+- Optimalizace CSS stylů pro správné zobrazení glóbusu
+- Vynucení překreslení scény po dokončení animace
+
 ## [0.2.1] - 2025-04-18
 
 ### Opraveno
@@ -475,7 +486,17 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementováno inteligentní vyhledávání tlačítek podle kontextu (fullscreen nebo normální režim)
 - Zlepšena odolnost kódu proti chybám při práci s tlačítky
 
-#### Plánované funkce pro verzi 0.2.2 (Květen 2025)
+### Verze 0.2.2 (Duben 2025)
+#### Oprava glóbus režimu
+- Kompletní přepracování inicializace glóbus režimu pro správné zobrazení planety
+- Použití CDN pro lepší dostupnost Cesium.js knihovny
+- Vylepšené ošetření chyb při inicializaci Cesium Vieweru
+- Přidání testovacího markeru pro ověření funkčnosti glóbusu
+- Použití jednodušších bodů místo billboardů pro lepší výkon
+- Optimalizace CSS stylů pro správné zobrazení glóbusu
+- Vynucení překreslení scény po dokončení animace
+
+#### Plánované funkce pro verzi 0.2.3 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
 - Přidání možnosti importu a exportu bodů ve formátech GPX, KML a GeoJSON
 - Implementace měření vzdáleností a ploch pomocí nástroje pro kreslení
