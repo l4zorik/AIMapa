@@ -407,13 +407,8 @@ function addMarkerToMap(latlng) {
             clearTimeout(popupTimers[markerIndex]);
         }
 
-        // Nastavení nového časovače
-        popupTimers[markerIndex] = setTimeout(() => {
-            if (marker.isPopupOpen()) {
-                marker.closePopup();
-            }
-            delete popupTimers[markerIndex];
-        }, 35000); // 35 sekund
+        // Nastavení nového časovače - nyní se o to stará funkce startCountdown
+        // Není potřeba zde nastavovat časovač, protože to dělá funkce startCountdown
     });
 
     // Přidání event listeneru pro otevření popup okna
@@ -1299,17 +1294,12 @@ function navigateToMarker(index) {
         setTimeout(() => {
             marker.openPopup();
 
-            // Nastavení časovače pro automatické zavření popup okna po 35 sekundách
+            // Zrušení předchozího časovače, pokud existuje
             if (popupTimers[index]) {
                 clearTimeout(popupTimers[index]);
             }
 
-            popupTimers[index] = setTimeout(() => {
-                if (marker.isPopupOpen()) {
-                    marker.closePopup();
-                }
-                delete popupTimers[index];
-            }, 35000); // 35 sekund
+            // Odpočet se spustí automaticky při otevření popup okna díky event listeneru 'popupopen'
         }, 500);
 
         return `Navigace na bod "${markerName}".`;
