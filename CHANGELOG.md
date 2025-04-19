@@ -25,6 +25,23 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.1.6] - 2025-04-18
+
+### Přidáno
+- Implementován vylepšený 3D glóbus režim pomocí knihovny Cesium.js
+- Automatická synchronizace bodů mezi 2D mapou a 3D glóbusem
+- Automatická aktualizace glóbusu při přidání nebo přesunutí bodů
+- Vylepšené zobrazení bodů na glóbusu s popisky a popup okny
+- Implementováno vykreslování tras mezi body na glóbusu
+- Vylepšené ovládací prvky pro rotaci, náklon a zoom glóbusu
+- Optimalizováno zobrazení glóbusu pro různé velikosti obrazovky
+- Přidána podpora pro zobrazení terénu a atmosféry pro realističtější vzhled
+
+### Opraveno
+- Opraven problém s nefunkčním 3D glóbusem v předchozí verzi
+- Vylepšena stabilita a výkon 3D glóbusu
+- Optimalizována paměťová náročnost při práci s 3D glóbusem
+
 ## [0.1.5] - 2025-04-18
 
 ### Přidáno
@@ -348,6 +365,18 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementována atmosféra a obloha pro realističtější vzhled glóbusu
 - Optimalizováno zobrazení glóbusu pro různé velikosti obrazovky
 - Přidáno tlačítko pro glóbus režim do hlavního rozhraní i fullscreen módu
+
+### Verze 0.1.6 (Duben 2025)
+#### Vylepšený 3D glóbus s Cesium.js
+- Implementován vylepšený 3D glóbus režim pomocí knihovny Cesium.js
+- Automatická synchronizace bodů mezi 2D mapou a 3D glóbusem
+- Automatická aktualizace glóbusu při přidání nebo přesunutí bodů
+- Vylepšené zobrazení bodů na glóbusu s popisky a popup okny
+- Implementováno vykreslování tras mezi body na glóbusu
+- Vylepšené ovládací prvky pro rotaci, náklon a zoom glóbusu
+- Optimalizováno zobrazení glóbusu pro různé velikosti obrazovky
+- Přidána podpora pro zobrazení terénu a atmosféry pro realističtější vzhled
+- Opraveny problémy s nefunkčním 3D glóbusem v předchozí verzi
 
 #### Plánované funkce pro verzi 0.2.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
