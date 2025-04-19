@@ -2,6 +2,18 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.4] - 2025-04-18
+
+### Přepracováno
+- Kompletní přepracování inicializace Cesium Vieweru a 3D glóbus režimu
+- Vytvořen nový modul `cesium-handler.js` pro zapouzdření všech funkcí souvisejících s Cesium
+- Zlepšená architektura kódu s čistým rozhraním pro interakci s Cesium
+- Optimalizace inicializace Cesium Vieweru pro rychlejší načítání
+- Zlepšené ošetření chyb při inicializaci a používání Cesium
+- Lepší synchronizace markerů a tras mezi Leaflet a Cesium
+- Implementace čistějšího API pro práci s glóbusem
+- Optimalizace výkonu při přepínání mezi 2D a 3D režimy
+
 # Můj osobní plán na vývoj
 
 ## Úkol 1

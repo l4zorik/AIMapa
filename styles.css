@@ -2976,6 +2976,7 @@ body.fullscreen-mode {
     z-index: 10 !important;
     display: none;
     background-color: #000000 !important;
+    touch-action: none !important;
 }
 
 .loading-overlay {
@@ -3063,6 +3064,39 @@ body.fullscreen-mode {
 
 .map-globe-mode .loading-overlay {
     display: flex !important;
+}
+
+/* Vylepšené styly pro Cesium */
+.cesium-viewer {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    touch-action: none !important;
+}
+
+.cesium-viewer-cesiumWidgetContainer {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative !important;
+}
+
+.cesium-widget {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative !important;
+}
+
+.cesium-widget canvas {
+    width: 100% !important;
+    height: 100% !important;
+    touch-action: none !important;
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
 }
 
 .map-globe-mode .leaflet-container {

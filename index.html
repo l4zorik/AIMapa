@@ -13,11 +13,14 @@
     <!-- OSM Buildings CSS -->
     <link rel="stylesheet" href="https://cdn.osmbuildings.org/4.1.1/OSMBuildings.css">
     <!-- Cesium CSS a JS - použijeme nejnovější verzi z CDN -->
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Cesium.js"></script>
 
     <!-- Přidáme také jQuery pro lepší manipulaci s DOM -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Přidáme Three.js pro lepší 3D efekty -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -312,6 +315,7 @@
     <!-- OSM Buildings JS pro 3D budovy -->
     <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
     <!-- Cesium JS je již načten v hlavičce -->
+    <script src="cesium-handler.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

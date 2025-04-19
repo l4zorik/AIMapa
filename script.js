@@ -11,6 +11,13 @@ const map = L.map('map', {
     maxBoundsViscosity: 1.0 // Zajistí, že mapa nebude moci být posunuta mimo hranice
 }).setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
 
+// Inicializace Cesium handleru
+if (window.CesiumHandler) {
+    window.CesiumHandler.initialize(map).catch(error => {
+        console.error('Chyba při inicializaci Cesium handleru:', error);
+    });
+}
+
 // Přidání OpenStreetMap podkladu
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
@@ -47,7 +54,7 @@ let isFullscreen = false;
 let is3DMode = false; // Výchozí stav - 3D režim je deaktivovaný
 let isGlobeMode = false; // Výchozí stav - glóbus režim je deaktivovaný
 let osmb = null; // Proměnná pro OSM Buildings
-let cesiumViewer = null; // Proměnná pro Cesium Viewer
+// Cesium Viewer je nyní součástí Cesium handleru
 let globeMarkers = []; // Proměnná pro markery na glóbusu
 
 // Konfigurace pro Leaflet Routing Machine
@@ -682,7 +689,7 @@ function addMarkerToMap(latlng) {
     }
 
     // Aktualizace glóbusu, pokud je aktivní
-    if (isGlobeMode && cesiumViewer) {
+    if (isGlobeMode && window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
         addMarkersToGlobe();
         addRoutesToGlobe();
     }
@@ -1525,8 +1532,6 @@ function remove3DControls() {
 
 // Funkce pro přepnutí glóbus režimu
 function toggleGlobeMode() {
-    console.log('toggleGlobeMode funkce byla volána');
-
     // Získání reference na tlačítko podle kontextu (fullscreen nebo normální režim)
     let toggleGlobeBtn;
 
@@ -1548,19 +1553,16 @@ function toggleGlobeMode() {
         toggleGlobeBtn = document.getElementById('toggleGlobeMode');
     }
 
-    console.log('Tlačítko pro glóbus režim:', toggleGlobeBtn);
-
     // Pokud je aktivní 3D režim, nejprve ho deaktivujeme
     if (is3DMode) {
         toggle3DMode();
     }
 
+    // Přepnutí stavu glóbus režimu
     isGlobeMode = !isGlobeMode;
 
     if (isGlobeMode) {
-        console.log('Aktivace glóbus režimu');
-
-        // Aktivace glóbus režimu
+        // Aktivace tlačítka
         if (toggleGlobeBtn) {
             toggleGlobeBtn.classList.add('active');
         }
@@ -1568,298 +1570,29 @@ function toggleGlobeMode() {
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
 
-        // Zobrazit loading overlay
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        if (loadingOverlay) {
-            loadingOverlay.style.display = 'flex';
-        }
-
-        // Uložení aktuálního středu mapy
-        const center = map.getCenter();
-        console.log('Střed mapy:', center);
-
-        try {
-            console.log('Inicializace Cesium Vieweru');
-
-            // Kontrola, zda je Cesium dostupný
-            if (typeof Cesium === 'undefined') {
-                throw new Error('Knihovna Cesium není dostupná. Zkontrolujte připojení k internetu.');
-            }
-
-            // Nastavení přístupového tokenu pro Cesium ion
-            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc3MzMsImlhdCI6MTYyMjg0MTU3Mn0.XcKpgANiY22ZtIiqSWFmj2XlPQd5HGDA-9N2FAB_5_4';
-            console.log('Cesium token nastaven');
-
-            // Odstranění předchozího Cesium Vieweru, pokud existuje
-            if (cesiumViewer) {
-                try {
-                    cesiumViewer.destroy();
-                } catch (e) {
-                    console.warn('Chyba při odstraňování předchozího Cesium Vieweru:', e);
-                }
-                cesiumViewer = null;
-                console.log('Předchozí Cesium Viewer byl odstraněn');
-            }
-
-            // Získání reference na Cesium kontejner
-            const cesiumContainer = document.getElementById('cesiumContainer');
-            if (!cesiumContainer) {
-                throw new Error('Cesium kontejner nebyl nalezen v DOM.');
-            }
-
-            // Ujistíme se, že kontejner je prázdný
-            cesiumContainer.innerHTML = '';
-            console.log('Cesium kontejner byl vyčištěn');
-
-            // Nastavení stylu kontejneru
-            cesiumContainer.style.display = 'block';
-            cesiumContainer.style.width = '100%';
-            cesiumContainer.style.height = '100%';
-            cesiumContainer.style.position = 'absolute';
-            cesiumContainer.style.top = '0';
-            cesiumContainer.style.left = '0';
-            cesiumContainer.style.zIndex = '1000';
-            cesiumContainer.style.backgroundColor = '#000';
-            console.log('Styly Cesium kontejneru byly nastaveny');
-
-            // Vytvoření nového Cesium Vieweru
-            console.log('Vytvářím nový Cesium Viewer...');
-            cesiumViewer = new Cesium.Viewer('cesiumContainer', {
-                animation: false,
-                baseLayerPicker: false,
-                fullscreenButton: false,
-                geocoder: false,
-                homeButton: false,
-                infoBox: false,
-                sceneModePicker: false,
-                selectionIndicator: false,
-                timeline: false,
-                navigationHelpButton: false,
-                navigationInstructionsInitiallyVisible: false,
-                // Použijeme Bing Maps jako základní mapovou vrstvu
-                imageryProvider: new Cesium.BingMapsImageryProvider({
-                    url: 'https://dev.virtualearth.net',
-                    key: 'AhbIRlUQ5NzgKaTXxE6Zf4_ReceZbw7TPkxVoF_C_rPmDU6bPBRQ1SxkQQFW0PO9',
-                    mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
-                }),
-                // Použijeme terén pro lepší vzhled
-                terrainProvider: Cesium.createWorldTerrain({
-                    requestWaterMask: true,
-                    requestVertexNormals: true
-                }),
-                // Nastavení pro lepší výkon
-                requestRenderMode: false,
-                maximumRenderTimeChange: Infinity,
-                // Nastavení pro lepší vzhled
-                skyBox: new Cesium.SkyBox({
-                    sources: {
-                        positiveX: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_px.jpg',
-                        negativeX: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_mx.jpg',
-                        positiveY: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_py.jpg',
-                        negativeY: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_my.jpg',
-                        positiveZ: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_pz.jpg',
-                        negativeZ: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_mz.jpg'
+        // Aktivace glóbus režimu pomocí Cesium handleru
+        if (window.CesiumHandler) {
+            window.CesiumHandler.activateGlobeMode(markers, addMessage)
+                .catch(error => {
+                    console.error('Chyba při aktivaci glóbus režimu:', error);
+                    // Obnovení původního stavu v případě chyby
+                    isGlobeMode = false;
+                    if (toggleGlobeBtn) {
+                        toggleGlobeBtn.classList.remove('active');
                     }
-                })
-            });
-
-            console.log('Cesium Viewer byl úspěšně vytvořen');
-
-            // Nastavení scény
-            cesiumViewer.scene.globe.enableLighting = true;
-            cesiumViewer.scene.skyAtmosphere.show = true;
-            cesiumViewer.scene.fog.enabled = false;
-            cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
-            cesiumViewer.scene.globe.maximumScreenSpaceError = 2.0; // Lepší kvalita zobrazení
-            cesiumViewer.scene.sun.show = true;
-            cesiumViewer.scene.moon.show = true;
-            console.log('Scéna byla nastavena');
-
-            // Odstranění výchozího loga Cesium
-            if (cesiumViewer.cesiumWidget && cesiumViewer.cesiumWidget.creditContainer) {
-                cesiumViewer.cesiumWidget.creditContainer.style.display = 'none';
-            }
-
-            // Nastavení výchozího pohledu
-            const center = map.getCenter();
-            cesiumViewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(center.lng, center.lat, 2000000),
-                orientation: {
-                    heading: 0.0,
-                    pitch: -0.5,
-                    roll: 0.0
-                },
-                duration: 2.0,
-                complete: function() {
-                    console.log('Kamera byla nastavena');
-                    // Skrytí loading overlay po dokončení animace
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    if (loadingOverlay) {
-                        loadingOverlay.style.display = 'none';
-                    }
-                    // Vynucení překreslení scény
-                    cesiumViewer.scene.requestRender();
-                }
-            });
-
-            console.log('Výchozí pohled byl nastaven');
-
-            // Přidání ovládacích prvků pro rotaci glóbusu
-            const viewerContainer = cesiumViewer.container;
-            const rotationControls = document.createElement('div');
-            rotationControls.className = 'cesium-rotation-controls';
-            rotationControls.innerHTML = `
-                <button class="cesium-button" id="rotateLeft" title="Rotovat doleva">←</button>
-                <button class="cesium-button" id="rotateUp" title="Rotovat nahoru">↑</button>
-                <button class="cesium-button" id="rotateDown" title="Rotovat dolů">↓</button>
-                <button class="cesium-button" id="rotateRight" title="Rotovat doprava">→</button>
-                <button class="cesium-button" id="zoomIn" title="Přiblížit">+</button>
-                <button class="cesium-button" id="zoomOut" title="Oddálit">-</button>
-            `;
-            viewerContainer.appendChild(rotationControls);
-
-            // Přidání event listenerů pro ovládací prvky
-            document.getElementById('rotateLeft').addEventListener('click', function() {
-                rotateGlobe(-0.1, 0);
-            });
-            document.getElementById('rotateRight').addEventListener('click', function() {
-                rotateGlobe(0.1, 0);
-            });
-            document.getElementById('rotateUp').addEventListener('click', function() {
-                rotateGlobe(0, -0.1);
-            });
-            document.getElementById('rotateDown').addEventListener('click', function() {
-                rotateGlobe(0, 0.1);
-            });
-            document.getElementById('zoomIn').addEventListener('click', function() {
-                zoomGlobe(0.5);
-            });
-            document.getElementById('zoomOut').addEventListener('click', function() {
-                zoomGlobe(2.0);
-            });
-
-            // Přidání CSS stylů pro ovládací prvky
-            const style = document.createElement('style');
-            style.textContent = `
-                .cesium-rotation-controls {
-                    position: absolute;
-                    bottom: 30px;
-                    right: 30px;
-                    background-color: rgba(0, 0, 0, 0.7);
-                    padding: 10px;
-                    border-radius: 5px;
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    grid-gap: 5px;
-                    z-index: 1000;
-                }
-                .cesium-button {
-                    width: 40px;
-                    height: 40px;
-                    background-color: rgba(255, 255, 255, 0.2);
-                    border: none;
-                    color: white;
-                    font-size: 20px;
-                    cursor: pointer;
-                    border-radius: 3px;
-                }
-                .cesium-button:hover {
-                    background-color: rgba(255, 255, 255, 0.4);
-                }
-                #rotateUp {
-                    grid-column: 2;
-                    grid-row: 1;
-                }
-                #rotateLeft {
-                    grid-column: 1;
-                    grid-row: 2;
-                }
-                #rotateDown {
-                    grid-column: 2;
-                    grid-row: 3;
-                }
-                #rotateRight {
-                    grid-column: 3;
-                    grid-row: 2;
-                }
-                #zoomIn {
-                    grid-column: 3;
-                    grid-row: 1;
-                }
-                #zoomOut {
-                    grid-column: 3;
-                    grid-row: 3;
-                }
-            `;
-            document.head.appendChild(style);
-
-            // Přidání markerů na glóbus
-            setTimeout(() => {
-                addMarkersToGlobe();
-                addRoutesToGlobe();
-            }, 1000);
-
-        } catch (error) {
-            console.error('Chyba při inicializaci Cesium Vieweru:', error);
-            addMessage('Nepodařilo se inicializovat 3D glóbus. Zkuste to prosím znovu. Chyba: ' + error.message, true);
+                    document.getElementById('map').classList.remove('map-globe-mode');
+                });
+        } else {
+            // Pokud není Cesium handler dostupný
+            addMessage('Nepodařilo se aktivovat glóbus režim. Cesium handler není dostupný.', true);
             isGlobeMode = false;
             if (toggleGlobeBtn) {
                 toggleGlobeBtn.classList.remove('active');
             }
             document.getElementById('map').classList.remove('map-globe-mode');
-
-            // Skrytí loading overlay
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            if (loadingOverlay) {
-                loadingOverlay.style.display = 'none';
-            }
-
-            // Skrytí Cesium kontejneru v případě chyby
-            const cesiumContainer = document.getElementById('cesiumContainer');
-            if (cesiumContainer) {
-                cesiumContainer.style.display = 'none';
-            }
-
-            // Zobrazení Leaflet mapy
-            const leafletContainer = document.querySelector('.leaflet-container');
-            if (leafletContainer) {
-                leafletContainer.style.display = 'block';
-            }
-
-            return;
         }
-
-        // Přidání markerů na glóbus
-        setTimeout(() => {
-            try {
-                // Přidání markerů na glóbus
-                addMarkersToGlobe();
-                console.log('Markery byly přidány na glóbus');
-
-                // Přidání tras mezi body na glóbusu
-                addRoutesToGlobe();
-                console.log('Trasy byly přidány na glóbus');
-
-                // Přidání ovládacích prvků pro glóbus
-                addGlobeControls();
-                console.log('Ovládací prvky byly přidány');
-
-                // Vynucení překreslení scény
-                if (cesiumViewer && cesiumViewer.scene) {
-                    cesiumViewer.scene.requestRender();
-                    console.log('Scéna byla překreslena');
-                }
-            } catch (error) {
-                console.error('Chyba při přidávání obsahu na glóbus:', error);
-            }
-        }, 500);
-
-        // Informace pro uživatele
-        addMessage('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
     } else {
-        console.log('Deaktivace glóbus režimu');
-
-        // Deaktivace glóbus režimu
+        // Deaktivace tlačítka
         if (toggleGlobeBtn) {
             toggleGlobeBtn.classList.remove('active');
         }
@@ -1867,394 +1600,63 @@ function toggleGlobeMode() {
         // Odstranění třídy pro glóbus režim
         document.getElementById('map').classList.remove('map-globe-mode');
 
-        try {
-            // Odstranění ovládacích prvků pro glóbus
-            removeGlobeControls();
-
-            // Vyčištění markerů na glóbusu
-            if (cesiumViewer) {
-                cesiumViewer.entities.removeAll();
-                console.log('Všechny entity byly odstraněny');
-            }
-
-            // Skrytí Cesium kontejneru
-            const cesiumContainer = document.getElementById('cesiumContainer');
-            if (cesiumContainer) {
-                cesiumContainer.style.display = 'none';
-                console.log('Cesium kontejner byl skryt');
-            }
-
-            // Zobrazení Leaflet mapy
-            const leafletContainer = document.querySelector('.leaflet-container');
-            if (leafletContainer) {
-                leafletContainer.style.display = 'block';
-                console.log('Leaflet mapa byla zobrazena');
-            }
-
-            // Aktualizace velikosti mapy
-            map.invalidateSize();
-            console.log('Velikost mapy byla aktualizována');
-
-            // Reset globálních proměnných
-            globeMarkers = [];
-        } catch (error) {
-            console.error('Chyba při deaktivaci glóbus režimu:', error);
+        // Deaktivace glóbus režimu pomocí Cesium handleru
+        if (window.CesiumHandler) {
+            window.CesiumHandler.deactivateGlobeMode(addMessage)
+                .catch(error => {
+                    console.error('Chyba při deaktivaci glóbus režimu:', error);
+                });
         }
-
-        // Informace pro uživatele
-        addMessage('Glóbus režim byl deaktivován. Mapa je nyní v klasickém 2D zobrazení.', false);
     }
 }
 
 // Funkce pro přidání markerů na glóbus
 function addMarkersToGlobe() {
-    if (!cesiumViewer) {
-        console.error('Cesium Viewer není inicializován');
-        return;
-    }
-
-    try {
-        console.log('Přidávání markerů na glóbus');
-
-        // Vyčištění všech entit
-        cesiumViewer.entities.removeAll();
-        globeMarkers = [];
-
-        // Kontrola, zda existují markery k přidání
-        if (markers.length === 0) {
-            console.log('Nejsou žádné markery k přidání na glóbus');
-
-            // Přidání testovacího markeru pro ověření funkčnosti
-            const testMarker = cesiumViewer.entities.add({
-                name: 'Testovací bod',
-                position: Cesium.Cartesian3.fromDegrees(15.0, 50.0, 0),
-                point: {
-                    pixelSize: 15,
-                    color: Cesium.Color.RED,
-                    outlineColor: Cesium.Color.WHITE,
-                    outlineWidth: 2
-                },
-                label: {
-                    text: 'Test',
-                    font: '14pt sans-serif',
-                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                    outlineWidth: 2,
-                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                    pixelOffset: new Cesium.Cartesian2(0, -10),
-                    fillColor: Cesium.Color.WHITE,
-                    outlineColor: Cesium.Color.BLACK,
-                    showBackground: true,
-                    backgroundColor: new Cesium.Color(0, 0, 0, 0.7)
-                }
-            });
-
-            globeMarkers.push(testMarker);
-            console.log('Přidán testovací marker pro ověření funkčnosti');
-            return;
-        }
-
-        // Přidání markerů z Leaflet mapy na glóbus
-        markers.forEach((marker, index) => {
-            const position = marker.getLatLng();
-
-            // Získání názvu markeru
-            const markerName = markerProperties[index] && markerProperties[index].name ?
-                markerProperties[index].name : `Bod ${index + 1}`;
-
-            // Vytvoření entity pro marker - použijeme jednodušší bod místo billboardu
-            const globeMarker = cesiumViewer.entities.add({
-                name: markerName,
-                position: Cesium.Cartesian3.fromDegrees(position.lng, position.lat, 0),
-                point: {
-                    pixelSize: 15,
-                    color: Cesium.Color.BLUE,
-                    outlineColor: Cesium.Color.WHITE,
-                    outlineWidth: 2
-                },
-                label: {
-                    text: `${index + 1}`,
-                    font: '14pt sans-serif',
-                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                    outlineWidth: 2,
-                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                    pixelOffset: new Cesium.Cartesian2(0, -10),
-                    fillColor: Cesium.Color.WHITE,
-                    outlineColor: Cesium.Color.BLACK,
-                    showBackground: true,
-                    backgroundColor: new Cesium.Color(0, 0, 0, 0.7)
-                }
-            });
-
-            // Přidání entity do pole markerů
-            globeMarkers.push(globeMarker);
-        });
-
-        console.log(`Přidáno ${globeMarkers.length} markerů na glóbus`);
-
-        // Pokud existují markery, přiblížíme kameru k prvnímu z nich
-        if (markers.length > 0) {
-            const firstPosition = markers[0].getLatLng();
-            cesiumViewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(firstPosition.lng, firstPosition.lat, 500000),
-                orientation: {
-                    heading: 0.0,
-                    pitch: -0.5,
-                    roll: 0.0
-                },
-                duration: 1.5,
-                complete: function() {
-                    // Vynucení překreslení scény po dokončení animace
-                    cesiumViewer.scene.requestRender();
-                }
-            });
-        }
-    } catch (error) {
-        console.error('Chyba při přidávání markerů na glóbus:', error);
+    // Použití Cesium handleru pro přidání markerů na glóbus
+    if (window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
+        window.CesiumHandler.addMarkersToGlobe(markers);
     }
 }
 
 // Funkce pro přidání ovládacích prvků pro glóbus
 function addGlobeControls() {
-    // Odstranění existujících ovládacích prvků, pokud existují
-    removeGlobeControls();
-
-    // Vytvoření kontejneru pro ovládací prvky
-    const controlsContainer = document.createElement('div');
-    controlsContainer.id = 'mapGlobeControls';
-    controlsContainer.className = 'map-globe-controls';
-
-    // Tlačítko pro zvětšení (zoom in)
-    const zoomInBtn = document.createElement('button');
-    zoomInBtn.className = 'map-globe-control-btn';
-    zoomInBtn.innerHTML = '+';
-    zoomInBtn.title = 'Přiblížit';
-    zoomInBtn.addEventListener('click', () => {
-        if (cesiumViewer) {
-            // Získání aktuální pozice kamery
-            const cameraPosition = cesiumViewer.camera.position;
-            const cameraHeight = Cesium.Cartographic.fromCartesian(cameraPosition).height;
-
-            // Přiblížení kamery (zmenšení výšky)
-            cesiumViewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromRadians(
-                    Cesium.Cartographic.fromCartesian(cameraPosition).longitude,
-                    Cesium.Cartographic.fromCartesian(cameraPosition).latitude,
-                    cameraHeight * 0.6 // Přiblížení o 40%
-                ),
-                duration: 0.5
-            });
-        }
-    });
-
-    // Tlačítko pro zmenšení (zoom out)
-    const zoomOutBtn = document.createElement('button');
-    zoomOutBtn.className = 'map-globe-control-btn';
-    zoomOutBtn.innerHTML = '-';
-    zoomOutBtn.title = 'Oddálit';
-    zoomOutBtn.addEventListener('click', () => {
-        if (cesiumViewer) {
-            // Získání aktuální pozice kamery
-            const cameraPosition = cesiumViewer.camera.position;
-            const cameraHeight = Cesium.Cartographic.fromCartesian(cameraPosition).height;
-
-            // Oddálení kamery (zvětšení výšky)
-            cesiumViewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromRadians(
-                    Cesium.Cartographic.fromCartesian(cameraPosition).longitude,
-                    Cesium.Cartographic.fromCartesian(cameraPosition).latitude,
-                    cameraHeight * 1.6 // Oddálení o 60%
-                ),
-                duration: 0.5
-            });
-        }
-    });
-
-    // Tlačítko pro rotaci doleva
-    const rotateLeftBtn = document.createElement('button');
-    rotateLeftBtn.className = 'map-globe-control-btn';
-    rotateLeftBtn.innerHTML = '↶';
-    rotateLeftBtn.title = 'Rotovat doleva';
-    rotateLeftBtn.addEventListener('click', () => {
-        if (cesiumViewer) {
-            // Rotace kamery doleva o 15 stupňů
-            cesiumViewer.camera.rotate(Cesium.Cartesian3.UNIT_Z, Cesium.Math.toRadians(15));
-        }
-    });
-
-    // Tlačítko pro rotaci doprava
-    const rotateRightBtn = document.createElement('button');
-    rotateRightBtn.className = 'map-globe-control-btn';
-    rotateRightBtn.innerHTML = '↷';
-    rotateRightBtn.title = 'Rotovat doprava';
-    rotateRightBtn.addEventListener('click', () => {
-        if (cesiumViewer) {
-            // Rotace kamery doprava o 15 stupňů
-            cesiumViewer.camera.rotate(Cesium.Cartesian3.UNIT_Z, Cesium.Math.toRadians(-15));
-        }
-    });
-
-    // Tlačítko pro náklon nahoru
-    const tiltUpBtn = document.createElement('button');
-    tiltUpBtn.className = 'map-globe-control-btn';
-    tiltUpBtn.innerHTML = '↑';
-    tiltUpBtn.title = 'Náklon nahoru';
-    tiltUpBtn.addEventListener('click', () => {
-        if (cesiumViewer) {
-            // Náklon kamery nahoru o 10 stupňů
-            cesiumViewer.camera.rotate(cesiumViewer.camera.right, Cesium.Math.toRadians(10));
-        }
-    });
-
-    // Tlačítko pro náklon dolů
-    const tiltDownBtn = document.createElement('button');
-    tiltDownBtn.className = 'map-globe-control-btn';
-    tiltDownBtn.innerHTML = '↓';
-    tiltDownBtn.title = 'Náklon dolů';
-    tiltDownBtn.addEventListener('click', () => {
-        if (cesiumViewer) {
-            // Náklon kamery dolů o 10 stupňů
-            cesiumViewer.camera.rotate(cesiumViewer.camera.right, Cesium.Math.toRadians(-10));
-        }
-    });
-
-    // Tlačítko pro reset pohledu
-    const resetViewBtn = document.createElement('button');
-    resetViewBtn.className = 'map-globe-control-btn';
-    resetViewBtn.innerHTML = '⟲';
-    resetViewBtn.title = 'Resetovat pohled';
-    resetViewBtn.addEventListener('click', () => {
-        if (cesiumViewer) {
-            // Získání středu Leaflet mapy
-            const center = map.getCenter();
-
-            // Reset pohledu na výchozí pozici
-            cesiumViewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(center.lng, center.lat, 1000000),
-                orientation: {
-                    heading: Cesium.Math.toRadians(0),
-                    pitch: Cesium.Math.toRadians(-90),
-                    roll: 0
-                },
-                duration: 1.5
-            });
-        }
-    });
-
-    // Přidání tlačítek do kontejneru
-    controlsContainer.appendChild(zoomInBtn);
-    controlsContainer.appendChild(zoomOutBtn);
-    controlsContainer.appendChild(rotateLeftBtn);
-    controlsContainer.appendChild(rotateRightBtn);
-    controlsContainer.appendChild(tiltUpBtn);
-    controlsContainer.appendChild(tiltDownBtn);
-    controlsContainer.appendChild(resetViewBtn);
-
-    // Přidání kontejneru do mapy
-    document.getElementById('map').appendChild(controlsContainer);
+    // Použití Cesium handleru pro přidání ovládacích prvků
+    // Tato funkce je nyní pouze wrapper pro kompatibilitu se starším kódem
 }
 
 // Funkce pro rotaci glóbusu
 function rotateGlobe(headingChange, pitchChange) {
-    if (!cesiumViewer) return;
-
-    const camera = cesiumViewer.camera;
-    const heading = camera.heading + headingChange;
-    const pitch = camera.pitch + pitchChange;
-
-    camera.setView({
-        orientation: {
-            heading: heading,
-            pitch: pitch,
-            roll: camera.roll
-        }
-    });
+    // Použití Cesium handleru pro rotaci glóbusu
+    if (window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
+        window.CesiumHandler.rotateGlobe(headingChange, pitchChange);
+    }
 }
 
 // Funkce pro zoom glóbusu
 function zoomGlobe(factor) {
-    if (!cesiumViewer) return;
-
-    const camera = cesiumViewer.camera;
-    const cameraPosition = camera.position;
-    const cameraDirection = camera.direction;
-
-    // Výpočet nové pozice kamery
-    const newPosition = Cesium.Cartesian3.multiplyByScalar(
-        cameraDirection,
-        -factor * 1000000,
-        new Cesium.Cartesian3()
-    );
-    Cesium.Cartesian3.add(cameraPosition, newPosition, newPosition);
-
-    camera.flyTo({
-        destination: newPosition,
-        orientation: {
-            heading: camera.heading,
-            pitch: camera.pitch,
-            roll: camera.roll
-        },
-        duration: 1.0
-    });
+    // Použití Cesium handleru pro zoom glóbusu
+    if (window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
+        // Cesium handler používá jinou implementaci, ale zachováváme kompatibilitu
+        if (factor < 1) {
+            // Přiblížení
+            window.CesiumHandler.getViewer().camera.zoomIn(1000000);
+        } else {
+            // Oddálení
+            window.CesiumHandler.getViewer().camera.zoomOut(1000000);
+        }
+    }
 }
 
 // Funkce pro odstranění ovládacích prvků pro glóbus
 function removeGlobeControls() {
-    // Odstranění ovládacích prvků pro glóbus, pokud existují
-    const controlsContainer = document.getElementById('mapGlobeControls');
-    if (controlsContainer) {
-        controlsContainer.remove();
-    }
-
-    // Odstranění rotace ovládacích prvků
-    const rotationControls = document.querySelector('.cesium-rotation-controls');
-    if (rotationControls) {
-        rotationControls.remove();
-    }
+    // Tato funkce je nyní pouze wrapper pro kompatibilitu se starším kódem
 }
 
 // Funkce pro přidání tras mezi body na glóbusu
 function addRoutesToGlobe() {
-    if (!cesiumViewer) {
-        console.error('Cesium Viewer není inicializován');
-        return;
-    }
-
-    try {
-        console.log('Přidávání tras na glóbus');
-
-        // Pokud nemáme alespoň dva body, nemůžeme vytvořit trasu
-        if (markers.length < 2) {
-            console.log('Není dostatek bodů pro vytvoření trasy');
-            return;
-        }
-
-        // Vytvoření pole souřadnic pro trasu
-        const positions = [];
-        markers.forEach(marker => {
-            const position = marker.getLatLng();
-            positions.push(position.lng, position.lat, 0);
-        });
-
-        // Vytvoření entity pro trasu
-        const routeEntity = cesiumViewer.entities.add({
-            name: 'Trasa',
-            polyline: {
-                positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
-                width: 5,
-                material: new Cesium.PolylineGlowMaterialProperty({
-                    glowPower: 0.2,
-                    color: Cesium.Color.BLUE
-                }),
-                clampToGround: true
-            }
-        });
-
-        // Přidání entity do pole markerů
-        globeMarkers.push(routeEntity);
-
-        console.log('Trasa byla úspěšně přidána na glóbus');
-    } catch (error) {
-        console.error('Chyba při přidávání trasy na glóbus:', error);
+    // Použití Cesium handleru pro přidání tras na glóbus
+    if (window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
+        window.CesiumHandler.addRoutesToGlobe(markers);
     }
 }
 
@@ -2711,7 +2113,7 @@ function setupMarkerEventListeners(marker, markerIndex) {
         }
 
         // Aktualizace glóbusu, pokud je aktivní
-        if (isGlobeMode && cesiumViewer) {
+        if (isGlobeMode && window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
             addMarkersToGlobe();
             addRoutesToGlobe();
         }
