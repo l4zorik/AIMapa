@@ -2738,7 +2738,7 @@ body.fullscreen-mode {
 .floating-chat-container {
     position: absolute;
     top: 20px;
-    right: 20px;
+    right: 70px; /* Posunuto doprava vedle tlačítka s lodičkou */
     width: 320px;
     max-height: 500px;
     background-color: rgba(31, 41, 55, 0.95);
@@ -2760,7 +2760,7 @@ body.fullscreen-mode {
 }
 
 .floating-chat-container.chat-right {
-    right: 20px;
+    right: 70px; /* Posunuto doprava vedle tlačítka s lodičkou */
     left: auto;
 }
 

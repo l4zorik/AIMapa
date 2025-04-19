@@ -25,6 +25,12 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.1.2] - 2025-04-18
+
+### Vylepšeno
+- Upravena pozice plovoucího chatu ve fullscreen režimu - nyní je umístěn vedle tlačítka s lodičkou pro lepší přístupnost
+- Optimalizováno umístění chatu při přepínání mezi levou a pravou stranou obrazovky
+
 ## [0.1.1] - 2025-04-18
 
 ### Opraveno
@@ -281,6 +287,11 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidána chybějící funkce processMessage pro zpracování zpráv z chatu
 - Zlepšena synchronizace mezi hlavním a plovoucím chatem
 - Optimalizovány event listenery pro odesílání zpráv
+
+### Verze 0.1.2 (Duben 2025)
+#### Vylepšení uživatelského rozhraní
+- Upravena pozice plovoucího chatu ve fullscreen režimu pro lepší přístupnost
+- Optimalizováno umístění chatu při přepínání mezi levou a pravou stranou obrazovky
 
 #### Plánované funkce pro verzi 0.2.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
