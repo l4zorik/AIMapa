@@ -49,6 +49,21 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Adaptivní rozhraní, které se přizpůsobuje potřebám uživatele
 - Bezproblémová integrace s dalšími aplikacemi a službami
 
+## [0.0.6] - 2025-04-18
+
+### Přidáno
+- Přidávání bodů nyní funguje pomocí dvojkliku místo jednoduchého kliku
+- Příkazy v chatu nyní fungují i po smazání bodů
+- Možnost obnovení smazaných bodů při navigaci na jejich původní pozici
+- Dva režimy zobrazení popup oken bodů: režim úprav a režim prohlížení
+
+### Vylepšeno
+- Po uložení bodu se popup okno přepne do prohlížecího režimu místo zavření
+- Prohlížecí režim popup okna zobrazuje přehledně všechny informace o bodu
+- Přidáno tlačítko "Upravit" pro přepnutí zpět do režimu úprav
+- Zobrazení názvu bodu v hlavičce popup okna místo generického "Bod X"
+- Vylepšený design popup oken pro lepší uživatelský zážitek
+
 ## [0.0.5] - 2025-04-18
 
 ### Vylepšeno

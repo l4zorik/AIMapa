@@ -1628,6 +1628,149 @@ body[data-theme="dark"] .club-popup .club-actions {
     border-top: 1px solid rgba(186, 104, 200, 0.2);
 }
 
+/* Styly pro uložený marker */
+.saved-marker .popup-info {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.saved-marker .info-row {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    gap: 10px;
+}
+
+.saved-marker .info-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(156, 39, 176, 0.1);
+    border-radius: 50%;
+    color: #9c27b0;
+}
+
+.saved-marker .info-content {
+    flex: 1;
+}
+
+.saved-marker .info-content strong {
+    font-weight: 600;
+    color: #666;
+    margin-right: 5px;
+}
+
+body[data-theme="dark"] .saved-marker .popup-info {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+body[data-theme="dark"] .saved-marker .info-icon {
+    background-color: rgba(186, 104, 200, 0.2);
+    color: #ce93d8;
+}
+
+body[data-theme="dark"] .saved-marker .info-content strong {
+    color: #aaa;
+}
+
+.saved-marker .edit-btn {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.saved-marker .edit-btn:hover {
+    background-color: #1976d2;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Styly pro dočasný marker smazaného bodu */
+.temp-marker-icon {
+    background-color: #e91e63;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    animation: pulse 1.5s infinite;
+    z-index: 1000;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.temp-marker-popup .leaflet-popup-content-wrapper {
+    background-color: #2d3748;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+}
+
+.temp-marker-popup .leaflet-popup-tip {
+    background-color: #2d3748;
+}
+
+.temp-marker-popup h3 {
+    color: #e91e63;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.temp-marker-popup p {
+    margin: 8px 0;
+    color: #cbd5e0;
+}
+
+.temp-marker-popup .popup-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.temp-marker-popup .popup-btn {
+    background-color: #e91e63;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.temp-marker-popup .popup-btn:hover {
+    background-color: #d81b60;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
 /* Responzivní úpravy pro různé velikosti obrazovky */
 @media (max-width: 480px) {
     .club-popup {

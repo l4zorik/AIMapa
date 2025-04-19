@@ -65,6 +65,9 @@ const routeTimeElement = document.getElementById('routeTime');
 // Proměnná pro ukládání vlastností markerů
 let markerProperties = [];
 
+// Proměnná pro ukládání smazaných bodů a jejich příkazů
+let deletedMarkerCommands = [];
+
 // Proměnná pro ukládání intervalů pro odpočet
 let countdownIntervals = {};
 
@@ -74,35 +77,68 @@ function createPopupContent(marker, index) {
         name: `Bod ${index + 1}`,
         command: `bod${index + 1}`,
         lat: marker.getLatLng().lat.toFixed(4),
-        lng: marker.getLatLng().lng.toFixed(4)
+        lng: marker.getLatLng().lng.toFixed(4),
+        saved: false // Přidání příznak, zda je bod uložený
     };
 
     // Vytvoření unikátního ID pro odpočet
     const countdownId = `countdown-${index}-${Date.now()}`;
 
-    return `
-        <div class="popup-content">
-            <div class="popup-header">
-                <div class="popup-title">Bod ${index + 1}</div>
-                <div class="popup-countdown" id="${countdownId}">35s</div>
-            </div>
-            <div class="popup-form">
-                <div class="form-group">
-                    <label for="markerName${index}">Název bodu:</label>
-                    <input type="text" id="markerName${index}" value="${markerProp.name}" class="popup-input">
+    // Kontrola, zda je bod uložený nebo nově vytvořený
+    if (markerProp.saved) {
+        // Verze pro uložený bod - režim prohlížení s možností úpravy
+        return `
+            <div class="popup-content saved-marker">
+                <div class="popup-header">
+                    <div class="popup-title">${markerProp.name}</div>
+                    <div class="popup-countdown" id="${countdownId}">35s</div>
                 </div>
-                <div class="form-group">
-                    <label for="markerCommand${index}">Příkaz pro chat:</label>
-                    <input type="text" id="markerCommand${index}" value="${markerProp.command}" class="popup-input">
+                <div class="popup-info">
+                    <div class="info-row">
+                        <div class="info-icon"><i class="icon">📍</i></div>
+                        <div class="info-content"><strong>Název:</strong> ${markerProp.name}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-icon"><i class="icon">💬</i></div>
+                        <div class="info-content"><strong>Příkaz:</strong> ${markerProp.command}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-icon"><i class="icon">📍</i></div>
+                        <div class="info-content"><strong>Souřadnice:</strong> ${markerProp.lat}, ${markerProp.lng}</div>
+                    </div>
                 </div>
-                <p class="coordinates">Souřadnice: ${markerProp.lat}, ${markerProp.lng}</p>
                 <div class="popup-actions">
-                    <button class="popup-btn save-btn" onclick="saveMarkerProperties(${index})">Uložit</button>
-                    <button class="popup-btn delete-btn" onclick="removeMarker(${index})">Odstranit bod</button>
+                    <button class="popup-btn edit-btn" onclick="editMarker(${index})">Upravit</button>
+                    <button class="popup-btn delete-btn" onclick="removeMarker(${index})">Odstranit</button>
                 </div>
             </div>
-        </div>
-    `;
+        `;
+    } else {
+        // Verze pro nově vytvořený bod - formulář pro zadání údajů
+        return `
+            <div class="popup-content new-marker">
+                <div class="popup-header">
+                    <div class="popup-title">${markerProp.name}</div>
+                    <div class="popup-countdown" id="${countdownId}">35s</div>
+                </div>
+                <div class="popup-form">
+                    <div class="form-group">
+                        <label for="markerName${index}">Název bodu:</label>
+                        <input type="text" id="markerName${index}" value="${markerProp.name}" class="popup-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="markerCommand${index}">Příkaz pro chat:</label>
+                        <input type="text" id="markerCommand${index}" value="${markerProp.command}" class="popup-input">
+                    </div>
+                    <p class="coordinates">Souřadnice: ${markerProp.lat}, ${markerProp.lng}</p>
+                    <div class="popup-actions">
+                        <button class="popup-btn save-btn" onclick="saveMarkerProperties(${index})">Uložit</button>
+                        <button class="popup-btn delete-btn" onclick="removeMarker(${index})">Odstranit bod</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
 }
 
 // Funkce pro spuštění odpočtu
@@ -155,7 +191,8 @@ function saveMarkerProperties(index) {
             name: nameInput.value || `Bod ${index + 1}`,
             command: commandInput.value || `bod${index + 1}`,
             lat: latlng.lat.toFixed(4),
-            lng: latlng.lng.toFixed(4)
+            lng: latlng.lng.toFixed(4),
+            saved: true // Nastavení příznaku, že bod byl uložen
         };
 
         // Zrušení časovače pro popup okno
@@ -175,11 +212,28 @@ function saveMarkerProperties(index) {
         // Informace pro uživatele
         addMessage(`Bod "${markerProperties[index].name}" byl uložen. Pro navigaci na tento bod napište "${markerProperties[index].command}" do chatu.`, false);
 
-        // Zavření popup po uložení
-        marker.closePopup();
+        // Aktualizace popup obsahu - přepnutí do prohlížecího režimu
+        marker.setPopupContent(createPopupContent(marker, index));
 
         // Uložení stavu aplikace po změně vlastností markeru
         saveAppState();
+    }
+}
+
+// Funkce pro přepnutí markeru do režimu úprav
+function editMarker(index) {
+    if (index < markers.length) {
+        const marker = markers[index];
+
+        // Dočasně nastavíme příznak saved na false, aby se zobrazil formulář
+        const tempProperties = {...markerProperties[index], saved: false};
+        markerProperties[index] = tempProperties;
+
+        // Aktualizace popup obsahu
+        marker.setPopupContent(createPopupContent(marker, index));
+
+        // Informace pro uživatele
+        addMessage(`Bod "${tempProperties.name}" je nyní v režimu úprav.`, false);
     }
 }
 
@@ -188,6 +242,20 @@ function removeMarker(index) {
     if (index < markers.length) {
         const marker = markers[index];
         const markerName = markerProperties[index]?.name || `Bod ${index + 1}`;
+        const markerCommand = markerProperties[index]?.command;
+        const markerLat = markerProperties[index]?.lat;
+        const markerLng = markerProperties[index]?.lng;
+
+        // Uložení příkazu a vlastností smazaného bodu pro pozdější použití
+        if (markerCommand && markerLat && markerLng) {
+            deletedMarkerCommands.push({
+                command: markerCommand,
+                name: markerName,
+                lat: markerLat,
+                lng: markerLng
+            });
+            addMessage(`Příkaz "${markerCommand}" zůstává aktivní i po smazání bodu.`, false);
+        }
 
         // Zrušení časovače pro popup okno
         if (popupTimers[index]) {
@@ -372,12 +440,15 @@ function addMarkerToMap(latlng) {
     return marker;
 }
 
-// Event listener pro kliknutí na mapu
-map.on('click', (e) => {
+// Event listener pro dvojklik na mapu
+map.on('dblclick', (e) => {
     if (isAddingPoints) {
         addMarkerToMap(e.latlng);
     }
 });
+
+// Deaktivace standardního chování dvojkliku (zoom)
+map.doubleClickZoom.disable();
 
 // Event listener pro zoom, aby se popup okna lépe chovaly při zoomu
 map.on('zoomstart', () => {
@@ -420,7 +491,7 @@ document.getElementById('addActivity').addEventListener('click', () => {
 
     if (isAddingPoints) {
         addActivityBtn.classList.add('active');
-        addMessage('Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.', false);
+        addMessage('Režim přidávání bodů je aktivní. Dvojklikněte na mapu pro přidání bodu.', false);
     } else {
         addActivityBtn.classList.remove('active');
         addMessage('Režim přidávání bodů byl deaktivován.', false);
@@ -637,6 +708,13 @@ function processUserInput(input) {
     for (let i = 0; i < markerProperties.length; i++) {
         if (markerProperties[i] && lowercaseInput === markerProperties[i].command.toLowerCase()) {
             return navigateToMarker(i);
+        }
+    }
+
+    // Kontrola příkazů pro smazané body
+    for (let i = 0; i < deletedMarkerCommands.length; i++) {
+        if (lowercaseInput === deletedMarkerCommands[i].command.toLowerCase()) {
+            return navigateToDeletedMarker(i);
         }
     }
 
@@ -871,6 +949,7 @@ function saveAppState() {
         markers: markersData,
         settings: settings,
         mapState: mapState,
+        deletedMarkerCommands: deletedMarkerCommands,
         lastSaved: new Date().toISOString()
     };
 
@@ -964,6 +1043,12 @@ function loadAppState() {
             );
         }
 
+        // Načtení smazaných příkazů
+        if (appState.deletedMarkerCommands && appState.deletedMarkerCommands.length > 0) {
+            deletedMarkerCommands = appState.deletedMarkerCommands;
+            console.log('Načteno ' + deletedMarkerCommands.length + ' smazaných příkazů.');
+        }
+
         // Načtení markerů
         if (appState.markers && appState.markers.length > 0) {
             // Odstranění všech stávajících markerů
@@ -981,6 +1066,11 @@ function loadAppState() {
                 const markerIndex = markers.length;
                 markers.push(marker);
                 markerProperties[markerIndex] = markerData.properties;
+
+                // Nastavení příznaku saved na true pro načtené body (pro zpětnou kompatibilitu)
+                if (markerProperties[markerIndex].saved === undefined) {
+                    markerProperties[markerIndex].saved = true;
+                }
 
                 // Přidání popup s formulářem
                 marker.bindPopup(createPopupContent(marker, markerIndex), {
@@ -1203,6 +1293,101 @@ function navigateToMarker(index) {
         return `Navigace na bod "${markerName}".`;
     }
     return 'Bod nebyl nalezen.';
+}
+
+// Funkce pro navigaci na smazaný bod
+function navigateToDeletedMarker(index) {
+    if (index < deletedMarkerCommands.length) {
+        const deletedMarker = deletedMarkerCommands[index];
+        const markerName = deletedMarker.name;
+        const markerLocation = L.latLng(deletedMarker.lat, deletedMarker.lng);
+
+        // Vytvoření dočasného markeru pro zobrazení pozice
+        const tempMarker = L.marker(markerLocation, {
+            icon: L.divIcon({
+                className: 'temp-marker',
+                html: `<div class="temp-marker-icon"><i class="icon">📍</i></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 30]
+            })
+        }).addTo(map);
+
+        // Přiblížení mapy na bod
+        map.setView(markerLocation, 15, {
+            animate: true,
+            duration: 1
+        });
+
+        // Vytvoření popup obsahu
+        const popupContent = `
+            <div class="temp-marker-popup">
+                <h3>${markerName}</h3>
+                <p>Tento bod byl smazán, ale příkaz "${deletedMarker.command}" zůstává aktivní.</p>
+                <p>Souřadnice: [${deletedMarker.lat}, ${deletedMarker.lng}]</p>
+                <div class="popup-actions">
+                    <button class="popup-btn" onclick="recreateMarker(${index})">Obnovit bod</button>
+                </div>
+            </div>
+        `;
+
+        // Přidání popup k dočasnému markeru
+        tempMarker.bindPopup(popupContent, {
+            className: 'temp-marker-popup',
+            maxWidth: 300,
+            minWidth: 250
+        }).openPopup();
+
+        // Odstranění dočasného markeru po 35 sekundách
+        setTimeout(() => {
+            if (map.hasLayer(tempMarker)) {
+                map.removeLayer(tempMarker);
+            }
+        }, 35000);
+
+        return `Navigace na původní pozici bodu "${markerName}".`;
+    }
+    return 'Smazaný bod nebyl nalezen.';
+}
+
+// Funkce pro obnovení smazaného bodu
+function recreateMarker(index) {
+    if (index < deletedMarkerCommands.length) {
+        const deletedMarker = deletedMarkerCommands[index];
+        const markerLocation = L.latLng(deletedMarker.lat, deletedMarker.lng);
+
+        // Vytvoření nového markeru na původní pozici
+        const newMarker = addMarkerToMap(markerLocation);
+        const newMarkerIndex = markers.length - 1;
+
+        // Nastavení původních vlastností
+        markerProperties[newMarkerIndex] = {
+            name: deletedMarker.name,
+            command: deletedMarker.command,
+            lat: deletedMarker.lat,
+            lng: deletedMarker.lng,
+            saved: true // Nastavení příznaku, že bod byl uložen
+        };
+
+        // Aktualizace popup obsahu
+        newMarker.setPopupContent(createPopupContent(newMarker, newMarkerIndex));
+
+        // Odstranění záznamu ze smazaných příkazů
+        deletedMarkerCommands.splice(index, 1);
+
+        // Informace pro uživatele
+        addMessage(`Bod "${deletedMarker.name}" byl obnoven.`, false);
+
+        // Uložení stavu aplikace po obnovení bodu
+        saveAppState();
+
+        // Zavření všech popup oken
+        map.closePopup();
+
+        // Otevření popup nového markeru
+        setTimeout(() => {
+            newMarker.openPopup();
+        }, 300);
+    }
 }
 
 // Funkce pro zobrazení nočního klubu v Rohatci
@@ -1947,7 +2132,7 @@ processUserInput = function(input) {
     } else if (lowercaseInput.includes('přidat bod') || lowercaseInput.includes('přidat aktivitu')) {
         isAddingPoints = true;
         document.getElementById('addActivity').classList.add('active');
-        return 'Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.';
+        return 'Režim přidávání bodů je aktivní. Dvojklikněte na mapu pro přidání bodu.';
     } else if (lowercaseInput.includes('vzdálenost') || lowercaseInput.includes('čas cesty')) {
         if (markers.length < 2) {
             return 'Pro výpočet vzdálenosti a času cesty potřebuji alespoň dva body na mapě.';
