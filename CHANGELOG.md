@@ -29,7 +29,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 ### Opraveno
 - Opraven závažný problém s nefunkční mapou po předchozích úpravách
-- Návrat k funkční verzi bez externího cesium-handler.js modulu
+- Návrat k funkční verzi 0.2.2 bez externího cesium-handler.js modulu
 - Zachována funkčnost 3D glóbus režimu v původní implementaci
 - Vylepšeno ošetření chyb při inicializaci a používání Cesium
 - Optimalizována funkce `toggleGlobeMode` pro spolehlivější přepínání režimů
@@ -45,7 +45,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementace interaktivních ovládacích prvků pro rotaci a zoom glóbusu
 - Použití Bing Maps s lepší kvalitou zobrazení
 - Přidání terénu pro realističtější vzhled planety
-- Přidání hvězdné oblohy a atmosféry pro lepší vizualní dojem
+- Přidání hvězdné oblohy a atmosféry pro lepší vizuální dojem
 - Optimalizace CSS stylů pro správné zobrazení všech komponent
 - Implementace funkcí pro rotaci a zoom glóbusu
 
