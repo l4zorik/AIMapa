@@ -5,7 +5,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 # Můj osobní plán na vývoj
 
 ## Úkol 1
--
+- Naučit se pracovat s WordPressem - základy tvorby webů, instalace pluginů, úprava šablon a práce s redakčním systémem
 
 # Vize a plán vývoje AIMapa - Nejlepší AI Mapový Systém na světě
 
