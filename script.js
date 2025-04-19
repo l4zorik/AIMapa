@@ -153,6 +153,14 @@ function startCountdown(elementId, seconds) {
 
     let remainingSeconds = seconds;
 
+    // Aktualizace počátečního zobrazení
+    countdownElement.textContent = `${remainingSeconds}s`;
+    countdownElement.style.display = 'block'; // Zajistíme, že je odpočet viditelný
+
+    // Získání indexu markeru z ID elementu
+    const idParts = elementId.split('-');
+    const markerIndex = parseInt(idParts[1]);
+
     // Aktualizace odpočtu každou sekundu
     countdownIntervals[elementId] = setInterval(() => {
         remainingSeconds--;
@@ -169,10 +177,24 @@ function startCountdown(elementId, seconds) {
             }
         }
 
-        // Ukončení intervalu po vypršení času
+        // Ukončení intervalu a zavření popup okna po vypršení času
         if (remainingSeconds <= 0) {
             clearInterval(countdownIntervals[elementId]);
             delete countdownIntervals[elementId];
+
+            // Zavření popup okna, pokud je index markeru platný
+            if (!isNaN(markerIndex) && markerIndex < markers.length) {
+                const marker = markers[markerIndex];
+                if (marker && marker.isPopupOpen()) {
+                    marker.closePopup();
+                }
+
+                // Zrušení časovače pro popup okno
+                if (popupTimers[markerIndex]) {
+                    clearTimeout(popupTimers[markerIndex]);
+                    delete popupTimers[markerIndex];
+                }
+            }
         }
     }, 1000);
 }

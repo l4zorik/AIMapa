@@ -553,24 +553,51 @@ body[data-theme="dark"] .popup-header {
 .popup-countdown {
     font-size: 0.9rem;
     font-weight: bold;
-    padding: 2px 6px;
-    border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s, color 0.3s;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background-color: rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
 body[data-theme="dark"] .popup-countdown {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .countdown-warning {
     background-color: #f59e0b !important;
     color: white;
+    animation: pulse 1s infinite;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
 }
 
 .countdown-danger {
     background-color: #ef4444 !important;
     color: white;
+    animation: pulse 0.7s infinite;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 .leaflet-popup-content-wrapper {
