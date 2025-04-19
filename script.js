@@ -385,15 +385,37 @@ function removeMarker(index, event) {
 // Proměnná pro ukládání časovačů popup oken
 let popupTimers = {};
 
+// Funkce pro vytvoření vlastního HTML markeru s číslem a pokročilými efekty
+function createCustomMarkerIcon(number, colorIndex) {
+    // Omezení barevných tříd na 1-5
+    const colorClass = `color-${(colorIndex % 5) + 1}`;
+
+    // Vytvoření HTML elementu pro marker s pokročilými efekty
+    const icon = L.divIcon({
+        className: 'custom-marker-container', // Kontejner pro marker
+        html: `<div class="custom-marker ${colorClass}"><span>${number}</span></div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
+
+    return icon;
+}
+
 // Funkce pro přidání bodu na mapu
 function addMarkerToMap(latlng) {
+    // Získání indexu pro nový marker
+    const markerIndex = markers.length;
+
+    // Vytvoření vlastního markeru s číslem
+    const customIcon = createCustomMarkerIcon(markerIndex + 1, markerIndex);
+
     const marker = L.marker(latlng, {
         draggable: true, // Umožní přesouvat marker tažením
-        title: `Bod ${markers.length + 1}` // Popisek při najetí myší
+        title: `Bod ${markerIndex + 1}`, // Popisek při najetí myší
+        icon: customIcon // Použití vlastního ikony
     }).addTo(map);
 
     // Přidání markeru do pole
-    const markerIndex = markers.length;
     markers.push(marker);
 
     // Vytvoření výchozích vlastností pro marker
@@ -431,6 +453,68 @@ function addMarkerToMap(latlng) {
         // Aktualizace popup obsahu
         marker.setPopupContent(createPopupContent(marker, markerIndex));
 
+        // Vylepšený efekt při přesunutí - změna velikosti, záření a animace
+        const markerElement = marker.getElement().querySelector('.custom-marker');
+        if (markerElement) {
+            // Přidání třídy 'selected' pro speciální efekty
+            markerElement.classList.add('selected');
+
+            // Pokročilé efekty pro přesunutý marker
+            markerElement.style.transform = 'scale(1.5) translateY(-10px)';
+            markerElement.style.boxShadow = '0 10px 30px rgba(139, 92, 246, 1), 0 20px 60px rgba(139, 92, 246, 0.6)';
+            markerElement.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+
+            // Vytvoření efektu stínu pod markerem
+            const shadow = document.createElement('div');
+            shadow.style.position = 'absolute';
+            shadow.style.bottom = '-15px';
+            shadow.style.left = '50%';
+            shadow.style.transform = 'translateX(-50%)';
+            shadow.style.width = '30px';
+            shadow.style.height = '10px';
+            shadow.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+            shadow.style.borderRadius = '50%';
+            shadow.style.filter = 'blur(5px)';
+            shadow.style.zIndex = '-1';
+            shadow.style.opacity = '0.7';
+            shadow.style.transition = 'all 0.5s ease';
+            shadow.style.pointerEvents = 'none';
+
+            // Přidání stínu do kontejneru markeru
+            const container = marker.getElement();
+            if (container) {
+                container.appendChild(shadow);
+            }
+
+            // Animace stínu
+            setTimeout(() => {
+                shadow.style.width = '40px';
+                shadow.style.opacity = '0.5';
+            }, 50);
+
+            // Efekt dokončení přesunutí - návrat do původního stavu s jemným odskočením
+            setTimeout(() => {
+                markerElement.style.transform = 'scale(1.2) translateY(-5px)';
+                markerElement.style.boxShadow = '0 5px 15px rgba(139, 92, 246, 0.8), 0 10px 30px rgba(139, 92, 246, 0.4)';
+
+                if (shadow && container && container.contains(shadow)) {
+                    shadow.style.width = '25px';
+                    shadow.style.opacity = '0.6';
+                }
+            }, 500);
+
+            // Konečný návrat do původního stavu
+            setTimeout(() => {
+                markerElement.classList.remove('selected');
+                markerElement.style.transform = '';
+                markerElement.style.boxShadow = '';
+
+                if (shadow && container && container.contains(shadow)) {
+                    container.removeChild(shadow);
+                }
+            }, 800);
+        }
+
         // Pokud máme alespoň dva body, přepočítáme trasu
         if (markers.length >= 2) {
             calculateRouteFunction();
@@ -442,6 +526,54 @@ function addMarkerToMap(latlng) {
         // Zrušení předchozího časovače, pokud existuje
         if (popupTimers[markerIndex]) {
             clearTimeout(popupTimers[markerIndex]);
+        }
+
+        // Pokročilý efekt při kliknutí - rotace, záření a pulzování
+        const markerElement = marker.getElement().querySelector('.custom-marker');
+        if (markerElement) {
+            // Přidání třídy 'active' pro aktivaci speciálních efektů
+            markerElement.classList.add('active');
+
+            // Přidání pokročilých stylů pro rotaci a záření
+            markerElement.style.transform = 'scale(1.4) rotate(360deg)';
+            markerElement.style.boxShadow = '0 0 25px rgba(139, 92, 246, 1), 0 0 50px rgba(139, 92, 246, 0.8)';
+            markerElement.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            markerElement.style.borderColor = '#FFD700'; // Zlatý okraj pro zvýraznění aktivního bodu
+
+            // Vytvoření efektu záblesku
+            const flash = document.createElement('div');
+            flash.style.position = 'absolute';
+            flash.style.top = '0';
+            flash.style.left = '0';
+            flash.style.right = '0';
+            flash.style.bottom = '0';
+            flash.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+            flash.style.borderRadius = '50%';
+            flash.style.opacity = '0.8';
+            flash.style.zIndex = '1';
+            flash.style.pointerEvents = 'none';
+            markerElement.appendChild(flash);
+
+            // Animace záblesku
+            setTimeout(() => {
+                flash.style.opacity = '0';
+                flash.style.transition = 'opacity 0.5s ease';
+            }, 50);
+
+            // Odstranění záblesku po dokončení animace
+            setTimeout(() => {
+                if (markerElement.contains(flash)) {
+                    markerElement.removeChild(flash);
+                }
+            }, 550);
+
+            // Návrat do původního stavu po animaci
+            setTimeout(() => {
+                markerElement.classList.remove('active');
+                markerElement.style.transform = '';
+                markerElement.style.boxShadow = '';
+                markerElement.style.borderColor = '';
+            }, 800);
         }
 
         // Nastavení nového časovače - nyní se o to stará funkce startCountdown
@@ -1142,12 +1274,17 @@ function loadAppState() {
 
             // Přidání uložených markerů
             appState.markers.forEach(markerData => {
+                const markerIndex = markers.length;
+
+                // Vytvoření vlastního markeru s číslem
+                const customIcon = createCustomMarkerIcon(markerIndex + 1, markerIndex);
+
                 const marker = L.marker([markerData.lat, markerData.lng], {
                     draggable: true,
-                    title: markerData.properties.name
+                    title: markerData.properties.name,
+                    icon: customIcon // Použití vlastního ikony
                 }).addTo(map);
 
-                const markerIndex = markers.length;
                 markers.push(marker);
                 markerProperties[markerIndex] = markerData.properties;
 
@@ -1388,15 +1525,79 @@ function navigateToDeletedMarker(index) {
         const markerName = deletedMarker.name;
         const markerLocation = L.latLng(deletedMarker.lat, deletedMarker.lng);
 
-        // Vytvoření dočasného markeru pro zobrazení pozice
+        // Vytvoření speciálního markeru pro smazaný bod s pokročilými efekty
+        const tempIcon = L.divIcon({
+            className: 'custom-marker-container',
+            html: `
+                <div class="custom-marker color-4" style="position: relative;">
+                    <span style="font-size: 18px;">?</span>
+                    <div class="marker-ring" style="
+                        position: absolute;
+                        top: -5px;
+                        left: -5px;
+                        right: -5px;
+                        bottom: -5px;
+                        border: 2px dashed rgba(255, 255, 255, 0.8);
+                        border-radius: 50%;
+                        animation: rotate 10s linear infinite;
+                    "></div>
+                </div>
+            `,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        });
+
         const tempMarker = L.marker(markerLocation, {
-            icon: L.divIcon({
-                className: 'temp-marker',
-                html: `<div class="temp-marker-icon"><i class="icon">📍</i></div>`,
-                iconSize: [30, 30],
-                iconAnchor: [15, 30]
-            })
+            icon: tempIcon
         }).addTo(map);
+
+        // Přidání pokročilých efektů pro zvýraznění smazaného bodu
+        setTimeout(() => {
+            const markerElement = tempMarker.getElement().querySelector('.custom-marker');
+            if (markerElement) {
+                // Přidání speciálních efektů pro smazaný bod
+                markerElement.style.animation = 'pulse 1.5s infinite, float 3s ease-in-out infinite';
+                markerElement.style.backgroundColor = '#EF4444'; // Červená barva pro smazaný bod
+                markerElement.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.8), 0 0 30px rgba(239, 68, 68, 0.4)';
+
+                // Přidání efektu záblesku při zobrazení
+                const flash = document.createElement('div');
+                flash.style.position = 'absolute';
+                flash.style.top = '0';
+                flash.style.left = '0';
+                flash.style.right = '0';
+                flash.style.bottom = '0';
+                flash.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                flash.style.borderRadius = '50%';
+                flash.style.opacity = '0.8';
+                flash.style.zIndex = '1';
+                flash.style.pointerEvents = 'none';
+                markerElement.appendChild(flash);
+
+                // Animace záblesku
+                setTimeout(() => {
+                    flash.style.opacity = '0';
+                    flash.style.transition = 'opacity 0.8s ease';
+                }, 50);
+
+                // Odstranění záblesku po dokončení animace
+                setTimeout(() => {
+                    if (markerElement.contains(flash)) {
+                        markerElement.removeChild(flash);
+                    }
+                }, 850);
+            }
+
+            // Přidání CSS animace pro rotaci
+            const styleElement = document.createElement('style');
+            styleElement.textContent = `
+                @keyframes rotate {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(styleElement);
+        }, 100);
 
         // Přiblížení mapy na bod
         map.setView(markerLocation, 15, {

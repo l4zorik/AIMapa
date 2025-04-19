@@ -25,6 +25,32 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.0.9] - 2025-04-18
+
+### Přidáno
+- Zcela přepracovaný design bodů na mapě s čísly a barevným rozlišením
+- Pokročilé vizualizace bodů s 3D efekty, stíny a gradientovým pozadím
+- Animace vznesení (floating) pro všechny body na mapě
+- Efekt záře (glow) kolem bodů s pulzováním pro lepší viditelnost
+- Efekt lesku (shine) uvnitř bodů pro realističtější vzhled
+- Efekt vlny (ripple) kolem bodů pro zvýraznění jejich pozice
+- Speciální efekty pro smazané body s rotujícím kruhem a otázníkem
+
+### Vylepšeno
+- Interaktivita bodů s pokročilými animacemi při kliknutí:
+  - Záblesk (flash) při kliknutí pro okamžitou zpětnou vazbu
+  - Rotace a zvětšení s plynulým přechodem
+  - Zlatý okraj pro zvýraznění aktivního bodu
+  - Pulzující záře pro zvýraznění vybraného bodu
+- Interaktivita bodů při přesunutí:
+  - Efekt vznesení (levitace) při přesunutí bodu
+  - Dynamický stín pod přesouvaným bodem
+  - Plynulé přechody mezi stavy s jemným odskočením
+  - Postupný návrat do původního stavu po dokončení přesunutí
+- Barevné rozlišení bodů s pokročilými gradienty a stíny
+- Zobrazení čísel bodů s lepším kontrastem a čitelností
+- Optimalizace animací pro plynulý chod i při větším počtu bodů
+
 ## [0.0.8] - 2025-04-18
 
 ### Přidáno

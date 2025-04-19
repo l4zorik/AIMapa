@@ -296,6 +296,188 @@ body[data-theme="dark"] .chat-input input {
     background-color: var(--primary-color-dark);
 }
 
+/* Custom Marker Styles */
+.custom-marker-container {
+    position: relative;
+}
+
+.custom-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--primary-color) 0%, var(--primary-color-dark) 70%);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 20px rgba(139, 92, 246, 0.4);
+    border: 3px solid white;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: float 3s ease-in-out infinite;
+    font-size: 16px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    z-index: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shiny effect inside marker */
+.custom-marker::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.4) 40%, rgba(255, 255, 255, 0.4) 60%, transparent 70%);
+    transform: rotate(45deg);
+    animation: shine 4s linear infinite;
+    pointer-events: none;
+}
+
+/* Ripple effect for markers */
+.custom-marker::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    animation: ripple 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.custom-marker:hover {
+    transform: scale(1.3) translateY(-5px);
+    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.8), 0 10px 30px rgba(139, 92, 246, 0.4);
+    animation-play-state: paused;
+}
+
+.custom-marker:hover::after {
+    animation-play-state: running;
+}
+
+/* Number inside marker */
+.custom-marker span {
+    position: relative;
+    z-index: 2;
+}
+
+/* Floating animation */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4), 0 10px 30px rgba(139, 92, 246, 0.2);
+    }
+    50% {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 20px rgba(139, 92, 246, 0.3), 0 20px 40px rgba(139, 92, 246, 0.1);
+    }
+    100% {
+        transform: translateY(0px);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4), 0 10px 30px rgba(139, 92, 246, 0.2);
+    }
+}
+
+/* Shiny effect animation */
+@keyframes shine {
+    0% {
+        left: -100%;
+        opacity: 0;
+    }
+    10% {
+        left: -100%;
+        opacity: 0.5;
+    }
+    20% {
+        left: 100%;
+        opacity: 0.5;
+    }
+    21% {
+        opacity: 0;
+    }
+    100% {
+        left: 100%;
+        opacity: 0;
+    }
+}
+
+/* Ripple effect animation */
+@keyframes ripple {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    40% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Pulse animation for glow effect */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(139, 92, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+    }
+}
+
+/* Marker colors for different indices with improved gradients */
+.custom-marker.color-1 {
+    background: radial-gradient(circle, #8B5CF6 0%, #7c4ddf 50%, #6d3fcf 100%);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 20px rgba(139, 92, 246, 0.4);
+    animation-delay: 0s;
+}
+
+.custom-marker.color-2 {
+    background: radial-gradient(circle, #10B981 0%, #0e9f6e 50%, #0c8c5f 100%);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.4);
+    animation-delay: 0.2s;
+}
+
+.custom-marker.color-3 {
+    background: radial-gradient(circle, #F59E0B 0%, #d97706 50%, #b45309 100%);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.8), 0 0 20px rgba(245, 158, 11, 0.4);
+    animation-delay: 0.4s;
+}
+
+.custom-marker.color-4 {
+    background: radial-gradient(circle, #EF4444 0%, #dc2626 50%, #b91c1c 100%);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.4);
+    animation-delay: 0.6s;
+}
+
+.custom-marker.color-5 {
+    background: radial-gradient(circle, #3B82F6 0%, #2563eb 50%, #1d4ed8 100%);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.4);
+    animation-delay: 0.8s;
+}
+
+/* Active marker state */
+.custom-marker.active {
+    transform: scale(1.4);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 1), 0 0 40px rgba(139, 92, 246, 0.6);
+    animation: pulse 1s infinite;
+}
+
+/* Selected marker state */
+.custom-marker.selected {
+    border-color: #FFD700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4);
+}
+
 /* Settings Modal */
 .modal {
     display: none;
