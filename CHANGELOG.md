@@ -25,7 +25,19 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
-## [0.2.6.1] - 2025-04-20
+## [0.2.6.1] - 2025-04-20 - SPECIÁLNÍ OPRAVA
+
+### Poznámka vývojáře
+Tato verze je speciální opravnou verzí zaměřenou na stabilizaci aplikace. Přestože bylo opraveno mnoho chyb, stále přetrvává zásadní problém, který zatím není viditelný na první pohled. Aplikace funguje, ale není dokonale stabilní. Tato verze slouží jako základ pro budoucí vývoj a opravy.
+
+### Známé problémy
+- **Kritický problém s asynchronním načítáním**: Aplikace má problémy s asynchronním načítáním mapových podkladů a dat, což může vést k nestabilitě při delším používání
+- **Problém s pamětí**: Při delším používání aplikace dochází k postupnému zvyšování využití paměti (memory leak)
+- **Nekonzistentní stav aplikace**: Při některých operacích může dojít k nekonzistenci mezi zobrazeným stavem a vnitřním stavem aplikace
+- **Problém s event listenery**: Při opakovaném přidávání a odstraňování markerů může docházet k duplicitnímu přidávání event listenerů
+- **Problém s localStorage**: Při ukládání většího množství dat může dojít k překročení limitu localStorage
+
+Tyto problémy budou řešeny v budoucích verzích. Nyní jsou zdokumentovány jako výchozí bod pro další vývoj.
 
 ### Opraveno
 - Kompletní přepracování systému ošetření chyb v celé aplikaci
