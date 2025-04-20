@@ -2,6 +2,36 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.6.4] - 2025-04-20 - NOUZOVÁ VERZE
+
+### Nouzová oprava s minimalistickým skriptem
+
+Tato verze představuje nouzové řešení pro zajištění základní funkčnosti aplikace. Vzhledem k přetrvávajícím problémům s původním skriptem byl vytvořen zcela nový, minimalistický skript, který obsahuje pouze základní funkce pro práci s mapou.
+
+#### Klíčové změny
+- Vytvořen nový soubor `script_new.js` s minimalistickým kódem
+- Původní skript `script.js` byl dočasně deaktivován
+- Implementovány pouze základní funkce pro zajištění funkčnosti mapy
+- Odstraněny všechny pokročilé funkce, které mohly způsobovat nestabilitu
+- Zjednodušeno uživatelské rozhraní pro maximální spolehlivost
+
+#### Funkční prvky v této verzi
+- Základní zobrazení mapy
+- Přidávání bodů na mapu pomocí dvojkliku
+- Odstranění bodů z mapy
+- Výpočet trasy mezi body (přímá čára)
+- Základní funkce tlačítek (přidání aktivity, výpočet trasy, vymazání mapy, tisk)
+- Fullscreen režim
+- Základní chat rozhraní (bez pokročilých funkcí)
+
+#### Omezení této verze
+- Nefunkční pokročilé funkce (glóbus režim, 3D budovy, atd.)
+- Zjednodušené zobrazení bodů na mapě bez pokročilých efektů
+- Omezená funkcionalita chatu (bez zpracování příkazů)
+- Nefunkční nastavení aplikace
+
+Tato verze je určena jako dočasné řešení, dokud nebude možné opravit všechny problémy v původním skriptu. Přestože nabízí pouze základní funkce, měla by být stabilní a spolehlivá.
+
 # Můj osobní plán na vývoj
 
 ## Úkol 1
