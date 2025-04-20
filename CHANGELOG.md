@@ -30,6 +30,19 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 ### Poznámka vývojáře
 Tato verze je speciální opravnou verzí zaměřenou na stabilizaci aplikace. Přestože bylo opraveno mnoho chyb, stále přetrvává zásadní problém, který zatím není viditelný na první pohled. Aplikace funguje, ale není dokonale stabilní. Tato verze slouží jako základ pro budoucí vývoj a opravy.
 
+### Co způsobila kritická chyba
+Kritická chyba v aplikaci způsobila, že jsem musel celý projekt začít znovu od začátku. Tato situace mě však přiměla naučit se používat GitHub, což se ukázalo jako nesmirně přínosné. Díky této zdánlivě negativní zkušenosti jsem získal cennou dovednost, která mi umožnila:
+
+- **Verzování kódu**: Nyní mohu sledovat všechny změny v projektu a v případě potřeby se vrátit k předchozím verzím
+- **Zálohování projektu**: GitHub slouží jako bezpečná záloha celého projektu, což eliminuje riziko ztráty dat
+- **Lepší organizace práce**: Používání větví (branches) mi umožňuje pracovat na různých částech projektu nezávisle
+- **Dokumentace změn**: Prostřednictvím commit zpráv a CHANGELOG.md mohu lépe dokumentovat všechny změny v projektu
+- **Snadnější spolupráce**: V budoucnu bude možné snáze spolupracovat s dalšími vývojáři
+- **Profesionální přístup k vývoji**: Osvojil jsem si profesionální postupy vývoje softwaru, které jsou standardem v oboru
+- **Lepší přehled o projektu**: Mohu sledovat historii projektu a lépe plánovat budoucí vývoj
+
+Tato zkušenost mi ukázala, že i z problémů se mohu poučit a získat nové dovednosti, které mi pomohou stát se lepším vývojářem.
+
 ### Známé problémy
 - **Kritický problém s asynchronním načítáním**: Aplikace má problémy s asynchronním načítáním mapových podkladů a dat, což může vést k nestabilitě při delším používání
 - **Problém s pamětí**: Při delším používání aplikace dochází k postupnému zvyšování využití paměti (memory leak)
