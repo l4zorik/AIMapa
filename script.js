@@ -89,68 +89,105 @@ let countdownIntervals = {};
 
 // Funkce pro vytvoření popup obsahu s formulářem
 function createPopupContent(marker, index) {
-    const markerProp = markerProperties[index] || {
-        name: `Bod ${index + 1}`,
-        command: `bod${index + 1}`,
-        lat: marker.getLatLng().lat.toFixed(4),
-        lng: marker.getLatLng().lng.toFixed(4),
-        saved: false // Přidání příznak, zda je bod uložený
-    };
+    console.log(`Creating popup content for marker ${index}`);
+    try {
+        // Získání vlastností markeru nebo vytvoření výchozích hodnot
+        let markerProp;
+        try {
+            const latLng = marker.getLatLng();
+            markerProp = markerProperties[index] || {
+                name: `Bod ${index + 1}`,
+                command: `bod${index + 1}`,
+                lat: latLng.lat.toFixed(4),
+                lng: latLng.lng.toFixed(4),
+                saved: false // Přidání příznak, zda je bod uložený
+            };
+        } catch (propError) {
+            console.error(`Error getting marker properties for index ${index}:`, propError);
+            // Použijí výchozích hodnot v případě chyby
+            markerProp = {
+                name: `Bod ${index + 1}`,
+                command: `bod${index + 1}`,
+                lat: '0.0000',
+                lng: '0.0000',
+                saved: false
+            };
+        }
 
-    // Vytvoření unikátního ID pro odpočet - použijeme fixní ID pro každý marker
-    const countdownId = `countdown-${index}`;
+        // Vytvoření unikátního ID pro odpočet - použijeme fixní ID pro každý marker
+        const countdownId = `countdown-${index}`;
+        console.log(`Countdown ID for marker ${index}: ${countdownId}`);
 
-    // Kontrola, zda je bod uložený nebo nově vytvořený
-    if (markerProp.saved) {
-        // Verze pro uložený bod - režim prohlížení s možností úpravy
+        // Kontrola, zda je bod uložený nebo nově vytvořený
+        if (markerProp.saved) {
+            console.log(`Creating view mode popup for saved marker ${index}`);
+            // Verze pro uložený bod - režim prohlížení s možností úpravy
+            return `
+                <div class="popup-content saved-marker">
+                    <div class="popup-header">
+                        <div class="popup-title">${markerProp.name}</div>
+                        <div class="popup-countdown" id="${countdownId}">35s</div>
+                    </div>
+                    <div class="popup-info">
+                        <div class="info-row">
+                            <div class="info-icon"><i class="icon">📍</i></div>
+                            <div class="info-content"><strong>Název:</strong> ${markerProp.name}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon"><i class="icon">💬</i></div>
+                            <div class="info-content"><strong>Příkaz:</strong> ${markerProp.command}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon"><i class="icon">📍</i></div>
+                            <div class="info-content"><strong>Souřadnice:</strong> ${markerProp.lat}, ${markerProp.lng}</div>
+                        </div>
+                    </div>
+                    <div class="popup-actions">
+                        <button class="popup-btn edit-btn" onclick="editMarker(${index}, event)">Upravit</button>
+                        <button class="popup-btn delete-btn" onclick="removeMarker(${index}, event)">Odstranit</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            console.log(`Creating edit mode popup for marker ${index}`);
+            // Verze pro nově vytvořený bod - formulář pro zadání údajů
+            return `
+                <div class="popup-content new-marker">
+                    <div class="popup-header">
+                        <div class="popup-title">${markerProp.name}</div>
+                        <div class="popup-countdown" id="${countdownId}">35s</div>
+                    </div>
+                    <div class="popup-form">
+                        <div class="form-group">
+                            <label for="markerName${index}">Název bodu:</label>
+                            <input type="text" id="markerName${index}" value="${markerProp.name}" class="popup-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="markerCommand${index}">Příkaz pro chat:</label>
+                            <input type="text" id="markerCommand${index}" value="${markerProp.command}" class="popup-input">
+                        </div>
+                        <p class="coordinates">Souřadnice: ${markerProp.lat}, ${markerProp.lng}</p>
+                        <div class="popup-actions">
+                            <button class="popup-btn save-btn" onclick="saveMarkerProperties(${index}, event)">Uložit</button>
+                            <button class="popup-btn delete-btn" onclick="removeMarker(${index}, event)">Odstranit bod</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error(`Error creating popup content for marker ${index}:`, error);
+        // Vrácení záložního obsahu v případě chyby
         return `
-            <div class="popup-content saved-marker">
+            <div class="popup-content error-marker">
                 <div class="popup-header">
-                    <div class="popup-title">${markerProp.name}</div>
-                    <div class="popup-countdown" id="${countdownId}">35s</div>
+                    <div class="popup-title">Bod ${index + 1}</div>
                 </div>
                 <div class="popup-info">
-                    <div class="info-row">
-                        <div class="info-icon"><i class="icon">📍</i></div>
-                        <div class="info-content"><strong>Název:</strong> ${markerProp.name}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-icon"><i class="icon">💬</i></div>
-                        <div class="info-content"><strong>Příkaz:</strong> ${markerProp.command}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-icon"><i class="icon">📍</i></div>
-                        <div class="info-content"><strong>Souřadnice:</strong> ${markerProp.lat}, ${markerProp.lng}</div>
-                    </div>
+                    <p>Došlo k chybě při načítání informací o bodu.</p>
                 </div>
                 <div class="popup-actions">
-                    <button class="popup-btn edit-btn" onclick="editMarker(${index}, event)">Upravit</button>
-                    <button class="popup-btn delete-btn" onclick="removeMarker(${index}, event)">Odstranit</button>
-                </div>
-            </div>
-        `;
-    } else {
-        // Verze pro nově vytvořený bod - formulář pro zadání údajů
-        return `
-            <div class="popup-content new-marker">
-                <div class="popup-header">
-                    <div class="popup-title">${markerProp.name}</div>
-                    <div class="popup-countdown" id="${countdownId}">35s</div>
-                </div>
-                <div class="popup-form">
-                    <div class="form-group">
-                        <label for="markerName${index}">Název bodu:</label>
-                        <input type="text" id="markerName${index}" value="${markerProp.name}" class="popup-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="markerCommand${index}">Příkaz pro chat:</label>
-                        <input type="text" id="markerCommand${index}" value="${markerProp.command}" class="popup-input">
-                    </div>
-                    <p class="coordinates">Souřadnice: ${markerProp.lat}, ${markerProp.lng}</p>
-                    <div class="popup-actions">
-                        <button class="popup-btn save-btn" onclick="saveMarkerProperties(${index}, event)">Uložit</button>
-                        <button class="popup-btn delete-btn" onclick="removeMarker(${index}, event)">Odstranit bod</button>
-                    </div>
+                    <button class="popup-btn delete-btn" onclick="removeMarker(${index}, event)">Odstranit bod</button>
                 </div>
             </div>
         `;
@@ -159,77 +196,109 @@ function createPopupContent(marker, index) {
 
 // Funkce pro spuštění odpočtu
 function startCountdown(elementId, seconds) {
-    const countdownElement = document.getElementById(elementId);
-    if (!countdownElement) {
-        console.error('Countdown element not found in startCountdown:', elementId);
-        return;
-    }
-
-    // Zrušení předchozího intervalu, pokud existuje
-    if (countdownIntervals[elementId]) {
-        clearInterval(countdownIntervals[elementId]);
-    }
-
-    let remainingSeconds = seconds;
-
-    // Aktualizace počátečního zobrazení - skrytý odpočet
-    countdownElement.textContent = `${remainingSeconds}s`;
-    // countdownElement.style.display = 'none'; // Skryjeme odpočet
-    countdownElement.classList.remove('countdown-warning', 'countdown-danger'); // Reset tříd
-
-    // Získání indexu markeru z ID elementu
-    const idParts = elementId.split('-');
-    const markerIndex = parseInt(idParts[1]);
-
-    console.log(`Starting countdown for marker ${markerIndex}, element ID: ${elementId}, seconds: ${seconds}`);
-
-    // Aktualizace odpočtu každou sekundu
-    countdownIntervals[elementId] = setInterval(() => {
-        remainingSeconds--;
-
-        // Kontrola, zda element stále existuje v DOM
-        const updatedElement = document.getElementById(elementId);
-        if (updatedElement) {
-            updatedElement.textContent = `${remainingSeconds}s`;
-
-            // Skryté změny barvy při nízkém čase - pouze pro ladění
-            // if (remainingSeconds <= 10) {
-            //     updatedElement.classList.add('countdown-warning');
-            // }
-            // if (remainingSeconds <= 5) {
-            //     updatedElement.classList.add('countdown-danger');
-            // }
-        } else {
-            console.error('Countdown element disappeared during countdown');
-            clearInterval(countdownIntervals[elementId]);
-            delete countdownIntervals[elementId];
-            return;
+    console.log(`Starting countdown for element ID: ${elementId}, seconds: ${seconds}`);
+    try {
+        const countdownElement = document.getElementById(elementId);
+        if (!countdownElement) {
+            console.error('Countdown element not found in startCountdown:', elementId);
+            return null;
         }
 
-        // Ukončení intervalu a zavření popup okna po vypršení času
-        if (remainingSeconds <= 0) {
-            clearInterval(countdownIntervals[elementId]);
-            delete countdownIntervals[elementId];
-
-            // Zavření popup okna, pokud je index markeru platný
-            if (!isNaN(markerIndex) && markerIndex < markers.length) {
-                const marker = markers[markerIndex];
-                if (marker && marker.isPopupOpen()) {
-                    console.log(`Closing popup for marker ${markerIndex} after countdown`);
-                    marker.closePopup();
-                }
-
-                // Zrušení časovače pro popup okno
-                if (popupTimers[markerIndex]) {
-                    clearTimeout(popupTimers[markerIndex]);
-                    delete popupTimers[markerIndex];
-                }
+        // Zrušení předchozího intervalu, pokud existuje
+        if (countdownIntervals[elementId]) {
+            try {
+                clearInterval(countdownIntervals[elementId]);
+                console.log(`Previous interval for ${elementId} cleared`);
+            } catch (clearError) {
+                console.error(`Error clearing previous interval for ${elementId}:`, clearError);
             }
         }
-    }, 1000);
 
-    // Uložení intervalu do globální proměnné
-    return countdownIntervals[elementId];
+        let remainingSeconds = seconds;
+
+        // Aktualizace počátečního zobrazení
+        countdownElement.textContent = `${remainingSeconds}s`;
+        countdownElement.classList.remove('countdown-warning', 'countdown-danger'); // Reset tříd
+
+        // Získání indexu markeru z ID elementu
+        let markerIndex = -1;
+        try {
+            const idParts = elementId.split('-');
+            if (idParts.length >= 2) {
+                markerIndex = parseInt(idParts[1]);
+                console.log(`Extracted marker index: ${markerIndex} from element ID: ${elementId}`);
+            }
+        } catch (parseError) {
+            console.error(`Error parsing marker index from ${elementId}:`, parseError);
+        }
+
+        // Aktualizace odpočtu každou sekundu
+        try {
+            countdownIntervals[elementId] = setInterval(() => {
+                try {
+                    remainingSeconds--;
+
+                    // Kontrola, zda element stále existuje v DOM
+                    const updatedElement = document.getElementById(elementId);
+                    if (updatedElement) {
+                        updatedElement.textContent = `${remainingSeconds}s`;
+
+                        // Změny barvy při nízkém čase
+                        if (remainingSeconds <= 10) {
+                            updatedElement.classList.add('countdown-warning');
+                        }
+                        if (remainingSeconds <= 5) {
+                            updatedElement.classList.add('countdown-danger');
+                        }
+                    } else {
+                        console.warn(`Countdown element ${elementId} disappeared during countdown`);
+                        clearInterval(countdownIntervals[elementId]);
+                        delete countdownIntervals[elementId];
+                        return;
+                    }
+
+                    // Ukončení intervalu a zavření popup okna po vypršení času
+                    if (remainingSeconds <= 0) {
+                        clearInterval(countdownIntervals[elementId]);
+                        delete countdownIntervals[elementId];
+                        console.log(`Countdown for ${elementId} finished`);
+
+                        // Zavření popup okna, pokud je index markeru platný
+                        if (!isNaN(markerIndex) && markerIndex >= 0 && markerIndex < markers.length) {
+                            try {
+                                const marker = markers[markerIndex];
+                                if (marker && marker.isPopupOpen()) {
+                                    console.log(`Closing popup for marker ${markerIndex} after countdown`);
+                                    marker.closePopup();
+                                }
+
+                                // Zrušení časovače pro popup okno
+                                if (popupTimers[markerIndex]) {
+                                    clearTimeout(popupTimers[markerIndex]);
+                                    delete popupTimers[markerIndex];
+                                }
+                            } catch (markerError) {
+                                console.error(`Error closing popup for marker ${markerIndex}:`, markerError);
+                            }
+                        }
+                    }
+                } catch (intervalError) {
+                    console.error(`Error in countdown interval for ${elementId}:`, intervalError);
+                    clearInterval(countdownIntervals[elementId]);
+                    delete countdownIntervals[elementId];
+                }
+            }, 1000);
+
+            console.log(`Countdown interval created for ${elementId}`);
+            return countdownIntervals[elementId];
+        } catch (setIntervalError) {
+            console.error(`Error creating interval for ${elementId}:`, setIntervalError);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Unexpected error in startCountdown for ${elementId}:`, error);
+        return null;
+    }
 }
 
 // Funkce pro uložení vlastností markeru
@@ -239,8 +308,12 @@ function saveMarkerProperties(index, event) {
         event.stopPropagation();
     }
 
+    console.log('Saving marker properties for index:', index);
+
     const nameInput = document.getElementById(`markerName${index}`);
     const commandInput = document.getElementById(`markerCommand${index}`);
+
+    console.log('Inputs found:', nameInput, commandInput);
 
     if (nameInput && commandInput && index < markers.length) {
         const marker = markers[index];
@@ -254,6 +327,8 @@ function saveMarkerProperties(index, event) {
             lng: latlng.lng.toFixed(4),
             saved: true // Nastavení příznaku, že bod byl uložen
         };
+
+        console.log('Marker properties saved:', markerProperties[index]);
 
         // Zrušení časovače pro popup okno
         if (popupTimers[index]) {
@@ -273,128 +348,281 @@ function saveMarkerProperties(index, event) {
         addMessage(`Bod "${markerProperties[index].name}" byl uložen. Pro navigaci na tento bod napište "${markerProperties[index].command}" do chatu.`, false);
 
         // Aktualizace popup obsahu - přepnutí do prohlížecího režimu
-        marker.setPopupContent(createPopupContent(marker, index));
+        try {
+            const newContent = createPopupContent(marker, index);
+            console.log('New popup content created');
+            marker.setPopupContent(newContent);
+            console.log('Popup content updated');
+        } catch (error) {
+            console.error('Error updating popup content:', error);
+        }
 
         // Uložení stavu aplikace po změně vlastností markeru
-        saveAppState();
+        try {
+            saveAppState();
+            console.log('App state saved');
+        } catch (error) {
+            console.error('Error saving app state:', error);
+        }
+    } else {
+        console.error('Cannot save marker properties - inputs not found or invalid index');
     }
 }
 
 // Funkce pro přepnutí markeru do režimu úprav
 function editMarker(index, event) {
-    // Zastavení propagace události, aby se nezavřelo popup okno
-    if (event) {
-        event.stopPropagation();
-    }
-
-    if (index < markers.length) {
-        const marker = markers[index];
-
-        // Dočasně nastavíme příznak saved na false, aby se zobrazil formulář
-        const tempProperties = {...markerProperties[index], saved: false};
-        markerProperties[index] = tempProperties;
-
-        // Aktualizace popup obsahu
-        marker.setPopupContent(createPopupContent(marker, index));
-
-        // Znovu otevřeme popup, pokud bylo zavřeno
-        if (!marker.isPopupOpen()) {
-            marker.openPopup();
+    console.log(`Editing marker ${index}`);
+    try {
+        // Zastavení propagace události, aby se nezavřelo popup okno
+        if (event) {
+            event.stopPropagation();
         }
 
-        // Informace pro uživatele
-        addMessage(`Bod "${tempProperties.name}" je nyní v režimu úprav.`, false);
+        if (index < markers.length) {
+            const marker = markers[index];
+            if (!marker) {
+                console.error(`Marker at index ${index} is undefined`);
+                return;
+            }
+
+            // Získání aktuálních vlastností markeru
+            const currentProperties = markerProperties[index] || {
+                name: `Bod ${index + 1}`,
+                command: `bod${index + 1}`,
+                lat: marker.getLatLng().lat.toFixed(4),
+                lng: marker.getLatLng().lng.toFixed(4),
+                saved: true
+            };
+
+            // Dočasně nastavíme příznak saved na false, aby se zobrazil formulář
+            const tempProperties = {...currentProperties, saved: false};
+            markerProperties[index] = tempProperties;
+            console.log(`Marker ${index} properties set to edit mode:`, tempProperties);
+
+            // Aktualizace popup obsahu
+            try {
+                const newContent = createPopupContent(marker, index);
+                marker.setPopupContent(newContent);
+                console.log(`Popup content updated for marker ${index}`);
+            } catch (popupError) {
+                console.error(`Error updating popup content for marker ${index}:`, popupError);
+            }
+
+            // Znovu otevřeme popup, pokud bylo zavřeno
+            if (!marker.isPopupOpen()) {
+                try {
+                    marker.openPopup();
+                    console.log(`Popup opened for marker ${index}`);
+                } catch (openError) {
+                    console.error(`Error opening popup for marker ${index}:`, openError);
+                }
+            }
+
+            // Zrušení předchozího časovače, pokud existuje
+            if (popupTimers[index]) {
+                try {
+                    clearTimeout(popupTimers[index]);
+                    delete popupTimers[index];
+                    console.log(`Popup timer cleared for marker ${index}`);
+                } catch (timerError) {
+                    console.error(`Error clearing popup timer for marker ${index}:`, timerError);
+                }
+            }
+
+            // Nastavení nového časovače pro automatické zavření popup okna
+            popupTimers[index] = setTimeout(() => {
+                if (marker.isPopupOpen()) {
+                    marker.closePopup();
+                    console.log(`Popup automatically closed for marker ${index} after timeout`);
+                }
+                delete popupTimers[index];
+            }, 35000); // 35 sekund
+
+            // Informace pro uživatele
+            addMessage(`Bod "${tempProperties.name}" je nyní v režimu úprav.`, false);
+        } else {
+            console.error(`Invalid marker index: ${index}, markers length: ${markers.length}`);
+        }
+    } catch (error) {
+        console.error(`Unexpected error editing marker ${index}:`, error);
     }
 }
 
 // Funkce pro odstranění markeru
 function removeMarker(index, event) {
-    // Zastavení propagace události, aby se nezavřelo popup okno předčasně
-    if (event) {
-        event.stopPropagation();
-    }
-
-    if (index < markers.length) {
-        const marker = markers[index];
-        const markerName = markerProperties[index]?.name || `Bod ${index + 1}`;
-        const markerCommand = markerProperties[index]?.command;
-        const markerLat = markerProperties[index]?.lat;
-        const markerLng = markerProperties[index]?.lng;
-
-        // Uložení příkazu a vlastností smazaného bodu pro pozdější použití
-        if (markerCommand && markerLat && markerLng) {
-            deletedMarkerCommands.push({
-                command: markerCommand,
-                name: markerName,
-                lat: markerLat,
-                lng: markerLng
-            });
-            addMessage(`Příkaz "${markerCommand}" zůstává aktivní i po smazání bodu.`, false);
+    console.log(`Removing marker ${index}`);
+    try {
+        // Zastavení propagace události, aby se nezavřelo popup okno předčasně
+        if (event) {
+            event.stopPropagation();
         }
 
-        // Zrušení časovače pro popup okno
-        if (popupTimers[index]) {
-            clearTimeout(popupTimers[index]);
-            delete popupTimers[index];
-        }
-
-        // Zrušení všech intervalů pro odpočet
-        Object.keys(countdownIntervals).forEach(key => {
-            if (key.startsWith(`countdown-${index}-`)) {
-                clearInterval(countdownIntervals[key]);
-                delete countdownIntervals[key];
+        if (index < markers.length) {
+            const marker = markers[index];
+            if (!marker) {
+                console.error(`Marker at index ${index} is undefined`);
+                return;
             }
-        });
 
-        // Odstranění markeru z mapy
-        map.removeLayer(marker);
+            // Získání informací o markeru před jeho odstraněním
+            const markerName = markerProperties[index]?.name || `Bod ${index + 1}`;
+            const markerCommand = markerProperties[index]?.command;
+            const markerLat = markerProperties[index]?.lat;
+            const markerLng = markerProperties[index]?.lng;
 
-        // Odstranění markeru a jeho vlastností z polí
-        markers.splice(index, 1);
-        markerProperties.splice(index, 1);
+            console.log(`Removing marker: ${markerName}, command: ${markerCommand}, position: [${markerLat}, ${markerLng}]`);
 
-        // Aktualizace časovačů pro zbývající markery
-        const oldPopupTimers = {...popupTimers};
-        popupTimers = {};
-
-        // Přečíslovat časovače
-        Object.keys(oldPopupTimers).forEach(key => {
-            const keyIndex = parseInt(key);
-            if (!isNaN(keyIndex)) {
-                if (keyIndex > index) {
-                    popupTimers[keyIndex - 1] = oldPopupTimers[key];
-                } else if (keyIndex < index) {
-                    popupTimers[keyIndex] = oldPopupTimers[key];
+            // Uložení příkazu a vlastností smazaného bodu pro pozdější použití
+            if (markerCommand && markerLat && markerLng) {
+                try {
+                    deletedMarkerCommands.push({
+                        command: markerCommand,
+                        name: markerName,
+                        lat: markerLat,
+                        lng: markerLng
+                    });
+                    console.log(`Command "${markerCommand}" saved to deleted commands list`);
+                    addMessage(`Příkaz "${markerCommand}" zůstává aktivní i po smazání bodu.`, false);
+                } catch (commandError) {
+                    console.error(`Error saving deleted command for marker ${index}:`, commandError);
                 }
             }
-        });
 
-        // Aktualizace vlastností zbývajících markerů (přečíslovat)
-        for (let i = index; i < markers.length; i++) {
-            if (!markerProperties[i]) {
-                markerProperties[i] = { name: `Bod ${i + 1}`, command: `bod${i + 1}` };
+            // Zrušení časovače pro popup okno
+            if (popupTimers[index]) {
+                try {
+                    clearTimeout(popupTimers[index]);
+                    delete popupTimers[index];
+                    console.log(`Popup timer cleared for marker ${index}`);
+                } catch (timerError) {
+                    console.error(`Error clearing popup timer for marker ${index}:`, timerError);
+                }
             }
-            markers[i].setPopupContent(createPopupContent(markers[i], i));
+
+            // Zrušení všech intervalů pro odpočet
+            try {
+                Object.keys(countdownIntervals).forEach(key => {
+                    if (key.startsWith(`countdown-${index}-`)) {
+                        clearInterval(countdownIntervals[key]);
+                        delete countdownIntervals[key];
+                        console.log(`Countdown interval cleared: ${key}`);
+                    }
+                });
+            } catch (intervalError) {
+                console.error(`Error clearing countdown intervals for marker ${index}:`, intervalError);
+            }
+
+            // Odstranění markeru z mapy
+            try {
+                map.removeLayer(marker);
+                console.log(`Marker ${index} removed from map`);
+            } catch (removeError) {
+                console.error(`Error removing marker ${index} from map:`, removeError);
+            }
+
+            // Odstranění markeru a jeho vlastností z polí
+            try {
+                markers.splice(index, 1);
+                markerProperties.splice(index, 1);
+                console.log(`Marker ${index} removed from arrays, new markers length: ${markers.length}`);
+            } catch (spliceError) {
+                console.error(`Error removing marker ${index} from arrays:`, spliceError);
+            }
+
+            // Aktualizace časovačů pro zbývající markery
+            try {
+                const oldPopupTimers = {...popupTimers};
+                popupTimers = {};
+
+                // Přečíslovat časovače
+                Object.keys(oldPopupTimers).forEach(key => {
+                    const keyIndex = parseInt(key);
+                    if (!isNaN(keyIndex)) {
+                        if (keyIndex > index) {
+                            popupTimers[keyIndex - 1] = oldPopupTimers[key];
+                        } else if (keyIndex < index) {
+                            popupTimers[keyIndex] = oldPopupTimers[key];
+                        }
+                    }
+                });
+                console.log('Popup timers renumbered');
+            } catch (timerRenumberError) {
+                console.error('Error renumbering popup timers:', timerRenumberError);
+            }
+
+            // Aktualizace vlastností zbývajících markerů (přečíslovat)
+            try {
+                for (let i = index; i < markers.length; i++) {
+                    if (!markerProperties[i]) {
+                        markerProperties[i] = { name: `Bod ${i + 1}`, command: `bod${i + 1}` };
+                    }
+
+                    try {
+                        const newContent = createPopupContent(markers[i], i);
+                        markers[i].setPopupContent(newContent);
+                        console.log(`Popup content updated for marker ${i}`);
+                    } catch (popupError) {
+                        console.error(`Error updating popup content for marker ${i}:`, popupError);
+                    }
+                }
+                console.log('Remaining markers renumbered');
+            } catch (markerRenumberError) {
+                console.error('Error renumbering remaining markers:', markerRenumberError);
+            }
+
+            // Informace pro uživatele
+            addMessage(`Bod "${markerName}" byl odstraněn.`, false);
+
+            // Přepočítání trasy, pokud máme alespoň dva body
+            if (markers.length >= 2) {
+                try {
+                    calculateRouteFunction();
+                    console.log('Route recalculated after marker removal');
+                } catch (routeError) {
+                    console.error('Error recalculating route after marker removal:', routeError);
+                }
+            } else {
+                // Odstranění trasy, pokud nemáme dostatek bodů
+                try {
+                    // Odstranění trasy vytvořené pomocí Leaflet Routing Machine
+                    if (routeControl) {
+                        map.removeControl(routeControl);
+                        routeControl = null;
+                        console.log('Route control removed');
+                    }
+
+                    // Odstranění přímé trasy, pokud existuje
+                    if (route) {
+                        map.removeLayer(route);
+                        route = null;
+                        console.log('Direct route removed');
+                    }
+
+                    // Reset informací o trase
+                    routeDistanceElement.textContent = '-';
+                    routeTimeElement.textContent = '-';
+                    console.log('Route information reset');
+                } catch (routeRemoveError) {
+                    console.error('Error removing route:', routeRemoveError);
+                }
+            }
+
+            // Uložení stavu aplikace po odstranění markeru
+            try {
+                saveAppState();
+                console.log('Application state saved after marker removal');
+            } catch (saveError) {
+                console.error('Error saving application state after marker removal:', saveError);
+            }
+
+            return true;
+        } else {
+            console.error(`Invalid marker index: ${index}, markers length: ${markers.length}`);
+            return false;
         }
-
-        // Informace pro uživatele
-        addMessage(`Bod "${markerName}" byl odstraněn.`, false);
-
-        // Přepočítání trasy, pokud máme alespoň dva body
-        if (markers.length >= 2) {
-            calculateRouteFunction();
-        } else if (routeControl) {
-            // Odstranění trasy, pokud nemáme dostatek bodů
-            map.removeControl(routeControl);
-            routeControl = null;
-
-            // Reset informací o trase
-            routeDistanceElement.textContent = '-';
-            routeTimeElement.textContent = '-';
-        }
-
-        // Uložení stavu aplikace po odstranění markeru
-        saveAppState();
+    } catch (error) {
+        console.error(`Unexpected error removing marker ${index}:`, error);
+        return false;
     }
 }
 
@@ -823,6 +1051,9 @@ if (isGlobeMode) {
 
 // Funkce pro výpočet trasy s použitím Leaflet Routing Machine
 function calculateRouteFunction() {
+    console.log('Calculating route...');
+    console.log('Number of markers:', markers.length);
+
     if (markers.length < 2) {
         addMessage('Pro výpočet trasy jsou potřeba alespoň 2 body', false);
         return;
@@ -830,11 +1061,28 @@ function calculateRouteFunction() {
 
     // Získání bodů pro výpočet trasy
     const points = markers.map(marker => marker.getLatLng());
+    console.log('Route points:', points);
 
     // Odstranění předchozí trasy, pokud existuje
     if (routeControl) {
-        map.removeControl(routeControl);
+        try {
+            map.removeControl(routeControl);
+            console.log('Previous route control removed');
+        } catch (error) {
+            console.error('Error removing previous route control:', error);
+        }
         routeControl = null;
+    }
+
+    // Odstranění přímé trasy, pokud existuje
+    if (route) {
+        try {
+            map.removeLayer(route);
+            console.log('Previous direct route removed');
+        } catch (error) {
+            console.error('Error removing previous direct route:', error);
+        }
+        route = null;
     }
 
     // Vytvoření nové trasy s použitím Leaflet Routing Machine
@@ -847,70 +1095,18 @@ function calculateRouteFunction() {
         routingPane.classList.remove('zooming', 'moving');
     }
 
-    // Vytvoření nové trasy s optimalizovanými nastaveními
-    routeControl = L.Routing.control({
-        ...routingOptions,
-        waypoints: points
-    }).addTo(map);
+    try {
+        // Vytvoření nové trasy s optimalizovanými nastaveními
+        console.log('Creating new route control with options:', {...routingOptions, waypoints: points});
 
-    // Pozastavení animací při vytváření trasy pro lepší výkon
-    const routingLayer = document.querySelector('.leaflet-routing-layer');
-    if (routingLayer) {
-        routingLayer.style.transition = 'none';
-        routingLayer.style.willChange = 'transform';
-    }
-
-    // Poslech na událost 'routesfound' pro získání informací o trase
-    routeControl.on('routesfound', function(e) {
-        const routes = e.routes;
-        const summary = routes[0].summary;
-
-        // Získání vzdálenosti v kilometrech
-        const distanceKm = (summary.totalDistance / 1000).toFixed(2);
-
-        // Získání času v sekundách a převod na hodiny a minuty
-        const totalTimeSeconds = summary.totalTime;
-        const hours = Math.floor(totalTimeSeconds / 3600);
-        const minutes = Math.round((totalTimeSeconds % 3600) / 60);
-
-        const timeString = hours > 0 ?
-            `${hours} h ${minutes} min` :
-            `${minutes} min`;
-
-        // Aktualizace informací o trase v panelu
-        routeDistanceElement.textContent = `${distanceKm} km`;
-        routeTimeElement.textContent = timeString;
-
-        // Přidání zprávy do chatu s informacemi o trase
-        addMessage(`Trasa vypočítána po skutečných silnicích. Celková vzdálenost: ${distanceKm} km, čas cesty: ${timeString}`, false);
-
-        // Přizpůsobení mapy, aby zobrazovala celou trasu
-        if (routes[0].coordinates && routes[0].coordinates.length > 0) {
-            map.fitBounds(L.latLngBounds(routes[0].coordinates), {padding: [50, 50]});
-        }
-
-        // Uložení stavu aplikace po výpočtu trasy
-        saveAppState();
-    });
-
-    // Poslech na událost 'routingerror' pro případ chyby při výpočtu trasy
-    routeControl.on('routingerror', function(e) {
-        console.error('Chyba při výpočtu trasy:', e.error);
-
-        // Pokud se nepodaří získat trasu přes API, použijeme záložní metodu s přímou čárou
-        addMessage('Nepodařilo se získat přesnou trasu po silnicích. Zobrazuji přímou trasu.', false);
-
-        // Vytvoření přímé trasy mezi body
-        if (route) {
-            map.removeLayer(route);
-        }
-
+        // Použití záložní metody s přímou čárou, protože OSRM API může být nespolehlivé
         route = L.polyline(points, {
-            color: 'red',
+            color: 'blue',
             weight: 4,
             opacity: 0.8,
             dashArray: '5, 10'
         }).addTo(map);
+        console.log('Direct route created');
 
         // Výpočet přibližné vzdálenosti přímé trasy
         let distance = 0;
@@ -936,11 +1132,28 @@ function calculateRouteFunction() {
         routeDistanceElement.textContent = `${distanceKm} km (přímá trasa)`;
         routeTimeElement.textContent = timeString;
 
+        // Přidání zprávy do chatu s informacemi o trase
+        addMessage(`Trasa vypočítána. Celková vzdálenost: ${distanceKm} km, přibližný čas cesty: ${timeString}`, false);
+
         // Přizpůsobení mapy, aby zobrazovala celou trasu
         map.fitBounds(route.getBounds(), {padding: [50, 50]});
-    });
 
-    return routeControl;
+        // Uložení stavu aplikace po výpočtu trasy
+        saveAppState();
+        console.log('Route calculation completed');
+
+        // Aktualizace glóbusu, pokud je aktivní
+        if (isGlobeMode && cesiumViewer) {
+            addRoutesToGlobe();
+            console.log('Globe routes updated');
+        }
+
+        return route;
+    } catch (error) {
+        console.error('Error calculating route:', error);
+        addMessage('Nepodařilo se vypočítat trasu. Zkuste to prosím znovu.', true);
+        return null;
+    }
 }
 
 // Event listener pro tlačítko výpočtu trasy
@@ -996,51 +1209,59 @@ const fullscreenOverlay = document.querySelector('.fullscreen-overlay');
 
 // Funkce pro přepnutí fullscreen režimu
 function toggleFullscreen() {
+    console.log('Toggling fullscreen mode');
     isFullscreen = !isFullscreen;
+    console.log('Fullscreen mode:', isFullscreen);
 
     if (isFullscreen) {
-        mapWrapper.classList.add('map-fullscreen');
-        fullscreenButton.innerHTML = '<i class="icon">⛵</i>'; // Symbol pro exit fullscreen
-        document.body.style.overflow = 'hidden'; // Zabrání scrollování stránky
+        try {
+            mapWrapper.classList.add('map-fullscreen');
+            fullscreenButton.innerHTML = '<i class="icon">⛵</i>'; // Symbol pro exit fullscreen
+            document.body.style.overflow = 'hidden'; // Zabrání scrollování stránky
 
-        // Přidání třídy pro lepší zobrazení mapy
-        document.body.classList.add('fullscreen-mode');
+            // Přidání třídy pro lepší zobrazení mapy
+            document.body.classList.add('fullscreen-mode');
 
-        // Přidání tlačítka pro rychlý návrat z fullscreen režimu
-        const exitFullscreenButton = document.createElement('button');
-        exitFullscreenButton.id = 'exitFullscreenButton';
-        exitFullscreenButton.className = 'exit-fullscreen-btn';
-        exitFullscreenButton.innerHTML = 'Zavřít celou obrazovku <i class="icon">⛵</i>';
-        exitFullscreenButton.addEventListener('click', toggleFullscreen);
-        mapWrapper.appendChild(exitFullscreenButton);
+            // Přidání tlačítka pro rychlý návrat z fullscreen režimu
+            const exitFullscreenButton = document.createElement('button');
+            exitFullscreenButton.id = 'exitFullscreenButton';
+            exitFullscreenButton.className = 'exit-fullscreen-btn';
+            exitFullscreenButton.innerHTML = 'Zavřít celou obrazovku <i class="icon">⛵</i>';
+            exitFullscreenButton.addEventListener('click', toggleFullscreen);
+            mapWrapper.appendChild(exitFullscreenButton);
+            console.log('Exit fullscreen button added');
 
-        // Přidání ovládacích tlačítek do fullscreen režimu
-        const fullscreenControls = document.createElement('div');
-        fullscreenControls.id = 'fullscreenControls';
-        fullscreenControls.className = 'fullscreen-controls';
+            // Přidání ovládacích tlačítek do fullscreen režimu
+            const fullscreenControls = document.createElement('div');
+            fullscreenControls.id = 'fullscreenControls';
+            fullscreenControls.className = 'fullscreen-controls';
 
-        // Tlačítko pro přidání aktivity
-        const addActivityFsBtn = document.createElement('button');
-        addActivityFsBtn.className = 'fs-btn';
-        addActivityFsBtn.innerHTML = '<i class="icon">📍</i> Přidat aktivitu';
-        addActivityFsBtn.addEventListener('click', () => {
-            isAddingPoints = !isAddingPoints;
-            if (isAddingPoints) {
-                addActivityFsBtn.classList.add('active');
-                addMessage('Režim přidávání bodů je aktivní. Dvojklikněte na mapu pro přidání bodu.', false);
-            } else {
-                addActivityFsBtn.classList.remove('active');
-                addMessage('Režim přidávání bodů byl deaktivován.', false);
-            }
+            // Tlačítko pro přidání aktivity
+            const addActivityFsBtn = document.createElement('button');
+            addActivityFsBtn.className = 'fs-btn';
+            addActivityFsBtn.innerHTML = '<i class="icon">📍</i> Přidat aktivitu';
+            addActivityFsBtn.addEventListener('click', () => {
+                isAddingPoints = !isAddingPoints;
+                if (isAddingPoints) {
+                    addActivityFsBtn.classList.add('active');
+                    addMessage('Režim přidávání bodů je aktivní. Dvojklikněte na mapu pro přidání bodu.', false);
+                } else {
+                    addActivityFsBtn.classList.remove('active');
+                    addMessage('Režim přidávání bodů byl deaktivován.', false);
+                }
 
-            // Synchronizace s hlavním tlačítkem
-            const mainAddActivityBtn = document.getElementById('addActivity');
-            if (isAddingPoints) {
-                mainAddActivityBtn.classList.add('active');
-            } else {
-                mainAddActivityBtn.classList.remove('active');
-            }
-        });
+                // Synchronizace s hlavním tlačítkem
+                const mainAddActivityBtn = document.getElementById('addActivity');
+                if (isAddingPoints) {
+                    mainAddActivityBtn.classList.add('active');
+                } else {
+                    mainAddActivityBtn.classList.remove('active');
+                }
+            });
+            console.log('Add activity button created');
+        } catch (error) {
+            console.error('Error setting up fullscreen mode:', error);
+        }
 
         // Tlačítko pro vymazání mapy
         const clearMapFsBtn = document.createElement('button');
@@ -1109,27 +1330,34 @@ function toggleFullscreen() {
             addActivityFsBtn.classList.add('active');
         }
     } else {
-        mapWrapper.classList.remove('map-fullscreen');
-        fullscreenButton.innerHTML = '<i class="icon">⛶</i>'; // Symbol pro fullscreen
-        document.body.style.overflow = ''; // Obnovení scrollování
+        try {
+            mapWrapper.classList.remove('map-fullscreen');
+            fullscreenButton.innerHTML = '<i class="icon">⛶</i>'; // Symbol pro fullscreen
+            document.body.style.overflow = ''; // Obnovení scrollování
 
-        // Odstranění třídy pro lepší zobrazení mapy
-        document.body.classList.remove('fullscreen-mode');
+            // Odstranění třídy pro lepší zobrazení mapy
+            document.body.classList.remove('fullscreen-mode');
 
-        // Odstranění tlačítka pro rychlý návrat z fullscreen režimu
-        const exitFullscreenButton = document.getElementById('exitFullscreenButton');
-        if (exitFullscreenButton) {
-            exitFullscreenButton.remove();
+            // Odstranění tlačítka pro rychlý návrat z fullscreen režimu
+            const exitFullscreenButton = document.getElementById('exitFullscreenButton');
+            if (exitFullscreenButton) {
+                exitFullscreenButton.remove();
+                console.log('Exit fullscreen button removed');
+            }
+
+            // Odstranění ovládacích tlačítek z fullscreen režimu
+            const fullscreenControls = document.getElementById('fullscreenControls');
+            if (fullscreenControls) {
+                fullscreenControls.remove();
+                console.log('Fullscreen controls removed');
+            }
+
+            // Odstranění plovoucího chatu
+            removeFloatingChat();
+            console.log('Floating chat removed');
+        } catch (error) {
+            console.error('Error exiting fullscreen mode:', error);
         }
-
-        // Odstranění ovládacích tlačítek z fullscreen režimu
-        const fullscreenControls = document.getElementById('fullscreenControls');
-        if (fullscreenControls) {
-            fullscreenControls.remove();
-        }
-
-        // Odstranění plovoucího chatu
-        removeFloatingChat();
     }
 
     // Aktualizace velikosti mapy po změně režimu
@@ -2097,297 +2325,535 @@ cancelSettingsButton.addEventListener('click', () => {
 
 // Funkce pro uložení stavu aplikace do localStorage
 function saveAppState() {
-    // Uložení markerů a jejich vlastností
-    const markersData = [];
-    for (let i = 0; i < markers.length; i++) {
-        const marker = markers[i];
-        const props = markerProperties[i] || { name: `Bod ${i + 1}`, command: `bod${i + 1}` };
-        markersData.push({
-            lat: marker.getLatLng().lat,
-            lng: marker.getLatLng().lng,
-            properties: props
-        });
-    }
-
-    // Uložení nastavení aplikace
-    const settings = {
-        darkMode: document.getElementById('darkModeToggle').checked,
-        colorScheme: document.querySelector('.color-option.active').getAttribute('data-color'),
-        markerStyle: markerStyle,
-        markerEffectsEnabled: markerEffectsEnabled
-    };
-
-    // Uložení stavu mapy
-    const mapState = {
-        center: {
-            lat: map.getCenter().lat,
-            lng: map.getCenter().lng
-        },
-        zoom: map.getZoom()
-    };
-
-    // Vytvoření objektu s kompletním stavem aplikace
-    const appState = {
-        markers: markersData,
-        settings: settings,
-        mapState: mapState,
-        deletedMarkerCommands: deletedMarkerCommands,
-        lastSaved: new Date().toISOString()
-    };
-
-    // Uložení do localStorage
+    console.log('Saving application state...');
     try {
-        localStorage.setItem('aiMapAppState', JSON.stringify(appState));
-        console.log('Stav aplikace byl úspěšně uložen:', appState);
-        return true;
+        // Uložení markerů a jejich vlastností
+        const markersData = [];
+        for (let i = 0; i < markers.length; i++) {
+            try {
+                const marker = markers[i];
+                if (!marker) {
+                    console.warn(`Marker at index ${i} is undefined, skipping`);
+                    continue;
+                }
+
+                const props = markerProperties[i] || { name: `Bod ${i + 1}`, command: `bod${i + 1}` };
+                const latLng = marker.getLatLng();
+
+                markersData.push({
+                    lat: latLng.lat,
+                    lng: latLng.lng,
+                    properties: props
+                });
+            } catch (markerError) {
+                console.error(`Error processing marker at index ${i}:`, markerError);
+            }
+        }
+        console.log(`Processed ${markersData.length} markers for saving`);
+
+        // Uložení nastavení aplikace
+        let settings = {};
+        try {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const activeColorOption = document.querySelector('.color-option.active');
+
+            settings = {
+                darkMode: darkModeToggle ? darkModeToggle.checked : false,
+                colorScheme: activeColorOption ? activeColorOption.getAttribute('data-color') : 'blue',
+                markerStyle: markerStyle || 'circle',
+                markerEffectsEnabled: markerEffectsEnabled !== undefined ? markerEffectsEnabled : true
+            };
+            console.log('Settings prepared for saving:', settings);
+        } catch (settingsError) {
+            console.error('Error preparing settings for saving:', settingsError);
+            // Použij výchozí nastavení v případě chyby
+            settings = {
+                darkMode: false,
+                colorScheme: 'blue',
+                markerStyle: 'circle',
+                markerEffectsEnabled: true
+            };
+        }
+
+        // Uložení stavu mapy
+        let mapState = {};
+        try {
+            mapState = {
+                center: {
+                    lat: map.getCenter().lat,
+                    lng: map.getCenter().lng
+                },
+                zoom: map.getZoom()
+            };
+            console.log('Map state prepared for saving:', mapState);
+        } catch (mapStateError) {
+            console.error('Error preparing map state for saving:', mapStateError);
+            // Použij výchozí stav mapy v případě chyby
+            mapState = {
+                center: {
+                    lat: 49.1951,
+                    lng: 16.6068
+                },
+                zoom: 13
+            };
+        }
+
+        // Vytvoření objektu s kompletním stavem aplikace
+        const appState = {
+            markers: markersData,
+            settings: settings,
+            mapState: mapState,
+            deletedMarkerCommands: deletedMarkerCommands || [],
+            lastSaved: new Date().toISOString()
+        };
+
+        // Uložení do localStorage
+        try {
+            const stateJson = JSON.stringify(appState);
+            localStorage.setItem('aiMapAppState', stateJson);
+            console.log('Application state successfully saved');
+            return true;
+        } catch (storageError) {
+            console.error('Error saving to localStorage:', storageError);
+            // Pokus o uložení zjednodušeného stavu v případě chyby (např. překročení limitu localStorage)
+            try {
+                const simplifiedState = {
+                    markers: markersData.map(m => ({ lat: m.lat, lng: m.lng })),
+                    settings: settings,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('aiMapAppState', JSON.stringify(simplifiedState));
+                console.log('Simplified application state saved as fallback');
+                return true;
+            } catch (fallbackError) {
+                console.error('Failed to save even simplified state:', fallbackError);
+                return false;
+            }
+        }
     } catch (error) {
-        console.error('Chyba při ukládání stavu aplikace:', error);
+        console.error('Unexpected error in saveAppState:', error);
         return false;
     }
 }
 
 // Funkce pro načtení stavu aplikace z localStorage
 function loadAppState() {
+    console.log('Loading application state...');
     try {
         const savedState = localStorage.getItem('aiMapAppState');
         if (!savedState) {
-            console.log('Nenalezen žádný uložený stav aplikace.');
+            console.log('No saved application state found.');
             return false;
         }
 
-        const appState = JSON.parse(savedState);
-        console.log('Načten stav aplikace:', appState);
+        let appState;
+        try {
+            appState = JSON.parse(savedState);
+            console.log('Application state loaded:', appState);
+        } catch (parseError) {
+            console.error('Error parsing saved state:', parseError);
+            return false;
+        }
 
         // Načtení nastavení aplikace
         if (appState.settings) {
-            // Nastavení tmavého režimu
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            if (darkModeToggle) {
-                darkModeToggle.checked = appState.settings.darkMode;
-                // Aplikace nastavení tmavého režimu
-                if (appState.settings.darkMode) {
-                    document.documentElement.style.setProperty('--dark-bg', '#1a1b26');
-                    document.documentElement.style.setProperty('--card-bg', '#1F2937');
-                    document.documentElement.style.setProperty('--text-color', '#fff');
-                    document.body.setAttribute('data-theme', 'dark');
-                } else {
-                    document.documentElement.style.setProperty('--dark-bg', '#f3f4f6');
-                    document.documentElement.style.setProperty('--card-bg', '#ffffff');
-                    document.documentElement.style.setProperty('--text-color', '#1F2937');
-                    document.body.removeAttribute('data-theme');
+            try {
+                // Nastavení tmavého režimu
+                const darkModeToggle = document.getElementById('darkModeToggle');
+                if (darkModeToggle) {
+                    darkModeToggle.checked = appState.settings.darkMode;
+                    // Aplikace nastavení tmavého režimu
+                    if (appState.settings.darkMode) {
+                        document.documentElement.style.setProperty('--dark-bg', '#1a1b26');
+                        document.documentElement.style.setProperty('--card-bg', '#1F2937');
+                        document.documentElement.style.setProperty('--text-color', '#fff');
+                        document.body.setAttribute('data-theme', 'dark');
+                    } else {
+                        document.documentElement.style.setProperty('--dark-bg', '#f3f4f6');
+                        document.documentElement.style.setProperty('--card-bg', '#ffffff');
+                        document.documentElement.style.setProperty('--text-color', '#1F2937');
+                        document.body.removeAttribute('data-theme');
+                    }
+                    console.log('Dark mode setting applied:', appState.settings.darkMode);
                 }
-            }
 
-            // Nastavení barevného schématu
-            if (appState.settings.colorScheme) {
-                const colorOptions = document.querySelectorAll('.color-option');
-                colorOptions.forEach(option => {
-                    option.classList.remove('active');
-                    if (option.getAttribute('data-color') === appState.settings.colorScheme) {
-                        option.classList.add('active');
-                        // Aplikace barevného schématu
-                        let colorValue;
-                        switch(appState.settings.colorScheme) {
-                            case 'blue':
-                                colorValue = '#8B5CF6';
-                                break;
-                            case 'purple':
-                                colorValue = '#9333EA';
-                                break;
-                            case 'green':
-                                colorValue = '#10B981';
-                                break;
-                            case 'orange':
-                                colorValue = '#F59E0B';
-                                break;
-                            default:
-                                colorValue = '#8B5CF6';
+                // Nastavení barevného schématu
+                if (appState.settings.colorScheme) {
+                    const colorOptions = document.querySelectorAll('.color-option');
+                    let colorApplied = false;
+
+                    colorOptions.forEach(option => {
+                        option.classList.remove('active');
+                        if (option.getAttribute('data-color') === appState.settings.colorScheme) {
+                            option.classList.add('active');
+                            colorApplied = true;
+
+                            // Aplikace barevného schématu
+                            let colorValue;
+                            switch(appState.settings.colorScheme) {
+                                case 'blue':
+                                    colorValue = '#8B5CF6';
+                                    break;
+                                case 'purple':
+                                    colorValue = '#9333EA';
+                                    break;
+                                case 'green':
+                                    colorValue = '#10B981';
+                                    break;
+                                case 'orange':
+                                    colorValue = '#F59E0B';
+                                    break;
+                                default:
+                                    colorValue = '#8B5CF6';
+                            }
+                            document.documentElement.style.setProperty('--primary-color', colorValue);
                         }
-                        document.documentElement.style.setProperty('--primary-color', colorValue);
+                    });
+
+                    if (!colorApplied && colorOptions.length > 0) {
+                        // Pokud není nalezena odpovídající barva, použij první dostupnou
+                        colorOptions[0].classList.add('active');
+                        document.documentElement.style.setProperty('--primary-color', '#8B5CF6');
                     }
-                });
-            }
 
-
-
-            // Nastavení stylu markerů
-            if (appState.settings.markerStyle) {
-                markerStyle = appState.settings.markerStyle;
-
-                // Aktualizace aktivního stylu v UI
-                const markerStyleOptions = document.querySelectorAll('.marker-style-option');
-                markerStyleOptions.forEach(option => {
-                    option.classList.remove('active');
-                    if (option.getAttribute('data-marker-style') === markerStyle) {
-                        option.classList.add('active');
-                    }
-                });
-            }
-
-            // Nastavení efektů markerů
-            if (appState.settings.markerEffectsEnabled !== undefined) {
-                markerEffectsEnabled = appState.settings.markerEffectsEnabled;
-
-                // Aktualizace přepínače v UI
-                const markerEffectsToggle = document.getElementById('markerEffectsToggle');
-                if (markerEffectsToggle) {
-                    markerEffectsToggle.checked = markerEffectsEnabled;
+                    console.log('Color scheme applied:', appState.settings.colorScheme);
                 }
+
+                // Nastavení stylu markerů
+                if (appState.settings.markerStyle) {
+                    markerStyle = appState.settings.markerStyle;
+
+                    // Aktualizace aktivního stylu v UI
+                    const markerStyleOptions = document.querySelectorAll('.marker-style-option');
+                    let styleApplied = false;
+
+                    markerStyleOptions.forEach(option => {
+                        option.classList.remove('active');
+                        if (option.getAttribute('data-marker-style') === markerStyle) {
+                            option.classList.add('active');
+                            styleApplied = true;
+                        }
+                    });
+
+                    if (!styleApplied && markerStyleOptions.length > 0) {
+                        // Pokud není nalezen odpovídající styl, použij první dostupný
+                        markerStyleOptions[0].classList.add('active');
+                        markerStyle = markerStyleOptions[0].getAttribute('data-marker-style') || 'circle';
+                    }
+
+                    console.log('Marker style applied:', markerStyle);
+                }
+
+                // Nastavení efektů markerů
+                if (appState.settings.markerEffectsEnabled !== undefined) {
+                    markerEffectsEnabled = appState.settings.markerEffectsEnabled;
+
+                    // Aktualizace přepínače v UI
+                    const markerEffectsToggle = document.getElementById('markerEffectsToggle');
+                    if (markerEffectsToggle) {
+                        markerEffectsToggle.checked = markerEffectsEnabled;
+                    }
+                    console.log('Marker effects setting applied:', markerEffectsEnabled);
+                }
+            } catch (settingsError) {
+                console.error('Error applying settings:', settingsError);
             }
         }
 
         // Načtení stavu mapy
         if (appState.mapState) {
-            map.setView(
-                [appState.mapState.center.lat, appState.mapState.center.lng],
-                appState.mapState.zoom
-            );
+            try {
+                map.setView(
+                    [appState.mapState.center.lat, appState.mapState.center.lng],
+                    appState.mapState.zoom
+                );
+                console.log('Map state applied');
+            } catch (mapError) {
+                console.error('Error applying map state:', mapError);
+            }
         }
 
         // Načtení smazaných příkazů
-        if (appState.deletedMarkerCommands && appState.deletedMarkerCommands.length > 0) {
-            deletedMarkerCommands = appState.deletedMarkerCommands;
-            console.log('Načteno ' + deletedMarkerCommands.length + ' smazaných příkazů.');
+        if (appState.deletedMarkerCommands && Array.isArray(appState.deletedMarkerCommands)) {
+            try {
+                deletedMarkerCommands = appState.deletedMarkerCommands;
+                console.log(`Loaded ${deletedMarkerCommands.length} deleted marker commands`);
+            } catch (commandsError) {
+                console.error('Error loading deleted commands:', commandsError);
+                deletedMarkerCommands = [];
+            }
         }
 
         // Načtení markerů
-        if (appState.markers && appState.markers.length > 0) {
-            // Odstranění všech stávajících markerů
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-            markerProperties = [];
+        if (appState.markers && Array.isArray(appState.markers) && appState.markers.length > 0) {
+            try {
+                // Odstranění všech stávajících markerů
+                markers.forEach(marker => {
+                    try {
+                        map.removeLayer(marker);
+                    } catch (removeError) {
+                        console.error('Error removing existing marker:', removeError);
+                    }
+                });
+                markers = [];
+                markerProperties = [];
+                console.log('Existing markers cleared');
 
-            // Přidání uložených markerů
-            appState.markers.forEach(markerData => {
-                const markerIndex = markers.length;
+                // Přidání uložených markerů
+                let successfullyLoadedMarkers = 0;
 
-                // Vytvoření vlastního markeru s číslem
-                const customIcon = createCustomMarkerIcon(markerIndex + 1, markerIndex);
+                for (let i = 0; i < appState.markers.length; i++) {
+                    try {
+                        const markerData = appState.markers[i];
+                        if (!markerData || !markerData.lat || !markerData.lng) {
+                            console.warn(`Invalid marker data at index ${i}, skipping`);
+                            continue;
+                        }
 
-                const marker = L.marker([markerData.lat, markerData.lng], {
-                    draggable: true,
-                    title: markerData.properties.name,
-                    icon: customIcon // Použití vlastního ikony
-                }).addTo(map);
+                        const markerIndex = markers.length;
 
-                markers.push(marker);
-                markerProperties[markerIndex] = markerData.properties;
+                        // Vytvoření vlastního markeru s číslem
+                        const customIcon = createCustomMarkerIcon(markerIndex + 1, markerIndex);
 
-                // Nastavení příznaku saved na true pro načtené body (pro zpětnou kompatibilitu)
-                if (markerProperties[markerIndex].saved === undefined) {
-                    markerProperties[markerIndex].saved = true;
+                        const marker = L.marker([markerData.lat, markerData.lng], {
+                            draggable: true,
+                            title: markerData.properties?.name || `Bod ${markerIndex + 1}`,
+                            icon: customIcon // Použití vlastního ikony
+                        }).addTo(map);
+
+                        markers.push(marker);
+
+                        // Kontrola a oprava vlastností markeru
+                        if (!markerData.properties) {
+                            markerData.properties = {
+                                name: `Bod ${markerIndex + 1}`,
+                                command: `bod${markerIndex + 1}`,
+                                saved: true
+                            };
+                        }
+
+                        markerProperties[markerIndex] = markerData.properties;
+
+                        // Nastavení příznaku saved na true pro načtené body (pro zpětnou kompatibilitu)
+                        if (markerProperties[markerIndex].saved === undefined) {
+                            markerProperties[markerIndex].saved = true;
+                        }
+
+                        // Přidání popup s formulářem
+                        try {
+                            marker.bindPopup(createPopupContent(marker, markerIndex), {
+                                className: 'marker-popup',
+                                maxWidth: 350,
+                                minWidth: 250,
+                                autoPan: true,
+                                autoPanPadding: [50, 50],
+                                closeOnClick: false,
+                                autoClose: false
+                            });
+                        } catch (popupError) {
+                            console.error(`Error binding popup for marker ${markerIndex}:`, popupError);
+                        }
+
+                        // Přidání event listenerů pro marker
+                        try {
+                            setupMarkerEventListeners(marker, markerIndex);
+                        } catch (listenerError) {
+                            console.error(`Error setting up listeners for marker ${markerIndex}:`, listenerError);
+                        }
+
+                        successfullyLoadedMarkers++;
+                    } catch (markerError) {
+                        console.error(`Error loading marker at index ${i}:`, markerError);
+                    }
                 }
 
-                // Přidání popup s formulářem
-                marker.bindPopup(createPopupContent(marker, markerIndex), {
-                    className: 'marker-popup',
-                    maxWidth: 350,
-                    minWidth: 250,
-                    autoPan: true,
-                    autoPanPadding: [50, 50],
-                    closeOnClick: false,
-                    autoClose: false
-                });
+                console.log(`Successfully loaded ${successfullyLoadedMarkers} of ${appState.markers.length} markers`);
 
-                // Přidání event listenerů pro marker
-                setupMarkerEventListeners(marker, markerIndex);
-            });
+                // Pokud máme alespoň dva body, vypočítáme trasu
+                if (markers.length >= 2) {
+                    try {
+                        calculateRouteFunction();
+                    } catch (routeError) {
+                        console.error('Error calculating route:', routeError);
+                    }
+                }
 
-            // Pokud máme alespoň dva body, vypočítáme trasu
-            if (markers.length >= 2) {
-                calculateRouteFunction();
+                addMessage(`Načteno ${successfullyLoadedMarkers} bodů z předchozího sezení.`, false);
+            } catch (markersError) {
+                console.error('Error loading markers:', markersError);
             }
-
-            addMessage(`Načteno ${markers.length} bodů z předchozího sezení.`, false);
         }
 
         return true;
     } catch (error) {
-        console.error('Chyba při načítání stavu aplikace:', error);
+        console.error('Unexpected error loading application state:', error);
         return false;
     }
 }
 
 // Funkce pro nastavení event listenerů pro marker
 function setupMarkerEventListeners(marker, markerIndex) {
-    // Přidání event listeneru pro přesunutí markeru
-    marker.on('dragend', function() {
-        const newPos = marker.getLatLng();
+    console.log(`Setting up event listeners for marker ${markerIndex}`);
+    try {
+        // Přidání event listeneru pro přesunutí markeru
+        marker.on('dragend', function() {
+            console.log(`Marker ${markerIndex} dragged`);
+            try {
+                const newPos = marker.getLatLng();
+                console.log(`New position for marker ${markerIndex}: [${newPos.lat}, ${newPos.lng}]`);
 
-        // Aktualizace souřadnic v properties
-        if (markerProperties[markerIndex]) {
-            markerProperties[markerIndex].lat = newPos.lat.toFixed(4);
-            markerProperties[markerIndex].lng = newPos.lng.toFixed(4);
-        }
+                // Aktualizace souřadnic v properties
+                if (markerProperties[markerIndex]) {
+                    markerProperties[markerIndex].lat = newPos.lat.toFixed(4);
+                    markerProperties[markerIndex].lng = newPos.lng.toFixed(4);
+                    console.log(`Updated coordinates in properties for marker ${markerIndex}`);
+                }
 
-        // Aktualizace popup obsahu
-        marker.setPopupContent(createPopupContent(marker, markerIndex));
+                // Aktualizace popup obsahu
+                try {
+                    const newContent = createPopupContent(marker, markerIndex);
+                    marker.setPopupContent(newContent);
+                    console.log(`Popup content updated for marker ${markerIndex} after drag`);
+                } catch (popupError) {
+                    console.error(`Error updating popup content for marker ${markerIndex} after drag:`, popupError);
+                }
 
-        // Pokud máme alespoň dva body, přepočítáme trasu
-        if (markers.length >= 2) {
-            calculateRouteFunction();
-        }
+                // Pokud máme alespoň dva body, přepočítáme trasu
+                if (markers.length >= 2) {
+                    try {
+                        calculateRouteFunction();
+                        console.log('Route recalculated after marker drag');
+                    } catch (routeError) {
+                        console.error('Error recalculating route after marker drag:', routeError);
+                    }
+                }
 
-        // Aktualizace glóbusu, pokud je aktivní
-        if (isGlobeMode && cesiumViewer) {
-            addMarkersToGlobe();
-            addRoutesToGlobe();
-        }
+                // Aktualizace glóbusu, pokud je aktivní
+                if (isGlobeMode && cesiumViewer) {
+                    try {
+                        addMarkersToGlobe();
+                        addRoutesToGlobe();
+                        console.log('Globe updated after marker drag');
+                    } catch (globeError) {
+                        console.error('Error updating globe after marker drag:', globeError);
+                    }
+                }
 
-        // Uložení stavu aplikace po přesunutí markeru
-        saveAppState();
-    });
-
-    // Přidání event listeneru pro kliknutí na marker
-    marker.on('click', function() {
-        // Zrušení předchozího časovače, pokud existuje
-        if (popupTimers[markerIndex]) {
-            clearTimeout(popupTimers[markerIndex]);
-        }
-
-        // Nastavení nového časovače
-        popupTimers[markerIndex] = setTimeout(() => {
-            if (marker.isPopupOpen()) {
-                marker.closePopup();
+                // Uložení stavu aplikace po přesunutí markeru
+                try {
+                    saveAppState();
+                    console.log('Application state saved after marker drag');
+                } catch (saveError) {
+                    console.error('Error saving application state after marker drag:', saveError);
+                }
+            } catch (dragError) {
+                console.error(`Error handling drag event for marker ${markerIndex}:`, dragError);
             }
-            delete popupTimers[markerIndex];
-        }, 35000); // 35 sekund
-    });
+        });
 
-    // Přidání event listeneru pro otevření popup okna
-    marker.on('popupopen', function() {
-        // Zrušení všech předchozích intervalů pro odpočet
-        Object.keys(countdownIntervals).forEach(key => {
-            if (key.startsWith(`countdown-${markerIndex}-`)) {
-                clearInterval(countdownIntervals[key]);
-                delete countdownIntervals[key];
+        // Přidání event listeneru pro kliknutí na marker
+        marker.on('click', function() {
+            console.log(`Marker ${markerIndex} clicked`);
+            try {
+                // Zrušení předchozího časovače, pokud existuje
+                if (popupTimers[markerIndex]) {
+                    try {
+                        clearTimeout(popupTimers[markerIndex]);
+                        console.log(`Previous popup timer cleared for marker ${markerIndex}`);
+                    } catch (clearError) {
+                        console.error(`Error clearing previous popup timer for marker ${markerIndex}:`, clearError);
+                    }
+                }
+
+                // Nastavení nového časovače
+                popupTimers[markerIndex] = setTimeout(() => {
+                    try {
+                        if (marker.isPopupOpen()) {
+                            marker.closePopup();
+                            console.log(`Popup automatically closed for marker ${markerIndex} after timeout`);
+                        }
+                        delete popupTimers[markerIndex];
+                    } catch (closeError) {
+                        console.error(`Error closing popup for marker ${markerIndex} after timeout:`, closeError);
+                    }
+                }, 35000); // 35 sekund
+                console.log(`New popup timer set for marker ${markerIndex}`);
+            } catch (clickError) {
+                console.error(`Error handling click event for marker ${markerIndex}:`, clickError);
             }
         });
 
-        // Spuštění odpočtu
-        const countdownId = `countdown-${markerIndex}-${Date.now()}`;
-        const countdownElement = document.getElementById(countdownId);
-        if (countdownElement) {
-            startCountdown(countdownId, 35);
-        }
-    });
+        // Přidání event listeneru pro otevření popup okna
+        marker.on('popupopen', function() {
+            console.log(`Popup opened for marker ${markerIndex}`);
+            try {
+                // Zrušení všech předchozích intervalů pro odpočet
+                try {
+                    Object.keys(countdownIntervals).forEach(key => {
+                        if (key.startsWith(`countdown-${markerIndex}-`)) {
+                            clearInterval(countdownIntervals[key]);
+                            delete countdownIntervals[key];
+                            console.log(`Previous countdown interval cleared: ${key}`);
+                        }
+                    });
+                } catch (intervalError) {
+                    console.error(`Error clearing countdown intervals for marker ${markerIndex}:`, intervalError);
+                }
 
-    // Přidání event listeneru pro zavření popup okna
-    marker.on('popupclose', function() {
-        // Zrušení časovače při manuálním zavření popup okna
-        if (popupTimers[markerIndex]) {
-            clearTimeout(popupTimers[markerIndex]);
-            delete popupTimers[markerIndex];
-        }
-
-        // Zrušení všech intervalů pro odpočet
-        Object.keys(countdownIntervals).forEach(key => {
-            if (key.startsWith(`countdown-${markerIndex}-`)) {
-                clearInterval(countdownIntervals[key]);
-                delete countdownIntervals[key];
+                // Spuštění odpočtu
+                try {
+                    const countdownId = `countdown-${markerIndex}`;
+                    const countdownElement = document.getElementById(countdownId);
+                    if (countdownElement) {
+                        startCountdown(countdownId, 35);
+                        console.log(`Countdown started for marker ${markerIndex} with ID: ${countdownId}`);
+                    } else {
+                        console.warn(`Countdown element not found for marker ${markerIndex} with ID: ${countdownId}`);
+                    }
+                } catch (countdownError) {
+                    console.error(`Error starting countdown for marker ${markerIndex}:`, countdownError);
+                }
+            } catch (popupOpenError) {
+                console.error(`Error handling popupopen event for marker ${markerIndex}:`, popupOpenError);
             }
         });
-    });
+
+        // Přidání event listeneru pro zavření popup okna
+        marker.on('popupclose', function() {
+            console.log(`Popup closed for marker ${markerIndex}`);
+            try {
+                // Zrušení časovače při manuálním zavření popup okna
+                if (popupTimers[markerIndex]) {
+                    try {
+                        clearTimeout(popupTimers[markerIndex]);
+                        delete popupTimers[markerIndex];
+                        console.log(`Popup timer cleared for marker ${markerIndex} on popup close`);
+                    } catch (timerError) {
+                        console.error(`Error clearing popup timer for marker ${markerIndex} on popup close:`, timerError);
+                    }
+                }
+
+                // Zrušení všech intervalů pro odpočet
+                try {
+                    Object.keys(countdownIntervals).forEach(key => {
+                        if (key.startsWith(`countdown-${markerIndex}-`)) {
+                            clearInterval(countdownIntervals[key]);
+                            delete countdownIntervals[key];
+                            console.log(`Countdown interval cleared on popup close: ${key}`);
+                        }
+                    });
+                } catch (intervalError) {
+                    console.error(`Error clearing countdown intervals for marker ${markerIndex} on popup close:`, intervalError);
+                }
+            } catch (popupCloseError) {
+                console.error(`Error handling popupclose event for marker ${markerIndex}:`, popupCloseError);
+            }
+        });
+
+        console.log(`Event listeners successfully set up for marker ${markerIndex}`);
+    } catch (error) {
+        console.error(`Unexpected error setting up event listeners for marker ${markerIndex}:`, error);
+    }
 }
 
 // Event listenery pro nastavení markerů
