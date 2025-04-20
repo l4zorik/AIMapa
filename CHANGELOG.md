@@ -8,6 +8,18 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 Tato verze představuje návrat k poslední stabilní verzi 0.2.4, která poskytuje spolehlivou funkčnost všech základních funkcí aplikace. Po několika pokusech o opravu problémů v novějších verzích bylo rozhodnuto vrátit se k této ověřené verzi a zachovat dokumentaci o provedených změnách pro případné budoucí využití.
 
+### Plán pro verzi 0.2.4.1
+
+V příští verzi 0.2.4.1 je plánováno přidání dokumentace a funkcí z verze 0.2.6.4-emergency, která obsahovala následující klíčové prvky:
+
+- Nouzová oprava s minimalistickým skriptem pro zajištění základní funkčnosti aplikace
+- Zcela nový soubor `script_new.js` s minimalistickým kódem (pouze 300 řádků oproti původním 4000+)
+- Implementace pouze základních funkcí pro zajištění funkčnosti mapy bez zbytečných komplikací
+- Zjednodušené uživatelské rozhraní pro maximální spolehlivost
+- Zcela nová architektura kódu s důrazem na jednoduchost a čitelnost
+
+Tato plánovaná verze bude kombinovat stabilitu verze 0.2.4 s vylepšenými prvky z verze 0.2.6.4-emergency.
+
 #### Klíčové změny
 - Návrat k původnímu skriptu `script.js` místo opravného skriptu `fix.js`
 - Zachování všech funkcí stabilní verze 0.2.4
