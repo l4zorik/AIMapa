@@ -30,45 +30,120 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 ### Poznámka vývojáře
 Tato verze je speciální opravnou verzí zaměřenou na stabilizaci aplikace. Přestože bylo opraveno mnoho chyb, stále přetrvává zásadní problém, který zatím není viditelný na první pohled. Aplikace funguje, ale není dokonale stabilní. Tato verze slouží jako základ pro budoucí vývoj a opravy.
 
-### Co způsobila kritická chyba
-Kritická chyba v aplikaci způsobila, že jsem musel celý projekt začít znovu od začátku. Tato situace mě však přiměla naučit se používat GitHub, což se ukázalo jako nesmirně přínosné. Díky této zdánlivě negativní zkušenosti jsem získal cennou dovednost, která mi umožnila:
+### Co způsobila kritická chyba - Příběh vývojáře
+Kritická chyba v jádru aplikace způsobila kaskadovitý kolaps celého systému, což vedlo k úplné ztrátě funkčnosti a nemožnosti pokračovat ve vývoji. Po mnoha hodinách pokusů o opravu jsem byl nucen učinit jedno z nejtěžších rozhodnutí - začít celý projekt znovu od nuly. Tato zdrcující zkušenost mě však přivedla k rozhodnutí, které naprosto změnilo můj přístup k vývoji softwaru - naučit se používat GitHub.
 
-- **Verzování kódu**: Nyní mohu sledovat všechny změny v projektu a v případě potřeby se vrátit k předchozím verzím
-- **Zálohování projektu**: GitHub slouží jako bezpečná záloha celého projektu, což eliminuje riziko ztráty dat
-- **Lepší organizace práce**: Používání větví (branches) mi umožňuje pracovat na různých částech projektu nezávisle
-- **Dokumentace změn**: Prostřednictvím commit zpráv a CHANGELOG.md mohu lépe dokumentovat všechny změny v projektu
-- **Snadnější spolupráce**: V budoucnu bude možné snáze spolupracovat s dalšími vývojáři
-- **Profesionální přístup k vývoji**: Osvojil jsem si profesionální postupy vývoje softwaru, které jsou standardem v oboru
-- **Lepší přehled o projektu**: Mohu sledovat historii projektu a lépe plánovat budoucí vývoj
+Začátky s GitHubem byly náročné. Musel jsem se naučit zcela nový způsob myšlení o vývoji softwaru, pochopit koncepty jako verzování, větvení, commitování a mergování. Každý krok byl výzvou, ale s každým úspěchem rostla moje sebejistota a nadšení. Postupně jsem začal chápat, jaký obrovský potenciál tato platforma nabízí.
 
-Tato zkušenost mi ukázala, že i z problémů se mohu poučit a získat nové dovednosti, které mi pomohou stát se lepším vývojářem.
+Nyní, po měsících práce s GitHubem, mohu s jistotou říci, že to byla jedna z nejlepších věcí, které jsem kdy pro svůj profesionální růst udělal. To, co začalo jako reakce na katastrofu, se proměnilo v transformativní cestu, která zcela změnila můj přístup k programování.
 
-### Známé problémy
-- **Kritický problém s asynchronním načítáním**: Aplikace má problémy s asynchronním načítáním mapových podkladů a dat, což může vést k nestabilitě při delším používání
-- **Problém s pamětí**: Při delším používání aplikace dochází k postupnému zvyšování využití paměti (memory leak)
-- **Nekonzistentní stav aplikace**: Při některých operacích může dojít k nekonzistenci mezi zobrazeným stavem a vnitřním stavem aplikace
-- **Problém s event listenery**: Při opakovaném přidávání a odstraňování markerů může docházet k duplicitnímu přidávání event listenerů
-- **Problém s localStorage**: Při ukládání většího množství dat může dojít k překročení limitu localStorage
+### Revoluční přínos GitHubu pro můj vývoj
 
-Tyto problémy budou řešeny v budoucích verzích. Nyní jsou zdokumentovány jako výchozí bod pro další vývoj.
+Používání GitHubu mi přineslo daleko více, než jsem původně očekával. Nejde jen o technický nástroj, ale o komplexní ekosystém, který revolucím způsobem změnil můj přístup k vývoji softwaru:
 
-### Opraveno
-- Kompletní přepracování systému ošetření chyb v celé aplikaci
-- Opravena nefunkčnost ukládání bodů na mapě s robustním ošetřením chyb
-- Opravena nefunkčnost zobrazení trasy mezi body s automatickým přepínáním na záložní metodu
-- Opravena nefunkčnost nastavení aplikace s kontrolou existence prvků
-- Opravena nefunkčnost fullscreen režimu s ošetřením všech možných chyb
-- Přidáno podrobné logování pro lepší diagnostiku problémů v celé aplikaci
-- Vylepšeno ošetření chyb při práci s mapou a jejími funkcemi
-- Optimalizována funkce pro výpočet trasy s použitím přímé čáry místo nespolehlivejšího API
-- Vylepšeno ošetření chyb při přepínání do fullscreen režimu
-- Opravena funkce `createPopupContent` s lepším ošetřením chyb a záložním obsahem
-- Opravena funkce `startCountdown` s lepším ošetřením chyb a kontrolou existence elementů
-- Opravena funkce `editMarker` s lepším ošetřením chyb a kontrolou existence markerů
-- Opravena funkce `removeMarker` s lepším ošetřením chyb a kontrolou existence markerů
-- Opravena funkce `setupMarkerEventListeners` s lepším ošetřením chyb a kontrolou existence markerů
-- Opravena funkce `saveAppState` s lepším ošetřením chyb a záložními hodnotami
-- Opravena funkce `loadAppState` s lepším ošetřením chyb a kontrolou existence dat
+- **Pokročilé verzování kódu**: GitHub mi umožnil vytvořit detailní historii vývoje s možností sledovat každou změnu, porovnávat různé verze a okamžitě se vracet k libovolnému bodu v historii projektu. Tato schopnost je neocenitelnou pojišťovnou proti chybám a umožňuje mi experimentovat s novými funkcemi bez strachu ze ztráty práce.
+
+- **Robustní zálohování projektu**: GitHub funguje jako dokonale zabezpečená cloudová záloha, která je dostupná odkudkoliv a kdykoliv. Eliminuje riziko ztráty dat při selhání hardwaru, lidské chybě nebo jiných nepředvídatelných událostech. Každý řádek kódu je bezpečně uložen a připraven k obnovení.
+
+- **Strategická organizace práce**: Systém větví (branches) mi umožnil paralelně pracovat na různých aspektech projektu bez vzájemného ovlivňování. Mohu vytvořit samostatnou větev pro každou novou funkci, experimentální řešení nebo opravu chyby, a teprve po důkladném testování ji integrovat do hlavního projektu.
+
+- **Komplexní dokumentace změn**: Prostřednictvím strukturovaných commit zpráv, podrobných pull requestů a propracovaného CHANGELOG.md mohu vytvářet vysoce detailní dokumentaci všech změn v projektu. Tato dokumentace je klíčová nejen pro mě, ale i pro každého, kdo by v budoucnu s projektem pracoval.
+
+- **Efektivní spolupráce**: GitHub poskytuje kompletní infrastrukturu pro týmovou spolupráci, včetně nástrojů pro code review, diskuze o kódu, správu úkolů a automatizaci workflow. I když momentálně pracuji sám, tyto nástroje mi umožní efektivně organizovat vlastní práci a připravit projekt na potenciální budoucí spolupráci.
+
+- **Profesionální workflow**: Osvojil jsem si profesionální postupy vývoje softwaru, které jsou standardem v průmyslu - od Gitflow workflow přes správu issues a milestonů až po automatizaci pomocí GitHub Actions. Tyto dovednosti jsou přenosné a vysoce ceněné v profesionálním prostředí.
+
+- **Strategické řízení projektu**: GitHub mi poskytuje komplexní přehled o celém projektu, včetně jeho historie, aktuálního stavu a plánovaných funkcí. Mohu sledovat vývoj projektu v čase, identifikovat trendy a problémy, a na základě těchto informací činit informovaná rozhodnutí o budoucím vývoji.
+
+- **Kontinuitní integrace a nasazení**: Seznámil jsem se s koncepty CI/CD (Continuous Integration/Continuous Deployment), které umožňují automatizovat testování a nasazování aplikace. Tyto postupy významně zvyšují kvalitu kódu a efektivitu vývojového procesu.
+
+- **Osobní portfolio**: Můj GitHub profil se postupně stává mým profesionálním portfoliem, které demonstruje mé schopnosti, projekty a vývojový styl potenciálním zaměstnavatelům nebo klientům.
+
+Tato zkušenost mi ukázala, že i z největších problémů se mohu poučit a získat dovednosti, které daleko přesahují původní cíle. To, co začalo jako reakce na kritickou chybu, se proměnilo v transformativní cestu, která zcela změnila můj přístup k vývoji softwaru a otevřela mi dveře k novým možnostem profesionálního růstu.
+
+### Technická dokumentace známých problémů
+
+V průběhu vývoje verze 0.2.6.1 byly identifikovány následující zásadní technické problémy, které představují významné výzvy pro budoucí vývoj. Tyto problémy jsou nyní podrobně zdokumentovány jako výchozí bod pro systematické řešení v následujících verzích:
+
+#### 1. Kritický problém s asynchronním načítáním
+- **Popis**: Aplikace využívá několik asynchronních operací pro načítání mapových podkladů, dat a interakci s API. Tyto operace nejsou správně synchronizovány a řízeny, což vede k nestabilitě.
+- **Projevy**: Náhodné zamrzání aplikace, nekonzistentní zobrazení dat, chybějící nebo nekompletní mapové podklady.
+- **Technické detaily**: Chybějící nebo nesprávné použití Promise.all(), async/await, chybějící ošetření chyb v asynchronních operacích.
+- **Závažnost**: Kritická
+
+#### 2. Problém s únikem paměti (memory leak)
+- **Popis**: Při delším používání aplikace dochází k postupnému zvyšování využití paměti, což může vést až k pádu aplikace.
+- **Projevy**: Zpomalující se aplikace, zvyšující se latence, náhodné pády prohlížeče.
+- **Technické detaily**: Neodstraňování nepoužívaných objektů, cyklické reference, neodregistrování event listenerů, neefektivní práce s velkými datovými strukturami.
+- **Závažnost**: Vysoká
+
+#### 3. Nekonzistentní stav aplikace
+- **Popis**: Při některých operacích dochází k rozcházení mezi zobrazeným stavem a vnitřním stavem aplikace.
+- **Projevy**: Nesprávné zobrazení dat, nekonzistentní chování UI, neodpovídající reakce na uživatelské akce.
+- **Technické detaily**: Chybějící nebo nesprávná implementace stavového managementu, nekonzistentní aktualizace UI, nesprávná propagace změn.
+- **Závažnost**: Střední
+
+#### 4. Problém s event listenery
+- **Popis**: Při opakovaném přidávání a odstraňování markerů dochází k duplicitnímu přidávání event listenerů.
+- **Projevy**: Multiplicitní vyvolávání událostí, nekonzistentní chování UI, zvyšující se využití paměti.
+- **Technické detaily**: Chybějící odregistrace event listenerů, nesprávná implementace vzoru observer, chybějící kontrola existence listenerů před jejich přidáním.
+- **Závažnost**: Střední
+
+#### 5. Problém s localStorage
+- **Popis**: Při ukládání většího množství dat může dojít k překročení limitu localStorage (obvykle 5-10 MB).
+- **Projevy**: Ztráta dat, selhání ukládání stavu aplikace, nekonzistentní stav po opětovném načtení stránky.
+- **Technické detaily**: Chybějící komprese dat, nesprávná strategie ukládání, chybějící kontrola velikosti dat, absence alternativních úložišť (IndexedDB).
+- **Závažnost**: Nízká
+
+Tyto problémy budou systematicky řešeny v následujících verzích podle jejich závažnosti a dopadu na funkčnost aplikace. Nyní jsou podrobně zdokumentovány jako výchozí bod pro další vývoj a zlepšování aplikace.
+
+### Komplexní přehled provedených oprav a vylepšení
+
+V rámci verze 0.2.6.1 bylo provedeno rozesáhlé přepracování a optimalizace kódu s cílem maximálně zvýšit stabilitu a spolehlivost aplikace. Níže je uveden podrobný přehled všech provedených oprav a vylepšení:
+
+#### Základní systémové vylepšení
+- **Kompletní přepracování systému ošetření chyb**: Implementován robustní systém zachytávání a zpracování chyb v celé aplikaci s využitím try-catch bloků a záložních mechanizmů
+- **Implementace pokročilého logování**: Přidán systém podrobného logování s různými úrovněmi závažnosti (info, warning, error, critical) pro lepší diagnostiku problémů
+- **Optimalizace výkonnosti**: Provedena analýza a optimalizace kritických částí kódu pro zvýšení výkonu a snížení latence
+- **Zlepšení správy paměti**: Implementovány techniky pro efektivnější správu paměti a prevenci úniků paměti
+
+#### Opravy klíčových funkcí
+
+##### Správa markerů a bodů na mapě
+- **Opravena funkce `createMarker`**: Přidáno důkladné ošetření vstupních parametrů, kontrola platnosti souřadnic a ošetření chyb při vytváření markerů
+- **Opravena funkce `saveMarkerProperties`**: Implementována validace vstupních dat, ošetření chyb při ukládání a záložní mechanizmus pro případ selhání
+- **Opravena funkce `editMarker`**: Přidána kontrola existence markeru před editací, ošetření chyb při úpravách a logování změn
+- **Opravena funkce `removeMarker`**: Implementována bezpečná metoda odstranění markeru s kontrolou existence, odregistrací event listenerů a aktualizací stavu aplikace
+- **Opravena funkce `setupMarkerEventListeners`**: Přepracován systém přidávání event listenerů s prevencí duplicit a kontrolou existence markeru
+
+##### Popup okna a uživatelské rozhraní
+- **Opravena funkce `createPopupContent`**: Implementováno robustní vytváření obsahu popup oken s ošetřením chyb a záložním obsahem pro případ selhání
+- **Opravena funkce `startCountdown`**: Přepracován systém odpočtu s kontrolou existence elementů, ošetřením chyb a bezpečným ukončením
+- **Opravena funkce `toggleFullscreen`**: Vylepšeno přepínání do fullscreen režimu s ošetřením všech možných chyb a kompatibilitou napříč prohlížeči
+- **Opravena funkce `updateCoordinatesDisplay`**: Zlepšeno zobrazení souřadnic s validací dat a ošetřením chyb
+
+##### Výpočet trasy a navigace
+- **Optimalizována funkce `calculateRoute`**: Přepracován algoritmus výpočtu trasy s použitím přímé čáry jako záložní metody při selhání API
+- **Vylepšena funkce `displayRouteInfo`**: Zlepšeno zobrazení informací o trase s ošetřením chyb a záložními hodnotami
+- **Opravena funkce `handleRouteCalculation`**: Přidáno ošetření chyb při výpočtu trasy a implementován záložní mechanizmus
+
+##### Správa stavu aplikace
+- **Opravena funkce `saveAppState`**: Implementováno efektivnější ukládání stavu aplikace s kompresí dat, ošetřením chyb a záložními hodnotami
+- **Opravena funkce `loadAppState`**: Vylepšeno načítání stavu aplikace s kontrolou existence dat, validací a ošetřením chyb
+- **Implementována funkce `validateAppState`**: Přidána nová funkce pro validaci stavu aplikace před jeho použitím
+
+##### Nastavení aplikace
+- **Opravena funkce `initSettings`**: Vylepšena inicializace nastavení s kontrolou existence prvků a ošetřením chyb
+- **Opravena funkce `saveSettings`**: Zlepšeno ukládání nastavení s validací dat a ošetřením chyb
+- **Opravena funkce `applySettings`**: Vylepšeno aplikování nastavení s kontrolou existence prvků a ošetřením chyb
+
+#### Ostatní vylepšení
+- **Optimalizace inicializace aplikace**: Zlepšen proces inicializace aplikace s postupným načítáním komponent
+- **Vylepšení responzivity**: Optimalizováno uživatelské rozhraní pro různé velikosti obrazovky
+- **Zlepšení výkonu map**: Optimalizováno načítání a zobrazení mapových podkladů
+- **Rozšíření logování**: Implementováno podrobnější logování pro lepší diagnostiku problémů
+
+Všechny tyto opravy a vylepšení významně přispívají ke zvýšení stability, spolehlivosti a uživatelského komfortu aplikace AIMapa. Přestože některé zásadní problémy stále přetrvávají (viz sekce "Známé problémy"), tato verze představuje významný krok k vytvoření stabilní a spolehlivé aplikace.
 
 ## [0.2.6] - 2025-04-20
 
