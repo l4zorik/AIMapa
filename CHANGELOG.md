@@ -25,6 +25,26 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.2.6.1] - 2025-04-20
+
+### Opraveno
+- Kompletní přepracování systému ošetření chyb v celé aplikaci
+- Opravena nefunkčnost ukládání bodů na mapě s robustním ošetřením chyb
+- Opravena nefunkčnost zobrazení trasy mezi body s automatickým přepínáním na záložní metodu
+- Opravena nefunkčnost nastavení aplikace s kontrolou existence prvků
+- Opravena nefunkčnost fullscreen režimu s ošetřením všech možných chyb
+- Přidáno podrobné logování pro lepší diagnostiku problémů v celé aplikaci
+- Vylepšeno ošetření chyb při práci s mapou a jejími funkcemi
+- Optimalizována funkce pro výpočet trasy s použitím přímé čáry místo nespolehlivejšího API
+- Vylepšeno ošetření chyb při přepínání do fullscreen režimu
+- Opravena funkce `createPopupContent` s lepším ošetřením chyb a záložním obsahem
+- Opravena funkce `startCountdown` s lepším ošetřením chyb a kontrolou existence elementů
+- Opravena funkce `editMarker` s lepším ošetřením chyb a kontrolou existence markerů
+- Opravena funkce `removeMarker` s lepším ošetřením chyb a kontrolou existence markerů
+- Opravena funkce `setupMarkerEventListeners` s lepším ošetřením chyb a kontrolou existence markerů
+- Opravena funkce `saveAppState` s lepším ošetřením chyb a záložními hodnotami
+- Opravena funkce `loadAppState` s lepším ošetřením chyb a kontrolou existence dat
+
 ## [0.2.6] - 2025-04-20
 
 ### Opraveno
