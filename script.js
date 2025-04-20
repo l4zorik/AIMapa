@@ -854,54 +854,117 @@ function addMarkerToMap(latlng) {
         // Není potřeba zde nastavovat časovač, protože to dělá funkce startCountdown
     });
 
-    // Přidání event listeneru pro otevření popup okna
+    // Přidání event listeneru pro otevření popup okna s robustním ošetřením chyb
     marker.on('popupopen', function() {
-        console.log(`Popup opened for marker ${markerIndex}`);
+        try {
+            console.log(`Popup opened for marker ${markerIndex}`);
 
-        // Zrušení všech předchozích intervalů pro odpočet
-        Object.keys(countdownIntervals).forEach(key => {
-            clearInterval(countdownIntervals[key]);
-            delete countdownIntervals[key];
-        });
+            // Zrušení všech předchozích intervalů pro odpočet
+            try {
+                const intervalKeys = Object.keys(countdownIntervals);
+                if (intervalKeys && intervalKeys.length > 0) {
+                    intervalKeys.forEach(key => {
+                        try {
+                            clearInterval(countdownIntervals[key]);
+                            delete countdownIntervals[key];
+                            console.log(`Cleared interval: ${key}`);
+                        } catch (clearError) {
+                            console.error(`Error clearing interval ${key}:`, clearError);
+                        }
+                    });
+                }
+            } catch (intervalsError) {
+                console.error('Error clearing countdown intervals:', intervalsError);
+            }
 
-        // Spuštění odpočtu - počkáme na vykreslení DOM
-        setTimeout(() => {
-            // Použijeme přímý selektor pro nalezení elementu odpočtu v aktuálním popup okně
-            const popupElement = marker.getPopup().getElement();
-            if (popupElement) {
-                const countdownElement = popupElement.querySelector('.popup-countdown');
-                if (countdownElement) {
+            // Spuštění odpočtu - počkáme na vykreslení DOM
+            setTimeout(() => {
+                try {
+                    // Kontrola, zda marker stále existuje
+                    if (!marker || !markers.includes(marker)) {
+                        console.warn(`Marker ${markerIndex} no longer exists, aborting countdown`);
+                        return;
+                    }
+
+                    // Kontrola, zda je popup stále otevřený
+                    if (!marker.isPopupOpen()) {
+                        console.warn(`Popup for marker ${markerIndex} is no longer open, aborting countdown`);
+                        return;
+                    }
+
+                    // Použijeme přímý selektor pro nalezení elementu odpočtu v aktuálním popup okně
+                    const popup = marker.getPopup();
+                    if (!popup) {
+                        console.error(`Popup for marker ${markerIndex} is undefined`);
+                        return;
+                    }
+
+                    const popupElement = popup.getElement();
+                    if (!popupElement) {
+                        console.error(`Popup element for marker ${markerIndex} is undefined`);
+                        return;
+                    }
+
+                    const countdownElement = popupElement.querySelector('.popup-countdown');
+                    if (!countdownElement) {
+                        console.error(`Countdown element for marker ${markerIndex} not found in popup`);
+                        return;
+                    }
+
                     // Nastavíme ID pro element odpočtu
                     const countdownId = `countdown-${markerIndex}`;
                     countdownElement.id = countdownId;
 
                     // Spuštění odpočtu
-                    console.log(`Starting countdown for marker ${markerIndex} with element:`, countdownElement);
+                    console.log(`Starting countdown for marker ${markerIndex} with element:`, countdownId);
                     startCountdown(countdownId, 35);
-                } else {
-                    console.error('Countdown element not found in popup');
+                } catch (timeoutError) {
+                    console.error(`Error in popupopen timeout for marker ${markerIndex}:`, timeoutError);
                 }
-            } else {
-                console.error('Popup element not found');
-            }
-        }, 300); // Počkáme 300ms na vykreslení DOM
+            }, 300); // Počkáme 300ms na vykreslení DOM
+        } catch (popupOpenError) {
+            console.error(`Error in popupopen event for marker ${markerIndex}:`, popupOpenError);
+        }
     });
 
-    // Přidání event listeneru pro zavření popup okna
+    // Přidání event listeneru pro zavření popup okna s robustním ošetřením chyb
     marker.on('popupclose', function() {
-        // Zrušení časovače při manuálním zavření popup okna
-        if (popupTimers[markerIndex]) {
-            clearTimeout(popupTimers[markerIndex]);
-            delete popupTimers[markerIndex];
-        }
+        try {
+            console.log(`Popup closed for marker ${markerIndex}`);
 
-        // Zrušení všech intervalů pro odpočet
-        Object.keys(countdownIntervals).forEach(key => {
-            if (key.startsWith(`countdown-${markerIndex}-`)) {
-                clearInterval(countdownIntervals[key]);
-                delete countdownIntervals[key];
+            // Zrušení časovače při manuálním zavření popup okna
+            try {
+                if (popupTimers && popupTimers[markerIndex]) {
+                    clearTimeout(popupTimers[markerIndex]);
+                    delete popupTimers[markerIndex];
+                    console.log(`Popup timer cleared for marker ${markerIndex}`);
+                }
+            } catch (timerError) {
+                console.error(`Error clearing popup timer for marker ${markerIndex}:`, timerError);
             }
-        });
+
+            // Zrušení všech intervalů pro odpočet
+            try {
+                const intervalKeys = Object.keys(countdownIntervals);
+                if (intervalKeys && intervalKeys.length > 0) {
+                    intervalKeys.forEach(key => {
+                        if (key.startsWith(`countdown-${markerIndex}`)) {
+                            try {
+                                clearInterval(countdownIntervals[key]);
+                                delete countdownIntervals[key];
+                                console.log(`Cleared interval: ${key}`);
+                            } catch (clearError) {
+                                console.error(`Error clearing interval ${key}:`, clearError);
+                            }
+                        }
+                    });
+                }
+            } catch (intervalsError) {
+                console.error(`Error clearing countdown intervals for marker ${markerIndex}:`, intervalsError);
+            }
+        } catch (popupCloseError) {
+            console.error(`Error in popupclose event for marker ${markerIndex}:`, popupCloseError);
+        }
     });
 
     // Pokud máme právě dva nebo více bodů, automaticky vypočítáme trasu
@@ -986,37 +1049,74 @@ map.on('zoomend', () => {
 
 // Event listenery pro pohyb mapy, aby se popup okna a trasy lépe chovaly při pohybu mapy
 map.on('movestart', () => {
-    // Přidání třídy pro animaci při pohybu mapy
-    document.querySelectorAll('.leaflet-popup').forEach(popup => {
-        popup.classList.add('moving');
-    });
+    try {
+        // Přidání třídy pro animaci při pohybu mapy
+        const popups = document.querySelectorAll('.leaflet-popup');
+        if (popups && popups.length > 0) {
+            popups.forEach(popup => {
+                if (popup) {
+                    popup.classList.add('moving');
+                }
+            });
+        }
 
-    // Optimalizace trasy při pohybu mapy
-    const routingPane = document.querySelector('.leaflet-overlay-pane');
-    if (routingPane) {
-        routingPane.classList.add('moving');
+        // Optimalizace trasy při pohybu mapy
+        const routingPane = document.querySelector('.leaflet-overlay-pane');
+        if (routingPane) {
+            routingPane.classList.add('moving');
+        }
+
+        // Pozastavení animací pro lepší výkon při pohybu mapy
+        console.log('Map movement started, optimizations applied');
+    } catch (error) {
+        console.error('Error in movestart event handler:', error);
     }
-
-    // Pozastavení animací pro lepší výkon při pohybu mapy
     document.body.classList.add('map-moving');
 });
 
 map.on('moveend', () => {
-    // Odstranění třídy po dokončení pohybu mapy
-    setTimeout(() => {
-        document.querySelectorAll('.leaflet-popup').forEach(popup => {
-            popup.classList.remove('moving');
-        });
+    try {
+        // Odstranění třídy po dokončení pohybu mapy
+        setTimeout(() => {
+            try {
+                const popups = document.querySelectorAll('.leaflet-popup');
+                if (popups && popups.length > 0) {
+                    popups.forEach(popup => {
+                        if (popup) {
+                            popup.classList.remove('moving');
+                        }
+                    });
+                }
 
-        // Obnovení trasy po dokončení pohybu mapy
-        const routingPane = document.querySelector('.leaflet-overlay-pane');
-        if (routingPane) {
-            routingPane.classList.remove('moving');
-        }
+                // Obnovení trasy po dokončení pohybu mapy
+                const routingPane = document.querySelector('.leaflet-overlay-pane');
+                if (routingPane) {
+                    routingPane.classList.remove('moving');
+                }
 
-        // Obnovení animací po dokončení pohybu mapy
+                // Obnovení animací po dokončení pohybu mapy
+                document.body.classList.remove('map-moving');
+
+                // Aktualizace velikosti mapy pro správné vykreslení trasy
+                try {
+                    map.invalidateSize();
+                    console.log('Map size invalidated after movement');
+                } catch (invalidateError) {
+                    console.error('Error invalidating map size:', invalidateError);
+                }
+
+                console.log('Map movement ended, optimizations removed');
+            } catch (timeoutError) {
+                console.error('Error in moveend timeout handler:', timeoutError);
+                // Záložní mechanismus pro případ chyby
+                document.body.classList.remove('map-moving');
+            }
+        }, 100);
+    } catch (error) {
+        console.error('Error in moveend event handler:', error);
+        // Záložní mechanismus pro případ chyby
         document.body.classList.remove('map-moving');
-    }, 100);
+    }
 });
 
 // Event listeners pro tlačítka
@@ -2327,8 +2427,23 @@ cancelSettingsButton.addEventListener('click', () => {
 function saveAppState() {
     console.log('Saving application state...');
     try {
+        // Kontrola dostupnosti localStorage
+        if (!window.localStorage) {
+            console.error('localStorage is not available');
+            return false;
+        }
+
         // Uložení markerů a jejich vlastností
         const markersData = [];
+
+        // Kontrola existence pole markerů
+        if (!markers || !Array.isArray(markers)) {
+            console.warn('Markers array is not properly initialized');
+            // Vytvoření prázdného pole pro markery
+            markers = [];
+        }
+
+        // Zpracování markerů s robustním ošetřením chyb
         for (let i = 0; i < markers.length; i++) {
             try {
                 const marker = markers[i];
@@ -2337,12 +2452,31 @@ function saveAppState() {
                     continue;
                 }
 
-                const props = markerProperties[i] || { name: `Bod ${i + 1}`, command: `bod${i + 1}` };
-                const latLng = marker.getLatLng();
+                // Získání vlastností markeru nebo vytvoření výchozích hodnot
+                let props;
+                try {
+                    props = markerProperties[i] || { name: `Bod ${i + 1}`, command: `bod${i + 1}` };
+                } catch (propsError) {
+                    console.warn(`Error getting marker properties for index ${i}, using defaults:`, propsError);
+                    props = { name: `Bod ${i + 1}`, command: `bod${i + 1}` };
+                }
 
+                // Získání souřadnic markeru
+                let lat, lng;
+                try {
+                    const latLng = marker.getLatLng();
+                    lat = latLng.lat;
+                    lng = latLng.lng;
+                } catch (latLngError) {
+                    console.warn(`Error getting marker coordinates for index ${i}, using defaults:`, latLngError);
+                    lat = 0;
+                    lng = 0;
+                }
+
+                // Přidání dat markeru do pole
                 markersData.push({
-                    lat: latLng.lat,
-                    lng: latLng.lng,
+                    lat: lat,
+                    lng: lng,
                     properties: props
                 });
             } catch (markerError) {
@@ -2407,27 +2541,75 @@ function saveAppState() {
             lastSaved: new Date().toISOString()
         };
 
-        // Uložení do localStorage
+        // Uložení do localStorage s kompresí dat a ošetřením chyb
         try {
+            // Kontrola velikosti dat před uložením
             const stateJson = JSON.stringify(appState);
-            localStorage.setItem('aiMapAppState', stateJson);
-            console.log('Application state successfully saved');
-            return true;
-        } catch (storageError) {
-            console.error('Error saving to localStorage:', storageError);
-            // Pokus o uložení zjednodušeného stavu v případě chyby (např. překročení limitu localStorage)
-            try {
+            const stateSize = new Blob([stateJson]).size;
+            console.log(`Application state size: ${stateSize} bytes`);
+
+            // Kontrola, zda velikost nepřekračuje limit localStorage (obvykle 5-10 MB)
+            if (stateSize > 4 * 1024 * 1024) { // 4 MB jako bezpeční limit
+                console.warn('Application state is too large, trying to compress');
+                // Zjednodušení stavu - odstranění nepotřebných dat
                 const simplifiedState = {
-                    markers: markersData.map(m => ({ lat: m.lat, lng: m.lng })),
+                    markers: markersData.map(m => ({
+                        lat: parseFloat(m.lat.toFixed(6)), // Snížení přesnosti souřadnic
+                        lng: parseFloat(m.lng.toFixed(6)),
+                        properties: {
+                            name: m.properties.name,
+                            command: m.properties.command,
+                            saved: m.properties.saved
+                        }
+                    })),
                     settings: settings,
+                    mapState: appState.mapState,
                     lastSaved: new Date().toISOString()
                 };
-                localStorage.setItem('aiMapAppState', JSON.stringify(simplifiedState));
-                console.log('Simplified application state saved as fallback');
+
+                // Pokus o uložení zjednodušeného stavu
+                const simplifiedJson = JSON.stringify(simplifiedState);
+                localStorage.setItem('aiMapAppState', simplifiedJson);
+                console.log('Compressed application state saved successfully');
+                return true;
+            } else {
+                // Standardní uložení, pokud je velikost v pořádku
+                localStorage.setItem('aiMapAppState', stateJson);
+                console.log('Application state successfully saved');
+                return true;
+            }
+        } catch (storageError) {
+            console.error('Error saving to localStorage:', storageError);
+
+            // Pokus o uložení minimálního stavu v případě chyby
+            try {
+                // Vytvoření extrémně zjednodušeného stavu
+                const minimalState = {
+                    markers: markersData.map(m => ({ lat: parseFloat(m.lat.toFixed(4)), lng: parseFloat(m.lng.toFixed(4)) })),
+                    settings: {
+                        darkMode: settings.darkMode,
+                        colorScheme: settings.colorScheme
+                    },
+                    lastSaved: new Date().toISOString()
+                };
+
+                // Pokus o uložení minimálního stavu
+                localStorage.setItem('aiMapAppState', JSON.stringify(minimalState));
+                console.log('Minimal application state saved as fallback');
                 return true;
             } catch (fallbackError) {
-                console.error('Failed to save even simplified state:', fallbackError);
-                return false;
+                console.error('Failed to save even minimal state:', fallbackError);
+
+                // Poslední pokus - vyčistít localStorage a uložit pouze nastavení
+                try {
+                    localStorage.removeItem('aiMapAppState');
+                    localStorage.setItem('aiMapAppState', JSON.stringify({ settings: { darkMode: settings.darkMode } }));
+                    console.log('Only basic settings saved as last resort');
+                    return true;
+                } catch (lastResortError) {
+                    console.error('All attempts to save state failed:', lastResortError);
+                    return false;
+                }
             }
         }
     } catch (error) {
@@ -2440,16 +2622,38 @@ function saveAppState() {
 function loadAppState() {
     console.log('Loading application state...');
     try {
-        const savedState = localStorage.getItem('aiMapAppState');
+        // Kontrola dostupnosti localStorage
+        if (!window.localStorage) {
+            console.error('localStorage is not available');
+            return false;
+        }
+
+        // Pokus o získání uloženého stavu
+        let savedState;
+        try {
+            savedState = localStorage.getItem('aiMapAppState');
+        } catch (storageError) {
+            console.error('Error accessing localStorage:', storageError);
+            return false;
+        }
+
+        // Kontrola existence uloženého stavu
         if (!savedState) {
             console.log('No saved application state found.');
             return false;
         }
 
+        // Parsování JSON
         let appState;
         try {
             appState = JSON.parse(savedState);
-            console.log('Application state loaded:', appState);
+            console.log('Application state loaded successfully');
+
+            // Validace načteného stavu
+            if (!appState || typeof appState !== 'object') {
+                console.error('Invalid application state format');
+                return false;
+            }
         } catch (parseError) {
             console.error('Error parsing saved state:', parseError);
             return false;
@@ -3988,3 +4192,61 @@ processUserInput = function(input) {
 
     return originalProcessUserInput(input);
 };
+
+// Funkce pro bezpečnou inicializaci aplikace
+function initializeApp() {
+    console.log('Initializing application...');
+    try {
+        // Kontrola, zda jsou všechny potřebné DOM elementy načteny
+        if (!document.getElementById('map')) {
+            console.error('Map container not found');
+            return false;
+        }
+
+        // Načtení uloženého stavu aplikace
+        try {
+            loadAppState();
+            console.log('Application state loaded successfully');
+        } catch (loadError) {
+            console.error('Error loading application state:', loadError);
+            // Pokračujeme i při chybě načtení stavu
+        }
+
+        // Vyčištění chat okna od výchozích zpráv
+        try {
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                chatMessages.innerHTML = '';
+                addMessage('Vítejte v aplikaci AIMapa! Jak vám mohu pomoci?', false);
+            }
+        } catch (chatError) {
+            console.error('Error initializing chat:', chatError);
+        }
+
+        // Kontrola a inicializace globálních proměnných
+        if (!markers) markers = [];
+        if (!markerProperties) markerProperties = [];
+        if (!popupTimers) popupTimers = {};
+        if (!countdownIntervals) countdownIntervals = {};
+        if (!deletedMarkerCommands) deletedMarkerCommands = [];
+
+        console.log('Application initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('Critical error during application initialization:', error);
+        // Zobrazení chybové hlášky uživateli
+        try {
+            const statusBar = document.querySelector('.status-bar');
+            if (statusBar) {
+                statusBar.style.backgroundColor = '#7f1d1d';
+                statusBar.innerHTML = '<span class="status-icon" style="color: #f87171;">✗</span> Došlo k chybě při inicializaci aplikace. Zkuste obnovit stránku.';
+            }
+        } catch (statusError) {
+            console.error('Error updating status bar:', statusError);
+        }
+        return false;
+    }
+}
+
+// Spuštění inicializace po načtení stránky
+document.addEventListener('DOMContentLoaded', initializeApp);
