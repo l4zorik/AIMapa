@@ -6,31 +6,52 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 ### Nouzová oprava s minimalistickým skriptem
 
-Tato verze představuje nouzové řešení pro zajištění základní funkčnosti aplikace. Vzhledem k přetrvávajícím problémům s původním skriptem byl vytvořen zcela nový, minimalistický skript, který obsahuje pouze základní funkce pro práci s mapou.
+Tato verze představuje radikální nouzové řešení pro zajištění základní funkčnosti aplikace. Po mnoha nespěšných pokusech o opravu původního skriptu bylo rozhodnuto vytvořit zcela nový, minimalistický skript, který obsahuje pouze základní funkce pro práci s mapou. Tento přístup eliminuje všechny potenciální zdroje problémů a zajišťuje stabilní funkčnost aplikace.
 
 #### Klíčové změny
-- Vytvořen nový soubor `script_new.js` s minimalistickým kódem
-- Původní skript `script.js` byl dočasně deaktivován
-- Implementovány pouze základní funkce pro zajištění funkčnosti mapy
+- Vytvořen zcela nový soubor `script_new.js` s minimalistickým kódem (pouze 300 řádků oproti původním 4000+)
+- Původní skript `script.js` byl dočasně deaktivován v index.html pomocí komentářů
+- Implementovány pouze základní funkce pro zajištění funkčnosti mapy bez zbytečných komplikací
 - Odstraněny všechny pokročilé funkce, které mohly způsobovat nestabilitu
 - Zjednodušeno uživatelské rozhraní pro maximální spolehlivost
+- Přidán podrobný návod pro uživatele v souboru EMERGENCY_README.md
 
 #### Funkční prvky v této verzi
-- Základní zobrazení mapy
-- Přidávání bodů na mapu pomocí dvojkliku
-- Odstranění bodů z mapy
-- Výpočet trasy mezi body (přímá čára)
+- Základní zobrazení mapy s OpenStreetMap podklady
+- Přidávání bodů na mapu pomocí dvojkliku s okamžitou odezvou
+- Odstranění bodů z mapy pomocí popup oken
+- Výpočet trasy mezi body (přímá čára) s informacemi o vzdálenosti a čase
 - Základní funkce tlačítek (přidání aktivity, výpočet trasy, vymazání mapy, tisk)
-- Fullscreen režim
-- Základní chat rozhraní (bez pokročilých funkcí)
+- Fullscreen režim s plnou funkčností
+- Základní chat rozhraní pro jednoduchou komunikaci
+- Zobrazení souřadnic při pohybu myši nad mapou
+- Automatické přepočítávání trasy při přesunu bodů
+
+#### Technické vylepšení
+- Zcela nová architektura kódu s důrazem na jednoduchost a čitelnost
+- Odstranění všech zbytečných závislostí a externích knihoven
+- Použití pouze základních funkcí Leaflet.js pro maximální stabilitu
+- Implementace robustního ošetření chyb ve všech částech aplikace
+- Optimalizace výkonu díky odstranění zbytečných výpočtů a animací
+- Zjednodušené ukládání stavu aplikace bez použití localStorage
+- Odstranění všech potenciálních zdrojů memory leaků
 
 #### Omezení této verze
 - Nefunkční pokročilé funkce (glóbus režim, 3D budovy, atd.)
 - Zjednodušené zobrazení bodů na mapě bez pokročilých efektů
-- Omezená funkcionalita chatu (bez zpracování příkazů)
-- Nefunkční nastavení aplikace
+- Omezená funkcionalita chatu (bez zpracování příkazů jako "alexa" nebo "oteviracidoba")
+- Nefunkční nastavení aplikace (ozubené kolečko)
+- Chybí pokročilé animace a vizualizační efekty
+- Chybí ukládání stavu aplikace mezi relacemi
 
-Tato verze je určena jako dočasné řešení, dokud nebude možné opravit všechny problémy v původním skriptu. Přestože nabízí pouze základní funkce, měla by být stabilní a spolehlivá.
+#### Plán pro budoucnost
+- Postupné přidávání pokročilých funkcí zpět do nového skriptu, ale s důrazem na stabilitu
+- Analýza původního skriptu a identifikace konkrétních příčin problémů
+- Vytvoření nové, stabilnější verze s plnou funkcionalitou
+- Implementace lepšího systému pro správu stavu aplikace
+- Vylepšení uživatelského rozhraní s důrazem na jednoduchost a přehlednost
+
+Tato verze je určena jako dočasné řešení, dokud nebude možné opravit všechny problémy v původním skriptu. Přestože nabízí pouze základní funkce, měla by být stabilní, spolehlivá a použitelná pro základní práci s mapou.
 
 # Můj osobní plán na vývoj
 
