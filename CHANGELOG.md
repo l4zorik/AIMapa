@@ -25,6 +25,125 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.2.6] - 2025-04-20
+
+### Opraveno
+- Opravena nefunkčnost ukládání bodů na mapě
+- Opravena nefunkčnost zobrazení trasy mezi body
+- Opravena nefunkčnost nastavení aplikace
+- Opravena nefunkčnost fullscreen režimu
+- Přidáno podrobné logování pro lepší diagnostiku problémů
+- Vylepšeno ošetření chyb při práci s mapou a jejími funkcemi
+- Optimalizována funkce pro výpočet trasy s použitím přímé čáry místo nespolehlivejšího API
+- Vylepšeno ošetření chyb při přepínání do fullscreen režimu
+
+## [0.2.5] - 2025-04-19
+
+### Přidáno
+- Vylepšení glóbus režimu s plynulým přepínáním
+- Optimalizace načítání 3D planety s mapou
+- Vylepšení zobrazení bodů na 3D glóbusu s barevným rozlišením
+- Vylepšení tras na glóbusu s popisky vzdáleností
+- Vylepšení ovládacích prvků pro rotaci a zoom glóbusu
+- Optimalizace výkonu při práci s 3D glóbusem
+- Zachování kompatibility s přímým spuštěním z filesystému
+- Přidáno tlačítko pro glóbus režim do hlavního rozhraní (mimo fullscreen)
+
+### Odstraněno
+- Odstraněn 3D režim, který byl nahrazen vylepšeným glóbus režimem
+- Odstraněny všechny reference na 3D režim z kódu a stylů
+
+### Vylepšeno
+- Vylepšeny CSS styly pro glóbus režim a Cesium entity
+- Optimalizována inicializace Cesium Vieweru pro lepší výkon
+- Vylepšeno ošetření chyb při práci s glóbusem
+- Vylepšeno zobrazení infoboxu při kliknutí na body na glóbusu
+
+### Opraveno
+- Opravena chyba, kdy nebylo možné aktivovat glóbus režim mimo fullscreen mód
+- Odstraněny zbylé reference na funkci toggle3DMode
+
+## [0.2.4] - 2025-04-19 - STABILNÍ VERZE
+
+### Opraveno
+- Opraven závažný problém s nefunkční mapou po předchozích úpravách
+- Návrat k funkční verzi 0.2.0 bez externího cesium-handler.js modulu
+- Zachována funkčnost 3D glóbus režimu v původní implementaci
+- Vylepšeno ošetření chyb při inicializaci a používání Cesium
+- Optimalizována funkce `toggleGlobeMode` pro spolehlivější přepínání režimů
+- Implementováno automatické zobrazení/skrytí Cesium containeru při přepínání režimů
+- Vylepšena kontrola stavu Cesium Vieweru před jeho použitím
+- Optimalizována práce s DOM elementy pro lepší výkon a stabilitu
+- Opraveno spuštění aplikace přímo z filesystému bez nutnosti webového serveru
+
+### Poznámky
+- Tato verze je označena jako stabilní a funkční
+- V případě problémů v budoucích verzích se vždy vracíme k této verzi
+- Obsahuje základní funkčnost mapy, chatu a bodů
+- Obsahuje funkční 3D glóbus režim v původní implementaci
+
+## [0.2.4] - 2025-04-18 - STABILNÍ VERZE
+
+### Opraveno
+- Opraven závažný problém s nefunkční mapou po předchozích úpravách
+- Návrat k funkční verzi 0.2.0 bez externího cesium-handler.js modulu
+- Zachována funkčnost 3D glóbus režimu v původní implementaci
+- Vylepšeno ošetření chyb při inicializaci a používání Cesium
+- Optimalizována funkce `toggleGlobeMode` pro spolehlivější přepínání režimů
+- Implementováno automatické zobrazení/skrytí Cesium containeru při přepínání režimů
+- Vylepšena kontrola stavu Cesium Vieweru před jeho použitím
+- Optimalizována práce s DOM elementy pro lepší výkon a stabilitu
+- Opraveno spuštění aplikace přímo z filesystému bez nutnosti webového serveru
+
+### Poznámky
+- Tato verze je označena jako stabilní a funkční
+- V případě problémů v budoucích verzích se vždy vracíme k této verzi
+- Obsahuje základní funkčnost mapy, chatu a bodů
+- Obsahuje funkční 3D glóbus režim v původní implementaci
+
+## [0.2.3] - 2025-04-18
+
+### Přepracováno
+- Kompletní přepracování 3D glóbus režimu s interaktivními ovládacími prvky
+- Přidání loading overlay pro lepší uživatelský zážitek při načítání glóbusu
+- Implementace interaktivních ovládacích prvků pro rotaci a zoom glóbusu
+- Použití Bing Maps s lepší kvalitou zobrazení
+- Přidání terénu pro realističtější vzhled planety
+- Přidání hvězdné oblohy a atmosféry pro lepší vizuální dojem
+- Optimalizace CSS stylů pro správné zobrazení všech komponent
+- Implementace funkcí pro rotaci a zoom glóbusu
+
+## [0.2.2] - 2025-04-18
+
+### Přepracováno
+- Kompletní přepracování inicializace glóbus režimu pro správné zobrazení planety
+- Použití CDN pro lepší dostupnost Cesium.js knihovny
+- Vylepšené ošetření chyb při inicializaci Cesium Vieweru
+- Přidání testovacího markeru pro ověření funkčnosti glóbusu
+- Použití jednodušších bodů místo billboardů pro lepší výkon
+- Optimalizace CSS stylů pro správné zobrazení glóbusu
+- Vynucení překreslení scény po dokončení animace
+
+## [0.2.1] - 2025-04-18
+
+### Opraveno
+- Opravena funkčnost tlačítek 3D a glóbus režimu ve fullscreen módu
+- Přidáno podrobné logování pro diagnostiku problémů s tlačítky
+- Implementováno inteligentní vyhledávání tlačítek podle kontextu (fullscreen nebo normální režim)
+- Zlepšena odolnost kódu proti chybám při práci s tlačítky
+
+## [0.2.0] - 2025-04-18
+
+### Přepracováno
+- Kompletní přepracování glóbus režimu pro správné zobrazení planety
+- Nový přístup k inicializaci Cesium Vieweru s lepším nastavením
+- Vylepšené zobrazení markerů a tras na glóbusu
+- Optimalizováno nastavení kamery pro lepší pohled na glóbus
+- Přidáno podrobné logování pro diagnostiku problémů
+- Vylepšeny CSS styly pro správné zobrazení všech komponent Cesium
+- Optimalizována práce s Cesium entitami pro lepší výkon
+- Implementováno správné čištění zdrojů při deaktivaci glóbus režimu
+
 ## [0.1.9] - 2025-04-18
 
 ### Změněno
@@ -437,7 +556,46 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidána další nastavení scény pro lepší zobrazení glóbusu
 - Vylepšeno nastavení pozadí pro lepší kontrast a viditelnost
 
-#### Plánované funkce pro verzi 0.2.0 (Květen 2025)
+### Verze 0.2.0 (Duben 2025)
+#### Kompletní přepracování glóbus režimu
+- Kompletní přepracování glóbus režimu pro správné zobrazení planety
+- Nový přístup k inicializaci Cesium Vieweru s lepším nastavením
+- Vylepšené zobrazení markerů a tras na glóbusu
+- Optimalizováno nastavení kamery pro lepší pohled na glóbus
+- Přidáno podrobné logování pro diagnostiku problémů
+- Vylepšeny CSS styly pro správné zobrazení všech komponent Cesium
+- Optimalizována práce s Cesium entitami pro lepší výkon
+- Implementováno správné čištění zdrojů při deaktivaci glóbus režimu
+
+### Verze 0.2.1 (Duben 2025)
+#### Oprava funkčnosti tlačítek
+- Opravena funkčnost tlačítek 3D a glóbus režimu ve fullscreen módu
+- Přidáno podrobné logování pro diagnostiku problémů s tlačítky
+- Implementováno inteligentní vyhledávání tlačítek podle kontextu (fullscreen nebo normální režim)
+- Zlepšena odolnost kódu proti chybám při práci s tlačítky
+
+### Verze 0.2.2 (Duben 2025)
+#### Oprava glóbus režimu
+- Kompletní přepracování inicializace glóbus režimu pro správné zobrazení planety
+- Použití CDN pro lepší dostupnost Cesium.js knihovny
+- Vylepšené ošetření chyb při inicializaci Cesium Vieweru
+- Přidání testovacího markeru pro ověření funkčnosti glóbusu
+- Použití jednodušších bodů místo billboardů pro lepší výkon
+- Optimalizace CSS stylů pro správné zobrazení glóbusu
+- Vynucení překreslení scény po dokončení animace
+
+### Verze 0.2.3 (Duben 2025)
+#### Interaktivní 3D glóbus
+- Kompletní přepracování 3D glóbus režimu s interaktivními ovládacími prvky
+- Přidání loading overlay pro lepší uživatelský zážitek při načítání glóbusu
+- Implementace interaktivních ovládacích prvků pro rotaci a zoom glóbusu
+- Použití Bing Maps s lepší kvalitou zobrazení
+- Přidání terénu pro realističtější vzhled planety
+- Přidání hvězdné oblohy a atmosféry pro lepší vizualní dojem
+- Optimalizace CSS stylů pro správné zobrazení všech komponent
+- Implementace funkcí pro rotaci a zoom glóbusu
+
+#### Plánované funkce pro verzi 0.3.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
 - Přidání možnosti importu a exportu bodů ve formátech GPX, KML a GeoJSON
 - Implementace měření vzdáleností a ploch pomocí nástroje pro kreslení
