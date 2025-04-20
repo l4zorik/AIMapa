@@ -25,6 +25,39 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
+## [0.2.6.2] - 2025-04-20 - STABILIZAČNÍ VERZE
+
+### Oprava kritických problémů
+
+Tato verze se zaměřuje na opravu kritických problémů identifikovaných v předchozích verzích, zejména na problémy s asynchronním načítáním a event listenery. Implementovány byly následující opravy:
+
+#### 1. Oprava asynchronního načítání
+- Implementováno robustní ošetření chyb při asynchronních operacích
+- Přidány kontroly existence objektů před jejich použitím
+- Implementovány záložní mechanismy pro případ selhání asynchronních operací
+
+#### 2. Oprava problému s event listenery
+- Přepracován systém přidávání a odstraňování event listenerů
+- Implementována kontrola existence listenerů před jejich přidáním
+- Přidáno správné odregistrování listenerů při odstranění objektů
+
+#### 3. Oprava problému s localStorage
+- Implementována kontrola velikosti dat před uložením do localStorage
+- Přidána komprese dat pro snížení velikosti ukládaných dat
+- Implementovány záložní mechanismy pro případ překročení limitu localStorage
+
+#### 4. Bezpečná inicializace aplikace
+- Přidána nová funkce `initializeApp()` pro bezpečnou inicializaci aplikace
+- Implementována kontrola existence všech potřebných DOM elementů
+- Přidána inicializace globálních proměnných s výchozími hodnotami
+
+#### 5. Vylepšení ošetření chyb
+- Přidáno podrobné logování chyb pro snadnější diagnostiku
+- Implementovány try-catch bloky kolem všech kritických operací
+- Přidány záložní mechanismy pro případ selhání hlavních funkcí
+
+Tato verze významně zvyšuje stabilitu aplikace a měla by odstranit většinu problémů, které způsobovaly nestabilitu v předchozích verzích.
+
 ## [0.2.6.1] - 2025-04-20 - SPECIÁLNÍ OPRAVA
 
 ### Poznámka vývojáře
