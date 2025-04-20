@@ -2,6 +2,34 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.4] - 2025-04-20 - NÁVRAT KE STABILNÍ VERZI
+
+### Návrat k ověřené stabilní verzi
+
+Tato verze představuje návrat k poslední stabilní verzi 0.2.4, která poskytuje spolehlivou funkčnost všech základních funkcí aplikace. Po několika pokusech o opravu problémů v novějších verzích bylo rozhodnuto vrátit se k této ověřené verzi a zachovat dokumentaci o provedených změnách pro případné budoucí využití.
+
+#### Klíčové změny
+- Návrat k původnímu skriptu `script.js` místo opravného skriptu `fix.js`
+- Zachování všech funkcí stabilní verze 0.2.4
+- Zachování dokumentace o provedených změnách v novějších verzích
+- Označení verze 0.2.4 jako hlavní stabilní verze pro další vývoj
+
+#### Funkční prvky v této verzi
+- Základní zobrazení mapy s OpenStreetMap podklady
+- Přidávání bodů na mapu pomocí dvojkliku
+- Výpočet trasy mezi body s informacemi o vzdálenosti a čase
+- Funkční chat rozhraní s podporou příkazů (alexa, oteviracidoba)
+- Funkční 3D glóbus režim v původní implementaci
+- Fullscreen režim s plnou funkčností
+- Nastavení aplikace (tmavý režim, barevné schéma, design bodů)
+- Ukládání stavu aplikace mezi relacemi
+
+#### Poznámky
+- Tato verze je označena jako stabilní a funkční
+- V případě problémů v budoucích verzích se vždy vracíme k této verzi
+- Obsahuje základní funkčnost mapy, chatu a bodů
+- Obsahuje funkční 3D glóbus režim v původní implementaci
+
 # Můj osobní plán na vývoj
 
 ## Úkol 1
