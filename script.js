@@ -1505,14 +1505,58 @@ function toggleChatPosition() {
     }
 }
 
+// Funkce pro generování odpovědi s návrhy dalších akcí
+function generateResponseWithSuggestions(message) {
+    // Získání odpovědi z původní funkce
+    const response = processUserInput(message);
+
+    // Generování návrhů na základě obsahu odpovědi a zprávy
+    let suggestions = [];
+
+    // Základní návrhy pro různé typy dotazů
+    if (message.toLowerCase().includes('bod') || response.toLowerCase().includes('bod')) {
+        suggestions.push('Seznam bodů', 'Přidat aktivitu', 'Vypočítat trasu');
+    }
+
+    if (message.toLowerCase().includes('trasa') || response.toLowerCase().includes('trasa') ||
+        message.toLowerCase().includes('cesta') || response.toLowerCase().includes('cesta')) {
+        suggestions.push('Vypočítat trasu', 'Seznam bodů');
+    }
+
+    if (message.toLowerCase().includes('otevírací') || response.toLowerCase().includes('otevírací') ||
+        message.toLowerCase().includes('obchod') || response.toLowerCase().includes('obchod')) {
+        suggestions.push('Otevírací doba');
+    }
+
+    if (message.toLowerCase().includes('klub') || response.toLowerCase().includes('klub') ||
+        message.toLowerCase().includes('alexa') || response.toLowerCase().includes('alexa')) {
+        suggestions.push('Alexa');
+    }
+
+    if (message.toLowerCase().includes('glóbus') || response.toLowerCase().includes('glóbus')) {
+        suggestions.push('Glóbus');
+    }
+
+    // Pokud nemáme žádné specifické návrhy, přidáme obecné
+    if (suggestions.length === 0) {
+        suggestions = ['Přidat aktivitu', 'Seznam bodů', 'Vypočítat trasu', 'Nastavení'];
+    }
+
+    // Omezení počtu návrhů na 4
+    if (suggestions.length > 4) {
+        suggestions = suggestions.slice(0, 4);
+    }
+
+    return { response, suggestions };
+}
+
 // Funkce pro zpracování zprávy z chatu
 function processMessage(message) {
     // Přidání zprávy uživatele do chatu
     addMessage(message, true);
 
-    // Simulace odpovědi AI
+    // Simulace odpovědi AI s návrhy dalších akcí
     setTimeout(() => {
-        // Získání odpovědi a návrhů dalších akcí
         const { response, suggestions } = generateResponseWithSuggestions(message);
         addMessage(response, false, suggestions);
     }, 500);
@@ -1575,36 +1619,38 @@ const chatMessages = document.getElementById('chatMessages');
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendMessage');
 
-function addMessage(message, isUser = false, suggestions = []) {
+function addMessage(message, isUser = false, suggestions = null) {
+    // Vytvoření kontejneru pro zprávu a případné návrhy
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'message-container';
+
+    // Vytvoření elementu pro zprávu
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+    messageDiv.textContent = message;
+    messageContainer.appendChild(messageDiv);
 
-    // Vytvoření obsahu zprávy
-    const messageContent = document.createElement('div');
-    messageContent.className = 'message-content';
-    messageContent.textContent = message;
-    messageDiv.appendChild(messageContent);
-
-    // Přidání návrhů dalších akcí, pokud existují a nejde o zprávu uživatele
-    if (!isUser && suggestions && suggestions.length > 0) {
+    // Přidání návrhů dalších akcí, pokud existují
+    if (!isUser && suggestions && Array.isArray(suggestions) && suggestions.length > 0) {
         const suggestionsContainer = document.createElement('div');
-        suggestionsContainer.className = 'message-suggestions';
+        suggestionsContainer.className = 'suggestions-container';
 
         suggestions.forEach(suggestion => {
             const suggestionBtn = document.createElement('button');
             suggestionBtn.className = 'suggestion-btn';
             suggestionBtn.textContent = suggestion;
             suggestionBtn.addEventListener('click', () => {
-                // Při kliknutí na návrh se zpráva odešle jako by ji napsal uživatel
+                // Při kliknutí na návrh se chová jako by uživatel napsal zprávu
                 processMessage(suggestion);
             });
             suggestionsContainer.appendChild(suggestionBtn);
         });
 
-        messageDiv.appendChild(suggestionsContainer);
+        messageContainer.appendChild(suggestionsContainer);
     }
 
-    chatMessages.appendChild(messageDiv);
+    // Přidání kontejneru do chatu
+    chatMessages.appendChild(messageContainer);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     // Aktualizace plovoucího chatu, pokud existuje
@@ -1615,28 +1661,24 @@ function addMessage(message, isUser = false, suggestions = []) {
 function updateFloatingChat() {
     const floatingChatMessages = document.getElementById('floatingChatMessages');
     if (floatingChatMessages && isFullscreen) {
-        // Kopírujeme obsah chatu včetně všech event listenerů
-        floatingChatMessages.innerHTML = '';
-
-        // Kopírujeme všechny zprávy z originálního chatu
-        Array.from(chatMessages.children).forEach(messageNode => {
-            const clonedNode = messageNode.cloneNode(true);
-
-            // Pokud má zpráva návrhy akcí, přidáme event listenery
-            const suggestionsContainer = clonedNode.querySelector('.message-suggestions');
-            if (suggestionsContainer) {
-                const suggestionButtons = suggestionsContainer.querySelectorAll('.suggestion-btn');
-                suggestionButtons.forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        processMessage(btn.textContent);
-                    });
-                });
-            }
-
-            floatingChatMessages.appendChild(clonedNode);
-        });
-
+        // Kopírujeme obsah chatu do plovoucího chatu
+        floatingChatMessages.innerHTML = chatMessages.innerHTML;
         floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+
+        // Znovu přidáme event listenery pro tlačítka návrhů v plovoucím chatu
+        const suggestionBtns = floatingChatMessages.querySelectorAll('.suggestion-btn');
+        suggestionBtns.forEach(btn => {
+            // Odstraníme původní event listenery
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+
+            // Přidáme nový event listener
+            newBtn.addEventListener('click', () => {
+                // Při kliknutí na návrh se chová jako by uživatel napsal zprávu
+                const suggestion = newBtn.textContent;
+                processMessage(suggestion);
+            });
+        });
     }
 }
 
@@ -2244,151 +2286,82 @@ function addRoutesToGlobe() {
     }
 }
 
-// Funkce pro generování odpovědi s návrhy dalších akcí
-function generateResponseWithSuggestions(input) {
-    // Použití vylepšeného zpracování vstupu, pokud je k dispozici
-    if (typeof enhancedProcessUserInput === 'function') {
-        const response = enhancedProcessUserInput(input);
-        return {
-            response,
-            suggestions: generateSuggestions(input, response)
-        };
-    }
-
-    // Záložní implementace pro případ, že vylepšený modul není načten
+// Funkce pro zpracování uživatelského vstupu
+function processUserInput(input) {
+    // Jednoduchá simulace AI odpovědí
     const lowercaseInput = input.toLowerCase();
-    let response = '';
-    let suggestions = [];
 
     // Kontrola příkazu "alexa"
     if (lowercaseInput === 'alexa') {
-        response = showRohatecClub();
-        suggestions = ['Rezervovat tanečnici', 'Otevírací doba', 'Jak se dostanu do Rohatce?'];
+        return showRohatecClub();
     }
+
     // Kontrola příkazu "oteviracidoba"
-    else if (lowercaseInput === 'oteviracidoba' || lowercaseInput.includes('otevíraci doba') || lowercaseInput.includes('oteviraci doba')) {
-        response = showOpeningHours();
-        suggestions = ['Kaufland Hodonín', 'Albert Hodonín', 'Jak se dostanu do Hodonína?'];
+    if (lowercaseInput === 'oteviracidoba' || lowercaseInput.includes('otevíraci doba') || lowercaseInput.includes('oteviraci doba')) {
+        return showOpeningHours();
     }
+
     // Kontrola příkazů pro body
-    else {
-        let foundMarker = false;
-
-        // Kontrola příkazů pro body
-        for (let i = 0; i < markerProperties.length; i++) {
-            if (markerProperties[i] && lowercaseInput === markerProperties[i].command.toLowerCase()) {
-                response = navigateToMarker(i);
-                suggestions = ['Vypočítat trasu', 'Přidat další bod', 'Smazat tento bod'];
-                foundMarker = true;
-                break;
-            }
-        }
-
-        // Kontrola příkazů pro smazané body
-        if (!foundMarker) {
-            for (let i = 0; i < deletedMarkerCommands.length; i++) {
-                if (lowercaseInput === deletedMarkerCommands[i].command.toLowerCase()) {
-                    response = navigateToDeletedMarker(i);
-                    suggestions = ['Obnovit bod', 'Přidat nový bod', 'Seznam bodů'];
-                    foundMarker = true;
-                    break;
-                }
-            }
-        }
-
-        // Kontrola obecných příkazů
-        if (!foundMarker) {
-            if (lowercaseInput.includes('ahoj') || lowercaseInput.includes('čau') || lowercaseInput.includes('dobrý den')) {
-                response = 'Dobrý den! Jak vám mohu pomoci s plánováním vašich aktivit?';
-                suggestions = ['Přidat aktivitu', 'Vypočítat trasu', 'Otevírací doba', 'Alexa'];
-            } else if (lowercaseInput.includes('trasa') || lowercaseInput.includes('cesta')) {
-                response = 'Pro výpočet trasy přidejte alespoň dva body na mapu a klikněte na tlačítko "Vypočítat trasu".';
-                suggestions = ['Přidat aktivitu', 'Seznam bodů', 'Vymazat mapu'];
-            } else if (lowercaseInput.includes('aktivita') || lowercaseInput.includes('bod')) {
-                response = 'Pro přidání aktivity klikněte na tlačítko "Přidat aktivitu" a poté klikněte na místo na mapě.';
-                suggestions = ['Seznam bodů', 'Vypočítat trasu', 'Vymazat mapu'];
-            } else if (lowercaseInput.includes('tisk') || lowercaseInput.includes('vytisknout')) {
-                response = 'Pro tisk mapy klikněte na tlačítko "Vytisknout mapu".';
-                suggestions = ['Přidat aktivitu', 'Vypočítat trasu', 'Vymazat mapu'];
-            } else if (lowercaseInput.includes('vymazat') || lowercaseInput.includes('smazat') || lowercaseInput.includes('reset')) {
-                // Vymazání všech bodů a tras
-                markers.forEach(marker => map.removeLayer(marker));
-                if (route) {
-                    map.removeLayer(route);
-                }
-
-                // Vymazání trasy vytvořené pomocí Leaflet Routing Machine
-                if (routeControl) {
-                    map.removeControl(routeControl);
-                    routeControl = null;
-                }
-
-                markers = [];
-                markerProperties = [];
-                route = null;
-
-                // Reset informací o trase
-                routeDistanceElement.textContent = '-';
-                routeTimeElement.textContent = '-';
-
-                // Uložení stavu aplikace po vymazání mapy
-                saveAppState();
-
-                response = 'Mapa byla vyčištěna.';
-                suggestions = ['Přidat aktivitu', 'Alexa', 'Otevírací doba'];
-            } else if (lowercaseInput.includes('seznam bodů') || lowercaseInput.includes('ukaž body')) {
-                if (markers.length === 0) {
-                    response = 'Na mapě nejsou žádné body.';
-                    suggestions = ['Přidat aktivitu', 'Alexa', 'Otevírací doba'];
-                } else {
-                    response = 'Seznam bodů na mapě:\n';
-                    markerProperties.forEach((prop, index) => {
-                        response += `${index + 1}. ${prop.name} - příkaz: "${prop.command}"\n`;
-                    });
-                    suggestions = ['Vypočítat trasu', 'Přidat další bod', 'Vymazat mapu'];
-                }
-            } else if (lowercaseInput.includes('glob') || lowercaseInput.includes('3d')) {
-                response = 'Pro aktivaci glóbus režimu klikněte na tlačítko "Glóbus" v ovládacích prvcích mapy. Pro 3D režim klikněte na tlačítko "3D režim".';
-                suggestions = ['Přepnout na glóbus', 'Aktivovat 3D režim', 'Zpět na 2D mapu'];
-            } else {
-                response = 'Omlouvám se, nerozumím vašemu požadavku. Můžete se zeptat na přidání aktivit, výpočet trasy nebo tisk mapy.';
-                suggestions = ['Přidat aktivitu', 'Vypočítat trasu', 'Seznam bodů', 'Alexa'];
-            }
+    for (let i = 0; i < markerProperties.length; i++) {
+        if (markerProperties[i] && lowercaseInput === markerProperties[i].command.toLowerCase()) {
+            return navigateToMarker(i);
         }
     }
 
-    return { response, suggestions };
-}
-
-// Funkce pro generování návrhů na základě kontextu
-function generateSuggestions(input, response) {
-    // Základní návrhy pro různé kontexty
-    const defaultSuggestions = ['Přidat aktivitu', 'Vypočítat trasu', 'Seznam bodů'];
-
-    // Pokud je odpověď prázdná nebo neexistuje, vrátíme výchozí návrhy
-    if (!response) return defaultSuggestions;
-
-    // Kontextové návrhy na základě obsahu odpovědi
-    if (response.includes('Rohatec') || response.includes('Alexa')) {
-        return ['Rezervovat tanečnici', 'Otevírací doba', 'Jak se dostanu do Rohatce?'];
-    } else if (response.includes('otevírací doba') || response.includes('Kaufland') || response.includes('Albert')) {
-        return ['Kaufland Hodonín', 'Albert Hodonín', 'Jak se dostanu do Hodonína?'];
-    } else if (response.includes('Navigace na bod')) {
-        return ['Vypočítat trasu', 'Přidat další bod', 'Smazat tento bod'];
-    } else if (response.includes('Mapa byla vyčištěna')) {
-        return ['Přidat aktivitu', 'Alexa', 'Otevírací doba'];
-    } else if (response.includes('Seznam bodů')) {
-        return ['Vypočítat trasu', 'Přidat další bod', 'Vymazat mapu'];
+    // Kontrola příkazů pro smazané body
+    for (let i = 0; i < deletedMarkerCommands.length; i++) {
+        if (lowercaseInput === deletedMarkerCommands[i].command.toLowerCase()) {
+            return navigateToDeletedMarker(i);
+        }
     }
 
-    // Pokud nemáme specifický kontext, vrátíme výchozí návrhy
-    return defaultSuggestions;
-}
+    // Kontrola obecných příkazů
+    if (lowercaseInput.includes('ahoj') || lowercaseInput.includes('čau') || lowercaseInput.includes('dobrý den')) {
+        return 'Dobrý den! Jak vám mohu pomoci s plánováním vašich aktivit?';
+    } else if (lowercaseInput.includes('trasa') || lowercaseInput.includes('cesta')) {
+        return 'Pro výpočet trasy přidejte alespoň dva body na mapu a klikněte na tlačítko "Vypočítat trasu".';
+    } else if (lowercaseInput.includes('aktivita') || lowercaseInput.includes('bod')) {
+        return 'Pro přidání aktivity klikněte na tlačítko "Přidat aktivitu" a poté klikněte na místo na mapě.';
+    } else if (lowercaseInput.includes('tisk') || lowercaseInput.includes('vytisknout')) {
+        return 'Pro tisk mapy klikněte na tlačítko "Vytisknout mapu".';
+    } else if (lowercaseInput.includes('vymazat') || lowercaseInput.includes('smazat') || lowercaseInput.includes('reset')) {
+        // Vymazání všech bodů a tras
+        markers.forEach(marker => map.removeLayer(marker));
+        if (route) {
+            map.removeLayer(route);
+        }
 
-// Původní funkce pro zpracování uživatelského vstupu (pro zpětnou kompatibilitu)
-function processUserInput(input) {
-    const { response } = generateResponseWithSuggestions(input);
-    return response;
+        // Vymazání trasy vytvořené pomocí Leaflet Routing Machine
+        if (routeControl) {
+            map.removeControl(routeControl);
+            routeControl = null;
+        }
+
+        markers = [];
+        markerProperties = [];
+        route = null;
+
+        // Reset informací o trase
+        routeDistanceElement.textContent = '-';
+        routeTimeElement.textContent = '-';
+
+        // Uložení stavu aplikace po vymazání mapy
+        saveAppState();
+
+        return 'Mapa byla vyčištěna.';
+    } else if (lowercaseInput.includes('seznam bodů') || lowercaseInput.includes('ukaž body')) {
+        if (markers.length === 0) {
+            return 'Na mapě nejsou žádné body.';
+        }
+
+        let response = 'Seznam bodů na mapě:\n';
+        markerProperties.forEach((prop, index) => {
+            response += `${index + 1}. ${prop.name} - příkaz: "${prop.command}"\n`;
+        });
+        return response;
+    } else {
+        return 'Omlouvám se, nerozumím vašemu požadavku. Můžete se zeptat na přidání aktivit, výpočet trasy nebo tisk mapy.';
+    }
 }
 
 sendButton.addEventListener('click', () => {
