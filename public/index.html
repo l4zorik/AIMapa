@@ -8,28 +8,25 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Modern UI CSS pro verzi 0.2.9.0 -->
     <link rel="stylesheet" href="modern-ui.css">
+    <!-- Oprava pro fullscreen režim -->
+    <link rel="stylesheet" href="fullscreen-fix.css">
     <!-- Leaflet CSS pro mapu -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
-    <!-- OSM Buildings CSS -->
-    <link rel="stylesheet" href="https://cdn.osmbuildings.org/4.1.1/OSMBuildings.css">
     <!-- Three.js pro 3D glóbus -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
     <!-- Globe.gl pro 3D glóbus -->
     <script src="https://unpkg.com/globe.gl@2.32.1/dist/globe.gl.min.js"></script>
-    <!-- Cesium CSS a JS (ponecháno pro zpětnou kompatibilitu) -->
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
+    <!-- Font Awesome ikony -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>AI Map - Into the known</h1>
             <button id="settingsButton" class="settings-button" aria-label="Nastavení">
-                <i class="icon">⚙️</i>
+                <i class="fas fa-cog"></i>
             </button>
         </header>
 
@@ -43,16 +40,16 @@
                 <h2>Mapa aktivit</h2>
                 <div class="map-wrapper">
                     <div id="map"></div>
-                    <div id="cesiumContainer" class="cesium-container"></div>
+
                     <div id="threeGlobeContainer" class="three-globe-container"></div>
                     <button id="fullscreenButton" class="map-control-btn" title="Fullscreen režim">
-                        <i class="icon">⛶</i>
+                        <i class="fas fa-expand"></i>
                     </button>
                     <button id="toggleGlobeMode" class="map-control-btn" title="Glóbus režim">
-                        <i class="icon">🌎</i>
+                        <i class="fas fa-globe"></i>
                     </button>
                     <button id="exitGlobeMode" class="map-control-btn" title="Zpět na mapu" style="display: none;">
-                        <i class="icon">🗺️</i>
+                        <i class="fas fa-map"></i>
                     </button>
                     <div id="coordinates" class="coordinates-display"></div>
                 </div>
@@ -71,16 +68,16 @@
 
                 <div class="controls">
                     <button class="btn" id="addActivity">
-                        <i class="icon">📍</i> Přidat aktivitu
+                        <i class="fas fa-map-pin"></i> Přidat aktivitu
                     </button>
                     <button class="btn" id="calculateRoute">
-                        <i class="icon">🗺️</i> Vypočítat trasu
+                        <i class="fas fa-route"></i> Vypočítat trasu
                     </button>
                     <button class="btn" id="clearMap">
-                        <i class="icon">🗑️</i> Vymazat mapu
+                        <i class="fas fa-trash"></i> Vymazat mapu
                     </button>
                     <button class="btn" id="printMap">
-                        <i class="icon">🖨️</i> Vytisknout mapu
+                        <i class="fas fa-print"></i> Vytisknout mapu
                     </button>
                 </div>
             </div>
@@ -89,18 +86,12 @@
                 <h2>AI Asistent</h2>
                 <div class="chat-messages" id="chatMessages">
                     <div class="message ai">
-                        Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
-                    </div>
-                    <div class="message ai">
-                        Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
-                    </div>
-                    <div class="message ai">
-                        Trasa byde vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
+                        Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?
                     </div>
                 </div>
                 <div class="chat-input">
                     <input type="text" id="messageInput" placeholder="Napište zprávu...">
-                    <button class="send-btn" id="sendMessage">➤</button>
+                    <button class="send-btn" id="sendMessage"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </main>
@@ -223,103 +214,13 @@
         </div>
     </div>
 
-    <!-- Dancer Reservation Modal -->
-    <div id="dancerReservationModal" class="modal">
-        <div class="modal-content dancer-modal-content">
-            <div class="modal-header">
-                <h2>Rezervace tanečnice</h2>
-                <span class="close-button dancer-close-button">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="dancer-selection-section">
-                    <h3>Vyberte tanečnici</h3>
-                    <div class="dancers-grid">
-                        <div class="dancer-card" data-dancer="Nikol">
-                            <div class="dancer-image-container">
-                                <div class="dancer-image dancer-image-1"></div>
-                            </div>
-                            <div class="dancer-info">
-                                <h4>Nikol</h4>
-                                <p>Věk: 23 | Výška: 175 cm</p>
-                                <div class="dancer-rating">★★★★★</div>
-                            </div>
-                        </div>
-                        <div class="dancer-card" data-dancer="Monika">
-                            <div class="dancer-image-container">
-                                <div class="dancer-image dancer-image-2"></div>
-                            </div>
-                            <div class="dancer-info">
-                                <h4>Monika</h4>
-                                <p>Věk: 25 | Výška: 168 cm</p>
-                                <div class="dancer-rating">★★★★★</div>
-                            </div>
-                        </div>
-                        <div class="dancer-card" data-dancer="Tereza">
-                            <div class="dancer-image-container">
-                                <div class="dancer-image dancer-image-3"></div>
-                            </div>
-                            <div class="dancer-info">
-                                <h4>Tereza</h4>
-                                <p>Věk: 24 | Výška: 172 cm</p>
-                                <div class="dancer-rating">★★★★★</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="reservation-details-section">
-                    <h3>Detaily rezervace</h3>
-                    <div class="form-group">
-                        <label for="dancerReservationDate">Datum:</label>
-                        <input type="date" id="dancerReservationDate" class="popup-input" value="">
-                    </div>
-                    <div class="form-group">
-                        <label for="dancerReservationTime">Hodina:</label>
-                        <input type="time" id="dancerReservationTime" class="popup-input" value="22:00">
-                    </div>
-                    <div class="form-group">
-                        <label for="dancerReservationHours">Počet hodin:</label>
-                        <select id="dancerReservationHours" class="popup-input">
-                            <option value="1">1 hodina (5000 Kč)</option>
-                            <option value="2" selected>2 hodiny (9000 Kč)</option>
-                            <option value="3">3 hodiny (12000 Kč)</option>
-                            <option value="4">4 hodiny (15000 Kč)</option>
-                            <option value="night">Celá noc (25000 Kč)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="dancerReservationName">Vaše jméno:</label>
-                        <input type="text" id="dancerReservationName" class="popup-input" placeholder="Zadejte vaše jméno">
-                    </div>
-                    <div class="form-group">
-                        <label for="dancerReservationContact">Kontakt:</label>
-                        <input type="text" id="dancerReservationContact" class="popup-input" placeholder="Telefon nebo email">
-                    </div>
-                    <div class="form-group">
-                        <label for="dancerReservationNote">Speciální požadavky:</label>
-                        <textarea id="dancerReservationNote" class="popup-input" placeholder="Např. preference hudby, speciální přání..."></textarea>
-                    </div>
-                </div>
-
-                <div class="reservation-terms">
-                    <p><strong>Poznámka:</strong> Rezervace je závazná a podléhá pravidlům klubu. Platba probíhá na místě. Storno rezervace je možné nejpozději 24 hodin před rezervovaným termínem.</p>
-                </div>
-
-                <div class="reservation-actions">
-                    <button id="confirmDancerReservation" class="btn primary-btn">Potvrdit rezervaci</button>
-                    <button id="cancelDancerReservation" class="btn secondary-btn">Zrušit</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Leaflet JS pro mapu -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- OpenRouteService API pro přesné směrování po silnicích -->
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-    <!-- OSM Buildings JS pro 3D budovy -->
-    <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
-    <!-- Cesium JS je již načten v hlavičce -->
+
     <!-- Přímá implementace Globe.gl -->
     <script src="globe-simple.js"></script>
     <!-- Rozšířené mapové funkce pro verzi 0.2.9.1 -->
@@ -336,5 +237,8 @@
     <script src="commands-dialog.js"></script>
     <!-- Hlavní skript aplikace -->
     <script src="script.js"></script>
+
+    <!-- Opravný nástroj pro načítání -->
+    <script src="fix-loader.js"></script>
 </body>
 </html>
