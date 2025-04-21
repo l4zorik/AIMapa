@@ -35,17 +35,49 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vylepšení rozpoznávání přirozeného jazyka pro lepší porozumění uživatelským dotazům
 - Přidání možnosti hlasového vstupu pro ovládání aplikace
 
-### Nové příkazy a funkce
+### Nové příkazy a funkce pro ovládání mapy přes chat
 
-- Příkaz "počasí" pro zobrazení aktuálního počasí v dané lokalitě
-- Příkaz "restaurace" pro vyhledání restaurací v okolí
-- Příkaz "ubytování" pro vyhledání hotelů a penzionů
-- Příkaz "zábava" pro vyhledání kulturních a zábavních míst
-- Příkaz "doprava" pro zobrazení informací o veřejné dopravě
+#### Příkazy pro navigaci a manipulaci s mapou
+- Příkaz "přiblížit" a "oddálit" pro změnu úrovně zoomu mapy
+- Příkaz "centrovat [místo]" pro vycentrování mapy na konkrétní lokalitu
+- Příkaz "přesunout na [souřadnice]" pro přesun mapy na zadané souřadnice
+- Příkaz "ukázat celý svět" pro zobrazení celé mapy světa
+- Příkaz "rotovat [stupeň]" pro rotaci mapy v glóbus režimu
+
+#### Příkazy pro práci s body
+- Příkaz "přidat bod [název] na [místo/souřadnice]" pro přidání nového bodu
+- Příkaz "upravit bod [název/číslo]" pro úpravu existujícího bodu
+- Příkaz "smazat bod [název/číslo]" pro odstranění bodu
+- Příkaz "přesunout bod [název/číslo] na [místo/souřadnice]" pro přesun bodu
+- Příkaz "najdi nejbližší bod" pro nalezení nejbližšího bodu k aktuálnímu středu mapy
+
+#### Příkazy pro práci s trasami
+- Příkaz "trasa z [bod A] do [bod B]" pro vytvoření trasy mezi dvěma body
+- Příkaz "trasa přes [bod A, bod B, ...]" pro vytvoření trasy přes více bodů
+- Příkaz "optimalizovat trasu" pro optimalizaci pořadí bodů v trase
+- Příkaz "vymazat trasu" pro odstranění aktuální trasy
+- Příkaz "uložit trasu jako [název]" pro uložení aktuální trasy
+- Příkaz "načíst trasu [název]" pro načtení uložené trasy
+
+#### Příkazy pro režimy zobrazení
+- Příkaz "přepnout na glóbus" pro přepnutí do glóbus režimu
+- Příkaz "přepnout na mapu" pro přepnutí do 2D režimu mapy
+- Příkaz "fullscreen" pro přepnutí do celoobrazovkového režimu
+- Příkaz "tmavý režim" a "světlý režim" pro přepnutí barevného schématu
+
+#### Informační příkazy
+- Příkaz "počasí v [místo]" pro zobrazení aktuálního počasí v dané lokalitě
+- Příkaz "restaurace v [místo]" pro vyhledání restaurací v okolí
+- Příkaz "ubytování v [místo]" pro vyhledání hotelů a penzionů
+- Příkaz "zábava v [místo]" pro vyhledání kulturních a zábavních míst
+- Příkaz "doprava v [místo]" pro zobrazení informací o veřejné dopravě
 - Příkaz "statistiky" pro zobrazení statistik o používání aplikace
-- Funkce pro sdílení tras a bodů s ostatními uživateli
+
+#### Pokročilé funkce
+- Funkce pro sdílení tras a bodů s ostatními uživateli přes URL nebo QR kód
 - Funkce pro export tras a bodů do různých formátů (GPX, KML, JSON)
-- Funkce pro import tras a bodů z externích zdrojů
+- Funkce pro import tras a bodů z externích zdrojů a souborů
+- Funkce pro automatické rozpoznávání míst a bodů zájmu v textu zprávy
 
 ### Vylepšení uživatelského rozhraní
 
