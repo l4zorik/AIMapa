@@ -25,6 +25,68 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9.0] - Plánovaná verze - CELKOVÉ ROZŠÍŘENÍ A VYLEPŠENÍ VZHLEDU
+
+### Moderní redesign uživatelského rozhraní
+
+- Kompletní přepracování uživatelského rozhraní s důrazem na moderní a čistý design
+- Implementace nového systému barev s lepším kontrastem a přístupností
+- Vylepšené tmavé téma s optimalizací pro noční používání
+- Nové animace a přechody pro plynulejší uživatelský zážitek
+- Redesign všech tlačítek, formulářů a ovládacích prvků
+- Vylepšená typografie pro lepší čitelnost na všech zařízeních
+- Optimalizace pro mobilní zařízení a tablety
+
+### Nové funkce pro práci s mapou
+
+- Přidání nových mapových podkladů (topografické, turistické, cyklistické)
+- Implementace pokročilého vyhledávání míst s našeptávačem
+- Možnost kreslení a měření na mapě (vzdálenosti, plochy, obvody)
+- Přidání vrstev s body zájmu (restaurace, hotely, památky, atd.)
+- Funkce pro sdílení aktuálního pohledu mapy přes URL nebo QR kód
+- Možnost přidání vlastních GeoJSON dat na mapu
+- Implementace clusteru pro přehlednější zobrazení více bodů v jedné oblasti
+
+### Rozšířené možnosti personalizace
+
+- Vytvoření uživatelských profilů s možností přihlášení
+- Ukládání oblíbených míst a tras do uživatelského profilu
+- Možnost přizpůsobení rozložení prvků v aplikaci
+- Nastavení výchozího pohledu mapy a preferovaných mapových podkladů
+- Systém motivů a barevných schémat s možností vlastního nastavení
+- Synchronizace nastavení mezi zařízeními
+- Exporty a importy uživatelských dat
+
+### Vylepšený systém navigace a plánování tras
+
+- Implementace multimodálního plánování tras (kombinace různých typů dopravy)
+- Zobrazení aktuálních dopravních informací a uzavírek
+- Vylepšený výškový profil trasy s detailními informacemi
+- Možnost plánování tras s více zastávkami a optimalizací pořadí
+- Ukládání a sdílení oblíbených tras
+- Offline navigace s hlasovými pokyny
+- Integrace s kalendářem pro plánování cest
+
+### Integrace sociálních funkcí
+
+- Možnost sdílení míst a tras na sociálních sítích
+- Systém hodnocení a recenzí míst
+- Vytváření a sdílení cestovních deníků
+- Možnost sledování přátel a zobrazení jejich aktivit na mapě
+- Komunitní funkce pro sdílení tipů a doporučení
+- Systém odznaků a úspěchů za navštívená místa
+- Gamifikace pro zvýšení motivace k používání aplikace
+
+### Vylepšení výkonu a stability
+
+- Optimalizace načítání mapových podkladů pro rychlejší zobrazení
+- Implementace pokročilého cachování pro snížení datového toku
+- Vylepšení stability při přepínání mezi 2D a 3D režimy
+- Optimalizace paměťové náročnosti pro lepší výkon na slabších zařízeních
+- Implementace progresivního načítání aplikace (PWA)
+- Vylepšení offline funkcionality
+- Automatické testování a monitorování výkonu
+
 ## [0.2.8.5] - Plánovaná verze - OPRAVY A VYLEPŠENÍ UŽIVATELSKÉHO ROZHRANÍ
 
 ### Opravy a vylepšení uživatelského rozhraní
