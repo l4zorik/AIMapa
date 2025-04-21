@@ -27,34 +27,120 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 ## [0.2.8.3] - Plánovaná verze - INTEGRACE PŘEDPOVĚDI POČASÍ
 
-### Integrace předpovědi počasí
+### Integrace reálných dat o počasí z internetu
 
-- Implementace API pro získávání aktuálních dat o počasí a předpovědi
-- Zobrazení aktuálního počasí pro libovolné místo na mapě
-- Zobrazení předpovědi počasí na 7 dní dopředu
-- Zobrazení hodinové předpovědi počasí pro následujících 48 hodin
-- Vizualizace počasí pomocí interaktivních ikon a grafů
-- Zobrazení detailních informací o počasí (teplota, vlhkost, tlak, vítr, srážky)
-- Zobrazení výstrah před extrémním počasím
-- Možnost přidání počasí jako vrstvu na mapu
+#### Integrace profesionálních meteorologických API
+- Implementace OpenWeatherMap API pro získávání přesných meteorologických dat
+- Integrace WeatherAPI.com pro získávání detailních předpovědí počasí
+- Využití AccuWeather API pro výstrahy a speciální meteorologické jevy
+- Implementace Windy API pro vizualizaci větru a proudění vzduchu
+- Integrace s Českým hydrometeorologickým ústavem pro lokální data
+- Automatické aktualizace dat v reálném čase (každých 30 minut)
 
-### Nové příkazy pro počasí
+#### Pokročilé zobrazení aktuálního počasí
+- Zobrazení aktuálního počasí pro libovolné místo na mapě s přesností na 500 metrů
+- Detailní informace o teplotě, pocitové teplotě, vlhkosti, tlaku, větru a viditelnosti
+- Zobrazení UV indexu, kvality vzduchu a koncentrace pylu
+- Informace o východu a západu slunce a měsíce
+- Zobrazení aktuálních srážek s intenzitou a pravděpodobností
+- Reálné fotografie oblohy z nejbližších meteorologických stanic
 
+#### Detailní předpověď počasí
+- Zobrazení předpovědi počasí na 14 dní dopředu s denními a nočními hodnotami
+- Hodinová předpověď počasí pro následujících 72 hodin s přesností na minuty
+- Detailní předpověď srážek včetně typu (déšť, sníh, kroupy) a intenzity
+- Předpověď větru včetně směru, rychlosti a nárazů
+- Předpověď bouřek a blesková aktivita v reálném čase
+- Historická data o počasí pro srovnání s aktuálními hodnotami
+
+#### Pokročilé meteorologické mapy a vizualizace
+- Interaktivní radarové mapy srážek s animací vývoje za posledních 6 hodin
+- Teplotní mapy s barevným rozlišením a izotermami
+- Mapy tlakových výtvorů a frontálních systémů
+- Vizualizace větru pomocí proudnic a vektorových polí
+- Satelitní snímky oblačnosti v reálném čase
+- 3D vizualizace počasí v glóbus režimu
+
+#### Systém výstrah a upozornění
+- Zobrazení oficiálních výstrah před extrémním počasím z ČHMÚ a ECMWF
+- Automatická upozornění na nebezpečné meteorologické jevy v oblasti uživatele
+- Detailní informace o výstrahách včetně stupně nebezpečí, časového období a doporučených opatření
+- Upozornění na blížící se bouřky, silný vítr nebo jiné nebezpečné jevy
+- Integrace s evropským systémem Meteoalarm
+
+### Rozšířené příkazy pro počasí
+
+#### Základní příkazy pro aktuální počasí
 - Příkaz "počasí nyní v [místo]" pro zobrazení aktuálního počasí
+- Příkaz "detailní počasí v [místo]" pro zobrazení všech dostupných meteorologických údajů
+- Příkaz "teplota v [místo]" pro rychlé zobrazení aktuální teploty
+- Příkaz "pocitová teplota v [místo]" pro zobrazení pocitové teploty
+- Příkaz "vlhkost v [místo]" pro zobrazení aktuální vlhkosti vzduchu
+- Příkaz "tlak v [místo]" pro zobrazení atmosférického tlaku
+
+#### Příkazy pro předpověď počasí
 - Příkaz "předpověď na [počet] dní v [místo]" pro zobrazení předpovědi na více dní
 - Příkaz "hodinová předpověď v [místo]" pro zobrazení hodinové předpovědi
+- Příkaz "předpověď na zítra v [místo]" pro rychlé zobrazení zítřejšího počasí
+- Příkaz "předpověď na víkend v [místo]" pro zobrazení počasí na nadcházející víkend
+- Příkaz "bude pršet v [místo]" pro informaci o pravděpodobnosti srážek
+- Příkaz "předpověď srážek v [místo]" pro detailní předpověď srážek
+
+#### Příkazy pro speciální meteorologické informace
 - Příkaz "výstrahy počasí v [místo]" pro zobrazení výstrah před extrémním počasím
+- Příkaz "vítr v [místo]" pro zobrazení aktuálního větru a jeho předpovědi
+- Příkaz "UV index v [místo]" pro zobrazení UV indexu a doporučení pro ochranu
+- Příkaz "kvalita vzduchu v [místo]" pro zobrazení informací o kvalitě vzduchu
+- Příkaz "východ/západ slunce v [místo]" pro časy východu a západu slunce
+- Příkaz "fáze měsíce" pro zobrazení aktuální fáze měsíce
+
+#### Příkazy pro počasí na trase a v oblasti
 - Příkaz "počasí na trase" pro zobrazení počasí podlé aktuální trasy
-- Příkaz "zobrazit vrstvu počasí" pro přidání vrstvy počasí na mapu
+- Příkaz "počasí po cestě z [místo A] do [místo B]" pro počasí na konkrétní trase
+- Příkaz "počasí v okolí [počet] km" pro zobrazení počasí v okruhu kolem aktuální pozice
+- Příkaz "nejlepší počasí v okolí" pro nalezení místa s nejlepším počasím v okolí
+
+#### Příkazy pro meteorologické mapy a vizualizace
+- Příkaz "radar srážek" pro zobrazení radarové mapy srážek
+- Příkaz "teplotní mapa" pro zobrazení teplotní mapy oblasti
+- Příkaz "mapa větru" pro zobrazení mapy větru
+- Příkaz "satelitní snímek" pro zobrazení satelitního snímku oblačnosti
+- Příkaz "zobrazit vrstvu počasí [typ]" pro přidání konkrétní vrstvy počasí na mapu
 - Příkaz "skrýt vrstvu počasí" pro odstranění vrstvy počasí z mapy
 
 ### Vylepšení uživatelského rozhraní pro počasí
 
-- Implementace interaktivního panelu pro zobrazení počasí
-- Animované ikony pro různé typy počasí
-- Grafy pro zobrazení vývoje teploty, srážek a dalších parametrů
-- Barevné označení extrémních hodnot počasí
-- Možnost přepnutí mezi různými jednotkami (Celsius/Fahrenheit, km/h / mph)
+#### Moderní design a interaktivní prvky
+- Implementace responzivního interaktivního panelu pro zobrazení počasí
+- Animované HD ikony pro různé typy počasí s realistickými efekty
+- Dynamické pozadí panelu podle aktuálního počasí a denní doby
+- Interaktivní grafy s možností přiblížení a zobrazení detailních hodnot
+- Animace přechodů mezi různými zobrazeními počasí
+- Podpora gest pro ovládání na dotykových zařízeních
+
+#### Pokročilé vizualizace meteorologických dat
+- Interaktivní grafy pro zobrazení vývoje teploty, srážek a dalších parametrů
+- Barevné označení extrémních hodnot počasí s upozorněními
+- Vizualizace větru pomocí animovaných větrných růžic a šipek
+- Animované zobrazení pohybu srážek a bouřek
+- 3D vizualizace teplotních vrstev a proudění vzduchu
+- Grafy vývoje počasí s možností porovnání s historickými daty
+
+#### Přizpůsobitelné nastavení zobrazení
+- Možnost přepnutí mezi různými jednotkami (Celsius/Fahrenheit, km/h / mph, hPa/inHg)
+- Nastavení úrovně detailu zobrazených informací (základní/rozšířené/expertní)
+- Volba barevného schématu pro grafy a mapy (standardní/vysokokontrastní/pro barvoslepé)
+- Možnost přizpůsobení rozložení prvků v panelu počasí
+- Nastavení preferovaných zdrojů meteorologických dat
+- Možnost uložení oblíbených lokalit pro rychlý přístup k počasí
+
+#### Integrace s ostatními částmi aplikace
+- Zobrazení počasí přímo v popup oknech bodů na mapě
+- Integrace počasí do plánovače tras s upozorněními na nepříznivé počasí
+- Automatické zobrazení počasí pro aktuální polohu uživatele
+- Možnost přidání widgetu s počasím na hlavní obrazovku aplikace
+- Integrace s chatovacím rozhraním pro přímé dotazy na počasí
+- Automatické upozornění na významné změny počasí v oblíbených lokalitách
 
 ## [0.2.8.2] - Plánovaná verze - VYLEPŠENÍ CHATU A NOVÉ PŘÍKAZY
 
