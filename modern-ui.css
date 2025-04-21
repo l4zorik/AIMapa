@@ -10,7 +10,7 @@
   --accent-color: #f59e0b;
   --accent-color-light: #fbbf24;
   --accent-color-dark: #d97706;
-  
+
   /* Světlý režim */
   --light-bg: #f9fafb;
   --light-card-bg: #ffffff;
@@ -19,7 +19,7 @@
   --light-border: #e5e7eb;
   --light-input-bg: #f3f4f6;
   --light-hover: #f3f4f6;
-  
+
   /* Tmavý režim */
   --dark-bg: #111827;
   --dark-card-bg: #1f2937;
@@ -28,14 +28,14 @@
   --dark-border: #374151;
   --dark-input-bg: #374151;
   --dark-hover: #2d3748;
-  
+
   /* Stíny */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  
+
   /* Zaoblení */
   --radius-sm: 0.125rem;
   --radius: 0.25rem;
@@ -45,18 +45,18 @@
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
   --radius-full: 9999px;
-  
+
   /* Animace */
   --transition-fast: 150ms;
   --transition: 200ms;
   --transition-slow: 300ms;
   --easing: cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Typografie */
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  
+
   /* Velikosti písma */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -67,7 +67,7 @@
   --text-3xl: 1.875rem;
   --text-4xl: 2.25rem;
   --text-5xl: 3rem;
-  
+
   /* Mezery */
   --spacing-0: 0;
   --spacing-1: 0.25rem;
@@ -89,7 +89,8 @@
   --spacing-64: 16rem;
 }
 
-/* Základní reset */
+/* Základní reset - deaktivováno, aby nedocházelo ke konfliktu s původním designem */
+/*
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -121,6 +122,7 @@ body.dark-mode {
   margin: 0 auto;
   padding: var(--spacing-4);
 }
+*/
 
 /* Hlavička */
 header {
@@ -560,16 +562,16 @@ header h1 {
   .container {
     padding: var(--spacing-3);
   }
-  
+
   header h1 {
     font-size: var(--text-2xl);
   }
-  
+
   .main-nav {
     flex-direction: column;
     gap: var(--spacing-4);
   }
-  
+
   .nav-links {
     flex-wrap: wrap;
     justify-content: center;
@@ -580,7 +582,7 @@ header h1 {
   header h1 {
     font-size: var(--text-xl);
   }
-  
+
   .btn {
     padding: var(--spacing-1) var(--spacing-3);
   }
