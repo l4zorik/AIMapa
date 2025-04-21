@@ -25,6 +25,37 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.3] - Plánovaná verze - INTEGRACE PŘEDPOVĚDI POČASÍ
+
+### Integrace předpovědi počasí
+
+- Implementace API pro získávání aktuálních dat o počasí a předpovědi
+- Zobrazení aktuálního počasí pro libovolné místo na mapě
+- Zobrazení předpovědi počasí na 7 dní dopředu
+- Zobrazení hodinové předpovědi počasí pro následujících 48 hodin
+- Vizualizace počasí pomocí interaktivních ikon a grafů
+- Zobrazení detailních informací o počasí (teplota, vlhkost, tlak, vítr, srážky)
+- Zobrazení výstrah před extrémním počasím
+- Možnost přidání počasí jako vrstvu na mapu
+
+### Nové příkazy pro počasí
+
+- Příkaz "počasí nyní v [místo]" pro zobrazení aktuálního počasí
+- Příkaz "předpověď na [počet] dní v [místo]" pro zobrazení předpovědi na více dní
+- Příkaz "hodinová předpověď v [místo]" pro zobrazení hodinové předpovědi
+- Příkaz "výstrahy počasí v [místo]" pro zobrazení výstrah před extrémním počasím
+- Příkaz "počasí na trase" pro zobrazení počasí podlé aktuální trasy
+- Příkaz "zobrazit vrstvu počasí" pro přidání vrstvy počasí na mapu
+- Příkaz "skrýt vrstvu počasí" pro odstranění vrstvy počasí z mapy
+
+### Vylepšení uživatelského rozhraní pro počasí
+
+- Implementace interaktivního panelu pro zobrazení počasí
+- Animované ikony pro různé typy počasí
+- Grafy pro zobrazení vývoje teploty, srážek a dalších parametrů
+- Barevné označení extrémních hodnot počasí
+- Možnost přepnutí mezi různými jednotkami (Celsius/Fahrenheit, km/h / mph)
+
 ## [0.2.8.2] - Plánovaná verze - VYLEPŠENÍ CHATU A NOVÉ PŘÍKAZY
 
 ### Plánovaná vylepšení chatu
@@ -78,6 +109,42 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Funkce pro export tras a bodů do různých formátů (GPX, KML, JSON)
 - Funkce pro import tras a bodů z externích zdrojů a souborů
 - Funkce pro automatické rozpoznávání míst a bodů zájmu v textu zprávy
+
+#### Příkazy pro plánování a organizaci
+- Příkaz "vytvořit plán [název]" pro vytvoření nového plánu cesty
+- Příkaz "přidat do plánu [název] bod [místo]" pro přidání bodu do plánu
+- Příkaz "odstranit z plánu [název] bod [místo/číslo]" pro odstranění bodu z plánu
+- Příkaz "zobrazit plán [název]" pro zobrazení plánu na mapě
+- Příkaz "smazat plán [název]" pro odstranění plánu
+- Příkaz "seznam plánů" pro zobrazení všech uložených plánů
+
+#### Příkazy pro měření a analýzu
+- Příkaz "změřit vzdálenost mezi [bod A] a [bod B]" pro měření vzdálenosti mezi body
+- Příkaz "změřit plochu" pro měření plochy vybrané oblasti
+- Příkaz "změřit obvod" pro měření obvodu vybrané oblasti
+- Příkaz "analýza trasy" pro zobrazení detailní analýzy trasy (převýšení, povrch, obtížnost)
+- Příkaz "profil trasy" pro zobrazení výškového profilu trasy
+
+#### Příkazy pro práci s vrstvami mapy
+- Příkaz "přepnout na vrstvu [typ]" pro přepnutí mezi různými mapovými podklady (satelitní, turistická, silniční)
+- Příkaz "přidat vrstvu [typ]" pro přidání nové vrstvy na mapu
+- Příkaz "odstranit vrstvu [typ]" pro odstranění vrstvy z mapy
+- Příkaz "nastavit průhlednost vrstvy [typ] na [hodnota]" pro nastavení průhlednosti vrstvy
+- Příkaz "zobrazit legendu" pro zobrazení legendy mapových vrstev
+
+#### Příkazy pro práci s poznámkami
+- Příkaz "přidat poznámku k [bod/místo]" pro přidání poznámky k bodu nebo místu
+- Příkaz "upravit poznámku [bod/místo]" pro úpravu existující poznámky
+- Příkaz "smazat poznámku [bod/místo]" pro odstranění poznámky
+- Příkaz "zobrazit poznámky" pro zobrazení všech poznámek
+- Příkaz "hledat v poznámkách [text]" pro vyhledávání v poznámkách
+
+#### Příkazy pro práci s fotkami a médii
+- Příkaz "přidat fotku k [bod/místo]" pro přidání fotky k bodu nebo místu
+- Příkaz "zobrazit fotky [bod/místo]" pro zobrazení fotek přiřazených k bodu nebo místu
+- Příkaz "odstranit fotku [bod/místo] [číslo]" pro odstranění fotky
+- Příkaz "přidat video k [bod/místo]" pro přidání videa k bodu nebo místu
+- Příkaz "zobrazit videa [bod/místo]" pro zobrazení videí přiřazených k bodu nebo místu
 
 ### Vylepšení uživatelského rozhraní
 
