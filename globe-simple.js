@@ -167,37 +167,255 @@ function addRouteToGlobe(routeLayer) {
             return;
         }
 
+        console.log(`Získáno ${routeCoordinates.length} bodů trasy`);
+
+        // Optimalizace pro dlouhé trasy - omezení počtu bodů
+        const MAX_ROUTE_POINTS = 100; // Maximální počet bodů pro optimalizaci
+        let optimizedCoordinates = routeCoordinates;
+
+        if (routeCoordinates.length > MAX_ROUTE_POINTS) {
+            console.log(`Trasa je příliš dlouhá (${routeCoordinates.length} bodů), probíhá optimalizace...`);
+
+            // Vzorkování bodů pro dlouhé trasy
+            optimizedCoordinates = sampleRoutePoints(routeCoordinates, MAX_ROUTE_POINTS);
+            console.log(`Trasa byla optimalizována na ${optimizedCoordinates.length} bodů`);
+        }
+
         // Vytvoření tras mezi body
         globeRoutes = [];
 
-        // Rozdělení trasy na segmenty pro lepší vizualizaci
-        for (let i = 0; i < routeCoordinates.length - 1; i++) {
-            const startPos = routeCoordinates[i];
-            const endPos = routeCoordinates[i + 1];
+        // Kontrola, zda trasa nepřekračuje 180. poledník (problém s dlouhými trasami)
+        const crossesDateLine = checkIfCrossesDateLine(optimizedCoordinates);
 
-            globeRoutes.push({
-                startLat: startPos.lat,
-                startLng: startPos.lng,
-                endLat: endPos.lat,
-                endLng: endPos.lng,
-                color: '#FF5733', // Odlišná barva pro trasu
-                stroke: 0.8 // Silnější čára pro trasu
-            });
+        // Rozdělení trasy na segmenty pro lepší vizualizaci
+        for (let i = 0; i < optimizedCoordinates.length - 1; i++) {
+            const startPos = optimizedCoordinates[i];
+            const endPos = optimizedCoordinates[i + 1];
+
+            // Kontrola vzdálenosti mezi body - příliš vzdálené body mohou způsobit problémy
+            const distance = calculateDistance(startPos.lat, startPos.lng, endPos.lat, endPos.lng);
+
+            // Pokud je vzdálenost příliš velká, rozdělíme segment na menší části
+            if (distance > 2000) { // 2000 km jako hranice pro rozdělení
+                const segments = splitLongSegment(startPos, endPos);
+                segments.forEach(segment => {
+                    globeRoutes.push({
+                        startLat: segment.startLat,
+                        startLng: segment.startLng,
+                        endLat: segment.endLat,
+                        endLng: segment.endLng,
+                        color: '#FF5733', // Odlišná barva pro trasu
+                        stroke: 0.8 // Silnější čára pro trasu
+                    });
+                });
+            } else {
+                // Standardní přidání segmentu
+                globeRoutes.push({
+                    startLat: startPos.lat,
+                    startLng: startPos.lng,
+                    endLat: endPos.lat,
+                    endLng: endPos.lng,
+                    color: '#FF5733', // Odlišná barva pro trasu
+                    stroke: 0.8 // Silnější čára pro trasu
+                });
+            }
         }
 
-        // Přidání tras na Globe.gl
-        globeInstance
-            .arcsData([...globeArcs, ...globeRoutes])
-            .arcColor('color')
-            .arcStroke('stroke')
-            .arcDashLength(0.4)
-            .arcDashGap(0.2)
-            .arcDashAnimateTime(1000);
+        // Pokud trasa překračuje 180. poledník, rozdělíme ji na dvě části
+        if (crossesDateLine) {
+            console.log('Trasa překračuje 180. poledník, probíhá speciální zpracování...');
+            globeRoutes = handleDateLineCrossing(globeRoutes);
+        }
+
+        // Postupné přidávání tras na Globe.gl pro lepší výkon
+        const BATCH_SIZE = 50; // Počet segmentů v jedné dávce
+
+        if (globeRoutes.length > BATCH_SIZE) {
+            console.log(`Trasa obsahuje ${globeRoutes.length} segmentů, probíhá postupné přidávání...`);
+
+            // Nejprve přidáme jen část trasy pro rychlejší odezvu
+            const initialBatch = globeRoutes.slice(0, BATCH_SIZE);
+            globeInstance
+                .arcsData([...globeArcs, ...initialBatch])
+                .arcColor('color')
+                .arcStroke('stroke')
+                .arcDashLength(0.4)
+                .arcDashGap(0.2)
+                .arcDashAnimateTime(1000);
+
+            // Postupné přidávání zbývajících segmentů
+            setTimeout(() => {
+                addRemainingSegments(BATCH_SIZE);
+            }, 500);
+        } else {
+            // Přidání všech tras najednou pro kratší trasy
+            globeInstance
+                .arcsData([...globeArcs, ...globeRoutes])
+                .arcColor('color')
+                .arcStroke('stroke')
+                .arcDashLength(0.4)
+                .arcDashGap(0.2)
+                .arcDashAnimateTime(1000);
+        }
 
         console.log(`Přidáno ${globeRoutes.length} segmentů trasy na Globe.gl`);
     } catch (error) {
         console.error('Chyba při přidávání trasy na Globe.gl:', error);
     }
+}
+
+// Funkce pro postupné přidávání zbývajících segmentů trasy
+function addRemainingSegments(startIndex) {
+    const BATCH_SIZE = 50;
+    const nextBatch = globeRoutes.slice(startIndex, startIndex + BATCH_SIZE);
+
+    if (nextBatch.length === 0) {
+        console.log('Všechny segmenty trasy byly přidány');
+        return;
+    }
+
+    // Přidání další dávky segmentů
+    const currentArcs = globeInstance.arcsData();
+    globeInstance.arcsData([...currentArcs, ...nextBatch]);
+
+    console.log(`Přidána dávka segmentů ${startIndex} až ${startIndex + nextBatch.length}`);
+
+    // Pokračování s další dávkou
+    if (startIndex + BATCH_SIZE < globeRoutes.length) {
+        setTimeout(() => {
+            addRemainingSegments(startIndex + BATCH_SIZE);
+        }, 300);
+    }
+}
+
+// Funkce pro vzorkování bodů trasy (redukce počtu bodů)
+function sampleRoutePoints(points, maxPoints) {
+    if (points.length <= maxPoints) return points;
+
+    const result = [];
+
+    // Vždy zachováme první a poslední bod
+    result.push(points[0]);
+
+    // Vzorkování středních bodů
+    const step = Math.max(1, Math.floor(points.length / (maxPoints - 2)));
+    for (let i = step; i < points.length - 1; i += step) {
+        result.push(points[i]);
+    }
+
+    // Přidání posledního bodu
+    result.push(points[points.length - 1]);
+
+    return result;
+}
+
+// Funkce pro výpočet vzdálenosti mezi dvěma body (Haversine formula)
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Poloměr Země v km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Vzdálenost v km
+}
+
+// Funkce pro rozdělení dlouhého segmentu na menší části
+function splitLongSegment(startPos, endPos) {
+    const segments = [];
+    const numSegments = 5; // Počet segmentů, na které rozdělíme dlouhý segment
+
+    for (let i = 0; i < numSegments; i++) {
+        const ratio = i / numSegments;
+        const nextRatio = (i + 1) / numSegments;
+
+        // Interpolace mezi počátečním a koncovým bodem
+        const startLat = startPos.lat + ratio * (endPos.lat - startPos.lat);
+        const startLng = startPos.lng + ratio * (endPos.lng - startPos.lng);
+        const endLat = startPos.lat + nextRatio * (endPos.lat - startPos.lat);
+        const endLng = startPos.lng + nextRatio * (endPos.lng - startPos.lng);
+
+        segments.push({
+            startLat: startLat,
+            startLng: startLng,
+            endLat: endLat,
+            endLng: endLng
+        });
+    }
+
+    return segments;
+}
+
+// Funkce pro kontrolu, zda trasa překračuje 180. poledník
+function checkIfCrossesDateLine(coordinates) {
+    for (let i = 0; i < coordinates.length - 1; i++) {
+        const lon1 = coordinates[i].lng;
+        const lon2 = coordinates[i + 1].lng;
+
+        // Pokud rozdíl zeměpisných délek je větší než 180 stupňů, trasa pravděpodobně překračuje 180. poledník
+        if (Math.abs(lon2 - lon1) > 180) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Funkce pro zpracování trasy překračující 180. poledník
+function handleDateLineCrossing(routes) {
+    const processedRoutes = [];
+
+    routes.forEach(route => {
+        // Kontrola, zda segment překračuje 180. poledník
+        if (Math.abs(route.endLng - route.startLng) > 180) {
+            // Rozdělení segmentu na dva - jeden končí na 180° a druhý začíná na -180°
+            const midLat = (route.startLat + route.endLat) / 2;
+
+            // První část segmentu (k 180. poledníku)
+            if (route.startLng < 0 && route.endLng > 0) {
+                processedRoutes.push({
+                    startLat: route.startLat,
+                    startLng: route.startLng,
+                    endLat: midLat,
+                    endLng: 180,
+                    color: route.color,
+                    stroke: route.stroke
+                });
+
+                processedRoutes.push({
+                    startLat: midLat,
+                    startLng: -180,
+                    endLat: route.endLat,
+                    endLng: route.endLng,
+                    color: route.color,
+                    stroke: route.stroke
+                });
+            } else {
+                processedRoutes.push({
+                    startLat: route.startLat,
+                    startLng: route.startLng,
+                    endLat: midLat,
+                    endLng: -180,
+                    color: route.color,
+                    stroke: route.stroke
+                });
+
+                processedRoutes.push({
+                    startLat: midLat,
+                    startLng: 180,
+                    endLat: route.endLat,
+                    endLng: route.endLng,
+                    color: route.color,
+                    stroke: route.stroke
+                });
+            }
+        } else {
+            // Segment nepřekračuje 180. poledník, přidáme ho beze změny
+            processedRoutes.push(route);
+        }
+    });
+
+    return processedRoutes;
 }
 
 // Funkce pro vyčištění Globe.gl

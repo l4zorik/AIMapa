@@ -25,6 +25,17 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.7.3] - 2025-04-20 - OPTIMALIZACE DLOUHÝCH TRAS NA GLÓBUSU
+
+### Optimalizace dlouhých tras na glóbusu
+
+- Opraveny problémy se zobrazením dlouhých tras na glóbusu (např. z Česka do Číny)
+- Přidána optimalizace počtu bodů trasy pro zlepšení výkonu
+- Implementováno postupné přidávání segmentů trasy pro plynulejší zobrazení
+- Přidáno speciální zpracování tras překračujících 180. poledník
+- Implementováno rozdělení dlouhých segmentů na menší části pro lepší vizualizaci
+- Přidáno ošetření chyb pro zvýšení stability aplikace
+
 ## [0.2.7.2] - 2025-04-20 - ZOBRAZENÍ TRASY Z KLASICKÉ MAPY NA GLÓBUSU
 
 ### Zobrazení trasy z klasické mapy na glóbusu
