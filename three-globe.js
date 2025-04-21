@@ -1,17 +1,39 @@
 // Three.js funkce pro glóbus režim
 
+// Globální proměnné pro Three.js
+let threeScene;
+let threeCamera;
+let threeRenderer;
+let threeControls;
+let threeGlobe;
+let threeAnimationFrame;
+let threeMarkers = [];
+let threeRoutes = [];
+
 // Inicializace Three.js glóbusu
 function initThreeJsGlobe() {
     console.log('Inicializace Three.js glóbusu - začátek');
 
     try {
+        // Kontrola, zda je Three.js dostupný
+        if (typeof THREE === 'undefined') {
+            throw new Error('Three.js knihovna není načtena');
+        }
+        console.log('Three.js knihovna je dostupná:', THREE.REVISION);
+
+        // Kontrola, zda existuje kontejner
+        const container = document.getElementById('threeGlobeContainer');
+        if (!container) {
+            throw new Error('Kontejner threeGlobeContainer nebyl nalezen');
+        }
+        console.log('Kontejner pro Three.js nalezen');
+
         // Vytvoření scény
         threeScene = new THREE.Scene();
         console.log('Three.js scéna vytvořena');
 
         // Vytvoření kamery
-        const container = document.getElementById('threeGlobeContainer');
-        const aspect = container.clientWidth / container.clientHeight;
+        const aspect = container.clientWidth / container.clientHeight || 1;
         threeCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
         threeCamera.position.z = 5;
         console.log('Three.js kamera vytvořena');
@@ -33,12 +55,25 @@ function initThreeJsGlobe() {
         console.log('Three.js renderer přidán do DOM');
 
         // Přidání ovládacích prvků
-        threeControls = new THREE.OrbitControls(threeCamera, threeRenderer.domElement);
-        threeControls.enableDamping = true;
-        threeControls.dampingFactor = 0.05;
-        threeControls.rotateSpeed = 0.5;
-        threeControls.minDistance = 2;
-        threeControls.maxDistance = 15;
+        if (typeof THREE.OrbitControls === 'undefined') {
+            console.warn('THREE.OrbitControls není dostupný, použijeme záložní řešení');
+            // Záložní řešení bez OrbitControls
+            threeControls = {
+                update: function() {},
+                enableDamping: true,
+                dampingFactor: 0.05,
+                rotateSpeed: 0.5,
+                minDistance: 2,
+                maxDistance: 15
+            };
+        } else {
+            threeControls = new THREE.OrbitControls(threeCamera, threeRenderer.domElement);
+            threeControls.enableDamping = true;
+            threeControls.dampingFactor = 0.05;
+            threeControls.rotateSpeed = 0.5;
+            threeControls.minDistance = 2;
+            threeControls.maxDistance = 15;
+        }
         console.log('Three.js ovládací prvky vytvořeny');
 
         // Vytvoření glóbusu
@@ -61,8 +96,10 @@ function initThreeJsGlobe() {
         console.log('Three.js první vykreslení provedeno');
 
         console.log('Inicializace Three.js glóbusu - dokončeno');
+        return true;
     } catch (error) {
         console.error('Chyba při inicializaci Three.js glóbusu:', error);
+        return false;
     }
 }
 
@@ -77,26 +114,28 @@ function createGlobe() {
 
         console.log('Načítání textur Země');
 
-        // Použití spolehlivejších URL pro textury
-        const earthTexture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg');
-        const bumpMap = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg');
-        const specularMap = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg');
-        const cloudsTexture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png');
+        // Jednodušší textury pro rychlejší načtení
+        const earthTexture = textureLoader.load(
+            'https://cdn.jsdelivr.net/npm/three/examples/textures/planets/earth_atmos_2048.jpg',
+            // Callback při úspěšném načtení
+            function() { console.log('Textura Země načtena'); },
+            // Callback při načítání
+            function() { console.log('Načítání textury Země...'); },
+            // Callback při chybě
+            function(err) { console.error('Chyba při načítání textury Země:', err); }
+        );
 
-        console.log('Textury Země načteny');
+        // Záložní textura pro případ, že se nepodaří načíst hlavní textura
+        earthTexture.name = 'earthTexture';
 
-        // Vytvoření materiálu pro Zemi
+        // Vytvoření materiálu pro Zemi - jednodušší verze bez bump a specular map
         const earthMaterial = new THREE.MeshPhongMaterial({
             map: earthTexture,
-            bumpMap: bumpMap,
-            bumpScale: 0.05,
-            specularMap: specularMap,
-            specular: new THREE.Color('grey'),
             shininess: 5
         });
 
         // Vytvoření geometrie pro Zemi
-        const earthGeometry = new THREE.SphereGeometry(2, 64, 64);
+        const earthGeometry = new THREE.SphereGeometry(2, 32, 32); // Snížení počtu segmentů pro lepší výkon
 
         // Vytvoření meshe pro Zemi
         threeGlobe = new THREE.Mesh(earthGeometry, earthMaterial);
@@ -107,8 +146,19 @@ function createGlobe() {
         // Nastavení rotace
         threeGlobe.rotation.y = Math.PI;
 
+        // Jednodušší mraky
+        const cloudsTexture = textureLoader.load(
+            'https://cdn.jsdelivr.net/npm/three/examples/textures/planets/earth_clouds_1024.png',
+            // Callback při úspěšném načtení
+            function() { console.log('Textura mraků načtena'); },
+            // Callback při načítání
+            function() { console.log('Načítání textury mraků...'); },
+            // Callback při chybě
+            function(err) { console.error('Chyba při načítání textury mraků:', err); }
+        );
+
         // Přidání vrstvy mraků
-        const cloudsGeometry = new THREE.SphereGeometry(2.05, 64, 64);
+        const cloudsGeometry = new THREE.SphereGeometry(2.05, 32, 32);
         const cloudsMaterial = new THREE.MeshPhongMaterial({
             map: cloudsTexture,
             transparent: true,
@@ -125,8 +175,10 @@ function createGlobe() {
         threeScene.userData.clouds = clouds;
 
         console.log('Glóbus úspěšně vytvořen');
+        return true;
     } catch (error) {
         console.error('Chyba při vytváření glóbusu:', error);
+        return false;
     }
 }
 

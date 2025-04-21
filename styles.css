@@ -2980,13 +2980,15 @@ body.fullscreen-mode {
     border-radius: 8px !important;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5) !important;
     pointer-events: auto !important;
+    visibility: visible !important;
 }
 
 /* Styly pro lepší zobrazení Three.js glóbusu */
 .map-globe-mode .three-globe-container {
     display: block !important;
-    z-index: 1000;
-    background: radial-gradient(circle at center, #111 0%, #000 100%);
+    z-index: 1000 !important;
+    background: radial-gradient(circle at center, #111 0%, #000 100%) !important;
+    visibility: visible !important;
 }
 
 .map-globe-mode .leaflet-container {

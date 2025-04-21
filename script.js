@@ -1745,30 +1745,63 @@ function toggleGlobeMode() {
         console.log('Střed mapy:', center);
 
         try {
+            // Kontrola, zda je Three.js dostupný
+            if (typeof THREE === 'undefined') {
+                throw new Error('Three.js knihovna není načtena');
+            }
+            console.log('Three.js knihovna je dostupná:', THREE.REVISION);
+
+            // Kontrola, zda existuje kontejner
+            const container = document.getElementById('threeGlobeContainer');
+            if (!container) {
+                throw new Error('Kontejner threeGlobeContainer nebyl nalezen');
+            }
+            console.log('Kontejner pro Three.js nalezen');
+
+            // Zobrazení kontejneru
+            container.style.display = 'block';
+
             // Inicializace Three.js scény, pokud ještě nebyla vytvořena
-            if (!threeScene) {
+            if (typeof window.initThreeJsGlobe === 'function') {
                 console.log('Inicializace Three.js glóbusu');
-                initThreeJsGlobe();
-                console.log('Three.js glóbus byl inicializován');
+                const success = window.initThreeJsGlobe();
+                if (!success) {
+                    throw new Error('Inicializace Three.js glóbusu selhala');
+                }
+                console.log('Three.js glóbus byl úspěšně inicializován');
+            } else {
+                throw new Error('Funkce initThreeJsGlobe není dostupná');
             }
 
             // Přidání markerů na glóbus
             console.log('Přidávání markerů na glóbus');
-            addMarkersToThreeGlobe();
-            console.log('Markery byly přidány na glóbus');
+            if (typeof window.addMarkersToThreeGlobe === 'function') {
+                window.addMarkersToThreeGlobe();
+                console.log('Markery byly přidány na glóbus');
+            } else {
+                console.warn('Funkce addMarkersToThreeGlobe není dostupná');
+            }
 
             // Přidání tras mezi body na glóbusu
             console.log('Přidávání tras na glóbus');
-            addRoutesToThreeGlobe();
-            console.log('Trasy byly přidány na glóbus');
+            if (typeof window.addRoutesToThreeGlobe === 'function') {
+                window.addRoutesToThreeGlobe();
+                console.log('Trasy byly přidány na glóbus');
+            } else {
+                console.warn('Funkce addRoutesToThreeGlobe není dostupná');
+            }
 
             // Přidání ovládacích prvků pro glóbus
             addGlobeControls();
             console.log('Ovládací prvky byly přidány');
 
             // Spuštění animační smyčky
-            startThreeAnimation();
-            console.log('Animační smyčka byla spuštěna');
+            if (typeof window.startThreeAnimation === 'function') {
+                window.startThreeAnimation();
+                console.log('Animační smyčka byla spuštěna');
+            } else {
+                console.warn('Funkce startThreeAnimation není dostupná');
+            }
 
             // Pokud není aktivní fullscreen režim, aktivujeme ho
             if (!isFullscreen) {
@@ -1778,7 +1811,7 @@ function toggleGlobeMode() {
 
         } catch (error) {
             console.error('Chyba při inicializaci Three.js glóbusu:', error);
-            addMessage('Nepodařilo se inicializovat 3D glóbus. Zkuste to prosím znovu.', true);
+            addMessage('Nepodařilo se inicializovat 3D glóbus. Chyba: ' + error.message, true);
             isGlobeMode = false;
             toggleGlobeBtn.classList.remove('active');
             document.getElementById('map').classList.remove('map-globe-mode');
@@ -1798,8 +1831,12 @@ function toggleGlobeMode() {
 
         try {
             // Zastavení animační smyčky
-            stopThreeAnimation();
-            console.log('Animační smyčka byla zastavena');
+            if (typeof window.stopThreeAnimation === 'function') {
+                window.stopThreeAnimation();
+                console.log('Animační smyčka byla zastavena');
+            } else {
+                console.warn('Funkce stopThreeAnimation není dostupná');
+            }
 
             // Odstranění ovládacích prvků pro glóbus
             removeGlobeControls();
@@ -1808,21 +1845,27 @@ function toggleGlobeMode() {
             if (typeof window.clearThreeGlobe === 'function') {
                 window.clearThreeGlobe();
                 console.log('Všechny objekty byly odstraněny z glóbusu');
-            } else if (threeScene) {
+            } else {
+                console.warn('Funkce clearThreeGlobe není dostupná');
                 // Záložní metoda pro odstranění objektů
-                while(threeScene.children.length > 0){
-                    threeScene.remove(threeScene.children[0]);
+                const threeScene = window.threeScene;
+                if (threeScene) {
+                    while(threeScene.children.length > 0){
+                        threeScene.remove(threeScene.children[0]);
+                    }
+                    console.log('Všechny objekty byly odstraněny z glóbusu pomocí záložní metody');
                 }
-                console.log('Všechny objekty byly odstraněny z glóbusu pomocí záložní metody');
+            }
+
+            // Skrytí kontejneru
+            const container = document.getElementById('threeGlobeContainer');
+            if (container) {
+                container.style.display = 'none';
             }
 
             // Aktualizace velikosti mapy
             map.invalidateSize();
             console.log('Velikost mapy byla aktualizována');
-
-            // Reset globálních proměnných
-            threeMarkers = [];
-            threeRoutes = [];
         } catch (error) {
             console.error('Chyba při deaktivaci glóbus režimu:', error);
         }
