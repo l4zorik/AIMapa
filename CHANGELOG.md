@@ -25,6 +25,76 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.4] - Plánovaná verze - OPTIMALIZACE VÝPOČTU TRAS A VYLEPŠENÍ SYSTÉMU PŘÍKAZŮ
+
+### Optimalizace výpočtu tras
+
+#### Pokročilé algoritmy pro výpočet tras
+- Implementace algoritmu Contraction Hierarchies pro až 100x rychlejší výpočet tras
+- Využití více-jádrového zpracování pro paralelní výpočet tras
+- Implementace algoritmu A* s heuristikou pro efektivní vyhledávání cest
+- Optimalizace datových struktur pro rychlejší přístup k mapovým datům
+- Cachování často používaných tras pro okamžité načtení
+- Implementace algoritmu pro výpočet tras v reálném čase s aktualizací během pohybu
+
+#### Vylepšené možnosti plánování tras
+- Podpora více typů dopravy (auto, kolo, pěšky, veřejná doprava) s optimalizací pro každý typ
+- Možnost kombinace různých typů dopravy v jedné trase (multimodální plánování)
+- Vyhledávání alternativních tras s různými parametry (nejrychlejší, nejkratší, nejkrásnější)
+- Zohlednění aktuální dopravní situace a uzávěrek při výpočtu trasy
+- Optimalizace trasy podle výškového profilu pro úsporu energie
+- Možnost nastavení průjezdných bodů a vyhnutí se určitým oblastem
+
+#### Integrace s externími službami pro výpočet tras
+- Využití Google Directions API pro přesné a aktuální trasy
+- Integrace s MapBox Directions API pro alternativní trasy
+- Využití OSRM (Open Source Routing Machine) pro rychlé výpočty tras
+- Implementace GraphHopper API pro speciální typy tras (cyklo, turistické)
+- Automatický výběr nejlepšího API podle typu trasy a dostupnosti
+- Záložní systém pro případ výpadku primárního API
+
+#### Vylepšené zobrazení tras
+- Barevné rozlišení různých úseků trasy podle typu cesty nebo náročnosti
+- Animované zobrazení průběhu trasy s možností přehrávání
+- Interaktivní výškový profil trasy s možností přiblížení a zobrazení detailů
+- Zobrazení zajímavých bodů podél trasy s možností přidání zastávek
+- Detailní navigace krok za krokem s hlasovými pokyny
+- 3D zobrazení trasy v glóbus režimu s realistickým terénem
+
+### Vylepšení systému příkazů
+
+#### Inteligentní systém rozpoznávání příkazů
+- Implementace pokročilého NLP (Natural Language Processing) pro lepší porozumění přirozenému jazyku
+- Automatické rozpoznávání záměru uživatele i při nejednoznačných nebo neúplných příkazech
+- Podpora různých variant a synonym pro stejný příkaz (např. "ukazat", "zobrazit", "najdi")
+- Automatické opravy překlepů a gramatických chyb v příkazech
+- Kontextové rozpoznávání příkazů na základě předchozích interakcí
+- Schopnost zpracovat složité příkazy s více parametry a podmínkami
+
+#### Efektivní systém výběru příkazů
+- Implementace inteligentního našeptávače příkazů s prediktivním textem
+- Zobrazení relevantních příkazů na základě aktuálního kontextu a činnosti uživatele
+- Kategorizované menu příkazů s možností rychlého přístupu k často používaným příkazům
+- Implementace systému rychlých klávesových zkratek pro nejpoužívanější příkazy
+- Kontextové menu příkazů dostupné při kliknutí pravým tlačítkem na různé prvky mapy
+- Personalizovaný seznam oblíbených příkazů na základě historie používání
+
+#### Interaktivní průvodce příkazy
+- Implementace interaktivního průvodce pro nové uživatele s vysvětlením dostupných příkazů
+- Kontextová nápověda při zadávání příkazů s příklady použití
+- Interaktivní tutoriály pro složitější příkazy a funkce
+- Zobrazení tipů a triků pro efektivní používání příkazů
+- Možnost vyhledávání v dokumentaci příkazů přímo z chatovacího rozhraní
+- Systém zpětné vazby pro vylepšování příkazů na základě uživatelských připomínek
+
+#### Pokročilé uživatelské rozhraní pro příkazy
+- Implementace hybridního rozhraní kombinujícího textové příkazy a grafické ovládací prvky
+- Dynamické formuláře pro zadávání parametrů příkazů s validací vstupu
+- Vizualizace výsledků příkazů pomocí interaktivních grafů a diagramů
+- Animované přechody mezi různými stavy příkazů
+- Podpora hlasového zadávání příkazů s rozpoznáváním řeči
+- Adaptivní rozhraní přizpůsobující se úrovni zkušeností uživatele
+
 ## [0.2.8.3] - Plánovaná verze - INTEGRACE PŘEDPOVĚDI POČASÍ
 
 ### Integrace reálných dat o počasí z internetu
