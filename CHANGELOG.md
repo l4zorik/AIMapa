@@ -25,6 +25,20 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.5] - Plánovaná verze - OPRAVY A VYLEPŠENÍ UŽIVATELSKÉHO ROZHRANÍ
+
+### Opravy a vylepšení uživatelského rozhraní
+
+- Opraveno překrývání tlačítka pro návrat z glóbus režimu s dialogem nastavení
+- Upravena pozice tlačítka pro návrat z glóbus režimu, aby bylo vždy viditelné a použitelné
+- Zvýšena vertikální pozice tlačítka pro lepší přístupnost a zabránění překrývání s jinými prvky
+- Barevné rozlišení různých úseků trasy podle typu cesty nebo náročnosti
+- Animované zobrazení průběhu trasy s možností přehrávání
+- Interaktivní výškový profil trasy s možností přiblížení a zobrazení detailů
+- Zobrazení zajímavých bodů podél trasy s možností přidání zastávek
+- Detailní navigace krok za krokem s hlasovými pokyny
+- 3D zobrazení trasy v glóbus režimu s realistickým terénem
+
 ## [0.2.8.4] - Plánovaná verze - OPTIMALIZACE VÝPOČTU TRAS A VYLEPŠENÍ SYSTÉMU PŘÍKAZŮ
 
 ### Optimalizace výpočtu tras
