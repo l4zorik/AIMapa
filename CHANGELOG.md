@@ -27,6 +27,13 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 ## [0.2.9.0] - Plánovaná verze - CELKOVÉ ROZŠÍŘENÍ A VYLEPŠENÍ VZHLEDU
 
+### Aktuální postup
+
+- Přidán základní framework pro moderní redesign uživatelského rozhraní (modern-ui.css)
+- Přidána kostra pro rozšířené mapové funkce (map-features.js)
+- Přidána kostra pro uživatelské profily a personalizaci (user-profiles.js)
+- Připravena struktura pro implementaci nových funkcí
+
 ### Moderní redesign uživatelského rozhraní
 
 - Kompletní přepracování uživatelského rozhraní s důrazem na moderní a čistý design
