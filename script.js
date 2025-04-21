@@ -1505,15 +1505,60 @@ function toggleChatPosition() {
     }
 }
 
+// Funkce pro generování odpovědi s návrhy dalších akcí
+function generateResponseWithSuggestions(message) {
+    // Získání odpovědi z původní funkce
+    const response = processUserInput(message);
+
+    // Generování návrhů na základě obsahu odpovědi a zprávy
+    let suggestions = [];
+
+    // Základní návrhy pro různé typy dotazů
+    if (message.toLowerCase().includes('bod') || response.toLowerCase().includes('bod')) {
+        suggestions.push('Seznam bodů', 'Přidat aktivitu', 'Vypočítat trasu');
+    }
+
+    if (message.toLowerCase().includes('trasa') || response.toLowerCase().includes('trasa') ||
+        message.toLowerCase().includes('cesta') || response.toLowerCase().includes('cesta')) {
+        suggestions.push('Vypočítat trasu', 'Seznam bodů');
+    }
+
+    if (message.toLowerCase().includes('otevírací') || response.toLowerCase().includes('otevírací') ||
+        message.toLowerCase().includes('obchod') || response.toLowerCase().includes('obchod')) {
+        suggestions.push('Otevírací doba');
+    }
+
+    if (message.toLowerCase().includes('klub') || response.toLowerCase().includes('klub') ||
+        message.toLowerCase().includes('alexa') || response.toLowerCase().includes('alexa')) {
+        suggestions.push('Alexa');
+    }
+
+    if (message.toLowerCase().includes('glóbus') || response.toLowerCase().includes('glóbus')) {
+        suggestions.push('Glóbus');
+    }
+
+    // Pokud nemáme žádné specifické návrhy, přidáme obecné
+    if (suggestions.length === 0) {
+        suggestions = ['Přidat aktivitu', 'Seznam bodů', 'Vypočítat trasu', 'Nastavení'];
+    }
+
+    // Omezení počtu návrhů na 4
+    if (suggestions.length > 4) {
+        suggestions = suggestions.slice(0, 4);
+    }
+
+    return { response, suggestions };
+}
+
 // Funkce pro zpracování zprávy z chatu
 function processMessage(message) {
     // Přidání zprávy uživatele do chatu
     addMessage(message, true);
 
-    // Simulace odpovědi AI
+    // Simulace odpovědi AI s návrhy dalších akcí
     setTimeout(() => {
-        const response = processUserInput(message);
-        addMessage(response);
+        const { response, suggestions } = generateResponseWithSuggestions(message);
+        addMessage(response, false, suggestions);
     }, 500);
 }
 
@@ -1574,11 +1619,38 @@ const chatMessages = document.getElementById('chatMessages');
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendMessage');
 
-function addMessage(message, isUser = false) {
+function addMessage(message, isUser = false, suggestions = null) {
+    // Vytvoření kontejneru pro zprávu a případné návrhy
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'message-container';
+
+    // Vytvoření elementu pro zprávu
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
     messageDiv.textContent = message;
-    chatMessages.appendChild(messageDiv);
+    messageContainer.appendChild(messageDiv);
+
+    // Přidání návrhů dalších akcí, pokud existují
+    if (!isUser && suggestions && Array.isArray(suggestions) && suggestions.length > 0) {
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.className = 'suggestions-container';
+
+        suggestions.forEach(suggestion => {
+            const suggestionBtn = document.createElement('button');
+            suggestionBtn.className = 'suggestion-btn';
+            suggestionBtn.textContent = suggestion;
+            suggestionBtn.addEventListener('click', () => {
+                // Při kliknutí na návrh se chová jako by uživatel napsal zprávu
+                processMessage(suggestion);
+            });
+            suggestionsContainer.appendChild(suggestionBtn);
+        });
+
+        messageContainer.appendChild(suggestionsContainer);
+    }
+
+    // Přidání kontejneru do chatu
+    chatMessages.appendChild(messageContainer);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     // Aktualizace plovoucího chatu, pokud existuje
@@ -1589,8 +1661,24 @@ function addMessage(message, isUser = false) {
 function updateFloatingChat() {
     const floatingChatMessages = document.getElementById('floatingChatMessages');
     if (floatingChatMessages && isFullscreen) {
+        // Kopírujeme obsah chatu do plovoucího chatu
         floatingChatMessages.innerHTML = chatMessages.innerHTML;
         floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+
+        // Znovu přidáme event listenery pro tlačítka návrhů v plovoucím chatu
+        const suggestionBtns = floatingChatMessages.querySelectorAll('.suggestion-btn');
+        suggestionBtns.forEach(btn => {
+            // Odstraníme původní event listenery
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+
+            // Přidáme nový event listener
+            newBtn.addEventListener('click', () => {
+                // Při kliknutí na návrh se chová jako by uživatel napsal zprávu
+                const suggestion = newBtn.textContent;
+                processMessage(suggestion);
+            });
+        });
     }
 }
 
@@ -2996,8 +3084,8 @@ window.addEventListener('load', () => {
     // Vyčištění předem definovaných zpráv
     chatMessages.innerHTML = '';
 
-    // Přidání uvítací zprávy
-    addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?');
+    // Přidání uvítací zprávy s návrhy akcí
+    addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?', false, ['Přidat aktivitu', 'Vypočítat trasu', 'Otevírací doba', 'Alexa']);
 
     // Pokus o načtení stavu aplikace
     const stateLoaded = loadAppState();
@@ -3005,10 +3093,10 @@ window.addEventListener('load', () => {
     if (!stateLoaded) {
         // Pokud se nepodařilo načíst stav, aktivujeme režim přidávání bodů
         document.getElementById('addActivity').classList.add('active');
-        addMessage('Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.', false);
+        addMessage('Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.', false, ['Vypočítat trasu', 'Otevírací doba', 'Alexa']);
     } else {
         // Pokud se podařilo načíst stav, informujeme uživatele
-        addMessage('Stav aplikace byl úspěšně načten z předchozího sezení.', false);
+        addMessage('Stav aplikace byl úspěšně načten z předchozího sezení.', false, ['Seznam bodů', 'Vypočítat trasu', 'Otevírací doba']);
     }
 
     // Nastavení výchozího data pro rezervaci tanečnice

@@ -315,6 +315,7 @@ body[data-theme="dark"] .chat-messages {
     padding: 10px;
     border-radius: 5px;
     max-width: 90%;
+    white-space: pre-line;
 }
 
 .message.ai {
@@ -330,6 +331,53 @@ body[data-theme="dark"] .message.ai {
 .message.user {
     background-color: var(--primary-color);
     align-self: flex-end;
+}
+
+/* Styly pro návrhy dalších akcí */
+.message-container {
+    margin-bottom: 15px;
+}
+
+.suggestions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+    margin-left: 12px;
+}
+
+.suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.15);
+    color: var(--primary-color);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.suggestion-btn:active {
+    background-color: rgba(139, 92, 246, 0.35);
+    transform: scale(0.98);
+}
+
+/* Tmavý režim pro návrhy */
+[data-theme="dark"] .suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+[data-theme="dark"] .suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
 }
 
 .chat-input {
