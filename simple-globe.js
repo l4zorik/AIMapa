@@ -14,8 +14,10 @@ function initSimpleGlobe() {
         // Kontrola, zda je Globe.GL dostupný
         if (typeof Globe === 'undefined') {
             console.error('Globe.GL knihovna není dostupná');
+            console.log('Dostupné globální objekty:', Object.keys(window));
             return false;
         }
+        console.log('Globe.GL knihovna je dostupná:', typeof Globe);
 
         // Kontrola, zda existuje kontejner
         globeContainer = document.getElementById('simpleGlobeContainer');
@@ -72,8 +74,8 @@ function addPointsToSimpleGlobe(points) {
             let name = `Bod ${index + 1}`;
 
             // Pokud existují vlastnosti markeru, použijeme je
-            if (window.markerProperties && window.markerProperties[index]) {
-                name = window.markerProperties[index].name || name;
+            if (typeof markerProperties !== 'undefined' && markerProperties[index]) {
+                name = markerProperties[index].name || name;
             }
 
             return {
