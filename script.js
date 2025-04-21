@@ -823,47 +823,13 @@ function calculateRouteFunction() {
         routeControl = null;
     }
 
-    // Nejprve vytvoříme přímou trasu jako zálohu, aby byla okamžitě viditelná
+    // Odstranění přímé trasy, pokud existuje
     if (route) {
         map.removeLayer(route);
+        route = null;
     }
 
-    // Vytvoření přímé trasy mezi body pro okamžité zobrazení
-    route = L.polyline(points, {
-        color: 'blue',
-        weight: 3,
-        opacity: 0.6,
-        dashArray: '5, 10'
-    }).addTo(map);
-
-    // Výpočet přibližné vzdálenosti přímé trasy
-    let distance = 0;
-    for (let i = 0; i < points.length - 1; i++) {
-        distance += points[i].distanceTo(points[i+1]);
-    }
-
-    // Převod na kilometry
-    const distanceKm = (distance / 1000).toFixed(2);
-
-    // Výpočet přibližného času cesty (průměrná rychlost 50 km/h)
-    const averageSpeedKmh = 50;
-    const timeHours = distanceKm / averageSpeedKmh;
-
-    // Převod na hodiny a minuty
-    const hours = Math.floor(timeHours);
-    const minutes = Math.round((timeHours - hours) * 60);
-    const timeString = hours > 0 ?
-        `${hours} h ${minutes} min` :
-        `${minutes} min`;
-
-    // Aktualizace informací o trase v panelu s přímou trasou
-    routeDistanceElement.textContent = `${distanceKm} km (přímá trasa)`;
-    routeTimeElement.textContent = timeString;
-
-    // Přizpůsobení mapy, aby zobrazovala celou trasu
-    map.fitBounds(route.getBounds(), {padding: [50, 50]});
-
-    // Odstranění tříd pro optimalizaci před vytvořením nové trasy
+    // Optimalizace pro rychlejší výpočet trasy
     document.body.classList.remove('map-zooming', 'map-moving');
     const routingPane = document.querySelector('.leaflet-overlay-pane');
     if (routingPane) {
@@ -871,8 +837,26 @@ function calculateRouteFunction() {
     }
 
     // Vytvoření nové trasy s optimalizovanými nastaveními
-    routeControl = L.Routing.control({
+    // Upravené nastavení pro rychlejší zobrazení trasy
+    const optimizedRoutingOptions = {
         ...routingOptions,
+        lineOptions: {
+            ...routingOptions.lineOptions,
+            styles: [
+                {color: 'blue', opacity: 0.9, weight: 5}
+            ],
+            addWaypoints: false,
+            extendToWaypoints: true,
+            missingRouteTolerance: 0
+        },
+        fitSelectedRoutes: false,
+        useZoomParameter: false,
+        routeWhileDragging: false
+    };
+
+    // Vytvoření nové trasy s optimalizovanými nastaveními
+    routeControl = L.Routing.control({
+        ...optimizedRoutingOptions,
         waypoints: points
     }).addTo(map);
 
@@ -885,18 +869,53 @@ function calculateRouteFunction() {
 
     // Nastavení časového limitu pro získání trasy
     const routeTimeout = setTimeout(() => {
-        // Pokud se trasa nezobrazí do 5 sekund, použijeme přímou trasu
-        if (routeControl) {
-            addMessage('Používám přímou trasu, protože výpočet přesné trasy trvá příliš dlouho.', false);
+        // Pokud se trasa nezobrazí do 3 sekund, vytvoříme přímou trasu
+        if (routeControl && !route) {
+            addMessage('Výpočet přesné trasy trvá déle. Zobrazuji dočasnou přímou trasu.', false);
+
+            // Vytvoření přímé trasy mezi body jako dočasné řešení
+            route = L.polyline(points, {
+                color: 'red',
+                weight: 4,
+                opacity: 0.8,
+                dashArray: '5, 10'
+            }).addTo(map);
+
+            // Výpočet přibližné vzdálenosti přímé trasy
+            let distance = 0;
+            for (let i = 0; i < points.length - 1; i++) {
+                distance += points[i].distanceTo(points[i+1]);
+            }
+
+            // Převod na kilometry
+            const distanceKm = (distance / 1000).toFixed(2);
+
+            // Výpočet přibližného času cesty (průměrná rychlost 50 km/h)
+            const averageSpeedKmh = 50;
+            const timeHours = distanceKm / averageSpeedKmh;
+
+            // Převod na hodiny a minuty
+            const hours = Math.floor(timeHours);
+            const minutes = Math.round((timeHours - hours) * 60);
+            const timeString = hours > 0 ?
+                `${hours} h ${minutes} min` :
+                `${minutes} min`;
+
+            // Aktualizace informací o trase v panelu s přímou trasou
+            routeDistanceElement.textContent = `${distanceKm} km (přímá trasa)`;
+            routeTimeElement.textContent = timeString;
+
+            // Přizpůsobení mapy, aby zobrazovala celou trasu
+            map.fitBounds(route.getBounds(), {padding: [50, 50]});
         }
-    }, 5000);
+    }, 3000);
 
     // Poslech na událost 'routesfound' pro získání informací o trase
     routeControl.on('routesfound', function(e) {
         // Zrušení časového limitu
         clearTimeout(routeTimeout);
 
-        // Odstranění přímé trasy, protože máme přesnou trasu
+        // Odstranění přímé trasy, pokud byla vytvořena
         if (route) {
             map.removeLayer(route);
             route = null;
@@ -943,16 +962,44 @@ function calculateRouteFunction() {
         // Pokud se nepodaří získat trasu přes API, použijeme záložní metodu s přímou čárou
         addMessage('Nepodařilo se získat přesnou trasu po silnicích. Zobrazuji přímou trasu.', false);
 
-        // Přímá trasa již byla vytvořena na začátku funkce, takže nemusíme nic dělat
-        // Pouze aktualizujeme barvu a styl trasy
+        // Vytvoření přímé trasy mezi body jako záložní řešení
         if (route) {
-            route.setStyle({
-                color: 'red',
-                weight: 4,
-                opacity: 0.8,
-                dashArray: '5, 10'
-            });
+            map.removeLayer(route);
         }
+
+        route = L.polyline(points, {
+            color: 'red',
+            weight: 4,
+            opacity: 0.8,
+            dashArray: '5, 10'
+        }).addTo(map);
+
+        // Výpočet přibližné vzdálenosti přímé trasy
+        let distance = 0;
+        for (let i = 0; i < points.length - 1; i++) {
+            distance += points[i].distanceTo(points[i+1]);
+        }
+
+        // Převod na kilometry
+        const distanceKm = (distance / 1000).toFixed(2);
+
+        // Výpočet přibližného času cesty (průměrná rychlost 50 km/h)
+        const averageSpeedKmh = 50;
+        const timeHours = distanceKm / averageSpeedKmh;
+
+        // Převod na hodiny a minuty
+        const hours = Math.floor(timeHours);
+        const minutes = Math.round((timeHours - hours) * 60);
+        const timeString = hours > 0 ?
+            `${hours} h ${minutes} min` :
+            `${minutes} min`;
+
+        // Aktualizace informací o trase v panelu
+        routeDistanceElement.textContent = `${distanceKm} km (přímá trasa)`;
+        routeTimeElement.textContent = timeString;
+
+        // Přizpůsobení mapy, aby zobrazovala celou trasu
+        map.fitBounds(route.getBounds(), {padding: [50, 50]});
 
         // Uložení stavu aplikace po výpočtu trasy
         saveAppState();
