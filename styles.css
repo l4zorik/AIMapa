@@ -2330,6 +2330,26 @@ body[data-theme="dark"] .leaflet-routing-line {
     /* display: block; - Toto je nyní řízeno JavaScriptem */
 }
 
+/* Zvýraznění tlačítka návratu z glóbus režimu v glóbus režimu */
+.map-globe-mode #exitGlobeMode {
+    animation: pulse 2s infinite;
+    border: 3px solid white;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+}
+
+/* Animace pulzování pro tlačítko návratu z glóbus režimu */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+    }
+}
+
 .map-globe-mode #map {
     visibility: hidden;
 }
@@ -3357,6 +3377,17 @@ body.fullscreen-mode {
     color: white;
     transition: all 0.3s ease;
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+    z-index: 1500; /* Vyšší z-index než mapa (1000) */
+    position: absolute; /* Explicitní nastavení pozice */
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    border: 2px solid white; /* Výraznější okraj pro lepší viditelnost */
 }
 
 #exitGlobeMode:hover {
@@ -3455,6 +3486,17 @@ body[data-theme="dark"] .map-globe-control-btn:hover {
         right: 10px;
         width: 36px;
         height: 36px;
+    }
+
+    /* Optimalizace pro tlačítko návratu z glóbus režimu na malých obrazovkách */
+    #exitGlobeMode {
+        top: 60px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        border-width: 2px;
+        z-index: 2000; /* Ještě vyšší z-index pro malé obrazovky */
     }
 }
 

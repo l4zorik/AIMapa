@@ -1740,7 +1740,10 @@ function toggleGlobeMode() {
 
         // Skrytí tlačítka pro glóbus režim a zobrazení tlačítka pro návrat na mapu
         toggleGlobeBtn.style.display = 'none';
-        exitGlobeBtn.style.display = 'block';
+        exitGlobeBtn.style.display = 'flex'; // Použití flex místo block pro lepší zarovnání
+
+        // Zajištění, že tlačítko pro návrat bude vždy nad ostatními prvky
+        exitGlobeBtn.style.zIndex = '2000';
 
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');

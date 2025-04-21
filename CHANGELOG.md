@@ -25,6 +25,16 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.7.1] - 2025-04-20 - VYLEPŠENÍ VIDITELNOSTI TLAČÍTKA PRO NÁVRAT Z GLÓBUS REŽIMU
+
+### Vylepšení viditelnosti tlačítka pro návrat z glóbus režimu
+
+- Vylepšena viditelnost tlačítka pro návrat z glóbus režimu i na malých obrazovkách
+- Přidána animace pulzování pro tlačítko návratu z glóbus režimu pro lepší viditelnost
+- Zvýšen z-index tlačítka, aby bylo vždy nad ostatními prvky
+- Přidán výraznější okraj a stín pro lepší viditelnost tlačítka
+- Optimalizováno zobrazení tlačítka na různých velikostech obrazovky
+
 ## [0.2.7.0] - 2025-04-20 - VYLEPŠENÍ GLÓBUS REŽIMU
 
 ### Vylepšení glóbus režimu
