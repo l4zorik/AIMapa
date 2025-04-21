@@ -1723,6 +1723,7 @@ function remove3DControls() {
 // Funkce pro přepnutí glóbus režimu s Globe.GL
 function toggleGlobeMode() {
     const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+    const exitGlobeBtn = document.getElementById('exitGlobeMode');
 
     // Pokud je aktivní 3D režim, nejprve ho deaktivujeme
     if (is3DMode) {
@@ -1736,6 +1737,10 @@ function toggleGlobeMode() {
 
         // Aktivace glóbus režimu
         toggleGlobeBtn.classList.add('active');
+
+        // Skrytí tlačítka pro glóbus režim a zobrazení tlačítka pro návrat na mapu
+        toggleGlobeBtn.style.display = 'none';
+        exitGlobeBtn.style.display = 'block';
 
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
@@ -1829,6 +1834,10 @@ function toggleGlobeMode() {
 
         // Deaktivace glóbus režimu
         toggleGlobeBtn.classList.remove('active');
+
+        // Zobrazení tlačítka pro glóbus režim a skrytí tlačítka pro návrat na mapu
+        toggleGlobeBtn.style.display = 'block';
+        exitGlobeBtn.style.display = 'none';
 
         // Odstranění třídy pro glóbus režim
         document.getElementById('map').classList.remove('map-globe-mode');
@@ -2983,6 +2992,12 @@ window.addEventListener('load', () => {
     const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
     if (toggleGlobeBtn) {
         toggleGlobeBtn.addEventListener('click', toggleGlobeMode);
+    }
+
+    // Přidání event listeneru pro tlačítko návratu z glóbus režimu
+    const exitGlobeBtn = document.getElementById('exitGlobeMode');
+    if (exitGlobeBtn) {
+        exitGlobeBtn.addEventListener('click', toggleGlobeMode);
     }
 
     // Nastavení automatického ukládání stavu aplikace při změnách

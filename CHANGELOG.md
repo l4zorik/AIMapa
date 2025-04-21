@@ -25,6 +25,15 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.7.0] - 2025-04-20 - VYLEPŠENÍ GLÓBUS REŽIMU
+
+### Vylepšení glóbus režimu
+
+- Přidáno tlačítko pro návrat z glóbus režimu zpět na 2D mapu
+- Po aktivaci glóbus režimu se nyní skryje tlačítko pro aktivaci glóbus režimu a zobrazí se tlačítko pro návrat na 2D mapu
+- Vylepšeny CSS styly pro tlačítka glóbus režimu
+- Optimalizováno přepínání mezi glóbus režimem a 2D mapou
+
 ## [0.2.6.5] - 2025-04-20 - OPRAVA GLÓBUS REŽIMU
 
 ### Oprava glóbus režimu
