@@ -25,9 +25,9 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.2.5.0] - 2025-04-20 - INTERAKTIVNÍ 3D GLÓBUS - EXPERIMENTÁLNÍ VERZE
+## [0.2.5.0] - 2025-04-20 - ZJEDNODUŠENÝ GLÓBUS REŽIM
 
-### Experimentální implementace interaktivního 3D glóbusu
+### Experimentální implementace glóbus režimu
 
 - Pokus o implementaci interaktivního 3D glóbusu s využitím knihovny Three.js
 - Vytvoření základního rozhraní pro 3D glóbus

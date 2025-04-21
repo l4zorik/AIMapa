@@ -1745,28 +1745,28 @@ function toggleGlobeMode() {
         console.log('Střed mapy:', center);
 
         try {
-            // Inicializace Globe.GL
-            if (typeof window.initGlobeGL === 'function') {
-                console.log('Inicializace Globe.GL glóbusu');
-                const success = window.initGlobeGL();
+            // Inicializace jednoduchého glóbusu
+            if (typeof window.initSimpleGlobe === 'function') {
+                console.log('Inicializace jednoduchého glóbusu');
+                const success = window.initSimpleGlobe();
                 if (!success) {
-                    throw new Error('Inicializace Globe.GL glóbusu selhala');
+                    throw new Error('Inicializace jednoduchého glóbusu selhala');
                 }
-                console.log('Globe.GL glóbus byl úspěšně inicializován');
+                console.log('Jednoduchý glóbus byl úspěšně inicializován');
 
                 // Přidání bodů na glóbus
-                if (markers.length > 0 && typeof window.addPointsToGlobe === 'function') {
-                    window.addPointsToGlobe(markers);
+                if (markers.length > 0 && typeof window.addPointsToSimpleGlobe === 'function') {
+                    window.addPointsToSimpleGlobe(markers);
                     console.log('Body byly přidány na glóbus');
 
                     // Přidání tras mezi body
-                    if (markers.length > 1 && typeof window.addArcsToGlobe === 'function') {
-                        window.addArcsToGlobe(markers);
+                    if (markers.length > 1 && typeof window.addArcsToSimpleGlobe === 'function') {
+                        window.addArcsToSimpleGlobe(markers);
                         console.log('Trasy byly přidány na glóbus');
                     }
                 }
             } else {
-                throw new Error('Funkce initGlobeGL není dostupná');
+                throw new Error('Funkce initSimpleGlobe není dostupná');
             }
 
             // Přidání ovládacích prvků pro glóbus
@@ -1780,8 +1780,8 @@ function toggleGlobeMode() {
             }
 
         } catch (error) {
-            console.error('Chyba při inicializaci Globe.GL glóbusu:', error);
-            addMessage('Nepodařilo se inicializovat 3D glóbus. Chyba: ' + error.message, true);
+            console.error('Chyba při inicializaci jednoduchého glóbusu:', error);
+            addMessage('Nepodařilo se inicializovat glóbus. Chyba: ' + error.message, true);
             isGlobeMode = false;
             toggleGlobeBtn.classList.remove('active');
             document.getElementById('map').classList.remove('map-globe-mode');
@@ -1789,7 +1789,7 @@ function toggleGlobeMode() {
         }
 
         // Informace pro uživatele
-        addMessage('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako interaktivní 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
+        addMessage('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako interaktivní kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
     } else {
         console.log('Deaktivace glóbus režimu');
 
@@ -1801,8 +1801,8 @@ function toggleGlobeMode() {
 
         try {
             // Vyčištění glóbusu
-            if (typeof window.clearGlobe === 'function') {
-                window.clearGlobe();
+            if (typeof window.clearSimpleGlobe === 'function') {
+                window.clearSimpleGlobe();
                 console.log('Všechny objekty byly odstraněny z glóbusu');
             }
 
@@ -1810,7 +1810,7 @@ function toggleGlobeMode() {
             removeGlobeControls();
 
             // Skrytí kontejneru
-            const container = document.getElementById('globeGlContainer');
+            const container = document.getElementById('simpleGlobeContainer');
             if (container) {
                 container.style.display = 'none';
             }
