@@ -315,9 +315,7 @@ body[data-theme="dark"] .chat-messages {
     padding: 10px;
     border-radius: 5px;
     max-width: 90%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    white-space: pre-line;
 }
 
 .message.ai {
@@ -335,53 +333,51 @@ body[data-theme="dark"] .message.ai {
     align-self: flex-end;
 }
 
-/* Styly pro obsah zprávy */
-.message-content {
-    white-space: pre-line;
+/* Styly pro návrhy dalších akcí */
+.message-container {
+    margin-bottom: 15px;
 }
 
-/* Styly pro návrhy dalších akcí */
-.message-suggestions {
+.suggestions-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
     margin-top: 5px;
+    margin-left: 12px;
 }
 
 .suggestion-btn {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(139, 92, 246, 0.15);
+    color: var(--primary-color);
+    border: 1px solid rgba(139, 92, 246, 0.3);
     border-radius: 15px;
-    padding: 5px 12px;
-    font-size: 0.85rem;
-    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
 }
 
 .suggestion-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
+    background-color: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
 }
 
 .suggestion-btn:active {
-    transform: translateY(0);
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(139, 92, 246, 0.35);
+    transform: scale(0.98);
 }
 
-body[data-theme="dark"] .suggestion-btn {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-color: rgba(255, 255, 255, 0.15);
+/* Tmavý režim pro návrhy */
+[data-theme="dark"] .suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border-color: rgba(139, 92, 246, 0.4);
 }
 
-body[data-theme="dark"] .suggestion-btn:hover {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.25);
+[data-theme="dark"] .suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
 }
 
 .chat-input {
