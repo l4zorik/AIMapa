@@ -25,6 +25,16 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.7.2] - 2025-04-20 - ZOBRAZENÍ TRASY Z KLASICKÉ MAPY NA GLÓBUSU
+
+### Zobrazení trasy z klasické mapy na glóbusu
+
+- Přidána funkce pro zobrazení trasy z klasické mapy na glóbusu
+- Trasa se nyní automaticky zobrazuje na glóbusu při přepnutí do glóbus režimu
+- Trasa se aktualizuje při výpočtu nové trasy, pokud je glóbus režim aktivní
+- Podpora pro různé typy tras (přímá trasa, trasa z Leaflet Routing Machine)
+- Trasa na glóbusu má odlišnou barvu pro lepší odlišení od tras mezi body
+
 ## [0.2.7.1] - 2025-04-20 - VYLEPŠENÍ VIDITELNOSTI TLAČÍTKA PRO NÁVRAT Z GLÓBUS REŽIMU
 
 ### Vylepšení viditelnosti tlačítka pro návrat z glóbus režimu

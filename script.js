@@ -1053,6 +1053,12 @@ function calculateRouteFunction() {
 
                     // Přizpůsobení mapy, aby zobrazovala celou trasu
                     map.fitBounds(route.getBounds(), {padding: [50, 50]});
+
+                    // Přidání trasy na glóbus, pokud je glóbus režim aktivní
+                    if (isGlobeMode && typeof addRouteToGlobe === 'function') {
+                        addRouteToGlobe(route);
+                        console.log('Přímá trasa byla přidána na glóbus');
+                    }
                 }
             }, 2000);
 
@@ -1092,6 +1098,12 @@ function calculateRouteFunction() {
                 // Přizpůsobení mapy, aby zobrazovala celou trasu
                 if (routes[0].coordinates && routes[0].coordinates.length > 0) {
                     map.fitBounds(L.latLngBounds(routes[0].coordinates), {padding: [50, 50]});
+                }
+
+                // Přidání trasy na glóbus, pokud je glóbus režim aktivní
+                if (isGlobeMode && typeof addRouteToGlobe === 'function') {
+                    addRouteToGlobe(routeControl);
+                    console.log('Trasa byla přidána na glóbus');
                 }
 
                 // Uložení stavu aplikace po výpočtu trasy
@@ -1146,6 +1158,12 @@ function calculateRouteFunction() {
 
                 // Přizpůsobení mapy, aby zobrazovala celou trasu
                 map.fitBounds(route.getBounds(), {padding: [50, 50]});
+
+                // Přidání trasy na glóbus, pokud je glóbus režim aktivní
+                if (isGlobeMode && typeof addRouteToGlobe === 'function') {
+                    addRouteToGlobe(route);
+                    console.log('Záložní trasa byla přidána na glóbus');
+                }
 
                 // Uložení stavu aplikace po výpočtu trasy
                 saveAppState();
@@ -1807,7 +1825,20 @@ function toggleGlobeMode() {
                     // Přidání tras mezi body
                     if (markers.length > 1 && typeof addArcsToSimpleGlobe === 'function') {
                         addArcsToSimpleGlobe(markers);
-                        console.log('Trasy byly přidány na glóbus');
+                        console.log('Trasy mezi body byly přidány na glóbus');
+                    }
+
+                    // Přidání aktuální trasy na glóbus, pokud existuje
+                    if (typeof addRouteToGlobe === 'function') {
+                        if (route) {
+                            // Přímá trasa
+                            addRouteToGlobe(route);
+                            console.log('Aktuální přímá trasa byla přidána na glóbus');
+                        } else if (routeControl) {
+                            // Trasa z Leaflet Routing Machine
+                            addRouteToGlobe(routeControl);
+                            console.log('Aktuální trasa z Leaflet Routing Machine byla přidána na glóbus');
+                        }
                     }
                 }
             } else {
