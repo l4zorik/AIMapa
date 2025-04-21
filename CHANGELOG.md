@@ -8,10 +8,11 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 Tato verze představuje návrat k poslední stabilní verzi 0.2.4, která poskytuje spolehlivou funkčnost všech základních funkcí aplikace. Po několika pokusech o opravu problémů v novějších verzích bylo rozhodnuto vrátit se k této ověřené verzi a zachovat dokumentaci o provedených změnách pro případné budoucí využití.
 
-## [0.2.4.2] - 2025-04-20 - OPTIMALIZACE VÝPOČTU TRASY
+## [0.2.4.2] - 2025-04-20 - OPTIMALIZACE VÝKONU A STABILITY
 
-### Optimalizace výpočtu trasy
+### Optimalizace výkonu a stability
 
+#### Optimalizace výpočtu trasy
 - Implementováno přímé volání OSRM API pro rychlejší výpočet trasy
 - Optimalizována konfigurace Leaflet Routing Machine pro lepší výkon
 - Snížen časový limit pro zobrazení dočasné přímé trasy z 3 na 2 sekundy
@@ -20,6 +21,27 @@ Tato verze představuje návrat k poslední stabilní verzi 0.2.4, která poskyt
 - Implementován systém záložního výpočtu trasy při selhání primární metody
 - Optimalizovány síťové požadavky pro rychlejší odezvu
 - Vylepšeno vykreslování trasy pro plynulejší zobrazení
+
+#### Optimalizace správy event listenerů
+- Implementován systém pro sledování a správu event listenerů
+- Přidány funkce pro automatické odstranění event listenerů při odstranění elementů
+- Vylepšena detekce a prevence duplicitních event listenerů
+- Optimalizována paměťová náročnost při práci s event listenery
+
+#### Optimalizace ukládání a načítání stavu aplikace
+- Implementován systém pro rozdělení velkých dat při ukládání do localStorage
+- Přidána validace dat při načítání stavu aplikace
+- Implementován systém zálohování a obnovy při selhání ukládání/načítání
+- Vylepšeno zpracování chyb při práci s localStorage
+- Přidána podpora pro verzování stavu aplikace
+- Optimalizována velikost ukládaných dat pro lepší výkon
+
+#### Vylepšení stability aplikace
+- Implementována robustní validace všech vstupních dat
+- Vylepšeno zpracování chyb ve všech částech aplikace
+- Přidány mechanismy pro automatickou obnovu při selhání
+- Optimalizována práce s pamětí pro prevenci úniků paměti
+- Vylepšena kompatibilita s různými prohlížeči
 
 ## [0.2.4.1] - 2025-04-20 - STABILNÍ VERZE S DOKUMENTACÍ Z NOUZOVÉ VERZE
 

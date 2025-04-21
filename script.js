@@ -50,6 +50,58 @@ let osmb = null; // Proměnná pro OSM Buildings
 let cesiumViewer = null; // Proměnná pro Cesium Viewer
 let globeMarkers = []; // Proměnná pro markery na glóbusu
 
+// Globální proměnná pro ukládání event listenerů
+let eventListeners = [];
+
+// Pomocná funkce pro přidání event listeneru s automatickým sledováním
+function addTrackedEventListener(element, eventType, handler, options) {
+    if (!element) {
+        console.warn('Pokus o přidání event listeneru na neexistující element');
+        return;
+    }
+
+    // Přidání event listeneru
+    element.addEventListener(eventType, handler, options);
+
+    // Uložení reference pro pozdější odstranění
+    eventListeners.push({
+        element: element,
+        eventType: eventType,
+        handler: handler
+    });
+
+    return handler; // Vrátíme handler pro případ, že ho budeme potřebovat jinde
+}
+
+// Funkce pro odstranění všech event listenerů pro daný element
+function removeAllEventListeners(element) {
+    if (!element) return;
+
+    // Najdeme všechny event listenery pro daný element a odstraníme je
+    const listenersToRemove = eventListeners.filter(listener => listener.element === element);
+
+    listenersToRemove.forEach(listener => {
+        listener.element.removeEventListener(listener.eventType, listener.handler);
+    });
+
+    // Aktualizujeme globální pole event listenerů
+    eventListeners = eventListeners.filter(listener => listener.element !== element);
+}
+
+// Funkce pro odstranění konkrétního event listeneru
+function removeTrackedEventListener(element, eventType, handler) {
+    if (!element) return;
+
+    // Odstraníme event listener
+    element.removeEventListener(eventType, handler);
+
+    // Aktualizujeme globální pole event listenerů
+    eventListeners = eventListeners.filter(listener =>
+        !(listener.element === element &&
+          listener.eventType === eventType &&
+          listener.handler === handler));
+}
+
 // Konfigurace pro Leaflet Routing Machine
 const routingOptions = {
     router: L.Routing.osrmv1({
@@ -2335,7 +2387,7 @@ function saveAppState() {
     // Uložení nastavení aplikace
     const settings = {
         darkMode: document.getElementById('darkModeToggle').checked,
-        colorScheme: document.querySelector('.color-option.active').getAttribute('data-color'),
+        colorScheme: document.querySelector('.color-option.active')?.getAttribute('data-color') || 'blue',
         markerStyle: markerStyle,
         markerEffectsEnabled: markerEffectsEnabled
     };
@@ -2355,31 +2407,158 @@ function saveAppState() {
         settings: settings,
         mapState: mapState,
         deletedMarkerCommands: deletedMarkerCommands,
-        lastSaved: new Date().toISOString()
+        lastSaved: new Date().toISOString(),
+        version: '0.2.4.2' // Přidání verze pro lepší správu kompatibility
     };
 
-    // Uložení do localStorage
+    // Uložení do localStorage s kompresí pro úsporu místa
     try {
-        localStorage.setItem('aiMapAppState', JSON.stringify(appState));
-        console.log('Stav aplikace byl úspěšně uložen:', appState);
+        // Rozdělení dat na menší části, pokud jsou příliš velká
+        const jsonString = JSON.stringify(appState);
+
+        // Kontrola velikosti dat
+        if (jsonString.length > 4000000) { // Pokud je velikost větší než 4MB
+            console.warn('Data jsou příliš velká pro localStorage, bude provedena optimalizace.');
+
+            // Optimalizace dat - omezení počtu markerů
+            if (markersData.length > 100) {
+                appState.markers = markersData.slice(0, 100);
+                console.warn(`Počet markerů byl omezen na 100 z původních ${markersData.length}.`);
+            }
+
+            // Pokud jsou data stále příliš velká, zkusíme je rozdělit
+            const optimizedJsonString = JSON.stringify(appState);
+            if (optimizedJsonString.length > 5000000) {
+                // Rozdělení dat na části
+                const chunkSize = 1000000; // 1MB na část
+                const chunks = [];
+
+                for (let i = 0; i < optimizedJsonString.length; i += chunkSize) {
+                    chunks.push(optimizedJsonString.slice(i, i + chunkSize));
+                }
+
+                // Uložení počtu částí
+                localStorage.setItem('aiMapAppState_chunks', chunks.length.toString());
+
+                // Uložení jednotlivých částí
+                chunks.forEach((chunk, index) => {
+                    localStorage.setItem(`aiMapAppState_chunk_${index}`, chunk);
+                });
+
+                console.log(`Stav aplikace byl rozdělen na ${chunks.length} částí a úspěšně uložen.`);
+            } else {
+                localStorage.setItem('aiMapAppState', optimizedJsonString);
+                localStorage.removeItem('aiMapAppState_chunks'); // Odstranění předchozího rozdělení, pokud existovalo
+                console.log('Optimalizovaný stav aplikace byl úspěšně uložen.');
+            }
+        } else {
+            localStorage.setItem('aiMapAppState', jsonString);
+            localStorage.removeItem('aiMapAppState_chunks'); // Odstranění předchozího rozdělení, pokud existovalo
+            console.log('Stav aplikace byl úspěšně uložen.');
+        }
+
         return true;
     } catch (error) {
         console.error('Chyba při ukládání stavu aplikace:', error);
-        return false;
+
+        // Pokus o záchranu - uložení pouze základních dat
+        try {
+            const minimalState = {
+                mapState: mapState,
+                settings: settings,
+                version: '0.2.4.2',
+                lastSaved: new Date().toISOString(),
+                error: 'Kompletní data nemohla být uložena kvůli překročení limitu localStorage.'
+            };
+
+            localStorage.setItem('aiMapAppState_minimal', JSON.stringify(minimalState));
+            console.log('Uložena minimální verze stavu aplikace.');
+
+            // Informace pro uživatele
+            addMessage('Nepodařilo se uložit všechna data aplikace. Některá data mohou být ztracena.', false);
+
+            return false;
+        } catch (backupError) {
+            console.error('Selhal i záložní pokus o uložení:', backupError);
+            return false;
+        }
     }
 }
 
 // Funkce pro načtení stavu aplikace z localStorage
 function loadAppState() {
     try {
-        const savedState = localStorage.getItem('aiMapAppState');
-        if (!savedState) {
-            console.log('Nenalezen žádný uložený stav aplikace.');
-            return false;
+        // Nejprve zkontrolujeme, zda existuje rozdělený stav
+        const chunksCount = localStorage.getItem('aiMapAppState_chunks');
+        let savedStateJson = null;
+
+        if (chunksCount) {
+            // Načtení rozděleného stavu
+            console.log(`Načítám stav aplikace rozdělený na ${chunksCount} částí.`);
+
+            try {
+                // Spojení všech částí
+                let combinedState = '';
+                for (let i = 0; i < parseInt(chunksCount); i++) {
+                    const chunk = localStorage.getItem(`aiMapAppState_chunk_${i}`);
+                    if (chunk) {
+                        combinedState += chunk;
+                    } else {
+                        throw new Error(`Chybí část ${i} stavu aplikace.`);
+                    }
+                }
+
+                savedStateJson = combinedState;
+                console.log('Stav aplikace byl úspěšně sestaven z částí.');
+            } catch (chunkError) {
+                console.error('Chyba při načítání rozděleného stavu:', chunkError);
+
+                // Pokus o načtení běžného stavu jako zálohy
+                savedStateJson = localStorage.getItem('aiMapAppState');
+                if (!savedStateJson) {
+                    // Pokus o načtení minimálního stavu jako zálohy
+                    const minimalState = localStorage.getItem('aiMapAppState_minimal');
+                    if (minimalState) {
+                        console.log('Načítám minimální stav aplikace jako zálohu.');
+                        savedStateJson = minimalState;
+                    } else {
+                        console.log('Nenalezen žádný uložený stav aplikace.');
+                        return false;
+                    }
+                }
+            }
+        } else {
+            // Načtení běžného stavu
+            savedStateJson = localStorage.getItem('aiMapAppState');
+
+            if (!savedStateJson) {
+                // Pokus o načtení minimálního stavu jako zálohy
+                const minimalState = localStorage.getItem('aiMapAppState_minimal');
+                if (minimalState) {
+                    console.log('Načítám minimální stav aplikace.');
+                    savedStateJson = minimalState;
+                } else {
+                    console.log('Nenalezen žádný uložený stav aplikace.');
+                    return false;
+                }
+            }
         }
 
-        const appState = JSON.parse(savedState);
+        // Parsování JSON
+        const appState = JSON.parse(savedStateJson);
         console.log('Načten stav aplikace:', appState);
+
+        // Kontrola verze pro zajištění kompatibility
+        if (appState.version && appState.version !== '0.2.4.2') {
+            console.log(`Načten stav z jiné verze aplikace (${appState.version}). Probíhá konverze...`);
+            // Zde by mohla být logika pro konverzi dat mezi verzemi, pokud by bylo potřeba
+        }
+
+        // Kontrola, zda se jedná o minimální stav
+        if (appState.error) {
+            console.warn('Načten minimální stav aplikace s chybou:', appState.error);
+            addMessage('Některá data aplikace nemohla být načtena. Některé body mohou chybět.', false);
+        }
 
         // Načtení nastavení aplikace
         if (appState.settings) {
@@ -2461,59 +2640,126 @@ function loadAppState() {
 
         // Načtení stavu mapy
         if (appState.mapState) {
-            map.setView(
-                [appState.mapState.center.lat, appState.mapState.center.lng],
-                appState.mapState.zoom
-            );
+            try {
+                // Validace souřadnic
+                const lat = parseFloat(appState.mapState.center.lat);
+                const lng = parseFloat(appState.mapState.center.lng);
+                const zoom = parseFloat(appState.mapState.zoom);
+
+                if (isNaN(lat) || isNaN(lng) || isNaN(zoom) ||
+                    lat < -90 || lat > 90 || lng < -180 || lng > 180 ||
+                    zoom < 1 || zoom > 20) {
+                    console.warn('Neplatné souřadnice nebo zoom, použiji výchozí hodnoty.');
+                    map.setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
+                } else {
+                    map.setView([lat, lng], zoom);
+                }
+            } catch (mapError) {
+                console.error('Chyba při nastavení pohledu mapy:', mapError);
+                map.setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
+            }
         }
 
         // Načtení smazaných příkazů
-        if (appState.deletedMarkerCommands && appState.deletedMarkerCommands.length > 0) {
-            deletedMarkerCommands = appState.deletedMarkerCommands;
-            console.log('Načteno ' + deletedMarkerCommands.length + ' smazaných příkazů.');
+        if (appState.deletedMarkerCommands && Array.isArray(appState.deletedMarkerCommands)) {
+            try {
+                // Validace smazaných příkazů
+                const validCommands = appState.deletedMarkerCommands.filter(cmd => {
+                    // Kontrola, zda má všechny potřebné vlastnosti
+                    return cmd && cmd.name && cmd.command &&
+                           typeof cmd.lat === 'number' && !isNaN(cmd.lat) &&
+                           typeof cmd.lng === 'number' && !isNaN(cmd.lng) &&
+                           cmd.lat >= -90 && cmd.lat <= 90 &&
+                           cmd.lng >= -180 && cmd.lng <= 180;
+                });
+
+                deletedMarkerCommands = validCommands;
+                console.log('Načteno ' + deletedMarkerCommands.length + ' smazaných příkazů.');
+
+                if (validCommands.length < appState.deletedMarkerCommands.length) {
+                    console.warn(`${appState.deletedMarkerCommands.length - validCommands.length} neplatných smazaných příkazů bylo ignorováno.`);
+                }
+            } catch (commandsError) {
+                console.error('Chyba při načítání smazaných příkazů:', commandsError);
+                deletedMarkerCommands = [];
+            }
         }
 
         // Načtení markerů
-        if (appState.markers && appState.markers.length > 0) {
+        if (appState.markers && Array.isArray(appState.markers) && appState.markers.length > 0) {
             // Odstranění všech stávajících markerů
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
             markerProperties = [];
 
-            // Přidání uložených markerů
+            // Přidání uložených markerů s validací
+            let validMarkersCount = 0;
+            let invalidMarkersCount = 0;
+
             appState.markers.forEach(markerData => {
-                const markerIndex = markers.length;
+                try {
+                    // Validace dat markeru
+                    if (!markerData.lat || !markerData.lng ||
+                        isNaN(parseFloat(markerData.lat)) || isNaN(parseFloat(markerData.lng)) ||
+                        parseFloat(markerData.lat) < -90 || parseFloat(markerData.lat) > 90 ||
+                        parseFloat(markerData.lng) < -180 || parseFloat(markerData.lng) > 180) {
+                        console.warn('Neplatné souřadnice markeru:', markerData);
+                        invalidMarkersCount++;
+                        return; // Přeskočení neplatného markeru
+                    }
 
-                // Vytvoření vlastního markeru s číslem
-                const customIcon = createCustomMarkerIcon(markerIndex + 1, markerIndex);
+                    const markerIndex = markers.length;
 
-                const marker = L.marker([markerData.lat, markerData.lng], {
-                    draggable: true,
-                    title: markerData.properties.name,
-                    icon: customIcon // Použití vlastního ikony
-                }).addTo(map);
+                    // Vytvoření vlastního markeru s číslem
+                    const customIcon = createCustomMarkerIcon(markerIndex + 1, markerIndex);
 
-                markers.push(marker);
-                markerProperties[markerIndex] = markerData.properties;
+                    const marker = L.marker([markerData.lat, markerData.lng], {
+                        draggable: true,
+                        title: markerData.properties?.name || `Bod ${markerIndex + 1}`,
+                        icon: customIcon // Použití vlastního ikony
+                    }).addTo(map);
 
-                // Nastavení příznaku saved na true pro načtené body (pro zpětnou kompatibilitu)
-                if (markerProperties[markerIndex].saved === undefined) {
-                    markerProperties[markerIndex].saved = true;
+                    markers.push(marker);
+
+                    // Validace vlastností markeru
+                    if (!markerData.properties) {
+                        markerData.properties = { name: `Bod ${markerIndex + 1}`, command: `bod${markerIndex + 1}` };
+                    } else {
+                        // Kontrola povinných vlastností
+                        if (!markerData.properties.name) {
+                            markerData.properties.name = `Bod ${markerIndex + 1}`;
+                        }
+                        if (!markerData.properties.command) {
+                            markerData.properties.command = `bod${markerIndex + 1}`;
+                        }
+                    }
+
+                    markerProperties[markerIndex] = markerData.properties;
+
+                    // Nastavení příznaku saved na true pro načtené body (pro zpětnou kompatibilitu)
+                    if (markerProperties[markerIndex].saved === undefined) {
+                        markerProperties[markerIndex].saved = true;
+                    }
+
+                    // Přidání popup s formulářem
+                    marker.bindPopup(createPopupContent(marker, markerIndex), {
+                        className: 'marker-popup',
+                        maxWidth: 350,
+                        minWidth: 250,
+                        autoPan: true,
+                        autoPanPadding: [50, 50],
+                        closeOnClick: false,
+                        autoClose: false
+                    });
+
+                    // Přidání event listenerů pro marker
+                    setupMarkerEventListeners(marker, markerIndex);
+
+                    validMarkersCount++;
+                } catch (markerError) {
+                    console.error('Chyba při vytváření markeru:', markerError, markerData);
+                    invalidMarkersCount++;
                 }
-
-                // Přidání popup s formulářem
-                marker.bindPopup(createPopupContent(marker, markerIndex), {
-                    className: 'marker-popup',
-                    maxWidth: 350,
-                    minWidth: 250,
-                    autoPan: true,
-                    autoPanPadding: [50, 50],
-                    closeOnClick: false,
-                    autoClose: false
-                });
-
-                // Přidání event listenerů pro marker
-                setupMarkerEventListeners(marker, markerIndex);
             });
 
             // Pokud máme alespoň dva body, vypočítáme trasu
@@ -2521,12 +2767,33 @@ function loadAppState() {
                 calculateRouteFunction();
             }
 
-            addMessage(`Načteno ${markers.length} bodů z předchozího sezení.`, false);
+            // Informace pro uživatele
+            if (invalidMarkersCount > 0) {
+                addMessage(`Načteno ${validMarkersCount} bodů z předchozího sezení. ${invalidMarkersCount} bodů nebylo možné načíst kvůli chybě.`, false);
+            } else {
+                addMessage(`Načteno ${validMarkersCount} bodů z předchozího sezení.`, false);
+            }
         }
 
         return true;
     } catch (error) {
         console.error('Chyba při načítání stavu aplikace:', error);
+
+        // Pokus o obnovení základního stavu
+        try {
+            // Nastavení výchozího pohledu mapy
+            map.setView([49.8175, 15.4730], 7);
+
+            // Odstranění všech markerů
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            markerProperties = [];
+
+            addMessage('Došlo k chybě při načítání stavu aplikace. Aplikace byla resetována do výchozího stavu.', false);
+        } catch (recoveryError) {
+            console.error('Chyba při obnově základního stavu:', recoveryError);
+        }
+
         return false;
     }
 }
