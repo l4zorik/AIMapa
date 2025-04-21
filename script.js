@@ -1773,35 +1773,15 @@ function toggleGlobeMode() {
                 throw new Error('Funkce initThreeJsGlobe není dostupná');
             }
 
-            // Přidání markerů na glóbus
-            console.log('Přidávání markerů na glóbus');
-            if (typeof window.addMarkersToThreeGlobe === 'function') {
-                window.addMarkersToThreeGlobe();
-                console.log('Markery byly přidány na glóbus');
-            } else {
-                console.warn('Funkce addMarkersToThreeGlobe není dostupná');
-            }
-
-            // Přidání tras mezi body na glóbusu
-            console.log('Přidávání tras na glóbus');
-            if (typeof window.addRoutesToThreeGlobe === 'function') {
-                window.addRoutesToThreeGlobe();
-                console.log('Trasy byly přidány na glóbus');
-            } else {
-                console.warn('Funkce addRoutesToThreeGlobe není dostupná');
-            }
+            // V jednodušší verzi nepoužíváme markery a trasy
+            console.log('Používáme zjednodušenou verzi glóbusu bez markerů a tras');
 
             // Přidání ovládacích prvků pro glóbus
             addGlobeControls();
             console.log('Ovládací prvky byly přidány');
 
-            // Spuštění animační smyčky
-            if (typeof window.startThreeAnimation === 'function') {
-                window.startThreeAnimation();
-                console.log('Animační smyčka byla spuštěna');
-            } else {
-                console.warn('Funkce startThreeAnimation není dostupná');
-            }
+            // Animační smyčka je spuštěna automaticky při inicializaci
+            console.log('Animační smyčka je součástí inicializace');
 
             // Pokud není aktivní fullscreen režim, aktivujeme ho
             if (!isFullscreen) {
