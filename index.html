@@ -16,6 +16,8 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Globe.gl pro 3D glóbus -->
+    <script src="https://unpkg.com/globe.gl"></script>
     <!-- Cesium CSS a JS (ponecháno pro zpětnou kompatibilitu) -->
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
@@ -313,13 +315,8 @@
     <!-- OSM Buildings JS pro 3D budovy -->
     <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
     <!-- Cesium JS je již načten v hlavičce -->
-    <!-- Globe.GL knihovna - lokální soubory -->
-    <script src="kapsule-link.js"></script>
-    <script src="globe.js"></script>
-    <script src="index.js"></script>
-    <link rel="stylesheet" href="globe.css">
-    <!-- Jednoduchá implementace glóbusu -->
-    <script src="simple-globe.js"></script>
+    <!-- Přímá implementace Globe.gl -->
+    <script src="globe-simple.js"></script>
     <!-- Hlavní skript aplikace -->
     <script src="script.js"></script>
 </body>

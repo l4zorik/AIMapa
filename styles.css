@@ -2313,6 +2313,67 @@ body[data-theme="dark"] .leaflet-routing-line {
     stroke-opacity: 0.9 !important;
 }
 
+/* Styly pro Globe.GL režim */
+#simpleGlobeContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1000;
+    display: none;
+    background: radial-gradient(ellipse at center, #0d1423 0%, #090a0f 100%);
+}
+
+/* Glóbus kontejner se zobrazí pouze po kliknutí na tlačítko glóbus */
+.map-globe-mode #simpleGlobeContainer {
+    /* display: block; - Toto je nyní řízeno JavaScriptem */
+}
+
+.map-globe-mode #map {
+    visibility: hidden;
+}
+
+/* Ovládací prvky pro Globe.GL */
+.map-globe-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.map-globe-control-btn {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.map-globe-control-btn:hover {
+    background-color: white;
+    transform: scale(1.1);
+}
+
+body[data-theme="dark"] .map-globe-control-btn {
+    background-color: rgba(45, 55, 72, 0.8);
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] .map-globe-control-btn:hover {
+    background-color: #4a5568;
+}
+
 /* Optimalizace pro tmavý režim - popup okna */
 body[data-theme="dark"] .reservation-form h4 {
     color: #e2e8f0;

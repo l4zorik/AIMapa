@@ -25,6 +25,19 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.6.5] - 2025-04-20 - OPRAVA GLÓBUS REŽIMU
+
+### Oprava glóbus režimu
+
+- Opraven problém s aktivací glóbus režimu - nyní se aktivuje pouze po kliknutí na tlačítko glóbus
+- Přidán přímý odkaz na Globe.gl knihovnu z CDN pro zajištění spolehlivé funkce glóbusu
+- Vytvořen nový soubor `globe-simple.js` s jednoduchou implementací Globe.gl
+- Odstraněny nepotřebné soubory, které mohly způsobovat konflikty
+- Vylepšena inicializace glóbusu s automatickým načtením knihovny z CDN, pokud není dostupná
+- Optimalizováno zobrazení glóbusu přes celou plochu mapy
+- Přidána funkce `resizeGlobe` pro aktualizaci velikosti glóbusu po jeho zobrazení
+- Vylepšeny CSS styly pro glóbus kontejner
+
 ## [0.2.5.0] - 2025-04-21 - ZJEDNODUŠENÝ GLÓBUS REŽIM
 
 ### Experimentální implementace glóbus režimu

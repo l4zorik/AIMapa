@@ -1745,23 +1745,60 @@ function toggleGlobeMode() {
         console.log('Střed mapy:', center);
 
         try {
+            // Kontrola, zda je Globe.GL dostupný
+            if (typeof Globe === 'undefined') {
+                console.error('Globe.GL knihovna není dostupná');
+                console.log('Dostupné globální objekty:', Object.keys(window));
+                // Pokus o načtení Globe.gl z CDN
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/globe.gl';
+                script.async = true;
+                script.onload = function() {
+                    console.log('Globe.gl knihovna byla načtena z CDN');
+                    toggleGlobeMode(); // Zkusíme znovu aktivovat glóbus režim
+                };
+                script.onerror = function() {
+                    console.error('Nepodařilo se načíst Globe.gl knihovnu z CDN');
+                    addMessage('Nepodařilo se načíst Globe.gl knihovnu. Zkontrolujte připojení k internetu.', true);
+                };
+                document.head.appendChild(script);
+                return;
+            }
+
             // Inicializace jednoduchého glóbusu
-            if (typeof window.initSimpleGlobe === 'function') {
+            if (typeof initSimpleGlobe === 'function') {
                 console.log('Inicializace jednoduchého glóbusu');
-                const success = window.initSimpleGlobe();
+                const success = initSimpleGlobe();
                 if (!success) {
                     throw new Error('Inicializace jednoduchého glóbusu selhala');
                 }
                 console.log('Jednoduchý glóbus byl úspěšně inicializován');
 
+                // Zobrazení kontejneru pro glóbus
+                const container = document.getElementById('simpleGlobeContainer');
+                if (container) {
+                    container.style.display = 'block';
+                    container.style.width = '100%';
+                    container.style.height = '100%';
+                    console.log('Kontejner pro glóbus byl zobrazen');
+
+                    // Aktualizace velikosti glóbusu po zobrazení
+                    setTimeout(() => {
+                        if (typeof window.resizeGlobe === 'function') {
+                            window.resizeGlobe();
+                            console.log('Velikost glóbusu byla aktualizována');
+                        }
+                    }, 100);
+                }
+
                 // Přidání bodů na glóbus
-                if (markers.length > 0 && typeof window.addPointsToSimpleGlobe === 'function') {
-                    window.addPointsToSimpleGlobe(markers);
+                if (markers.length > 0 && typeof addPointsToSimpleGlobe === 'function') {
+                    addPointsToSimpleGlobe(markers);
                     console.log('Body byly přidány na glóbus');
 
                     // Přidání tras mezi body
-                    if (markers.length > 1 && typeof window.addArcsToSimpleGlobe === 'function') {
-                        window.addArcsToSimpleGlobe(markers);
+                    if (markers.length > 1 && typeof addArcsToSimpleGlobe === 'function') {
+                        addArcsToSimpleGlobe(markers);
                         console.log('Trasy byly přidány na glóbus');
                     }
                 }
@@ -1773,11 +1810,8 @@ function toggleGlobeMode() {
             addGlobeControls();
             console.log('Ovládací prvky byly přidány');
 
-            // Pokud není aktivní fullscreen režim, aktivujeme ho
-            if (!isFullscreen) {
-                toggleFullscreen();
-                console.log('Aktivován fullscreen režim pro lepší zobrazení glóbusu');
-            }
+            // Poznámka: Neaktivujeme automaticky fullscreen režim
+            // Uživatel si může aktivovat fullscreen režim samostatně
 
         } catch (error) {
             console.error('Chyba při inicializaci jednoduchého glóbusu:', error);
@@ -1801,8 +1835,8 @@ function toggleGlobeMode() {
 
         try {
             // Vyčištění glóbusu
-            if (typeof window.clearSimpleGlobe === 'function') {
-                window.clearSimpleGlobe();
+            if (typeof clearSimpleGlobe === 'function') {
+                clearSimpleGlobe();
                 console.log('Všechny objekty byly odstraněny z glóbusu');
             }
 
