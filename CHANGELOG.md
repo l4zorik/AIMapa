@@ -25,6 +25,19 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.7.4] - 2025-04-20 - VYLEPŠENÍ AI CHATU S NÁVRHY DALŠÍCH AKCÍ
+
+### Vylepšení AI chatu s návrhy dalších akcí
+
+- Přidány návrhy dalších akcí v chatovacím rozhraní pro rychlejší interakci
+- Implementovány klikatelné návrhy akcí pod každou zprávou AI asistenta
+- Návrhy akcí se dynamicky mění podle kontextu konverzace a aktuální situace
+- Vylepšen design chatovacího rozhraní pro lepší přehlednost a použitelnost
+- Optimalizováno zobrazení návrhů akcí v plovoucím chatu ve fullscreen režimu
+- Přidány kontextové návrhy pro různé typy dotazů (navigace, body, otevírací doby, atd.)
+- Implementována funkce pro generování relevantních návrhů na základě obsahu odpovědi
+- Vylepšena uvítací zpráva s návrhy nejpoužívanějších akcí
+
 ## [0.2.7.3] - 2025-04-20 - OPTIMALIZACE DLOUHÝCH TRAS NA GLÓBUSU
 
 ### Optimalizace dlouhých tras na glóbusu
