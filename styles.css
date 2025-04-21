@@ -2964,8 +2964,8 @@ body.fullscreen-mode {
     background-color: #000;
 }
 
-/* Three.js glóbus kontejner */
-#threeGlobeContainer {
+/* Globe.GL kontejner */
+.globe-gl-container {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -2982,8 +2982,8 @@ body.fullscreen-mode {
     pointer-events: auto;
 }
 
-/* Styly pro lepší zobrazení Three.js glóbusu */
-.map-globe-mode #threeGlobeContainer {
+/* Styly pro zobrazení Globe.GL glóbusu */
+.map-globe-mode .globe-gl-container {
     display: block;
     z-index: 1000;
     background: radial-gradient(circle at center, #111 0%, #000 100%);

@@ -25,20 +25,36 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.2.5.0] - 2025-04-20 - INTERAKTIVNÍ 3D GLÓBUS
+## [0.2.5.0] - 2025-04-20 - INTERAKTIVNÍ 3D GLÓBUS - EXPERIMENTÁLNÍ VERZE
 
-### Implementace interaktivního 3D glóbusu
+### Experimentální implementace interaktivního 3D glóbusu
 
-- Přidán nový interaktivní 3D glóbus s využitím knihovny Three.js
-- Implementována plynulá rotace a animace glóbusu
-- Přidány realistické textury Země s detailním povrchem
-- Implementováno pokročilé osvětlení pro realistický vzhled
-- Přidáno hvězdné pozadí pro lepší vizualizaci
-- Implementovány interaktivní ovládací prvky pro rotaci, zoom a náklon
-- Přidána podpora pro zobrazení bodů a tras na glóbusu
-- Optimalizován výkon pro plynulý běh i na slabších zařízeních
-- Implementována synchronizace mezi 2D mapou a 3D glóbusem
-- Vylepšena vizualizace tras mezi body s obloukovými křivkami
+- Pokus o implementaci interaktivního 3D glóbusu s využitím knihovny Three.js
+- Vytvoření základního rozhraní pro 3D glóbus
+- Implementace základních funkcí pro rotaci a animaci glóbusu
+- Pokus o integraci textur Země a mraků
+- Implementace základního osvětlení scény
+- Přidání hvězdného pozadí pro lepší vizualizaci
+- Vytvoření ovládacích prvků pro rotaci a zoom
+
+### Identifikované problémy s Three.js implementací
+
+- Zjištěny závažné problémy s kompatibilitou Three.js v různých prohlížečích
+- Problémy s načítáním textur z externích zdrojů
+- Nestabilita při inicializaci Three.js scény
+- Konflikty mezi Leaflet a Three.js knihovnami
+- Problémy s výkonem při rotaci a animaci glóbusu
+- Nekonzistentní zobrazení v různých prohlížečích
+- Problémy s CSS styly a z-indexy při přepínání mezi režimy
+
+### Poučení a plán dalšího vývoje
+
+- Zvážit alternativní přístupy k implementaci 3D glóbusu
+- Prozkoumat možnost využití specializovaných knihoven pro 3D glóby (např. WebGL Globe, Globe.GL)
+- Zvážit využití Cesium.js s lepší optimalizací
+- Implementovat robustnější ošetření chyb při inicializaci 3D režimu
+- Vytvořit záložní režim pro případ selhání 3D glóbusu
+- Zlepšit izolaci mezi 2D a 3D částmi aplikace pro prevenci konfliktů
 
 ## [0.2.4.2] - 2025-04-20 - OPTIMALIZACE VÝKONU A STABILITY
 
