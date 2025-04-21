@@ -25,6 +25,36 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.2] - Plánovaná verze - VYLEPŠENÍ CHATU A NOVÉ PŘÍKAZY
+
+### Plánovaná vylepšení chatu
+
+- Implementace pokročilého chatovacího rozhraní s podporou více typů zpráv (text, obrázky, odkazy)
+- Přidání nových příkazů pro práci s mapou a body zájmu
+- Implementace kontextového vyhledávání v chatu pro rychlejší přístup k informacím
+- Vylepšení rozpoznávání přirozeného jazyka pro lepší porozumění uživatelským dotazům
+- Přidání možnosti hlasového vstupu pro ovládání aplikace
+
+### Nové příkazy a funkce
+
+- Příkaz "počasí" pro zobrazení aktuálního počasí v dané lokalitě
+- Příkaz "restaurace" pro vyhledání restaurací v okolí
+- Příkaz "ubytování" pro vyhledání hotelů a penzionů
+- Příkaz "zábava" pro vyhledání kulturních a zábavních míst
+- Příkaz "doprava" pro zobrazení informací o veřejné dopravě
+- Příkaz "statistiky" pro zobrazení statistik o používání aplikace
+- Funkce pro sdílení tras a bodů s ostatními uživateli
+- Funkce pro export tras a bodů do různých formátů (GPX, KML, JSON)
+- Funkce pro import tras a bodů z externích zdrojů
+
+### Vylepšení uživatelského rozhraní
+
+- Redesign chatovacího rozhraní pro lepší přehlednost a použitelnost
+- Implementace nových animací a přechodů pro plynulejší uživatelský zážitek
+- Vylepšení responzivity pro různé velikosti obrazovky
+- Optimalizace pro mobilní zařízení s dotykovým ovládáním
+- Přidání možnosti přizpůsobení uživatelského rozhraní
+
 ## [0.2.8.1] - 2025-04-20 - FINALIZACE PROJEKTU - STABILNÍ ZAPEČEŤOVACÍ VERZE
 
 ### Finalizace projektu - stabilní zapečeťovací verze
