@@ -8,6 +8,19 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 Tato verze představuje návrat k poslední stabilní verzi 0.2.4, která poskytuje spolehlivou funkčnost všech základních funkcí aplikace. Po několika pokusech o opravu problémů v novějších verzích bylo rozhodnuto vrátit se k této ověřené verzi a zachovat dokumentaci o provedených změnách pro případné budoucí využití.
 
+## [0.2.4.2] - 2025-04-20 - OPTIMALIZACE VÝPOČTU TRASY
+
+### Optimalizace výpočtu trasy
+
+- Implementováno přímé volání OSRM API pro rychlejší výpočet trasy
+- Optimalizována konfigurace Leaflet Routing Machine pro lepší výkon
+- Snížen časový limit pro zobrazení dočasné přímé trasy z 3 na 2 sekundy
+- Přidány další parametry pro optimalizaci výpočtu trasy
+- Vylepšeno zpracování chyb při výpočtu trasy
+- Implementován systém záložního výpočtu trasy při selhání primární metody
+- Optimalizovány síťové požadavky pro rychlejší odezvu
+- Vylepšeno vykreslování trasy pro plynulejší zobrazení
+
 ## [0.2.4.1] - 2025-04-20 - STABILNÍ VERZE S DOKUMENTACÍ Z NOUZOVÉ VERZE
 
 ### Integrace dokumentace z nouzové verze 0.2.6.4
