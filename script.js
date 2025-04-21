@@ -3490,6 +3490,9 @@ function initializeComponents() {
             console.warn('AppStatus není definováno');
         }
 
+        // 6. Nastavení UI prvků a event listenerů
+        setupUIElements();
+
         console.log('Všechny komponenty byly úspěšně inicializovány');
         return true;
     } catch (error) {
@@ -3571,30 +3574,72 @@ function checkComponentsInitialization() {
     return allInitialized;
 }
 
-// Nastavení výchozího data pro rezervaci tanečnice
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-const dancerReservationDateInput = document.getElementById('dancerReservationDate');
-if (dancerReservationDateInput) {
-    dancerReservationDateInput.value = tomorrow.toISOString().split('T')[0];
-}
+// Funkce pro nastavení event listenerů a inicializaci UI prvků
+function setupUIElements() {
+    try {
+        console.log('Nastavení UI prvků a event listenerů...');
 
-// Event listenery pro modální okno rezervace tanečnice
-setupDancerReservationModal();
+        // Nastavení výchozího data pro rezervaci tanečnice
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dancerReservationDateInput = document.getElementById('dancerReservationDate');
+        if (dancerReservationDateInput) {
+            dancerReservationDateInput.value = tomorrow.toISOString().split('T')[0];
+        }
 
-// Nastavení event listenerů pro styly markerů
-setupMarkerStyleOptions();
+        // Event listenery pro modální okno rezervace tanečnice
+        setupDancerReservationModal();
 
-// Přidání event listeneru pro tlačítko glóbus režimu
-const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
-if (toggleGlobeBtn) {
-    toggleGlobeBtn.addEventListener('click', toggleGlobeMode);
-}
+        // Nastavení event listenerů pro styly markerů
+        setupMarkerStyleOptions();
 
-// Přidání event listeneru pro tlačítko návratu z glóbus režimu
-const exitGlobeBtn = document.getElementById('exitGlobeMode');
-if (exitGlobeBtn) {
-    exitGlobeBtn.addEventListener('click', toggleGlobeMode);
+        // Přidání event listeneru pro tlačítko glóbus režimu
+        const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+        if (toggleGlobeBtn) {
+            toggleGlobeBtn.addEventListener('click', toggleGlobeMode);
+        }
+
+        // Přidání event listeneru pro tlačítko návratu z glóbus režimu
+        const exitGlobeBtn = document.getElementById('exitGlobeMode');
+        if (exitGlobeBtn) {
+            exitGlobeBtn.addEventListener('click', toggleGlobeMode);
+        }
+
+        // Nastavení event listenerů pro nastavení
+        if (typeof setupSettingsEventListeners === 'function') {
+            setupSettingsEventListeners();
+        } else {
+            console.warn('Funkce setupSettingsEventListeners není definována');
+            // Základní nastavení pro tlačítko nastavení
+            const settingsButton = document.getElementById('settingsButton');
+            const settingsModal = document.getElementById('settingsModal');
+            const closeButton = document.querySelector('.close-button');
+
+            if (settingsButton && settingsModal) {
+                settingsButton.addEventListener('click', () => {
+                    settingsModal.style.display = 'block';
+                });
+
+                if (closeButton) {
+                    closeButton.addEventListener('click', () => {
+                        settingsModal.style.display = 'none';
+                    });
+                }
+
+                window.addEventListener('click', (e) => {
+                    if (e.target === settingsModal) {
+                        settingsModal.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        console.log('UI prvky a event listenery byly úspěšně nastaveny');
+        return true;
+    } catch (error) {
+        console.error('Chyba při nastavování UI prvků:', error);
+        return false;
+    }
 }
 
 // Nastavení event listenerů pro modální okno rezervace tanečnice
