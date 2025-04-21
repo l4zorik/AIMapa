@@ -8,17 +8,61 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 
 Tato verze představuje návrat k poslední stabilní verzi 0.2.4, která poskytuje spolehlivou funkčnost všech základních funkcí aplikace. Po několika pokusech o opravu problémů v novějších verzích bylo rozhodnuto vrátit se k této ověřené verzi a zachovat dokumentaci o provedených změnách pro případné budoucí využití.
 
-### Plán pro verzi 0.2.4.1
+## [0.2.4.1] - 2025-04-20 - STABILNÍ VERZE S DOKUMENTACÍ Z NOUZOVÉ VERZE
 
-V příští verzi 0.2.4.1 je plánováno přidání dokumentace a funkcí z verze 0.2.6.4-emergency, která obsahovala následující klíčové prvky:
+### Integrace dokumentace z nouzové verze 0.2.6.4
 
-- Nouzová oprava s minimalistickým skriptem pro zajištění základní funkčnosti aplikace
+Tato verze kombinuje stabilitu verze 0.2.4 s dokumentací z nouzové verze 0.2.6.4-emergency. Zachovává funkční kód verze 0.2.4, ale přidává cenné informace o problémech a řešeních z pozdějších verzí.
+
+#### Dokumentace z nouzové verze 0.2.6.4
+
+Nouzová verze 0.2.6.4 představovala radikální řešení pro zajištění základní funkčnosti aplikace. Po mnoha neúspěšných pokusech o opravu původního skriptu bylo vytvořeno zcela nové, minimalistické řešení, které obsahovalo pouze základní funkce pro práci s mapou. Tento přístup eliminoval všechny potenciální zdroje problémů a zajistil stabilní funkčnost aplikace.
+
+#### Klíčové prvky nouzové verze
 - Zcela nový soubor `script_new.js` s minimalistickým kódem (pouze 300 řádků oproti původním 4000+)
 - Implementace pouze základních funkcí pro zajištění funkčnosti mapy bez zbytečných komplikací
+- Odstranění všech pokročilých funkcí, které mohly způsobovat nestabilitu
 - Zjednodušené uživatelské rozhraní pro maximální spolehlivost
 - Zcela nová architektura kódu s důrazem na jednoduchost a čitelnost
 
-Tato plánovaná verze bude kombinovat stabilitu verze 0.2.4 s vylepšenými prvky z verze 0.2.6.4-emergency.
+#### Identifikované problémy v předchozích verzích
+
+1. **Problémy s Cesium.js a glóbus režimem**
+   - Nesprávné asynchronní načítání Cesium.js knihovny
+   - Chyby při inicializaci Cesium Vieweru
+   - Konflikty mezi Leaflet a Cesium knihovnami
+   - Nesprávné čištění zdrojů při deaktivaci glóbus režimu
+
+2. **Problémy s event listenery**
+   - Duplicitní přidávání event listenerů při práci s markery
+   - Neodregistrované event listenery při odstranění objektů
+   - Konflikty mezi různými event listenery
+
+3. **Problémy s localStorage a správou stavu aplikace**
+   - Překročení limitu localStorage při ukládání většího množství dat
+   - Nekonzistentní stav aplikace při načítání z localStorage
+   - Chybějící validace dat při načítání z localStorage
+
+4. **Problémy s výpočtem trasy**
+   - Nestabilita při volání externího API pro výpočet trasy
+   - Nesprávné zpracování chyb při výpočtu trasy
+   - Problémy s vykreslováním trasy při zoomování a přesouvání mapy
+
+5. **Problémy s CSS a zobrazením**
+   - Konflikty stylů mezi Leaflet, Cesium a vlastními komponentami
+   - Nesprávné nastavení z-indexů způsobující problémy se zobrazením
+   - Problémy s responzivním designem na různých velikostech obrazovky
+
+#### Doporučení pro budoucí vývoj
+
+- Zachovat stabilní verzi 0.2.4 jako základ pro další vývoj
+- Při implementaci nových funkcí postupovat postupně a důkladně testovat každou změnu
+- Implementovat robustní ošetření chyb ve všech částech aplikace
+- Vylepšit správu stavu aplikace s důrazem na konzistenci a validaci dat
+- Optimalizovat práci s event listenery pro prevenci úniků paměti a duplicit
+- Zvážit alternativní přístupy k implementaci 3D glóbus režimu
+
+Tato verze 0.2.4.1 slouží jako důležitý referenční bod pro budoucí vývoj, kombinující stabilitu původního kódu s cennými poznatky získanými při řešení problémů v pozdějších verzích.
 
 #### Klíčové změny
 - Návrat k původnímu skriptu `script.js` místo opravného skriptu `fix.js`
