@@ -263,35 +263,74 @@ function latLngToVector3(lat, lng, radius = 2) {
 
 // Přidání markerů na glóbus
 function addMarkersToThreeGlobe() {
-    // Odstranění existujících markerů
-    clearThreeMarkers();
+    try {
+        console.log('Přidávání markerů na glóbus - začátek');
 
-    // Přidání nových markerů
-    markers.forEach((marker, index) => {
-        const position = marker.getLatLng();
-        const vector3 = latLngToVector3(position.lat, position.lng);
+        // Odstranění existujících markerů
+        clearThreeMarkers();
+        console.log('Existující markery odstraněny');
 
-        // Vytvoření markeru
-        const markerGeometry = new THREE.SphereGeometry(0.03, 16, 16);
-        const markerMaterial = new THREE.MeshBasicMaterial({ color: 0x8B5CF6 });
-        const markerMesh = new THREE.Mesh(markerGeometry, markerMaterial);
+        // Kontrola, zda existuje globální proměnná markers
+        if (typeof window.markers === 'undefined' || !Array.isArray(window.markers)) {
+            console.warn('Globální proměnná markers není definována nebo není pole');
+            return;
+        }
 
-        // Nastavení pozice
-        markerMesh.position.copy(vector3);
+        console.log(`Počet markerů k přidání: ${window.markers.length}`);
 
-        // Přidání do scény
-        threeScene.add(markerMesh);
+        // Přidání nových markerů
+        window.markers.forEach((marker, index) => {
+            try {
+                const position = marker.getLatLng();
+                console.log(`Marker ${index + 1} pozice:`, position);
 
-        // Uložení reference
-        threeMarkers.push({
-            mesh: markerMesh,
-            index: index,
-            name: markerProperties[index]?.name || `Bod ${index + 1}`
+                const vector3 = latLngToVector3(position.lat, position.lng);
+
+                // Vytvoření markeru
+                const markerGeometry = new THREE.SphereGeometry(0.05, 16, 16);
+                const markerMaterial = new THREE.MeshPhongMaterial({
+                    color: 0x8B5CF6,
+                    emissive: 0x4B0082,
+                    shininess: 30,
+                    specular: 0xffffff
+                });
+                const markerMesh = new THREE.Mesh(markerGeometry, markerMaterial);
+
+                // Nastavení pozice
+                markerMesh.position.copy(vector3);
+
+                // Přidání do scény
+                threeScene.add(markerMesh);
+
+                // Získání názvu markeru z markerProperties
+                let markerName = `Bod ${index + 1}`;
+                if (typeof window.markerProperties !== 'undefined' &&
+                    Array.isArray(window.markerProperties) &&
+                    window.markerProperties[index] &&
+                    window.markerProperties[index].name) {
+                    markerName = window.markerProperties[index].name;
+                }
+
+                // Uložení reference
+                threeMarkers.push({
+                    mesh: markerMesh,
+                    index: index,
+                    name: markerName
+                });
+
+                // Přidání čísla markeru
+                addMarkerLabel(vector3, index + 1);
+
+                console.log(`Marker ${index + 1} (${markerName}) přidán na glóbus`);
+            } catch (error) {
+                console.error(`Chyba při přidávání markeru ${index + 1}:`, error);
+            }
         });
 
-        // Přidání čísla markeru
-        addMarkerLabel(vector3, index + 1);
-    });
+        console.log('Přidávání markerů na glóbus - dokončeno');
+    } catch (error) {
+        console.error('Chyba při přidávání markerů na glóbus:', error);
+    }
 }
 
 // Přidání popisku k markeru
@@ -335,34 +374,62 @@ function addMarkerLabel(position, number) {
 
 // Přidání tras mezi body na glóbusu
 function addRoutesToThreeGlobe() {
-    // Kontrola, zda máme alespoň dva body
-    if (markers.length < 2) {
-        return;
-    }
+    try {
+        console.log('Přidávání tras na glóbus - začátek');
 
-    // Vytvoření křivky pro trasu
-    const curvePoints = [];
+        // Kontrola, zda existuje globální proměnná markers
+        if (typeof window.markers === 'undefined' || !Array.isArray(window.markers)) {
+            console.warn('Globální proměnná markers není definována nebo není pole');
+            return;
+        }
 
-    // Přidání bodů do křivky
-    markers.forEach(marker => {
-        const position = marker.getLatLng();
-        const vector3 = latLngToVector3(position.lat, position.lng);
-        curvePoints.push(vector3);
-    });
+        // Kontrola, zda máme alespoň dva body
+        if (window.markers.length < 2) {
+            console.log('Pro vytvoření trasy je potřeba alespoň dva body');
+            return;
+        }
 
-    // Vytvoření křivky
-    for (let i = 0; i < curvePoints.length - 1; i++) {
-        const start = curvePoints[i];
-        const end = curvePoints[i + 1];
+        console.log(`Počet bodů pro trasy: ${window.markers.length}`);
 
-        // Vytvoření obloukové křivky mezi body
-        const curveSegment = createCurvedLine(start, end);
+        // Vytvoření křivky pro trasu
+        const curvePoints = [];
 
-        // Přidání do scény
-        threeScene.add(curveSegment);
+        // Přidání bodů do křivky
+        window.markers.forEach((marker, index) => {
+            try {
+                const position = marker.getLatLng();
+                const vector3 = latLngToVector3(position.lat, position.lng);
+                curvePoints.push(vector3);
+                console.log(`Bod ${index + 1} přidán do trasy`);
+            } catch (error) {
+                console.error(`Chyba při přidávání bodu ${index + 1} do trasy:`, error);
+            }
+        });
 
-        // Uložení reference
-        threeRoutes.push(curveSegment);
+        // Vytvoření křivky
+        for (let i = 0; i < curvePoints.length - 1; i++) {
+            try {
+                const start = curvePoints[i];
+                const end = curvePoints[i + 1];
+
+                // Vytvoření obloukové křivky mezi body
+                const curveSegment = createCurvedLine(start, end);
+
+                // Přidání do scény
+                threeScene.add(curveSegment);
+
+                // Uložení reference
+                threeRoutes.push(curveSegment);
+
+                console.log(`Trasa mezi body ${i + 1} a ${i + 2} vytvořena`);
+            } catch (error) {
+                console.error(`Chyba při vytváření trasy mezi body ${i + 1} a ${i + 2}:`, error);
+            }
+        }
+
+        console.log('Přidávání tras na glóbus - dokončeno');
+    } catch (error) {
+        console.error('Chyba při přidávání tras na glóbus:', error);
     }
 }
 
@@ -398,11 +465,51 @@ function createCurvedLine(start, end) {
 
 // Vyčištění markerů a tras
 function clearThreeGlobe() {
-    // Vyčištění markerů
-    clearThreeMarkers();
+    try {
+        console.log('Vyčišťování glóbusu - začátek');
 
-    // Vyčištění tras
-    clearThreeRoutes();
+        // Vyčištění markerů
+        clearThreeMarkers();
+        console.log('Markery odstraněny');
+
+        // Vyčištění tras
+        clearThreeRoutes();
+        console.log('Trasy odstraněny');
+
+        // Obnovení glóbusu a mraků
+        if (threeScene) {
+            // Zachování pouze glóbusu a mraků
+            const objectsToKeep = [];
+
+            // Projdeme všechny objekty ve scéně
+            threeScene.children.forEach(child => {
+                // Pokud je to glóbus nebo mraky, zachováme
+                if (child === threeGlobe || (threeScene.userData.clouds && child === threeScene.userData.clouds)) {
+                    objectsToKeep.push(child);
+                }
+            });
+
+            // Odstraníme všechny objekty ze scény
+            while (threeScene.children.length > 0) {
+                threeScene.remove(threeScene.children[0]);
+            }
+
+            // Přidáme zpět glóbus a mraky
+            objectsToKeep.forEach(obj => {
+                threeScene.add(obj);
+            });
+
+            console.log('Scéna vyčištěna, glóbus a mraky zachovány');
+
+            // Přidání osvětlení
+            addLighting();
+            console.log('Osvětlení obnoveno');
+        }
+
+        console.log('Vyčišťování glóbusu - dokončeno');
+    } catch (error) {
+        console.error('Chyba při čištění glóbusu:', error);
+    }
 }
 
 // Vyčištění markerů
@@ -434,3 +541,11 @@ function clearThreeRoutes() {
 
     threeRoutes = [];
 }
+
+// Export funkcí do globálního prostoru pro použití v script.js
+window.initThreeJsGlobe = initThreeJsGlobe;
+window.addMarkersToThreeGlobe = addMarkersToThreeGlobe;
+window.addRoutesToThreeGlobe = addRoutesToThreeGlobe;
+window.clearThreeGlobe = clearThreeGlobe;
+window.startThreeAnimation = startThreeAnimation;
+window.stopThreeAnimation = stopThreeAnimation;

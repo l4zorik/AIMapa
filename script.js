@@ -1754,12 +1754,12 @@ function toggleGlobeMode() {
 
             // Přidání markerů na glóbus
             console.log('Přidávání markerů na glóbus');
-            addMarkersToGlobe();
+            addMarkersToThreeGlobe();
             console.log('Markery byly přidány na glóbus');
 
             // Přidání tras mezi body na glóbusu
             console.log('Přidávání tras na glóbus');
-            addRoutesToGlobe();
+            addRoutesToThreeGlobe();
             console.log('Trasy byly přidány na glóbus');
 
             // Přidání ovládacích prvků pro glóbus
@@ -1805,12 +1805,15 @@ function toggleGlobeMode() {
             removeGlobeControls();
 
             // Vyčištění markerů a tras na glóbusu
-            if (threeScene) {
-                // Odstranění všech objektů ze scény
+            if (typeof window.clearThreeGlobe === 'function') {
+                window.clearThreeGlobe();
+                console.log('Všechny objekty byly odstraněny z glóbusu');
+            } else if (threeScene) {
+                // Záložní metoda pro odstranění objektů
                 while(threeScene.children.length > 0){
                     threeScene.remove(threeScene.children[0]);
                 }
-                console.log('Všechny objekty byly odstraněny z glóbusu');
+                console.log('Všechny objekty byly odstraněny z glóbusu pomocí záložní metody');
             }
 
             // Aktualizace velikosti mapy
@@ -1907,6 +1910,25 @@ function addMarkersToGlobe() {
         }
     } catch (error) {
         console.error('Chyba při přidávání markerů na glóbus:', error);
+    }
+}
+
+// Funkce pro volání Three.js funkcí
+function addMarkersToThreeGlobe() {
+    if (typeof window.addMarkersToThreeGlobe === 'function') {
+        // Použití funkce z three-globe.js
+        window.addMarkersToThreeGlobe();
+    } else {
+        console.error('Funkce addMarkersToThreeGlobe není dostupná');
+    }
+}
+
+function addRoutesToThreeGlobe() {
+    if (typeof window.addRoutesToThreeGlobe === 'function') {
+        // Použití funkce z three-globe.js
+        window.addRoutesToThreeGlobe();
+    } else {
+        console.error('Funkce addRoutesToThreeGlobe není dostupná');
     }
 }
 
