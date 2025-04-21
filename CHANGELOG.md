@@ -79,13 +79,21 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Kontextové menu příkazů dostupné při kliknutí pravým tlačítkem na různé prvky mapy
 - Personalizovaný seznam oblíbených příkazů na základě historie používání
 
-#### Interaktivní průvodce příkazy
-- Implementace interaktivního průvodce pro nové uživatele s vysvětlením dostupných příkazů
-- Kontextová nápověda při zadávání příkazů s příklady použití
-- Interaktivní tutoriály pro složitější příkazy a funkce
-- Zobrazení tipů a triků pro efektivní používání příkazů
-- Možnost vyhledávání v dokumentaci příkazů přímo z chatovacího rozhraní
+#### Komplexní systém pro seznámení uživatelů s příkazy
+- Implementace interaktivního průvodce "Příkazová akademie" pro systematické seznámení s příkazy
+- Gamifikovaný systém učení s postupným odemykáním nových příkazů a odměnami za jejich použití
+- Interaktivní mapa všech dostupných příkazů s vizualizací jejich vzájemných vztahů
+- Systém "Příkaz dne" představující každý den jeden příkaz s detailním popisem a příklady použití
+- Automatické detekce nevyužitých příkazů a jejich doporučení uživateli
+- Personalizovaný plán učení příkazů na základě uživatelských preferencí a způsobu používání aplikace
+
+#### Interaktivní průvodce a nápověda
+- Kontextová nápověda při zadávání příkazů s příklady použití a animovanými ukázkami
+- Interaktivní tutoriály pro složitější příkazy s možností přímého vyzkoušení v bezpečném režimu
+- Zobrazení tipů a triků pro efektivní používání příkazů v kontextu aktuální činnosti
+- Možnost vyhledávání v dokumentaci příkazů přímo z chatovacího rozhraní s okamžitou odpovědí
 - Systém zpětné vazby pro vylepšování příkazů na základě uživatelských připomínek
+- Interaktivní FAQ s nejčastějšími dotazy ohledně příkazů a jejich použití
 
 #### Pokročilé uživatelské rozhraní pro příkazy
 - Implementace hybridního rozhraní kombinujícího textové příkazy a grafické ovládací prvky
@@ -94,6 +102,30 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Animované přechody mezi různými stavy příkazů
 - Podpora hlasového zadávání příkazů s rozpoznáváním řeči
 - Adaptivní rozhraní přizpůsobující se úrovni zkušeností uživatele
+
+#### Hluboká integrace příkazů s mapou a chatem
+- Implementace systému "Aktivní mapa" umožňující přímé propojení příkazů s prvky na mapě
+- Kontextové příkazy dostupné při interakci s různými prvky mapy (body, trasy, oblasti)
+- Vizualizace dostupných příkazů přímo na mapě pomocí interaktivních ikon a zvýraznění
+- Systém "Chytrejší chat" s automatickým rozpoznáváním mapových prvků v textu
+- Obousměrná synchronizace mezi chatem a mapou - změny v jednom se okamžitě projeví v druhém
+- Funkce "Drag & Drop" pro přetáhnutí prvků z mapy do chatu a naopak
+
+#### Interaktivní příkazové centrum
+- Implementace centrálního hubu pro správu a objevování všech dostupných příkazů
+- Interaktivní 3D vizualizace kategorií příkazů s možností procházení a filtrování
+- Systém "Příkazové karty" s detailním popisem, příklady použití a ukázkovými animacemi
+- Možnost vytváření vlastních příkazů a maker kombinací existujících příkazů
+- Sociální funkce umožňující sdílení užitečných příkazů a maker s ostatními uživateli
+- Analytický dashboard zobrazující statistiky používání příkazů a doporučení pro zefektivnění práce
+
+#### Systém postupného učení příkazů
+- Implementace víceúrovňového systému učení od základních po pokročilé příkazy
+- Interaktivní výukové mise s konkrétními úkoly pro procvičení různých příkazů
+- Systém "Učení praxí" automaticky nabízející nápovědu při prvních pokusech o použití nových příkazů
+- Pokročilé výukové scénáře simulující reálné situace pro procvičení kombinací příkazů
+- Systém certifikací a odznaků za zvládnutí různých skupin příkazů
+- Pravidelné výzvy a soutěže motivující k učení a používání nových příkazů
 
 ## [0.2.8.3] - Plánovaná verze - INTEGRACE PŘEDPOVĚDI POČASÍ
 
