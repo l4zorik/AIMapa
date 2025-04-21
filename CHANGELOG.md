@@ -1,6 +1,46 @@
+# Můj osobní plán na vývoj
+
+## Úkol 1
+- Naučit se pracovat s WordPressem - základy tvorby webů, instalace pluginů, úprava šablon a práce s redakčním systémem
+
+## Úkol 2
+- Dohnat vzdělání v matematice - algebra, geometrie, diferenciální a integrovaný počet
+- Dohnat vzdělání ve fyzice - mechanika, elektromagnetismus, termodynamika, kvantová fyzika
+- Dohnat vzdělání v chemii - anorganická a organická chemie, biochemie
+- Prostudovat programovací jazyky - JavaScript, Python, C++, Java
+- Prohloubit znalosti v oblasti IT - databáze, sítě, bezpečnost, cloud computing, umělá inteligence
+
+## Úkol 3
+- Koupit všem členům rodiny dům
+- Koupit si řidičský průkaz
+- Koupit si auto
+- Koupit si počítač, který zvládne AI jakobynic
+
+## Úkol 4
+- Nastoupit ve středu 23.4.2025 do práce
+- Vyřídit papíry na úřad práce (příspěvek na bydlení)
+- Domluvit si výplatu před 10.5.2025 (den platby nájmu)
+
 # Changelog
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
+
+## [0.2.5.0] - 2025-04-20 - INTERAKTIVNÍ 3D GLÓBUS
+
+### Implementace interaktivního 3D glóbusu
+
+- Přidán nový interaktivní 3D glóbus s využitím knihovny Three.js
+- Implementována plynulá rotace a animace glóbusu
+- Přidány realistické textury Země s detailním povrchem
+- Implementováno pokročilé osvětlení pro realistický vzhled
+- Přidáno hvězdné pozadí pro lepší vizualizaci
+- Implementovány interaktivní ovládací prvky pro rotaci, zoom a náklon
+- Přidána podpora pro zobrazení bodů a tras na glóbusu
+- Optimalizován výkon pro plynulý běh i na slabších zařízeních
+- Implementována synchronizace mezi 2D mapou a 3D glóbusem
+- Vylepšena vizualizace tras mezi body s obloukovými křivkami
+
+## [0.2.4.2] - 2025-04-20 - OPTIMALIZACE VÝKONU A STABILITY
 
 ## [0.2.4] - 2025-04-20 - NÁVRAT KE STABILNÍ VERZI
 
@@ -120,29 +160,6 @@ Tato verze 0.2.4.1 slouží jako důležitý referenční bod pro budoucí vývo
 - V případě problémů v budoucích verzích se vždy vracíme k této verzi
 - Obsahuje základní funkčnost mapy, chatu a bodů
 - Obsahuje funkční 3D glóbus režim v původní implementaci
-
-# Můj osobní plán na vývoj
-
-## Úkol 1
-- Naučit se pracovat s WordPressem - základy tvorby webů, instalace pluginů, úprava šablon a práce s redakčním systémem
-
-## Úkol 2
-- Dohnat vzdělání v matematice - algebra, geometrie, diferenciální a integrovaný počet
-- Dohnat vzdělání ve fyzice - mechanika, elektromagnetismus, termodynamika, kvantová fyzika
-- Dohnat vzdělání v chemii - anorganická a organická chemie, biochemie
-- Prostudovat programovací jazyky - JavaScript, Python, C++, Java
-- Prohloubit znalosti v oblasti IT - databáze, sítě, bezpečnost, cloud computing, umělá inteligence
-
-## Úkol 3
-- Koupit všem členům rodiny dům
-- Koupit si řidičský průkaz
-- Koupit si auto
-- Koupit si počítač, který zvládne AI jakobynic
-
-## Úkol 4
-- Nastoupit ve středu 23.4.2025 do práce
-- Vyřídit papíry na úřad práce (příspěvek na bydlení)
-- Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
 ## [0.1.9] - 2025-04-18
 

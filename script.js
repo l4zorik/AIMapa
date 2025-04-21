@@ -50,6 +50,16 @@ let osmb = null; // Proměnná pro OSM Buildings
 let cesiumViewer = null; // Proměnná pro Cesium Viewer
 let globeMarkers = []; // Proměnná pro markery na glóbusu
 
+// Three.js globální proměnné
+let threeScene = null;
+let threeCamera = null;
+let threeRenderer = null;
+let threeControls = null;
+let threeGlobe = null;
+let threeMarkers = [];
+let threeRoutes = [];
+let threeAnimationFrame = null;
+
 // Globální proměnná pro ukládání event listenerů
 let eventListeners = [];
 
@@ -1700,7 +1710,7 @@ function remove3DControls() {
     }
 }
 
-// Funkce pro přepnutí glóbus režimu
+// Funkce pro přepnutí glóbus režimu s Three.js
 function toggleGlobeMode() {
     const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
 
@@ -1712,7 +1722,7 @@ function toggleGlobeMode() {
     isGlobeMode = !isGlobeMode;
 
     if (isGlobeMode) {
-        console.log('Aktivace glóbus režimu');
+        console.log('Aktivace glóbus režimu s Three.js');
 
         // Aktivace glóbus režimu
         toggleGlobeBtn.classList.add('active');
@@ -1724,79 +1734,45 @@ function toggleGlobeMode() {
         const center = map.getCenter();
         console.log('Střed mapy:', center);
 
+        // Skrytí Leaflet mapy
+        const leafletContainer = document.querySelector('.leaflet-container');
+        if (leafletContainer) {
+            leafletContainer.style.display = 'none';
+            console.log('Leaflet mapa byla skryta');
+        }
+
+        // Zobrazení Three.js kontejneru
+        const threeGlobeContainer = document.getElementById('threeGlobeContainer');
+        if (threeGlobeContainer) {
+            threeGlobeContainer.style.display = 'block';
+            console.log('Three.js kontejner byl zobrazen');
+        }
+
         try {
-            console.log('Inicializace Cesium Vieweru');
-
-            // Nastavení přístupového tokenu pro Cesium ion
-            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc3MzMsImlhdCI6MTYyMjg0MTU3Mn0.XcKpgANiY22ZtIiqSWFmj2XlPQd5HGDA-9N2FAB_5_4';
-
-            // Odstranění předchozího Cesium Vieweru, pokud existuje
-            if (cesiumViewer) {
-                cesiumViewer.destroy();
-                cesiumViewer = null;
-                console.log('Předchozí Cesium Viewer byl odstraněn');
+            // Inicializace Three.js scény, pokud ještě nebyla vytvořena
+            if (!threeScene) {
+                initThreeJsGlobe();
+                console.log('Three.js glóbus byl inicializován');
             }
 
-            // Získání reference na Cesium kontejner
-            const cesiumContainer = document.getElementById('cesiumContainer');
+            // Přidání markerů na glóbus
+            addMarkersToThreeGlobe();
+            console.log('Markery byly přidány na glóbus');
 
-            // Ujistíme se, že kontejner je prázdný
-            cesiumContainer.innerHTML = '';
+            // Přidání tras mezi body na glóbusu
+            addRoutesToThreeGlobe();
+            console.log('Trasy byly přidány na glóbus');
 
-            // Nastavení stylu kontejneru
-            cesiumContainer.style.display = 'block';
-            cesiumContainer.style.width = '100%';
-            cesiumContainer.style.height = '100%';
-            cesiumContainer.style.position = 'absolute';
-            cesiumContainer.style.top = '0';
-            cesiumContainer.style.left = '0';
-            cesiumContainer.style.zIndex = '1000';
+            // Přidání ovládacích prvků pro glóbus
+            addGlobeControls();
+            console.log('Ovládací prvky byly přidány');
 
-            // Vytvoření nového Cesium Vieweru
-            cesiumViewer = new Cesium.Viewer('cesiumContainer', {
-                animation: false,
-                baseLayerPicker: false,
-                fullscreenButton: false,
-                geocoder: false,
-                homeButton: false,
-                infoBox: false,
-                sceneModePicker: false,
-                selectionIndicator: false,
-                timeline: false,
-                navigationHelpButton: false,
-                navigationInstructionsInitiallyVisible: false,
-                imageryProvider: new Cesium.IonImageryProvider({ assetId: 3 }),
-                terrainProvider: Cesium.createWorldTerrain(),
-                requestRenderMode: false,
-                maximumRenderTimeChange: Infinity
-            });
+            // Spuštění animační smyčky
+            startThreeAnimation();
+            console.log('Animační smyčka byla spuštěna');
 
-            console.log('Cesium Viewer byl vytvořen');
-
-            // Nastavení scény
-            cesiumViewer.scene.globe.enableLighting = true;
-            cesiumViewer.scene.skyAtmosphere.show = true;
-            cesiumViewer.scene.fog.enabled = false;
-            cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
-
-            // Odstranění výchozího loga Cesium
-            cesiumViewer.cesiumWidget.creditContainer.style.display = 'none';
-
-            // Nastavení výchozího pohledu
-            const center = map.getCenter();
-            cesiumViewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(center.lng, center.lat, 2000000),
-                orientation: {
-                    heading: 0.0,
-                    pitch: -0.5,
-                    roll: 0.0
-                },
-                duration: 0
-            });
-
-            console.log('Výchozí pohled byl nastaven');
         } catch (error) {
-            console.error('Chyba při inicializaci Cesium Vieweru:', error);
+            console.error('Chyba při inicializaci Three.js glóbusu:', error);
             addMessage('Nepodařilo se inicializovat 3D glóbus. Zkuste to prosím znovu.', true);
             isGlobeMode = false;
             toggleGlobeBtn.classList.remove('active');
@@ -1804,33 +1780,8 @@ function toggleGlobeMode() {
             return;
         }
 
-        // Přidání markerů na glóbus
-        setTimeout(() => {
-            try {
-                // Přidání markerů na glóbus
-                addMarkersToGlobe();
-                console.log('Markery byly přidány na glóbus');
-
-                // Přidání tras mezi body na glóbusu
-                addRoutesToGlobe();
-                console.log('Trasy byly přidány na glóbus');
-
-                // Přidání ovládacích prvků pro glóbus
-                addGlobeControls();
-                console.log('Ovládací prvky byly přidány');
-
-                // Vynucení překreslení scény
-                if (cesiumViewer && cesiumViewer.scene) {
-                    cesiumViewer.scene.requestRender();
-                    console.log('Scéna byla překreslena');
-                }
-            } catch (error) {
-                console.error('Chyba při přidávání obsahu na glóbus:', error);
-            }
-        }, 500);
-
         // Informace pro uživatele
-        addMessage('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
+        addMessage('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako interaktivní 3D kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
     } else {
         console.log('Deaktivace glóbus režimu');
 
@@ -1841,20 +1792,22 @@ function toggleGlobeMode() {
         document.getElementById('map').classList.remove('map-globe-mode');
 
         try {
+            // Zastavení animační smyčky
+            stopThreeAnimation();
+            console.log('Animační smyčka byla zastavena');
+
             // Odstranění ovládacích prvků pro glóbus
             removeGlobeControls();
 
-            // Vyčištění markerů na glóbusu
-            if (cesiumViewer) {
-                cesiumViewer.entities.removeAll();
-                console.log('Všechny entity byly odstraněny');
-            }
+            // Vyčištění markerů a tras na glóbusu
+            clearThreeGlobe();
+            console.log('Všechny objekty byly odstraněny z glóbusu');
 
-            // Skrytí Cesium kontejneru
-            const cesiumContainer = document.getElementById('cesiumContainer');
-            if (cesiumContainer) {
-                cesiumContainer.style.display = 'none';
-                console.log('Cesium kontejner byl skryt');
+            // Skrytí Three.js kontejneru
+            const threeGlobeContainer = document.getElementById('threeGlobeContainer');
+            if (threeGlobeContainer) {
+                threeGlobeContainer.style.display = 'none';
+                console.log('Three.js kontejner byl skryt');
             }
 
             // Zobrazení Leaflet mapy
@@ -1869,7 +1822,8 @@ function toggleGlobeMode() {
             console.log('Velikost mapy byla aktualizována');
 
             // Reset globálních proměnných
-            globeMarkers = [];
+            threeMarkers = [];
+            threeRoutes = [];
         } catch (error) {
             console.error('Chyba při deaktivaci glóbus režimu:', error);
         }
