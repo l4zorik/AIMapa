@@ -57,6 +57,26 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vytvořen funkční glóbus režim pro 3D vizualizaci Země s body a trasami
 - Optimalizován výkon a uživatelská zkušenost na různých zařízeních
 
+## [0.2.8.0] - 2025-04-20 - VYLEPŠENÍ AI CHATU S NÁVRHY DALŠÍCH AKCÍ
+
+### Vylepšení AI chatu s návrhy dalších akcí
+
+- Přidány návrhy dalších akcí v chatovacím rozhraní pro rychlejší interakci
+- Implementovány klikatelné návrhy akcí pod každou zprávou AI asistenta
+- Návrhy akcí se dynamicky mění podle kontextu konverzace a aktuální situace
+- Vylepšen design chatovacího rozhraní pro lepší přehlednost a použitelnost
+- Optimalizováno zobrazení návrhů akcí v plovoucím chatu ve fullscreen režimu
+- Přidány kontextové návrhy pro různé typy dotazů (navigace, body, otevírací doby, atd.)
+- Implementována funkce pro generování relevantních návrhů na základě obsahu odpovědi
+- Vylepšena uvítací zpráva s návrhy nejpoužívanějších akcí
+
+### Identifikované problémy
+
+- Problémy s glóbus režimem - nefunkční zobrazení glóbusu
+- Konflikty mezi knihovnami pro glóbus a ostatními částmi aplikace
+- Problémy s načítáním knihovny Globe.gl
+- Nekonzistentní zobrazení návrhů akcí v různých částech aplikace
+
 ## [0.2.7.4] - 2025-04-20 - VYLEPŠENÍ AI CHATU S NÁVRHY DALŠÍCH AKCÍ
 
 ### Vylepšení AI chatu s návrhy dalších akcí
