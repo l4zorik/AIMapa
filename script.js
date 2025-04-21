@@ -11,34 +11,6 @@ const map = L.map('map', {
     maxBoundsViscosity: 1.0 // Zajistí, že mapa nebude moci být posunuta mimo hranice
 }).setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
 
-// Inicializace Cesium handleru
-function initializeCesiumHandler() {
-    console.log('Inicializace Cesium handleru...');
-    if (typeof Cesium === 'undefined') {
-        console.error('Cesium knihovna není dostupná. Zkontrolujte připojení k internetu.');
-        return Promise.reject(new Error('Cesium knihovna není dostupná'));
-    }
-
-    if (window.CesiumHandler) {
-        return window.CesiumHandler.initialize(map).catch(error => {
-            console.error('Chyba při inicializaci Cesium handleru:', error);
-            return Promise.reject(error);
-        });
-    } else {
-        console.error('Cesium handler není dostupný. Zkontrolujte, zda je soubor cesium-handler.js správně načten.');
-        return Promise.reject(new Error('Cesium handler není dostupný'));
-    }
-}
-
-// Inicializace Cesium handleru po načtení stránky
-document.addEventListener('DOMContentLoaded', function() {
-    initializeCesiumHandler().then(() => {
-        console.log('Cesium handler byl úspěšně inicializován');
-    }).catch(error => {
-        console.error('Nepodařilo se inicializovat Cesium handler:', error);
-    });
-});
-
 // Přidání OpenStreetMap podkladu
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
@@ -75,18 +47,97 @@ let isFullscreen = false;
 let is3DMode = false; // Výchozí stav - 3D režim je deaktivovaný
 let isGlobeMode = false; // Výchozí stav - glóbus režim je deaktivovaný
 let osmb = null; // Proměnná pro OSM Buildings
-// Cesium Viewer je nyní součástí Cesium handleru
+let cesiumViewer = null; // Proměnná pro Cesium Viewer
 let globeMarkers = []; // Proměnná pro markery na glóbusu
+
+// Three.js globální proměnné
+let threeScene = null;
+let threeCamera = null;
+let threeRenderer = null;
+let threeControls = null;
+let threeGlobe = null;
+let threeMarkers = [];
+let threeRoutes = [];
+let threeAnimationFrame = null;
+
+// Inicializace globálních proměnných pro Three.js glóbus, pokud ještě nejsou definovány
+if (typeof threeScene === 'undefined') threeScene = null;
+if (typeof threeCamera === 'undefined') threeCamera = null;
+if (typeof threeRenderer === 'undefined') threeRenderer = null;
+if (typeof threeControls === 'undefined') threeControls = null;
+if (typeof threeGlobe === 'undefined') threeGlobe = null;
+if (typeof threeMarkers === 'undefined') threeMarkers = [];
+if (typeof threeRoutes === 'undefined') threeRoutes = [];
+if (typeof threeAnimationFrame === 'undefined') threeAnimationFrame = null;
+
+// Globální proměnná pro ukládání event listenerů
+let eventListeners = [];
+
+// Pomocná funkce pro přidání event listeneru s automatickým sledováním
+function addTrackedEventListener(element, eventType, handler, options) {
+    if (!element) {
+        console.warn('Pokus o přidání event listeneru na neexistující element');
+        return;
+    }
+
+    // Přidání event listeneru
+    element.addEventListener(eventType, handler, options);
+
+    // Uložení reference pro pozdější odstranění
+    eventListeners.push({
+        element: element,
+        eventType: eventType,
+        handler: handler
+    });
+
+    return handler; // Vrátíme handler pro případ, že ho budeme potřebovat jinde
+}
+
+// Funkce pro odstranění všech event listenerů pro daný element
+function removeAllEventListeners(element) {
+    if (!element) return;
+
+    // Najdeme všechny event listenery pro daný element a odstraníme je
+    const listenersToRemove = eventListeners.filter(listener => listener.element === element);
+
+    listenersToRemove.forEach(listener => {
+        listener.element.removeEventListener(listener.eventType, listener.handler);
+    });
+
+    // Aktualizujeme globální pole event listenerů
+    eventListeners = eventListeners.filter(listener => listener.element !== element);
+}
+
+// Funkce pro odstranění konkrétního event listeneru
+function removeTrackedEventListener(element, eventType, handler) {
+    if (!element) return;
+
+    // Odstraníme event listener
+    element.removeEventListener(eventType, handler);
+
+    // Aktualizujeme globální pole event listenerů
+    eventListeners = eventListeners.filter(listener =>
+        !(listener.element === element &&
+          listener.eventType === eventType &&
+          listener.handler === handler));
+}
 
 // Konfigurace pro Leaflet Routing Machine
 const routingOptions = {
     router: L.Routing.osrmv1({
         serviceUrl: 'https://router.project-osrm.org/route/v1',
-        profile: 'driving' // Možnosti: driving, walking, cycling
+        profile: 'driving', // Možnosti: driving, walking, cycling
+        timeout: 5000, // Časový limit pro API požadavek (5 sekund)
+        geometryOnly: false, // Optimalizace pro získání pouze geometrie trasy
+        urlParameters: {
+            alternatives: false, // Nezobrazovat alternativní trasy
+            steps: false, // Nezobrazovat kroky trasy
+            overview: 'full' // Získat plnou geometrii trasy
+        }
     }),
     lineOptions: {
         styles: [
-            {color: 'blue', opacity: 0.8, weight: 5}
+            {color: 'blue', opacity: 0.9, weight: 5}
         ],
         addWaypoints: false,
         extendToWaypoints: true,
@@ -99,7 +150,12 @@ const routingOptions = {
     draggableWaypoints: false,
     createMarker: function() { return null; }, // Nepoužívat výchozí markery
     routeWhileDragging: false, // Zabrání přepočítávání trasy při přesouvní mapy
-    useZoomParameter: false // Zabrání přepočítávání trasy při změně zoomu
+    useZoomParameter: false, // Zabrání přepočítávání trasy při změně zoomu
+    addWaypoints: false, // Nezobrazovat průjezdní body
+    waypointMode: 'connect', // Pouze propojit body bez možnosti přidávání nových
+    autoRoute: true, // Automaticky vypočítat trasu
+    routeDragInterval: 500, // Interval pro přepočet trasy při přesouvní (vyšší hodnota = méně časté přepočty)
+    collapsible: true // Možnost sbalit panel s instrukcemi
 };
 
 // Reference na HTML elementy pro informace o trase
@@ -710,7 +766,7 @@ function addMarkerToMap(latlng) {
     }
 
     // Aktualizace glóbusu, pokud je aktivní
-    if (isGlobeMode && window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
+    if (isGlobeMode && cesiumViewer) {
         addMarkersToGlobe();
         addRoutesToGlobe();
     }
@@ -851,110 +907,269 @@ function calculateRouteFunction() {
         routeControl = null;
     }
 
-    // Vytvoření nové trasy s použitím Leaflet Routing Machine
-    // Toto používá OSRM (Open Source Routing Machine) pro výpočet trasy po skutečných silnicích
+    // Odstranění přímé trasy, pokud existuje
+    if (route) {
+        map.removeLayer(route);
+        route = null;
+    }
 
-    // Odstranění tříd pro optimalizaci před vytvořením nové trasy
+    // Optimalizace pro rychlejší výpočet trasy
     document.body.classList.remove('map-zooming', 'map-moving');
     const routingPane = document.querySelector('.leaflet-overlay-pane');
     if (routingPane) {
         routingPane.classList.remove('zooming', 'moving');
     }
 
-    // Vytvoření nové trasy s optimalizovanými nastaveními
-    routeControl = L.Routing.control({
-        ...routingOptions,
-        waypoints: points
-    }).addTo(map);
+    // Použití přímého volání OSRM API pro rychlejší výpočet trasy
+    // Toto je rychlejší než použití Leaflet Routing Machine
+    const fetchDirectRoute = async () => {
+        try {
+            // Vytvoření URL pro OSRM API
+            const coordinates = points.map(p => `${p.lng},${p.lat}`).join(';');
+            const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=polyline&steps=false&alternatives=false`;
 
-    // Pozastavení animací při vytváření trasy pro lepší výkon
-    const routingLayer = document.querySelector('.leaflet-routing-layer');
-    if (routingLayer) {
-        routingLayer.style.transition = 'none';
-        routingLayer.style.willChange = 'transform';
-    }
+            // Nastavení časového limitu pro fetch
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-    // Poslech na událost 'routesfound' pro získání informací o trase
-    routeControl.on('routesfound', function(e) {
-        const routes = e.routes;
-        const summary = routes[0].summary;
+            // Provedení požadavku na API
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
 
-        // Získání vzdálenosti v kilometrech
-        const distanceKm = (summary.totalDistance / 1000).toFixed(2);
+            if (!response.ok) {
+                throw new Error(`API responded with status ${response.status}`);
+            }
 
-        // Získání času v sekundách a převod na hodiny a minuty
-        const totalTimeSeconds = summary.totalTime;
-        const hours = Math.floor(totalTimeSeconds / 3600);
-        const minutes = Math.round((totalTimeSeconds % 3600) / 60);
+            const data = await response.json();
 
-        const timeString = hours > 0 ?
-            `${hours} h ${minutes} min` :
-            `${minutes} min`;
+            if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+                throw new Error('No route found');
+            }
 
-        // Aktualizace informací o trase v panelu
-        routeDistanceElement.textContent = `${distanceKm} km`;
-        routeTimeElement.textContent = timeString;
+            // Získání trasy z odpovědi
+            const routeData = data.routes[0];
 
-        // Přidání zprávy do chatu s informacemi o trase
-        addMessage(`Trasa vypočítána po skutečných silnicích. Celková vzdálenost: ${distanceKm} km, čas cesty: ${timeString}`, false);
+            // Dekódování polyline
+            const decodedRoute = L.Polyline.fromEncoded(routeData.geometry).getLatLngs();
 
-        // Přizpůsobení mapy, aby zobrazovala celou trasu
-        if (routes[0].coordinates && routes[0].coordinates.length > 0) {
-            map.fitBounds(L.latLngBounds(routes[0].coordinates), {padding: [50, 50]});
+            // Vytvoření trasy na mapě
+            if (route) {
+                map.removeLayer(route);
+            }
+
+            route = L.polyline(decodedRoute, {
+                color: 'blue',
+                weight: 5,
+                opacity: 0.9,
+                smoothFactor: 1
+            }).addTo(map);
+
+            // Výpočet vzdálenosti a času
+            const distanceKm = (routeData.distance / 1000).toFixed(2);
+            const totalTimeSeconds = routeData.duration;
+            const hours = Math.floor(totalTimeSeconds / 3600);
+            const minutes = Math.round((totalTimeSeconds % 3600) / 60);
+
+            const timeString = hours > 0 ?
+                `${hours} h ${minutes} min` :
+                `${minutes} min`;
+
+            // Aktualizace informací o trase v panelu
+            routeDistanceElement.textContent = `${distanceKm} km`;
+            routeTimeElement.textContent = timeString;
+
+            // Přidání zprávy do chatu s informacemi o trase
+            addMessage(`Trasa vypočítána po skutečných silnicích. Celková vzdálenost: ${distanceKm} km, čas cesty: ${timeString}`, false);
+
+            // Přizpůsobení mapy, aby zobrazovala celou trasu
+            map.fitBounds(route.getBounds(), {padding: [50, 50]});
+
+            // Uložení stavu aplikace po výpočtu trasy
+            saveAppState();
+
+            return true;
+        } catch (error) {
+            console.error('Chyba při přímém volání OSRM API:', error);
+            return false;
         }
+    };
 
-        // Uložení stavu aplikace po výpočtu trasy
-        saveAppState();
+    // Nejprve zkusíme přímé volání API pro rychlejší výsledek
+    fetchDirectRoute().then(success => {
+        if (!success) {
+            // Pokud přímé volání selhá, použijeme Leaflet Routing Machine jako zálohu
+            console.log('Používám Leaflet Routing Machine jako zálohu');
+
+            // Vytvoření nové trasy s optimalizovanými nastaveními
+            routeControl = L.Routing.control({
+                ...routingOptions,
+                waypoints: points
+            }).addTo(map);
+
+            // Pozastavení animací při vytváření trasy pro lepší výkon
+            const routingLayer = document.querySelector('.leaflet-routing-layer');
+            if (routingLayer) {
+                routingLayer.style.transition = 'none';
+                routingLayer.style.willChange = 'transform';
+            }
+
+            // Nastavení časového limitu pro získání trasy
+            const routeTimeout = setTimeout(() => {
+                // Pokud se trasa nezobrazí do 2 sekund, vytvoříme přímou trasu
+                if (routeControl && !route) {
+                    addMessage('Výpočet přesné trasy trvá déle. Zobrazuji dočasnou přímou trasu.', false);
+
+                    // Vytvoření přímé trasy mezi body jako dočasné řešení
+                    route = L.polyline(points, {
+                        color: 'red',
+                        weight: 4,
+                        opacity: 0.8,
+                        dashArray: '5, 10'
+                    }).addTo(map);
+
+                    // Výpočet přibližné vzdálenosti přímé trasy
+                    let distance = 0;
+                    for (let i = 0; i < points.length - 1; i++) {
+                        distance += points[i].distanceTo(points[i+1]);
+                    }
+
+                    // Převod na kilometry
+                    const distanceKm = (distance / 1000).toFixed(2);
+
+                    // Výpočet přibližného času cesty (průměrná rychlost 50 km/h)
+                    const averageSpeedKmh = 50;
+                    const timeHours = distanceKm / averageSpeedKmh;
+
+                    // Převod na hodiny a minuty
+                    const hours = Math.floor(timeHours);
+                    const minutes = Math.round((timeHours - hours) * 60);
+                    const timeString = hours > 0 ?
+                        `${hours} h ${minutes} min` :
+                        `${minutes} min`;
+
+                    // Aktualizace informací o trase v panelu s přímou trasou
+                    routeDistanceElement.textContent = `${distanceKm} km (přímá trasa)`;
+                    routeTimeElement.textContent = timeString;
+
+                    // Přizpůsobení mapy, aby zobrazovala celou trasu
+                    map.fitBounds(route.getBounds(), {padding: [50, 50]});
+
+                    // Přidání trasy na glóbus, pokud je glóbus režim aktivní
+                    if (isGlobeMode && typeof addRouteToGlobe === 'function') {
+                        addRouteToGlobe(route);
+                        console.log('Přímá trasa byla přidána na glóbus');
+                    }
+                }
+            }, 2000);
+
+            // Poslech na událost 'routesfound' pro získání informací o trase
+            routeControl.on('routesfound', function(e) {
+                // Zrušení časového limitu
+                clearTimeout(routeTimeout);
+
+                // Odstranění přímé trasy, pokud byla vytvořena
+                if (route) {
+                    map.removeLayer(route);
+                    route = null;
+                }
+
+                const routes = e.routes;
+                const summary = routes[0].summary;
+
+                // Získání vzdálenosti v kilometrech
+                const distanceKm = (summary.totalDistance / 1000).toFixed(2);
+
+                // Získání času v sekundách a převod na hodiny a minuty
+                const totalTimeSeconds = summary.totalTime;
+                const hours = Math.floor(totalTimeSeconds / 3600);
+                const minutes = Math.round((totalTimeSeconds % 3600) / 60);
+
+                const timeString = hours > 0 ?
+                    `${hours} h ${minutes} min` :
+                    `${minutes} min`;
+
+                // Aktualizace informací o trase v panelu
+                routeDistanceElement.textContent = `${distanceKm} km`;
+                routeTimeElement.textContent = timeString;
+
+                // Přidání zprávy do chatu s informacemi o trase
+                addMessage(`Trasa vypočítána po skutečných silnicích. Celková vzdálenost: ${distanceKm} km, čas cesty: ${timeString}`, false);
+
+                // Přizpůsobení mapy, aby zobrazovala celou trasu
+                if (routes[0].coordinates && routes[0].coordinates.length > 0) {
+                    map.fitBounds(L.latLngBounds(routes[0].coordinates), {padding: [50, 50]});
+                }
+
+                // Přidání trasy na glóbus, pokud je glóbus režim aktivní
+                if (isGlobeMode && typeof addRouteToGlobe === 'function') {
+                    addRouteToGlobe(routeControl);
+                    console.log('Trasa byla přidána na glóbus');
+                }
+
+                // Uložení stavu aplikace po výpočtu trasy
+                saveAppState();
+            });
+
+            // Poslech na událost 'routingerror' pro případ chyby při výpočtu trasy
+            routeControl.on('routingerror', function(e) {
+                // Zrušení časového limitu
+                clearTimeout(routeTimeout);
+
+                console.error('Chyba při výpočtu trasy:', e.error);
+
+                // Pokud se nepodaří získat trasu přes API, použijeme záložní metodu s přímou čárou
+                addMessage('Nepodařilo se získat přesnou trasu po silnicích. Zobrazuji přímou trasu.', false);
+
+                // Vytvoření přímé trasy mezi body jako záložní řešení
+                if (route) {
+                    map.removeLayer(route);
+                }
+
+                route = L.polyline(points, {
+                    color: 'red',
+                    weight: 4,
+                    opacity: 0.8,
+                    dashArray: '5, 10'
+                }).addTo(map);
+
+                // Výpočet přibližné vzdálenosti přímé trasy
+                let distance = 0;
+                for (let i = 0; i < points.length - 1; i++) {
+                    distance += points[i].distanceTo(points[i+1]);
+                }
+
+                // Převod na kilometry
+                const distanceKm = (distance / 1000).toFixed(2);
+
+                // Výpočet přibližného času cesty (průměrná rychlost 50 km/h)
+                const averageSpeedKmh = 50;
+                const timeHours = distanceKm / averageSpeedKmh;
+
+                // Převod na hodiny a minuty
+                const hours = Math.floor(timeHours);
+                const minutes = Math.round((timeHours - hours) * 60);
+                const timeString = hours > 0 ?
+                    `${hours} h ${minutes} min` :
+                    `${minutes} min`;
+
+                // Aktualizace informací o trase v panelu
+                routeDistanceElement.textContent = `${distanceKm} km (přímá trasa)`;
+                routeTimeElement.textContent = timeString;
+
+                // Přizpůsobení mapy, aby zobrazovala celou trasu
+                map.fitBounds(route.getBounds(), {padding: [50, 50]});
+
+                // Přidání trasy na glóbus, pokud je glóbus režim aktivní
+                if (isGlobeMode && typeof addRouteToGlobe === 'function') {
+                    addRouteToGlobe(route);
+                    console.log('Záložní trasa byla přidána na glóbus');
+                }
+
+                // Uložení stavu aplikace po výpočtu trasy
+                saveAppState();
+            });
+        }
     });
-
-    // Poslech na událost 'routingerror' pro případ chyby při výpočtu trasy
-    routeControl.on('routingerror', function(e) {
-        console.error('Chyba při výpočtu trasy:', e.error);
-
-        // Pokud se nepodaří získat trasu přes API, použijeme záložní metodu s přímou čárou
-        addMessage('Nepodařilo se získat přesnou trasu po silnicích. Zobrazuji přímou trasu.', false);
-
-        // Vytvoření přímé trasy mezi body
-        if (route) {
-            map.removeLayer(route);
-        }
-
-        route = L.polyline(points, {
-            color: 'red',
-            weight: 4,
-            opacity: 0.8,
-            dashArray: '5, 10'
-        }).addTo(map);
-
-        // Výpočet přibližné vzdálenosti přímé trasy
-        let distance = 0;
-        for (let i = 0; i < points.length - 1; i++) {
-            distance += points[i].distanceTo(points[i+1]);
-        }
-
-        // Převod na kilometry
-        const distanceKm = (distance / 1000).toFixed(2);
-
-        // Výpočet přibližného času cesty (průměrná rychlost 50 km/h)
-        const averageSpeedKmh = 50;
-        const timeHours = distanceKm / averageSpeedKmh;
-
-        // Převod na hodiny a minuty
-        const hours = Math.floor(timeHours);
-        const minutes = Math.round((timeHours - hours) * 60);
-        const timeString = hours > 0 ?
-            `${hours} h ${minutes} min` :
-            `${minutes} min`;
-
-        // Aktualizace informací o trase v panelu
-        routeDistanceElement.textContent = `${distanceKm} km (přímá trasa)`;
-        routeTimeElement.textContent = timeString;
-
-        // Přizpůsobení mapy, aby zobrazovala celou trasu
-        map.fitBounds(route.getBounds(), {padding: [50, 50]});
-    });
-
-    return routeControl;
 }
 
 // Event listener pro tlačítko výpočtu trasy
@@ -1297,8 +1512,9 @@ function processMessage(message) {
 
     // Simulace odpovědi AI
     setTimeout(() => {
-        const response = processUserInput(message);
-        addMessage(response);
+        // Získání odpovědi a návrhů dalších akcí
+        const { response, suggestions } = generateResponseWithSuggestions(message);
+        addMessage(response, false, suggestions);
     }, 500);
 }
 
@@ -1359,10 +1575,35 @@ const chatMessages = document.getElementById('chatMessages');
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendMessage');
 
-function addMessage(message, isUser = false) {
+function addMessage(message, isUser = false, suggestions = []) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
-    messageDiv.textContent = message;
+
+    // Vytvoření obsahu zprávy
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    messageContent.textContent = message;
+    messageDiv.appendChild(messageContent);
+
+    // Přidání návrhů dalších akcí, pokud existují a nejde o zprávu uživatele
+    if (!isUser && suggestions && suggestions.length > 0) {
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.className = 'message-suggestions';
+
+        suggestions.forEach(suggestion => {
+            const suggestionBtn = document.createElement('button');
+            suggestionBtn.className = 'suggestion-btn';
+            suggestionBtn.textContent = suggestion;
+            suggestionBtn.addEventListener('click', () => {
+                // Při kliknutí na návrh se zpráva odešle jako by ji napsal uživatel
+                processMessage(suggestion);
+            });
+            suggestionsContainer.appendChild(suggestionBtn);
+        });
+
+        messageDiv.appendChild(suggestionsContainer);
+    }
+
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -1374,45 +1615,39 @@ function addMessage(message, isUser = false) {
 function updateFloatingChat() {
     const floatingChatMessages = document.getElementById('floatingChatMessages');
     if (floatingChatMessages && isFullscreen) {
-        floatingChatMessages.innerHTML = chatMessages.innerHTML;
+        // Kopírujeme obsah chatu včetně všech event listenerů
+        floatingChatMessages.innerHTML = '';
+
+        // Kopírujeme všechny zprávy z originálního chatu
+        Array.from(chatMessages.children).forEach(messageNode => {
+            const clonedNode = messageNode.cloneNode(true);
+
+            // Pokud má zpráva návrhy akcí, přidáme event listenery
+            const suggestionsContainer = clonedNode.querySelector('.message-suggestions');
+            if (suggestionsContainer) {
+                const suggestionButtons = suggestionsContainer.querySelectorAll('.suggestion-btn');
+                suggestionButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        processMessage(btn.textContent);
+                    });
+                });
+            }
+
+            floatingChatMessages.appendChild(clonedNode);
+        });
+
         floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
     }
 }
 
 // Funkce pro přepnutí 3D režimu
 function toggle3DMode() {
-    console.log('toggle3DMode funkce byla volána');
-
-    // Získání reference na tlačítko podle kontextu (fullscreen nebo normální režim)
-    let toggle3DBtn;
-
-    if (isFullscreen) {
-        // Ve fullscreen režimu hledáme tlačítko v kontejneru fullscreenControls
-        const fullscreenControls = document.getElementById('fullscreenControls');
-        if (fullscreenControls) {
-            // Hledáme tlačítko s textem '3D režim'
-            const buttons = fullscreenControls.querySelectorAll('button');
-            for (const btn of buttons) {
-                if (btn.innerHTML.includes('3D režim')) {
-                    toggle3DBtn = btn;
-                    break;
-                }
-            }
-        }
-    } else {
-        // V normálním režimu použijeme ID
-        toggle3DBtn = document.getElementById('toggle3DMode');
-    }
-
-    console.log('Tlačítko pro 3D režim:', toggle3DBtn);
-
+    const toggle3DBtn = document.getElementById('toggle3DMode');
     is3DMode = !is3DMode;
 
     if (is3DMode) {
         // Aktivace 3D režimu
-        if (toggle3DBtn) {
-            toggle3DBtn.classList.add('active');
-        }
+        toggle3DBtn.classList.add('active');
 
         // Přidání třídy pro 3D režim
         document.getElementById('map').classList.add('map-3d-mode');
@@ -1437,9 +1672,7 @@ function toggle3DMode() {
         addMessage('3D režim byl aktivován. Nyní můžete vidět budovy ve 3D. Použijte ovládací prvky pro rotaci a náklon.', false);
     } else {
         // Deaktivace 3D režimu
-        if (toggle3DBtn) {
-            toggle3DBtn.classList.remove('active');
-        }
+        toggle3DBtn.classList.remove('active');
 
         // Odstranění třídy pro 3D režim
         document.getElementById('map').classList.remove('map-3d-mode');
@@ -1551,264 +1784,611 @@ function remove3DControls() {
     }
 }
 
-// Funkce pro přepnutí glóbus režimu
+// Funkce pro přepnutí glóbus režimu s Globe.GL
 function toggleGlobeMode() {
-    console.log('toggleGlobeMode funkce byla volána, isFullscreen:', isFullscreen);
-
-    // Získání reference na tlačítko podle kontextu (fullscreen nebo normální režim)
-    let toggleGlobeBtn;
-
-    if (isFullscreen) {
-        // Ve fullscreen režimu hledáme tlačítko v kontejneru fullscreenControls
-        const fullscreenControls = document.getElementById('fullscreenControls');
-        console.log('fullscreenControls:', fullscreenControls);
-
-        if (fullscreenControls) {
-            // Hledáme tlačítko s textem 'Glóbus'
-            const buttons = fullscreenControls.querySelectorAll('button');
-            console.log('Nalezeno tlačítek ve fullscreen:', buttons.length);
-
-            for (const btn of buttons) {
-                console.log('Tlačítko HTML:', btn.innerHTML);
-                if (btn.innerHTML.includes('Glóbus')) {
-                    toggleGlobeBtn = btn;
-                    console.log('Nalezeno tlačítko pro glóbus ve fullscreen');
-                    break;
-                }
-            }
-        }
-    } else {
-        // V normálním režimu použijeme ID
-        toggleGlobeBtn = document.getElementById('toggleGlobeMode');
-        console.log('Tlačítko pro glóbus v normálním režimu:', toggleGlobeBtn);
-    }
+    const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+    const exitGlobeBtn = document.getElementById('exitGlobeMode');
 
     // Pokud je aktivní 3D režim, nejprve ho deaktivujeme
     if (is3DMode) {
-        console.log('Deaktivace 3D režimu před aktivací glóbus režimu');
         toggle3DMode();
     }
 
-    // Přepínání stavu glóbus režimu
     isGlobeMode = !isGlobeMode;
-    console.log('Nový stav isGlobeMode:', isGlobeMode);
 
     if (isGlobeMode) {
-        console.log('Aktivace glóbus režimu');
+        console.log('Aktivace glóbus režimu s Globe.GL');
 
-        // Aktivace tlačítka
-        if (toggleGlobeBtn) {
-            toggleGlobeBtn.classList.add('active');
-            console.log('Tlačítko pro glóbus označeno jako aktivní');
-        }
+        // Aktivace glóbus režimu
+        toggleGlobeBtn.classList.add('active');
+
+        // Skrytí tlačítka pro glóbus režim a zobrazení tlačítka pro návrat na mapu
+        toggleGlobeBtn.style.display = 'none';
+        exitGlobeBtn.style.display = 'flex'; // Použití flex místo block pro lepší zarovnání
+
+        // Zajištění, že tlačítko pro návrat bude vždy nad ostatními prvky
+        exitGlobeBtn.style.zIndex = '2000';
 
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
 
-        // Kontrola, zda je Cesium handler inicializován
-        if (!window.CesiumHandler) {
-            console.log('Cesium handler není dostupný, pokus o inicializaci...');
-            // Pokus o inicializaci Cesium handleru
-            initializeCesiumHandler().then(() => {
-                console.log('Cesium handler byl úspěšně inicializován, aktivace glóbus režimu...');
-                activateGlobeMode();
-            }).catch(error => {
-                console.error('Nepodařilo se inicializovat Cesium handler:', error);
-                handleGlobeModeError('Nepodařilo se inicializovat Cesium handler: ' + error.message);
-            });
-        } else {
-            console.log('Cesium handler je dostupný, aktivace glóbus režimu...');
-            activateGlobeMode();
+        // Uložení aktuálního středu mapy
+        const center = map.getCenter();
+        console.log('Střed mapy:', center);
+
+        try {
+            // Kontrola, zda je Globe.GL dostupný
+            if (typeof Globe === 'undefined') {
+                console.error('Globe.GL knihovna není dostupná');
+                console.log('Dostupné globální objekty:', Object.keys(window));
+                // Pokus o načtení Globe.gl z CDN
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/globe.gl';
+                script.async = true;
+                script.onload = function() {
+                    console.log('Globe.gl knihovna byla načtena z CDN');
+                    toggleGlobeMode(); // Zkusíme znovu aktivovat glóbus režim
+                };
+                script.onerror = function() {
+                    console.error('Nepodařilo se načíst Globe.gl knihovnu z CDN');
+                    addMessage('Nepodařilo se načíst Globe.gl knihovnu. Zkontrolujte připojení k internetu.', true);
+                };
+                document.head.appendChild(script);
+                return;
+            }
+
+            // Inicializace jednoduchého glóbusu
+            if (typeof initSimpleGlobe === 'function') {
+                console.log('Inicializace jednoduchého glóbusu');
+                const success = initSimpleGlobe();
+                if (!success) {
+                    throw new Error('Inicializace jednoduchého glóbusu selhala');
+                }
+                console.log('Jednoduchý glóbus byl úspěšně inicializován');
+
+                // Zobrazení kontejneru pro glóbus
+                const container = document.getElementById('simpleGlobeContainer');
+                if (container) {
+                    container.style.display = 'block';
+                    container.style.width = '100%';
+                    container.style.height = '100%';
+                    console.log('Kontejner pro glóbus byl zobrazen');
+
+                    // Aktualizace velikosti glóbusu po zobrazení
+                    setTimeout(() => {
+                        if (typeof window.resizeGlobe === 'function') {
+                            window.resizeGlobe();
+                            console.log('Velikost glóbusu byla aktualizována');
+                        }
+                    }, 100);
+                }
+
+                // Přidání bodů na glóbus
+                if (markers.length > 0 && typeof addPointsToSimpleGlobe === 'function') {
+                    addPointsToSimpleGlobe(markers);
+                    console.log('Body byly přidány na glóbus');
+
+                    // Přidání tras mezi body
+                    if (markers.length > 1 && typeof addArcsToSimpleGlobe === 'function') {
+                        addArcsToSimpleGlobe(markers);
+                        console.log('Trasy mezi body byly přidány na glóbus');
+                    }
+
+                    // Přidání aktuální trasy na glóbus, pokud existuje
+                    if (typeof addRouteToGlobe === 'function') {
+                        if (route) {
+                            // Přímá trasa
+                            addRouteToGlobe(route);
+                            console.log('Aktuální přímá trasa byla přidána na glóbus');
+                        } else if (routeControl) {
+                            // Trasa z Leaflet Routing Machine
+                            addRouteToGlobe(routeControl);
+                            console.log('Aktuální trasa z Leaflet Routing Machine byla přidána na glóbus');
+                        }
+                    }
+                }
+            } else {
+                throw new Error('Funkce initSimpleGlobe není dostupná');
+            }
+
+            // Přidání ovládacích prvků pro glóbus
+            addGlobeControls();
+            console.log('Ovládací prvky byly přidány');
+
+            // Poznámka: Neaktivujeme automaticky fullscreen režim
+            // Uživatel si může aktivovat fullscreen režim samostatně
+
+        } catch (error) {
+            console.error('Chyba při inicializaci jednoduchého glóbusu:', error);
+            addMessage('Nepodařilo se inicializovat glóbus. Chyba: ' + error.message, true);
+            isGlobeMode = false;
+            toggleGlobeBtn.classList.remove('active');
+            document.getElementById('map').classList.remove('map-globe-mode');
+            return;
         }
+
+        // Informace pro uživatele
+        addMessage('Glóbus režim byl aktivován. Nyní můžete vidět Zemi jako interaktivní kouli. Použijte ovládací prvky pro rotaci a přiblížení.', false);
     } else {
         console.log('Deaktivace glóbus režimu');
 
-        // Deaktivace tlačítka
-        if (toggleGlobeBtn) {
-            toggleGlobeBtn.classList.remove('active');
-            console.log('Tlačítko pro glóbus označeno jako neaktivní');
-        }
+        // Deaktivace glóbus režimu
+        toggleGlobeBtn.classList.remove('active');
+
+        // Zobrazení tlačítka pro glóbus režim a skrytí tlačítka pro návrat na mapu
+        toggleGlobeBtn.style.display = 'block';
+        exitGlobeBtn.style.display = 'none';
 
         // Odstranění třídy pro glóbus režim
         document.getElementById('map').classList.remove('map-globe-mode');
 
-        // Deaktivace glóbus režimu pomocí Cesium handleru
-        if (window.CesiumHandler) {
-            console.log('Deaktivace glóbus režimu pomocí Cesium handleru');
-            window.CesiumHandler.deactivateGlobeMode(addMessage)
-                .catch(error => {
-                    console.error('Chyba při deaktivaci glóbus režimu:', error);
-                });
-        } else {
-            console.log('Cesium handler není dostupný, nelze deaktivovat glóbus režim');
+        try {
+            // Vyčištění glóbusu
+            if (typeof clearSimpleGlobe === 'function') {
+                clearSimpleGlobe();
+                console.log('Všechny objekty byly odstraněny z glóbusu');
+            }
+
+            // Odstranění ovládacích prvků pro glóbus
+            removeGlobeControls();
+
+            // Skrytí kontejneru
+            const container = document.getElementById('simpleGlobeContainer');
+            if (container) {
+                container.style.display = 'none';
+            }
+
+            // Aktualizace velikosti mapy
+            map.invalidateSize();
+            console.log('Velikost mapy byla aktualizována');
+        } catch (error) {
+            console.error('Chyba při deaktivaci glóbus režimu:', error);
         }
+
+        // Informace pro uživatele
+        addMessage('Glóbus režim byl deaktivován. Mapa je nyní v klasickém 2D zobrazení.', false);
     }
 
-    // Pomocná funkce pro aktivaci glóbus režimu
-    function activateGlobeMode() {
-        // Aktivace glóbus režimu pomocí Cesium handleru
-        window.CesiumHandler.activateGlobeMode(markers, addMessage)
-            .then(() => {
-                console.log('Glóbus režim byl úspěšně aktivován');
-                // Zajistíme, že Cesium container je viditelný
-                const cesiumContainer = document.getElementById('cesiumContainer');
-                if (cesiumContainer) {
-                    cesiumContainer.style.display = 'block';
-                    console.log('Cesium container byl zobrazen');
-                }
-            })
-            .catch(error => {
-                console.error('Chyba při aktivaci glóbus režimu:', error);
-                handleGlobeModeError('Chyba při aktivaci glóbus režimu: ' + error.message);
-            });
-    }
-
-    // Pomocná funkce pro zpracování chyby při aktivaci glóbus režimu
-    function handleGlobeModeError(errorMessage) {
-        // Obnovení původního stavu v případě chyby
-        isGlobeMode = false;
-        if (toggleGlobeBtn) {
-            toggleGlobeBtn.classList.remove('active');
-        }
-        document.getElementById('map').classList.remove('map-globe-mode');
-
-        // Zobrazení chybové zprávy uživateli
-        addMessage(errorMessage, true);
-
-        // Skrytí loading overlay
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
-        }
-    }
+    // Uložení stavu aplikace
+    saveAppState();
 }
 
 // Funkce pro přidání markerů na glóbus
 function addMarkersToGlobe() {
-    // Použití Cesium handleru pro přidání markerů na glóbus
-    if (window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
-        window.CesiumHandler.addMarkersToGlobe(markers);
+    if (!cesiumViewer) {
+        console.error('Cesium Viewer není inicializován');
+        return;
+    }
+
+    try {
+        console.log('Přidávání markerů na glóbus');
+
+        // Vyčištění všech entit
+        cesiumViewer.entities.removeAll();
+        globeMarkers = [];
+
+        // Kontrola, zda existují markery k přidání
+        if (markers.length === 0) {
+            console.log('Nejsou žádné markery k přidání na glóbus');
+            return;
+        }
+
+        // Přidání markerů z Leaflet mapy na glóbus
+        markers.forEach((marker, index) => {
+            const position = marker.getLatLng();
+
+            // Získání názvu markeru
+            const markerName = markerProperties[index] && markerProperties[index].name ?
+                markerProperties[index].name : `Bod ${index + 1}`;
+
+            // Vytvoření entity pro marker
+            const globeMarker = cesiumViewer.entities.add({
+                name: markerName,
+                position: Cesium.Cartesian3.fromDegrees(position.lng, position.lat, 0),
+                billboard: {
+                    image: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
+                    width: 25,
+                    height: 41,
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                },
+                label: {
+                    text: `${index + 1}`,
+                    font: '14pt sans-serif',
+                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    outlineWidth: 2,
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    pixelOffset: new Cesium.Cartesian2(0, -42),
+                    fillColor: Cesium.Color.WHITE,
+                    outlineColor: Cesium.Color.BLACK,
+                    showBackground: true,
+                    backgroundColor: new Cesium.Color(0, 0, 0, 0.7),
+                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                }
+            });
+
+            // Přidání entity do pole markerů
+            globeMarkers.push(globeMarker);
+        });
+
+        console.log(`Přidáno ${globeMarkers.length} markerů na glóbus`);
+
+        // Pokud existují markery, přiblížíme kameru k prvnímu z nich
+        if (markers.length > 0) {
+            const firstPosition = markers[0].getLatLng();
+            cesiumViewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(firstPosition.lng, firstPosition.lat, 500000),
+                orientation: {
+                    heading: 0.0,
+                    pitch: -0.5,
+                    roll: 0.0
+                },
+                duration: 1.5
+            });
+        }
+    } catch (error) {
+        console.error('Chyba při přidávání markerů na glóbus:', error);
+    }
+}
+
+// Funkce pro volání Three.js funkcí
+function addMarkersToThreeGlobe() {
+    if (typeof window.addMarkersToThreeGlobe === 'function') {
+        // Použití funkce z three-globe.js
+        window.addMarkersToThreeGlobe();
+    } else {
+        console.error('Funkce addMarkersToThreeGlobe není dostupná');
+    }
+}
+
+function addRoutesToThreeGlobe() {
+    if (typeof window.addRoutesToThreeGlobe === 'function') {
+        // Použití funkce z three-globe.js
+        window.addRoutesToThreeGlobe();
+    } else {
+        console.error('Funkce addRoutesToThreeGlobe není dostupná');
     }
 }
 
 // Funkce pro přidání ovládacích prvků pro glóbus
 function addGlobeControls() {
-    // Použití Cesium handleru pro přidání ovládacích prvků
-    // Tato funkce je nyní pouze wrapper pro kompatibilitu se starším kódem
-}
+    // Odstranění existujících ovládacích prvků, pokud existují
+    removeGlobeControls();
 
-// Funkce pro rotaci glóbusu
-function rotateGlobe(headingChange, pitchChange) {
-    // Použití Cesium handleru pro rotaci glóbusu
-    if (window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
-        window.CesiumHandler.rotateGlobe(headingChange, pitchChange);
-    }
-}
+    // Vytvoření kontejneru pro ovládací prvky
+    const controlsContainer = document.createElement('div');
+    controlsContainer.id = 'mapGlobeControls';
+    controlsContainer.className = 'map-globe-controls';
 
-// Funkce pro zoom glóbusu
-function zoomGlobe(factor) {
-    // Použití Cesium handleru pro zoom glóbusu
-    if (window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
-        // Cesium handler používá jinou implementaci, ale zachováváme kompatibilitu
-        if (factor < 1) {
-            // Přiblížení
-            window.CesiumHandler.getViewer().camera.zoomIn(1000000);
-        } else {
-            // Oddálení
-            window.CesiumHandler.getViewer().camera.zoomOut(1000000);
+    // Tlačítko pro zvětšení (zoom in)
+    const zoomInBtn = document.createElement('button');
+    zoomInBtn.className = 'map-globe-control-btn';
+    zoomInBtn.innerHTML = '+';
+    zoomInBtn.title = 'Přiblížit';
+    zoomInBtn.addEventListener('click', () => {
+        if (cesiumViewer) {
+            // Získání aktuální pozice kamery
+            const cameraPosition = cesiumViewer.camera.position;
+            const cameraHeight = Cesium.Cartographic.fromCartesian(cameraPosition).height;
+
+            // Přiblížení kamery (zmenšení výšky)
+            cesiumViewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromRadians(
+                    Cesium.Cartographic.fromCartesian(cameraPosition).longitude,
+                    Cesium.Cartographic.fromCartesian(cameraPosition).latitude,
+                    cameraHeight * 0.6 // Přiblížení o 40%
+                ),
+                duration: 0.5
+            });
         }
-    }
+    });
+
+    // Tlačítko pro zmenšení (zoom out)
+    const zoomOutBtn = document.createElement('button');
+    zoomOutBtn.className = 'map-globe-control-btn';
+    zoomOutBtn.innerHTML = '-';
+    zoomOutBtn.title = 'Oddálit';
+    zoomOutBtn.addEventListener('click', () => {
+        if (cesiumViewer) {
+            // Získání aktuální pozice kamery
+            const cameraPosition = cesiumViewer.camera.position;
+            const cameraHeight = Cesium.Cartographic.fromCartesian(cameraPosition).height;
+
+            // Oddálení kamery (zvětšení výšky)
+            cesiumViewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromRadians(
+                    Cesium.Cartographic.fromCartesian(cameraPosition).longitude,
+                    Cesium.Cartographic.fromCartesian(cameraPosition).latitude,
+                    cameraHeight * 1.6 // Oddálení o 60%
+                ),
+                duration: 0.5
+            });
+        }
+    });
+
+    // Tlačítko pro rotaci doleva
+    const rotateLeftBtn = document.createElement('button');
+    rotateLeftBtn.className = 'map-globe-control-btn';
+    rotateLeftBtn.innerHTML = '↶';
+    rotateLeftBtn.title = 'Rotovat doleva';
+    rotateLeftBtn.addEventListener('click', () => {
+        if (cesiumViewer) {
+            // Rotace kamery doleva o 15 stupňů
+            cesiumViewer.camera.rotate(Cesium.Cartesian3.UNIT_Z, Cesium.Math.toRadians(15));
+        }
+    });
+
+    // Tlačítko pro rotaci doprava
+    const rotateRightBtn = document.createElement('button');
+    rotateRightBtn.className = 'map-globe-control-btn';
+    rotateRightBtn.innerHTML = '↷';
+    rotateRightBtn.title = 'Rotovat doprava';
+    rotateRightBtn.addEventListener('click', () => {
+        if (cesiumViewer) {
+            // Rotace kamery doprava o 15 stupňů
+            cesiumViewer.camera.rotate(Cesium.Cartesian3.UNIT_Z, Cesium.Math.toRadians(-15));
+        }
+    });
+
+    // Tlačítko pro náklon nahoru
+    const tiltUpBtn = document.createElement('button');
+    tiltUpBtn.className = 'map-globe-control-btn';
+    tiltUpBtn.innerHTML = '↑';
+    tiltUpBtn.title = 'Náklon nahoru';
+    tiltUpBtn.addEventListener('click', () => {
+        if (cesiumViewer) {
+            // Náklon kamery nahoru o 10 stupňů
+            cesiumViewer.camera.rotate(cesiumViewer.camera.right, Cesium.Math.toRadians(10));
+        }
+    });
+
+    // Tlačítko pro náklon dolů
+    const tiltDownBtn = document.createElement('button');
+    tiltDownBtn.className = 'map-globe-control-btn';
+    tiltDownBtn.innerHTML = '↓';
+    tiltDownBtn.title = 'Náklon dolů';
+    tiltDownBtn.addEventListener('click', () => {
+        if (cesiumViewer) {
+            // Náklon kamery dolů o 10 stupňů
+            cesiumViewer.camera.rotate(cesiumViewer.camera.right, Cesium.Math.toRadians(-10));
+        }
+    });
+
+    // Tlačítko pro reset pohledu
+    const resetViewBtn = document.createElement('button');
+    resetViewBtn.className = 'map-globe-control-btn';
+    resetViewBtn.innerHTML = '⟲';
+    resetViewBtn.title = 'Resetovat pohled';
+    resetViewBtn.addEventListener('click', () => {
+        if (cesiumViewer) {
+            // Získání středu Leaflet mapy
+            const center = map.getCenter();
+
+            // Reset pohledu na výchozí pozici
+            cesiumViewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(center.lng, center.lat, 1000000),
+                orientation: {
+                    heading: Cesium.Math.toRadians(0),
+                    pitch: Cesium.Math.toRadians(-90),
+                    roll: 0
+                },
+                duration: 1.5
+            });
+        }
+    });
+
+    // Přidání tlačítek do kontejneru
+    controlsContainer.appendChild(zoomInBtn);
+    controlsContainer.appendChild(zoomOutBtn);
+    controlsContainer.appendChild(rotateLeftBtn);
+    controlsContainer.appendChild(rotateRightBtn);
+    controlsContainer.appendChild(tiltUpBtn);
+    controlsContainer.appendChild(tiltDownBtn);
+    controlsContainer.appendChild(resetViewBtn);
+
+    // Přidání kontejneru do mapy
+    document.getElementById('map').appendChild(controlsContainer);
 }
 
 // Funkce pro odstranění ovládacích prvků pro glóbus
 function removeGlobeControls() {
-    // Tato funkce je nyní pouze wrapper pro kompatibilitu se starším kódem
+    const controlsContainer = document.getElementById('mapGlobeControls');
+    if (controlsContainer) {
+        controlsContainer.remove();
+    }
 }
 
 // Funkce pro přidání tras mezi body na glóbusu
 function addRoutesToGlobe() {
-    // Použití Cesium handleru pro přidání tras na glóbus
-    if (window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
-        window.CesiumHandler.addRoutesToGlobe(markers);
+    if (!cesiumViewer) {
+        console.error('Cesium Viewer není inicializován');
+        return;
+    }
+
+    try {
+        console.log('Přidávání tras na glóbus');
+
+        // Pokud nemáme alespoň dva body, nemůžeme vytvořit trasu
+        if (markers.length < 2) {
+            console.log('Není dostatek bodů pro vytvoření trasy');
+            return;
+        }
+
+        // Vytvoření pole souřadnic pro trasu
+        const positions = [];
+        markers.forEach(marker => {
+            const position = marker.getLatLng();
+            positions.push(position.lng, position.lat, 0);
+        });
+
+        // Vytvoření entity pro trasu
+        const routeEntity = cesiumViewer.entities.add({
+            name: 'Trasa',
+            polyline: {
+                positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
+                width: 5,
+                material: new Cesium.PolylineGlowMaterialProperty({
+                    glowPower: 0.2,
+                    color: Cesium.Color.BLUE
+                }),
+                clampToGround: true
+            }
+        });
+
+        // Přidání entity do pole markerů
+        globeMarkers.push(routeEntity);
+
+        console.log('Trasa byla úspěšně přidána na glóbus');
+    } catch (error) {
+        console.error('Chyba při přidávání trasy na glóbus:', error);
     }
 }
 
-// Funkce pro zpracování uživatelského vstupu
-function processUserInput(input) {
-    // Jednoduchá simulace AI odpovědí
+// Funkce pro generování odpovědi s návrhy dalších akcí
+function generateResponseWithSuggestions(input) {
+    // Použití vylepšeného zpracování vstupu, pokud je k dispozici
+    if (typeof enhancedProcessUserInput === 'function') {
+        const response = enhancedProcessUserInput(input);
+        return {
+            response,
+            suggestions: generateSuggestions(input, response)
+        };
+    }
+
+    // Záložní implementace pro případ, že vylepšený modul není načten
     const lowercaseInput = input.toLowerCase();
+    let response = '';
+    let suggestions = [];
 
     // Kontrola příkazu "alexa"
     if (lowercaseInput === 'alexa') {
-        return showRohatecClub();
+        response = showRohatecClub();
+        suggestions = ['Rezervovat tanečnici', 'Otevírací doba', 'Jak se dostanu do Rohatce?'];
     }
-
     // Kontrola příkazu "oteviracidoba"
-    if (lowercaseInput === 'oteviracidoba' || lowercaseInput.includes('otevíraci doba') || lowercaseInput.includes('oteviraci doba')) {
-        return showOpeningHours();
+    else if (lowercaseInput === 'oteviracidoba' || lowercaseInput.includes('otevíraci doba') || lowercaseInput.includes('oteviraci doba')) {
+        response = showOpeningHours();
+        suggestions = ['Kaufland Hodonín', 'Albert Hodonín', 'Jak se dostanu do Hodonína?'];
     }
-
     // Kontrola příkazů pro body
-    for (let i = 0; i < markerProperties.length; i++) {
-        if (markerProperties[i] && lowercaseInput === markerProperties[i].command.toLowerCase()) {
-            return navigateToMarker(i);
+    else {
+        let foundMarker = false;
+
+        // Kontrola příkazů pro body
+        for (let i = 0; i < markerProperties.length; i++) {
+            if (markerProperties[i] && lowercaseInput === markerProperties[i].command.toLowerCase()) {
+                response = navigateToMarker(i);
+                suggestions = ['Vypočítat trasu', 'Přidat další bod', 'Smazat tento bod'];
+                foundMarker = true;
+                break;
+            }
+        }
+
+        // Kontrola příkazů pro smazané body
+        if (!foundMarker) {
+            for (let i = 0; i < deletedMarkerCommands.length; i++) {
+                if (lowercaseInput === deletedMarkerCommands[i].command.toLowerCase()) {
+                    response = navigateToDeletedMarker(i);
+                    suggestions = ['Obnovit bod', 'Přidat nový bod', 'Seznam bodů'];
+                    foundMarker = true;
+                    break;
+                }
+            }
+        }
+
+        // Kontrola obecných příkazů
+        if (!foundMarker) {
+            if (lowercaseInput.includes('ahoj') || lowercaseInput.includes('čau') || lowercaseInput.includes('dobrý den')) {
+                response = 'Dobrý den! Jak vám mohu pomoci s plánováním vašich aktivit?';
+                suggestions = ['Přidat aktivitu', 'Vypočítat trasu', 'Otevírací doba', 'Alexa'];
+            } else if (lowercaseInput.includes('trasa') || lowercaseInput.includes('cesta')) {
+                response = 'Pro výpočet trasy přidejte alespoň dva body na mapu a klikněte na tlačítko "Vypočítat trasu".';
+                suggestions = ['Přidat aktivitu', 'Seznam bodů', 'Vymazat mapu'];
+            } else if (lowercaseInput.includes('aktivita') || lowercaseInput.includes('bod')) {
+                response = 'Pro přidání aktivity klikněte na tlačítko "Přidat aktivitu" a poté klikněte na místo na mapě.';
+                suggestions = ['Seznam bodů', 'Vypočítat trasu', 'Vymazat mapu'];
+            } else if (lowercaseInput.includes('tisk') || lowercaseInput.includes('vytisknout')) {
+                response = 'Pro tisk mapy klikněte na tlačítko "Vytisknout mapu".';
+                suggestions = ['Přidat aktivitu', 'Vypočítat trasu', 'Vymazat mapu'];
+            } else if (lowercaseInput.includes('vymazat') || lowercaseInput.includes('smazat') || lowercaseInput.includes('reset')) {
+                // Vymazání všech bodů a tras
+                markers.forEach(marker => map.removeLayer(marker));
+                if (route) {
+                    map.removeLayer(route);
+                }
+
+                // Vymazání trasy vytvořené pomocí Leaflet Routing Machine
+                if (routeControl) {
+                    map.removeControl(routeControl);
+                    routeControl = null;
+                }
+
+                markers = [];
+                markerProperties = [];
+                route = null;
+
+                // Reset informací o trase
+                routeDistanceElement.textContent = '-';
+                routeTimeElement.textContent = '-';
+
+                // Uložení stavu aplikace po vymazání mapy
+                saveAppState();
+
+                response = 'Mapa byla vyčištěna.';
+                suggestions = ['Přidat aktivitu', 'Alexa', 'Otevírací doba'];
+            } else if (lowercaseInput.includes('seznam bodů') || lowercaseInput.includes('ukaž body')) {
+                if (markers.length === 0) {
+                    response = 'Na mapě nejsou žádné body.';
+                    suggestions = ['Přidat aktivitu', 'Alexa', 'Otevírací doba'];
+                } else {
+                    response = 'Seznam bodů na mapě:\n';
+                    markerProperties.forEach((prop, index) => {
+                        response += `${index + 1}. ${prop.name} - příkaz: "${prop.command}"\n`;
+                    });
+                    suggestions = ['Vypočítat trasu', 'Přidat další bod', 'Vymazat mapu'];
+                }
+            } else if (lowercaseInput.includes('glob') || lowercaseInput.includes('3d')) {
+                response = 'Pro aktivaci glóbus režimu klikněte na tlačítko "Glóbus" v ovládacích prvcích mapy. Pro 3D režim klikněte na tlačítko "3D režim".';
+                suggestions = ['Přepnout na glóbus', 'Aktivovat 3D režim', 'Zpět na 2D mapu'];
+            } else {
+                response = 'Omlouvám se, nerozumím vašemu požadavku. Můžete se zeptat na přidání aktivit, výpočet trasy nebo tisk mapy.';
+                suggestions = ['Přidat aktivitu', 'Vypočítat trasu', 'Seznam bodů', 'Alexa'];
+            }
         }
     }
 
-    // Kontrola příkazů pro smazané body
-    for (let i = 0; i < deletedMarkerCommands.length; i++) {
-        if (lowercaseInput === deletedMarkerCommands[i].command.toLowerCase()) {
-            return navigateToDeletedMarker(i);
-        }
+    return { response, suggestions };
+}
+
+// Funkce pro generování návrhů na základě kontextu
+function generateSuggestions(input, response) {
+    // Základní návrhy pro různé kontexty
+    const defaultSuggestions = ['Přidat aktivitu', 'Vypočítat trasu', 'Seznam bodů'];
+
+    // Pokud je odpověď prázdná nebo neexistuje, vrátíme výchozí návrhy
+    if (!response) return defaultSuggestions;
+
+    // Kontextové návrhy na základě obsahu odpovědi
+    if (response.includes('Rohatec') || response.includes('Alexa')) {
+        return ['Rezervovat tanečnici', 'Otevírací doba', 'Jak se dostanu do Rohatce?'];
+    } else if (response.includes('otevírací doba') || response.includes('Kaufland') || response.includes('Albert')) {
+        return ['Kaufland Hodonín', 'Albert Hodonín', 'Jak se dostanu do Hodonína?'];
+    } else if (response.includes('Navigace na bod')) {
+        return ['Vypočítat trasu', 'Přidat další bod', 'Smazat tento bod'];
+    } else if (response.includes('Mapa byla vyčištěna')) {
+        return ['Přidat aktivitu', 'Alexa', 'Otevírací doba'];
+    } else if (response.includes('Seznam bodů')) {
+        return ['Vypočítat trasu', 'Přidat další bod', 'Vymazat mapu'];
     }
 
-    // Kontrola obecných příkazů
-    if (lowercaseInput.includes('ahoj') || lowercaseInput.includes('čau') || lowercaseInput.includes('dobrý den')) {
-        return 'Dobrý den! Jak vám mohu pomoci s plánováním vašich aktivit?';
-    } else if (lowercaseInput.includes('trasa') || lowercaseInput.includes('cesta')) {
-        return 'Pro výpočet trasy přidejte alespoň dva body na mapu a klikněte na tlačítko "Vypočítat trasu".';
-    } else if (lowercaseInput.includes('aktivita') || lowercaseInput.includes('bod')) {
-        return 'Pro přidání aktivity klikněte na tlačítko "Přidat aktivitu" a poté klikněte na místo na mapě.';
-    } else if (lowercaseInput.includes('tisk') || lowercaseInput.includes('vytisknout')) {
-        return 'Pro tisk mapy klikněte na tlačítko "Vytisknout mapu".';
-    } else if (lowercaseInput.includes('vymazat') || lowercaseInput.includes('smazat') || lowercaseInput.includes('reset')) {
-        // Vymazání všech bodů a tras
-        markers.forEach(marker => map.removeLayer(marker));
-        if (route) {
-            map.removeLayer(route);
-        }
+    // Pokud nemáme specifický kontext, vrátíme výchozí návrhy
+    return defaultSuggestions;
+}
 
-        // Vymazání trasy vytvořené pomocí Leaflet Routing Machine
-        if (routeControl) {
-            map.removeControl(routeControl);
-            routeControl = null;
-        }
-
-        markers = [];
-        markerProperties = [];
-        route = null;
-
-        // Reset informací o trase
-        routeDistanceElement.textContent = '-';
-        routeTimeElement.textContent = '-';
-
-        // Uložení stavu aplikace po vymazání mapy
-        saveAppState();
-
-        return 'Mapa byla vyčištěna.';
-    } else if (lowercaseInput.includes('seznam bodů') || lowercaseInput.includes('ukaž body')) {
-        if (markers.length === 0) {
-            return 'Na mapě nejsou žádné body.';
-        }
-
-        let response = 'Seznam bodů na mapě:\n';
-        markerProperties.forEach((prop, index) => {
-            response += `${index + 1}. ${prop.name} - příkaz: "${prop.command}"\n`;
-        });
-        return response;
-    } else {
-        return 'Omlouvám se, nerozumím vašemu požadavku. Můžete se zeptat na přidání aktivit, výpočet trasy nebo tisk mapy.';
-    }
+// Původní funkce pro zpracování uživatelského vstupu (pro zpětnou kompatibilitu)
+function processUserInput(input) {
+    const { response } = generateResponseWithSuggestions(input);
+    return response;
 }
 
 sendButton.addEventListener('click', () => {
@@ -1969,7 +2549,7 @@ function saveAppState() {
     // Uložení nastavení aplikace
     const settings = {
         darkMode: document.getElementById('darkModeToggle').checked,
-        colorScheme: document.querySelector('.color-option.active').getAttribute('data-color'),
+        colorScheme: document.querySelector('.color-option.active')?.getAttribute('data-color') || 'blue',
         markerStyle: markerStyle,
         markerEffectsEnabled: markerEffectsEnabled
     };
@@ -1989,31 +2569,158 @@ function saveAppState() {
         settings: settings,
         mapState: mapState,
         deletedMarkerCommands: deletedMarkerCommands,
-        lastSaved: new Date().toISOString()
+        lastSaved: new Date().toISOString(),
+        version: '0.2.4.2' // Přidání verze pro lepší správu kompatibility
     };
 
-    // Uložení do localStorage
+    // Uložení do localStorage s kompresí pro úsporu místa
     try {
-        localStorage.setItem('aiMapAppState', JSON.stringify(appState));
-        console.log('Stav aplikace byl úspěšně uložen:', appState);
+        // Rozdělení dat na menší části, pokud jsou příliš velká
+        const jsonString = JSON.stringify(appState);
+
+        // Kontrola velikosti dat
+        if (jsonString.length > 4000000) { // Pokud je velikost větší než 4MB
+            console.warn('Data jsou příliš velká pro localStorage, bude provedena optimalizace.');
+
+            // Optimalizace dat - omezení počtu markerů
+            if (markersData.length > 100) {
+                appState.markers = markersData.slice(0, 100);
+                console.warn(`Počet markerů byl omezen na 100 z původních ${markersData.length}.`);
+            }
+
+            // Pokud jsou data stále příliš velká, zkusíme je rozdělit
+            const optimizedJsonString = JSON.stringify(appState);
+            if (optimizedJsonString.length > 5000000) {
+                // Rozdělení dat na části
+                const chunkSize = 1000000; // 1MB na část
+                const chunks = [];
+
+                for (let i = 0; i < optimizedJsonString.length; i += chunkSize) {
+                    chunks.push(optimizedJsonString.slice(i, i + chunkSize));
+                }
+
+                // Uložení počtu částí
+                localStorage.setItem('aiMapAppState_chunks', chunks.length.toString());
+
+                // Uložení jednotlivých částí
+                chunks.forEach((chunk, index) => {
+                    localStorage.setItem(`aiMapAppState_chunk_${index}`, chunk);
+                });
+
+                console.log(`Stav aplikace byl rozdělen na ${chunks.length} částí a úspěšně uložen.`);
+            } else {
+                localStorage.setItem('aiMapAppState', optimizedJsonString);
+                localStorage.removeItem('aiMapAppState_chunks'); // Odstranění předchozího rozdělení, pokud existovalo
+                console.log('Optimalizovaný stav aplikace byl úspěšně uložen.');
+            }
+        } else {
+            localStorage.setItem('aiMapAppState', jsonString);
+            localStorage.removeItem('aiMapAppState_chunks'); // Odstranění předchozího rozdělení, pokud existovalo
+            console.log('Stav aplikace byl úspěšně uložen.');
+        }
+
         return true;
     } catch (error) {
         console.error('Chyba při ukládání stavu aplikace:', error);
-        return false;
+
+        // Pokus o záchranu - uložení pouze základních dat
+        try {
+            const minimalState = {
+                mapState: mapState,
+                settings: settings,
+                version: '0.2.4.2',
+                lastSaved: new Date().toISOString(),
+                error: 'Kompletní data nemohla být uložena kvůli překročení limitu localStorage.'
+            };
+
+            localStorage.setItem('aiMapAppState_minimal', JSON.stringify(minimalState));
+            console.log('Uložena minimální verze stavu aplikace.');
+
+            // Informace pro uživatele
+            addMessage('Nepodařilo se uložit všechna data aplikace. Některá data mohou být ztracena.', false);
+
+            return false;
+        } catch (backupError) {
+            console.error('Selhal i záložní pokus o uložení:', backupError);
+            return false;
+        }
     }
 }
 
 // Funkce pro načtení stavu aplikace z localStorage
 function loadAppState() {
     try {
-        const savedState = localStorage.getItem('aiMapAppState');
-        if (!savedState) {
-            console.log('Nenalezen žádný uložený stav aplikace.');
-            return false;
+        // Nejprve zkontrolujeme, zda existuje rozdělený stav
+        const chunksCount = localStorage.getItem('aiMapAppState_chunks');
+        let savedStateJson = null;
+
+        if (chunksCount) {
+            // Načtení rozděleného stavu
+            console.log(`Načítám stav aplikace rozdělený na ${chunksCount} částí.`);
+
+            try {
+                // Spojení všech částí
+                let combinedState = '';
+                for (let i = 0; i < parseInt(chunksCount); i++) {
+                    const chunk = localStorage.getItem(`aiMapAppState_chunk_${i}`);
+                    if (chunk) {
+                        combinedState += chunk;
+                    } else {
+                        throw new Error(`Chybí část ${i} stavu aplikace.`);
+                    }
+                }
+
+                savedStateJson = combinedState;
+                console.log('Stav aplikace byl úspěšně sestaven z částí.');
+            } catch (chunkError) {
+                console.error('Chyba při načítání rozděleného stavu:', chunkError);
+
+                // Pokus o načtení běžného stavu jako zálohy
+                savedStateJson = localStorage.getItem('aiMapAppState');
+                if (!savedStateJson) {
+                    // Pokus o načtení minimálního stavu jako zálohy
+                    const minimalState = localStorage.getItem('aiMapAppState_minimal');
+                    if (minimalState) {
+                        console.log('Načítám minimální stav aplikace jako zálohu.');
+                        savedStateJson = minimalState;
+                    } else {
+                        console.log('Nenalezen žádný uložený stav aplikace.');
+                        return false;
+                    }
+                }
+            }
+        } else {
+            // Načtení běžného stavu
+            savedStateJson = localStorage.getItem('aiMapAppState');
+
+            if (!savedStateJson) {
+                // Pokus o načtení minimálního stavu jako zálohy
+                const minimalState = localStorage.getItem('aiMapAppState_minimal');
+                if (minimalState) {
+                    console.log('Načítám minimální stav aplikace.');
+                    savedStateJson = minimalState;
+                } else {
+                    console.log('Nenalezen žádný uložený stav aplikace.');
+                    return false;
+                }
+            }
         }
 
-        const appState = JSON.parse(savedState);
+        // Parsování JSON
+        const appState = JSON.parse(savedStateJson);
         console.log('Načten stav aplikace:', appState);
+
+        // Kontrola verze pro zajištění kompatibility
+        if (appState.version && appState.version !== '0.2.4.2') {
+            console.log(`Načten stav z jiné verze aplikace (${appState.version}). Probíhá konverze...`);
+            // Zde by mohla být logika pro konverzi dat mezi verzemi, pokud by bylo potřeba
+        }
+
+        // Kontrola, zda se jedná o minimální stav
+        if (appState.error) {
+            console.warn('Načten minimální stav aplikace s chybou:', appState.error);
+            addMessage('Některá data aplikace nemohla být načtena. Některé body mohou chybět.', false);
+        }
 
         // Načtení nastavení aplikace
         if (appState.settings) {
@@ -2095,59 +2802,126 @@ function loadAppState() {
 
         // Načtení stavu mapy
         if (appState.mapState) {
-            map.setView(
-                [appState.mapState.center.lat, appState.mapState.center.lng],
-                appState.mapState.zoom
-            );
+            try {
+                // Validace souřadnic
+                const lat = parseFloat(appState.mapState.center.lat);
+                const lng = parseFloat(appState.mapState.center.lng);
+                const zoom = parseFloat(appState.mapState.zoom);
+
+                if (isNaN(lat) || isNaN(lng) || isNaN(zoom) ||
+                    lat < -90 || lat > 90 || lng < -180 || lng > 180 ||
+                    zoom < 1 || zoom > 20) {
+                    console.warn('Neplatné souřadnice nebo zoom, použiji výchozí hodnoty.');
+                    map.setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
+                } else {
+                    map.setView([lat, lng], zoom);
+                }
+            } catch (mapError) {
+                console.error('Chyba při nastavení pohledu mapy:', mapError);
+                map.setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
+            }
         }
 
         // Načtení smazaných příkazů
-        if (appState.deletedMarkerCommands && appState.deletedMarkerCommands.length > 0) {
-            deletedMarkerCommands = appState.deletedMarkerCommands;
-            console.log('Načteno ' + deletedMarkerCommands.length + ' smazaných příkazů.');
+        if (appState.deletedMarkerCommands && Array.isArray(appState.deletedMarkerCommands)) {
+            try {
+                // Validace smazaných příkazů
+                const validCommands = appState.deletedMarkerCommands.filter(cmd => {
+                    // Kontrola, zda má všechny potřebné vlastnosti
+                    return cmd && cmd.name && cmd.command &&
+                           typeof cmd.lat === 'number' && !isNaN(cmd.lat) &&
+                           typeof cmd.lng === 'number' && !isNaN(cmd.lng) &&
+                           cmd.lat >= -90 && cmd.lat <= 90 &&
+                           cmd.lng >= -180 && cmd.lng <= 180;
+                });
+
+                deletedMarkerCommands = validCommands;
+                console.log('Načteno ' + deletedMarkerCommands.length + ' smazaných příkazů.');
+
+                if (validCommands.length < appState.deletedMarkerCommands.length) {
+                    console.warn(`${appState.deletedMarkerCommands.length - validCommands.length} neplatných smazaných příkazů bylo ignorováno.`);
+                }
+            } catch (commandsError) {
+                console.error('Chyba při načítání smazaných příkazů:', commandsError);
+                deletedMarkerCommands = [];
+            }
         }
 
         // Načtení markerů
-        if (appState.markers && appState.markers.length > 0) {
+        if (appState.markers && Array.isArray(appState.markers) && appState.markers.length > 0) {
             // Odstranění všech stávajících markerů
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
             markerProperties = [];
 
-            // Přidání uložených markerů
+            // Přidání uložených markerů s validací
+            let validMarkersCount = 0;
+            let invalidMarkersCount = 0;
+
             appState.markers.forEach(markerData => {
-                const markerIndex = markers.length;
+                try {
+                    // Validace dat markeru
+                    if (!markerData.lat || !markerData.lng ||
+                        isNaN(parseFloat(markerData.lat)) || isNaN(parseFloat(markerData.lng)) ||
+                        parseFloat(markerData.lat) < -90 || parseFloat(markerData.lat) > 90 ||
+                        parseFloat(markerData.lng) < -180 || parseFloat(markerData.lng) > 180) {
+                        console.warn('Neplatné souřadnice markeru:', markerData);
+                        invalidMarkersCount++;
+                        return; // Přeskočení neplatného markeru
+                    }
 
-                // Vytvoření vlastního markeru s číslem
-                const customIcon = createCustomMarkerIcon(markerIndex + 1, markerIndex);
+                    const markerIndex = markers.length;
 
-                const marker = L.marker([markerData.lat, markerData.lng], {
-                    draggable: true,
-                    title: markerData.properties.name,
-                    icon: customIcon // Použití vlastního ikony
-                }).addTo(map);
+                    // Vytvoření vlastního markeru s číslem
+                    const customIcon = createCustomMarkerIcon(markerIndex + 1, markerIndex);
 
-                markers.push(marker);
-                markerProperties[markerIndex] = markerData.properties;
+                    const marker = L.marker([markerData.lat, markerData.lng], {
+                        draggable: true,
+                        title: markerData.properties?.name || `Bod ${markerIndex + 1}`,
+                        icon: customIcon // Použití vlastního ikony
+                    }).addTo(map);
 
-                // Nastavení příznaku saved na true pro načtené body (pro zpětnou kompatibilitu)
-                if (markerProperties[markerIndex].saved === undefined) {
-                    markerProperties[markerIndex].saved = true;
+                    markers.push(marker);
+
+                    // Validace vlastností markeru
+                    if (!markerData.properties) {
+                        markerData.properties = { name: `Bod ${markerIndex + 1}`, command: `bod${markerIndex + 1}` };
+                    } else {
+                        // Kontrola povinných vlastností
+                        if (!markerData.properties.name) {
+                            markerData.properties.name = `Bod ${markerIndex + 1}`;
+                        }
+                        if (!markerData.properties.command) {
+                            markerData.properties.command = `bod${markerIndex + 1}`;
+                        }
+                    }
+
+                    markerProperties[markerIndex] = markerData.properties;
+
+                    // Nastavení příznaku saved na true pro načtené body (pro zpětnou kompatibilitu)
+                    if (markerProperties[markerIndex].saved === undefined) {
+                        markerProperties[markerIndex].saved = true;
+                    }
+
+                    // Přidání popup s formulářem
+                    marker.bindPopup(createPopupContent(marker, markerIndex), {
+                        className: 'marker-popup',
+                        maxWidth: 350,
+                        minWidth: 250,
+                        autoPan: true,
+                        autoPanPadding: [50, 50],
+                        closeOnClick: false,
+                        autoClose: false
+                    });
+
+                    // Přidání event listenerů pro marker
+                    setupMarkerEventListeners(marker, markerIndex);
+
+                    validMarkersCount++;
+                } catch (markerError) {
+                    console.error('Chyba při vytváření markeru:', markerError, markerData);
+                    invalidMarkersCount++;
                 }
-
-                // Přidání popup s formulářem
-                marker.bindPopup(createPopupContent(marker, markerIndex), {
-                    className: 'marker-popup',
-                    maxWidth: 350,
-                    minWidth: 250,
-                    autoPan: true,
-                    autoPanPadding: [50, 50],
-                    closeOnClick: false,
-                    autoClose: false
-                });
-
-                // Přidání event listenerů pro marker
-                setupMarkerEventListeners(marker, markerIndex);
             });
 
             // Pokud máme alespoň dva body, vypočítáme trasu
@@ -2155,12 +2929,33 @@ function loadAppState() {
                 calculateRouteFunction();
             }
 
-            addMessage(`Načteno ${markers.length} bodů z předchozího sezení.`, false);
+            // Informace pro uživatele
+            if (invalidMarkersCount > 0) {
+                addMessage(`Načteno ${validMarkersCount} bodů z předchozího sezení. ${invalidMarkersCount} bodů nebylo možné načíst kvůli chybě.`, false);
+            } else {
+                addMessage(`Načteno ${validMarkersCount} bodů z předchozího sezení.`, false);
+            }
         }
 
         return true;
     } catch (error) {
         console.error('Chyba při načítání stavu aplikace:', error);
+
+        // Pokus o obnovení základního stavu
+        try {
+            // Nastavení výchozího pohledu mapy
+            map.setView([49.8175, 15.4730], 7);
+
+            // Odstranění všech markerů
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            markerProperties = [];
+
+            addMessage('Došlo k chybě při načítání stavu aplikace. Aplikace byla resetována do výchozího stavu.', false);
+        } catch (recoveryError) {
+            console.error('Chyba při obnově základního stavu:', recoveryError);
+        }
+
         return false;
     }
 }
@@ -2186,7 +2981,7 @@ function setupMarkerEventListeners(marker, markerIndex) {
         }
 
         // Aktualizace glóbusu, pokud je aktivní
-        if (isGlobeMode && window.CesiumHandler && window.CesiumHandler.isGlobeModeActive()) {
+        if (isGlobeMode && cesiumViewer) {
             addMarkersToGlobe();
             addRoutesToGlobe();
         }
@@ -2316,8 +3111,8 @@ window.addEventListener('load', () => {
     // Vyčištění předem definovaných zpráv
     chatMessages.innerHTML = '';
 
-    // Přidání uvítací zprávy
-    addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?');
+    // Přidání uvítací zprávy s návrhy akcí
+    addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?', false, ['Přidat aktivitu', 'Vypočítat trasu', 'Otevírací doba', 'Alexa']);
 
     // Pokus o načtení stavu aplikace
     const stateLoaded = loadAppState();
@@ -2325,10 +3120,10 @@ window.addEventListener('load', () => {
     if (!stateLoaded) {
         // Pokud se nepodařilo načíst stav, aktivujeme režim přidávání bodů
         document.getElementById('addActivity').classList.add('active');
-        addMessage('Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.', false);
+        addMessage('Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.', false, ['Vypočítat trasu', 'Otevírací doba', 'Alexa']);
     } else {
         // Pokud se podařilo načíst stav, informujeme uživatele
-        addMessage('Stav aplikace byl úspěšně načten z předchozího sezení.', false);
+        addMessage('Stav aplikace byl úspěšně načten z předchozího sezení.', false, ['Seznam bodů', 'Vypočítat trasu', 'Otevírací doba']);
     }
 
     // Nastavení výchozího data pro rezervaci tanečnice
@@ -2341,6 +3136,18 @@ window.addEventListener('load', () => {
 
     // Nastavení event listenerů pro styly markerů
     setupMarkerStyleOptions();
+
+    // Přidání event listeneru pro tlačítko glóbus režimu
+    const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+    if (toggleGlobeBtn) {
+        toggleGlobeBtn.addEventListener('click', toggleGlobeMode);
+    }
+
+    // Přidání event listeneru pro tlačítko návratu z glóbus režimu
+    const exitGlobeBtn = document.getElementById('exitGlobeMode');
+    if (exitGlobeBtn) {
+        exitGlobeBtn.addEventListener('click', toggleGlobeMode);
+    }
 
     // Nastavení automatického ukládání stavu aplikace při změnách
     map.on('moveend', saveAppState); // Ukládání při posunu mapy

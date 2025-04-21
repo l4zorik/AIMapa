@@ -1,7 +1,3 @@
-# Changelog
-
-Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
-
 # Můj osobní plán na vývoj
 
 ## Úkol 1
@@ -25,60 +21,223 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vyřídit papíry na úřad práce (příspěvek na bydlení)
 - Domluvit si výplatu před 10.5.2025 (den platby nájmu)
 
-## [0.2.4] - 2025-04-18
+# Changelog
 
-### Opraveno
-- Opraven závažný problém s nefunkční mapou po předchozích úpravách
-- Návrat k funkční verzi 0.2.2 bez externího cesium-handler.js modulu
-- Zachována funkčnost 3D glóbus režimu v původní implementaci
-- Vylepšeno ošetření chyb při inicializaci a používání Cesium
-- Optimalizována funkce `toggleGlobeMode` pro spolehlivější přepínání režimů
-- Implementováno automatické zobrazení/skrytí Cesium containeru při přepínání režimů
-- Vylepšena kontrola stavu Cesium Vieweru před jeho použitím
-- Optimalizována práce s DOM elementy pro lepší výkon a stabilitu
+Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.2.3] - 2025-04-18
+## [0.2.7.3] - 2025-04-20 - OPTIMALIZACE DLOUHÝCH TRAS NA GLÓBUSU
 
-### Přepracováno
-- Kompletní přepracování 3D glóbus režimu s interaktivními ovládacími prvky
-- Přidání loading overlay pro lepší uživatelský zážitek při načítání glóbusu
-- Implementace interaktivních ovládacích prvků pro rotaci a zoom glóbusu
-- Použití Bing Maps s lepší kvalitou zobrazení
-- Přidání terénu pro realističtější vzhled planety
-- Přidání hvězdné oblohy a atmosféry pro lepší vizuální dojem
-- Optimalizace CSS stylů pro správné zobrazení všech komponent
-- Implementace funkcí pro rotaci a zoom glóbusu
+### Optimalizace dlouhých tras na glóbusu
 
-## [0.2.2] - 2025-04-18
+- Opraveny problémy se zobrazením dlouhých tras na glóbusu (např. z Česka do Číny)
+- Přidána optimalizace počtu bodů trasy pro zlepšení výkonu
+- Implementováno postupné přidávání segmentů trasy pro plynulejší zobrazení
+- Přidáno speciální zpracování tras překračujících 180. poledník
+- Implementováno rozdělení dlouhých segmentů na menší části pro lepší vizualizaci
+- Přidáno ošetření chyb pro zvýšení stability aplikace
 
-### Přepracováno
-- Kompletní přepracování inicializace glóbus režimu pro správné zobrazení planety
-- Použití CDN pro lepší dostupnost Cesium.js knihovny
-- Vylepšené ošetření chyb při inicializaci Cesium Vieweru
-- Přidání testovacího markeru pro ověření funkčnosti glóbusu
-- Použití jednodušších bodů místo billboardů pro lepší výkon
-- Optimalizace CSS stylů pro správné zobrazení glóbusu
-- Vynucení překreslení scény po dokončení animace
+## [0.2.7.2] - 2025-04-20 - ZOBRAZENÍ TRASY Z KLASICKÉ MAPY NA GLÓBUSU
 
-## [0.2.1] - 2025-04-18
+### Zobrazení trasy z klasické mapy na glóbusu
 
-### Opraveno
-- Opravena funkčnost tlačítek 3D a glóbus režimu ve fullscreen módu
-- Přidáno podrobné logování pro diagnostiku problémů s tlačítky
-- Implementováno inteligentní vyhledávání tlačítek podle kontextu (fullscreen nebo normální režim)
-- Zlepšena odolnost kódu proti chybám při práci s tlačítky
+- Přidána funkce pro zobrazení trasy z klasické mapy na glóbusu
+- Trasa se nyní automaticky zobrazuje na glóbusu při přepnutí do glóbus režimu
+- Trasa se aktualizuje při výpočtu nové trasy, pokud je glóbus režim aktivní
+- Podpora pro různé typy tras (přímá trasa, trasa z Leaflet Routing Machine)
+- Trasa na glóbusu má odlišnou barvu pro lepší odlišení od tras mezi body
 
-## [0.2.0] - 2025-04-18
+## [0.2.7.1] - 2025-04-20 - VYLEPŠENÍ VIDITELNOSTI TLAČÍTKA PRO NÁVRAT Z GLÓBUS REŽIMU
 
-### Přepracováno
-- Kompletní přepracování glóbus režimu pro správné zobrazení planety
-- Nový přístup k inicializaci Cesium Vieweru s lepším nastavením
-- Vylepšené zobrazení markerů a tras na glóbusu
-- Optimalizováno nastavení kamery pro lepší pohled na glóbus
-- Přidáno podrobné logování pro diagnostiku problémů
-- Vylepšeny CSS styly pro správné zobrazení všech komponent Cesium
-- Optimalizována práce s Cesium entitami pro lepší výkon
-- Implementováno správné čištění zdrojů při deaktivaci glóbus režimu
+### Vylepšení viditelnosti tlačítka pro návrat z glóbus režimu
+
+- Vylepšena viditelnost tlačítka pro návrat z glóbus režimu i na malých obrazovkách
+- Přidána animace pulzování pro tlačítko návratu z glóbus režimu pro lepší viditelnost
+- Zvýšen z-index tlačítka, aby bylo vždy nad ostatními prvky
+- Přidán výraznější okraj a stín pro lepší viditelnost tlačítka
+- Optimalizováno zobrazení tlačítka na různých velikostech obrazovky
+
+## [0.2.7.0] - 2025-04-20 - VYLEPŠENÍ GLÓBUS REŽIMU
+
+### Vylepšení glóbus režimu
+
+- Přidáno tlačítko pro návrat z glóbus režimu zpět na 2D mapu
+- Po aktivaci glóbus režimu se nyní skryje tlačítko pro aktivaci glóbus režimu a zobrazí se tlačítko pro návrat na 2D mapu
+- Vylepšeny CSS styly pro tlačítka glóbus režimu
+- Optimalizováno přepínání mezi glóbus režimem a 2D mapou
+
+## [0.2.6.5] - 2025-04-20 - OPRAVA GLÓBUS REŽIMU
+
+### Oprava glóbus režimu
+
+- Opraven problém s aktivací glóbus režimu - nyní se aktivuje pouze po kliknutí na tlačítko glóbus
+- Přidán přímý odkaz na Globe.gl knihovnu z CDN pro zajištění spolehlivé funkce glóbusu
+- Vytvořen nový soubor `globe-simple.js` s jednoduchou implementací Globe.gl
+- Odstraněny nepotřebné soubory, které mohly způsobovat konflikty
+- Vylepšena inicializace glóbusu s automatickým načtením knihovny z CDN, pokud není dostupná
+- Optimalizováno zobrazení glóbusu přes celou plochu mapy
+- Přidána funkce `resizeGlobe` pro aktualizaci velikosti glóbusu po jeho zobrazení
+- Vylepšeny CSS styly pro glóbus kontejner
+
+## [0.2.5.0] - 2025-04-21 - ZJEDNODUŠENÝ GLÓBUS REŽIM
+
+### Experimentální implementace glóbus režimu
+
+- Pokus o implementaci interaktivního 3D glóbusu s využitím knihovny Three.js
+- Vytvoření základního rozhraní pro 3D glóbus
+- Implementace základních funkcí pro rotaci a animaci glóbusu
+- Pokus o integraci textur Země a mraků
+- Implementace základního osvětlení scény
+- Přidání hvězdného pozadí pro lepší vizualizaci
+- Vytvoření ovládacích prvků pro rotaci a zoom
+
+### Integrace knihovny Globe.gl
+
+- Přidány zdrojové soubory knihovny Globe.gl pro lepší integraci a kontrolu
+- Implementována lokální verze knihovny pro zajištění nezávislosti na externích CDN
+- Přidány příklady použití Globe.gl pro inspiraci a testování
+- Vylepšena detekce a logování pro snadnější ladění glóbus režimu
+- Optimalizována inicializace glóbusu pro lepší výkon a stabilitu
+- Přidána podpora pro zobrazení bodů a tras na glóbusu
+
+### Identifikované problémy s Three.js implementací
+
+- Zjištěny závažné problémy s kompatibilitou Three.js v různých prohlížečích
+- Problémy s načítáním textur z externích zdrojů
+- Nestabilita při inicializaci Three.js scény
+- Konflikty mezi Leaflet a Three.js knihovnami
+- Problémy s výkonem při rotaci a animaci glóbusu
+- Nekonzistentní zobrazení v různých prohlížečích
+- Problémy s CSS styly a z-indexy při přepínání mezi režimy
+
+### Poučení a plán dalšího vývoje
+
+- Zvážit alternativní přístupy k implementaci 3D glóbusu
+- Prozkoumat možnost využití specializovaných knihoven pro 3D glóby (např. WebGL Globe, Globe.GL)
+- Zvážit využití Cesium.js s lepší optimalizací
+- Implementovat robustnější ošetření chyb při inicializaci 3D režimu
+- Vytvořit záložní režim pro případ selhání 3D glóbusu
+- Zlepšit izolaci mezi 2D a 3D částmi aplikace pro prevenci konfliktů
+
+## [0.2.4.2] - 2025-04-20 - OPTIMALIZACE VÝKONU A STABILITY
+
+## [0.2.4] - 2025-04-20 - NÁVRAT KE STABILNÍ VERZI
+
+### Návrat k ověřené stabilní verzi
+
+Tato verze představuje návrat k poslední stabilní verzi 0.2.4, která poskytuje spolehlivou funkčnost všech základních funkcí aplikace. Po několika pokusech o opravu problémů v novějších verzích bylo rozhodnuto vrátit se k této ověřené verzi a zachovat dokumentaci o provedených změnách pro případné budoucí využití.
+
+## [0.2.4.2] - 2025-04-20 - OPTIMALIZACE VÝKONU A STABILITY
+
+### Optimalizace výkonu a stability
+
+#### Optimalizace výpočtu trasy
+- Implementováno přímé volání OSRM API pro rychlejší výpočet trasy
+- Optimalizována konfigurace Leaflet Routing Machine pro lepší výkon
+- Snížen časový limit pro zobrazení dočasné přímé trasy z 3 na 2 sekundy
+- Přidány další parametry pro optimalizaci výpočtu trasy
+- Vylepšeno zpracování chyb při výpočtu trasy
+- Implementován systém záložního výpočtu trasy při selhání primární metody
+- Optimalizovány síťové požadavky pro rychlejší odezvu
+- Vylepšeno vykreslování trasy pro plynulejší zobrazení
+
+#### Optimalizace správy event listenerů
+- Implementován systém pro sledování a správu event listenerů
+- Přidány funkce pro automatické odstranění event listenerů při odstranění elementů
+- Vylepšena detekce a prevence duplicitních event listenerů
+- Optimalizována paměťová náročnost při práci s event listenery
+
+#### Optimalizace ukládání a načítání stavu aplikace
+- Implementován systém pro rozdělení velkých dat při ukládání do localStorage
+- Přidána validace dat při načítání stavu aplikace
+- Implementován systém zálohování a obnovy při selhání ukládání/načítání
+- Vylepšeno zpracování chyb při práci s localStorage
+- Přidána podpora pro verzování stavu aplikace
+- Optimalizována velikost ukládaných dat pro lepší výkon
+
+#### Vylepšení stability aplikace
+- Implementována robustní validace všech vstupních dat
+- Vylepšeno zpracování chyb ve všech částech aplikace
+- Přidány mechanismy pro automatickou obnovu při selhání
+- Optimalizována práce s pamětí pro prevenci úniků paměti
+- Vylepšena kompatibilita s různými prohlížeči
+
+## [0.2.4.1] - 2025-04-20 - STABILNÍ VERZE S DOKUMENTACÍ Z NOUZOVÉ VERZE
+
+### Integrace dokumentace z nouzové verze 0.2.6.4
+
+Tato verze kombinuje stabilitu verze 0.2.4 s dokumentací z nouzové verze 0.2.6.4-emergency. Zachovává funkční kód verze 0.2.4, ale přidává cenné informace o problémech a řešeních z pozdějších verzí.
+
+#### Dokumentace z nouzové verze 0.2.6.4
+
+Nouzová verze 0.2.6.4 představovala radikální řešení pro zajištění základní funkčnosti aplikace. Po mnoha neúspěšných pokusech o opravu původního skriptu bylo vytvořeno zcela nové, minimalistické řešení, které obsahovalo pouze základní funkce pro práci s mapou. Tento přístup eliminoval všechny potenciální zdroje problémů a zajistil stabilní funkčnost aplikace.
+
+#### Klíčové prvky nouzové verze
+- Zcela nový soubor `script_new.js` s minimalistickým kódem (pouze 300 řádků oproti původním 4000+)
+- Implementace pouze základních funkcí pro zajištění funkčnosti mapy bez zbytečných komplikací
+- Odstranění všech pokročilých funkcí, které mohly způsobovat nestabilitu
+- Zjednodušené uživatelské rozhraní pro maximální spolehlivost
+- Zcela nová architektura kódu s důrazem na jednoduchost a čitelnost
+
+#### Identifikované problémy v předchozích verzích
+
+1. **Problémy s Cesium.js a glóbus režimem**
+   - Nesprávné asynchronní načítání Cesium.js knihovny
+   - Chyby při inicializaci Cesium Vieweru
+   - Konflikty mezi Leaflet a Cesium knihovnami
+   - Nesprávné čištění zdrojů při deaktivaci glóbus režimu
+
+2. **Problémy s event listenery**
+   - Duplicitní přidávání event listenerů při práci s markery
+   - Neodregistrované event listenery při odstranění objektů
+   - Konflikty mezi různými event listenery
+
+3. **Problémy s localStorage a správou stavu aplikace**
+   - Překročení limitu localStorage při ukládání většího množství dat
+   - Nekonzistentní stav aplikace při načítání z localStorage
+   - Chybějící validace dat při načítání z localStorage
+
+4. **Problémy s výpočtem trasy**
+   - Nestabilita při volání externího API pro výpočet trasy
+   - Nesprávné zpracování chyb při výpočtu trasy
+   - Problémy s vykreslováním trasy při zoomování a přesouvání mapy
+
+5. **Problémy s CSS a zobrazením**
+   - Konflikty stylů mezi Leaflet, Cesium a vlastními komponentami
+   - Nesprávné nastavení z-indexů způsobující problémy se zobrazením
+   - Problémy s responzivním designem na různých velikostech obrazovky
+
+#### Doporučení pro budoucí vývoj
+
+- Zachovat stabilní verzi 0.2.4 jako základ pro další vývoj
+- Při implementaci nových funkcí postupovat postupně a důkladně testovat každou změnu
+- Implementovat robustní ošetření chyb ve všech částech aplikace
+- Vylepšit správu stavu aplikace s důrazem na konzistenci a validaci dat
+- Optimalizovat práci s event listenery pro prevenci úniků paměti a duplicit
+- Zvážit alternativní přístupy k implementaci 3D glóbus režimu
+
+Tato verze 0.2.4.1 slouží jako důležitý referenční bod pro budoucí vývoj, kombinující stabilitu původního kódu s cennými poznatky získanými při řešení problémů v pozdějších verzích.
+
+#### Klíčové změny
+- Návrat k původnímu skriptu `script.js` místo opravného skriptu `fix.js`
+- Zachování všech funkcí stabilní verze 0.2.4
+- Zachování dokumentace o provedených změnách v novějších verzích
+- Označení verze 0.2.4 jako hlavní stabilní verze pro další vývoj
+
+#### Funkční prvky v této verzi
+- Základní zobrazení mapy s OpenStreetMap podklady
+- Přidávání bodů na mapu pomocí dvojkliku
+- Výpočet trasy mezi body s informacemi o vzdálenosti a čase
+- Funkční chat rozhraní s podporou příkazů (alexa, oteviracidoba)
+- Funkční 3D glóbus režim v původní implementaci
+- Fullscreen režim s plnou funkčností
+- Nastavení aplikace (tmavý režim, barevné schéma, design bodů)
+- Ukládání stavu aplikace mezi relacemi
+
+#### Poznámky
+- Tato verze je označena jako stabilní a funkční
+- V případě problémů v budoucích verzích se vždy vracíme k této verzi
+- Obsahuje základní funkčnost mapy, chatu a bodů
+- Obsahuje funkční 3D glóbus režim v původní implementaci
 
 ## [0.1.9] - 2025-04-18
 
@@ -492,46 +651,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidána další nastavení scény pro lepší zobrazení glóbusu
 - Vylepšeno nastavení pozadí pro lepší kontrast a viditelnost
 
-### Verze 0.2.0 (Duben 2025)
-#### Kompletní přepracování glóbus režimu
-- Kompletní přepracování glóbus režimu pro správné zobrazení planety
-- Nový přístup k inicializaci Cesium Vieweru s lepším nastavením
-- Vylepšené zobrazení markerů a tras na glóbusu
-- Optimalizováno nastavení kamery pro lepší pohled na glóbus
-- Přidáno podrobné logování pro diagnostiku problémů
-- Vylepšeny CSS styly pro správné zobrazení všech komponent Cesium
-- Optimalizována práce s Cesium entitami pro lepší výkon
-- Implementováno správné čištění zdrojů při deaktivaci glóbus režimu
-
-### Verze 0.2.1 (Duben 2025)
-#### Oprava funkčnosti tlačítek
-- Opravena funkčnost tlačítek 3D a glóbus režimu ve fullscreen módu
-- Přidáno podrobné logování pro diagnostiku problémů s tlačítky
-- Implementováno inteligentní vyhledávání tlačítek podle kontextu (fullscreen nebo normální režim)
-- Zlepšena odolnost kódu proti chybám při práci s tlačítky
-
-### Verze 0.2.2 (Duben 2025)
-#### Oprava glóbus režimu
-- Kompletní přepracování inicializace glóbus režimu pro správné zobrazení planety
-- Použití CDN pro lepší dostupnost Cesium.js knihovny
-- Vylepšené ošetření chyb při inicializaci Cesium Vieweru
-- Přidání testovacího markeru pro ověření funkčnosti glóbusu
-- Použití jednodušších bodů místo billboardů pro lepší výkon
-- Optimalizace CSS stylů pro správné zobrazení glóbusu
-- Vynucení překreslení scény po dokončení animace
-
-### Verze 0.2.3 (Duben 2025)
-#### Interaktivní 3D glóbus
-- Kompletní přepracování 3D glóbus režimu s interaktivními ovládacími prvky
-- Přidání loading overlay pro lepší uživatelský zážitek při načítání glóbusu
-- Implementace interaktivních ovládacích prvků pro rotaci a zoom glóbusu
-- Použití Bing Maps s lepší kvalitou zobrazení
-- Přidání terénu pro realističtější vzhled planety
-- Přidání hvězdné oblohy a atmosféry pro lepší vizualní dojem
-- Optimalizace CSS stylů pro správné zobrazení všech komponent
-- Implementace funkcí pro rotaci a zoom glóbusu
-
-#### Plánované funkce pro verzi 0.3.0 (Květen 2025)
+#### Plánované funkce pro verzi 0.2.0 (Květen 2025)
 - Implementace pokročilého vyhledávání míst s automatickým doplňováním
 - Přidání možnosti importu a exportu bodů ve formátech GPX, KML a GeoJSON
 - Implementace měření vzdáleností a ploch pomocí nástroje pro kreslení
