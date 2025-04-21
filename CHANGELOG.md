@@ -25,7 +25,7 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.2.5.0] - 2025-04-20 - ZJEDNODUŠENÝ GLÓBUS REŽIM
+## [0.2.5.0] - 2025-04-21 - ZJEDNODUŠENÝ GLÓBUS REŽIM
 
 ### Experimentální implementace glóbus režimu
 
@@ -36,6 +36,15 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementace základního osvětlení scény
 - Přidání hvězdného pozadí pro lepší vizualizaci
 - Vytvoření ovládacích prvků pro rotaci a zoom
+
+### Integrace knihovny Globe.gl
+
+- Přidány zdrojové soubory knihovny Globe.gl pro lepší integraci a kontrolu
+- Implementována lokální verze knihovny pro zajištění nezávislosti na externích CDN
+- Přidány příklady použití Globe.gl pro inspiraci a testování
+- Vylepšena detekce a logování pro snadnější ladění glóbus režimu
+- Optimalizována inicializace glóbusu pro lepší výkon a stabilitu
+- Přidána podpora pro zobrazení bodů a tras na glóbusu
 
 ### Identifikované problémy s Three.js implementací
 
