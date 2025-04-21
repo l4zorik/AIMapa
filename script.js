@@ -60,6 +60,16 @@ let threeMarkers = [];
 let threeRoutes = [];
 let threeAnimationFrame = null;
 
+// Inicializace globálních proměnných pro Three.js glóbus, pokud ještě nejsou definovány
+if (typeof threeScene === 'undefined') threeScene = null;
+if (typeof threeCamera === 'undefined') threeCamera = null;
+if (typeof threeRenderer === 'undefined') threeRenderer = null;
+if (typeof threeControls === 'undefined') threeControls = null;
+if (typeof threeGlobe === 'undefined') threeGlobe = null;
+if (typeof threeMarkers === 'undefined') threeMarkers = [];
+if (typeof threeRoutes === 'undefined') threeRoutes = [];
+if (typeof threeAnimationFrame === 'undefined') threeAnimationFrame = null;
+
 // Globální proměnná pro ukládání event listenerů
 let eventListeners = [];
 
@@ -1734,33 +1744,22 @@ function toggleGlobeMode() {
         const center = map.getCenter();
         console.log('Střed mapy:', center);
 
-        // Skrytí Leaflet mapy
-        const leafletContainer = document.querySelector('.leaflet-container');
-        if (leafletContainer) {
-            leafletContainer.style.display = 'none';
-            console.log('Leaflet mapa byla skryta');
-        }
-
-        // Zobrazení Three.js kontejneru
-        const threeGlobeContainer = document.getElementById('threeGlobeContainer');
-        if (threeGlobeContainer) {
-            threeGlobeContainer.style.display = 'block';
-            console.log('Three.js kontejner byl zobrazen');
-        }
-
         try {
             // Inicializace Three.js scény, pokud ještě nebyla vytvořena
             if (!threeScene) {
+                console.log('Inicializace Three.js glóbusu');
                 initThreeJsGlobe();
                 console.log('Three.js glóbus byl inicializován');
             }
 
             // Přidání markerů na glóbus
-            addMarkersToThreeGlobe();
+            console.log('Přidávání markerů na glóbus');
+            addMarkersToGlobe();
             console.log('Markery byly přidány na glóbus');
 
             // Přidání tras mezi body na glóbusu
-            addRoutesToThreeGlobe();
+            console.log('Přidávání tras na glóbus');
+            addRoutesToGlobe();
             console.log('Trasy byly přidány na glóbus');
 
             // Přidání ovládacích prvků pro glóbus
@@ -1770,6 +1769,12 @@ function toggleGlobeMode() {
             // Spuštění animační smyčky
             startThreeAnimation();
             console.log('Animační smyčka byla spuštěna');
+
+            // Pokud není aktivní fullscreen režim, aktivujeme ho
+            if (!isFullscreen) {
+                toggleFullscreen();
+                console.log('Aktivován fullscreen režim pro lepší zobrazení glóbusu');
+            }
 
         } catch (error) {
             console.error('Chyba při inicializaci Three.js glóbusu:', error);
@@ -1800,21 +1805,12 @@ function toggleGlobeMode() {
             removeGlobeControls();
 
             // Vyčištění markerů a tras na glóbusu
-            clearThreeGlobe();
-            console.log('Všechny objekty byly odstraněny z glóbusu');
-
-            // Skrytí Three.js kontejneru
-            const threeGlobeContainer = document.getElementById('threeGlobeContainer');
-            if (threeGlobeContainer) {
-                threeGlobeContainer.style.display = 'none';
-                console.log('Three.js kontejner byl skryt');
-            }
-
-            // Zobrazení Leaflet mapy
-            const leafletContainer = document.querySelector('.leaflet-container');
-            if (leafletContainer) {
-                leafletContainer.style.display = 'block';
-                console.log('Leaflet mapa byla zobrazena');
+            if (threeScene) {
+                // Odstranění všech objektů ze scény
+                while(threeScene.children.length > 0){
+                    threeScene.remove(threeScene.children[0]);
+                }
+                console.log('Všechny objekty byly odstraněny z glóbusu');
             }
 
             // Aktualizace velikosti mapy
@@ -1831,6 +1827,9 @@ function toggleGlobeMode() {
         // Informace pro uživatele
         addMessage('Glóbus režim byl deaktivován. Mapa je nyní v klasickém 2D zobrazení.', false);
     }
+
+    // Uložení stavu aplikace
+    saveAppState();
 }
 
 // Funkce pro přidání markerů na glóbus
@@ -2928,6 +2927,12 @@ window.addEventListener('load', () => {
 
     // Nastavení event listenerů pro styly markerů
     setupMarkerStyleOptions();
+
+    // Přidání event listeneru pro tlačítko glóbus režimu
+    const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+    if (toggleGlobeBtn) {
+        toggleGlobeBtn.addEventListener('click', toggleGlobeMode);
+    }
 
     // Nastavení automatického ukládání stavu aplikace při změnách
     map.on('moveend', saveAppState); // Ukládání při posunu mapy

@@ -2976,18 +2976,20 @@ body.fullscreen-mode {
     overflow: hidden;
     z-index: 10;
     display: none;
-    background-color: #000000;
+    background: radial-gradient(ellipse at center, #0d1423 0%, #090a0f 100%);
     border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Styly pro lepší zobrazení Three.js glóbusu */
 .map-globe-mode .three-globe-container {
-    display: block;
+    display: block !important;
     z-index: 1000;
+    background: radial-gradient(circle at center, #111 0%, #000 100%);
 }
 
 .map-globe-mode .leaflet-container {
-    display: none;
+    display: none !important;
 }
 
 /* Styly pro glóbus markery */
@@ -3147,6 +3149,26 @@ body.fullscreen-mode {
     border-radius: 3px;
 }
 
+/* Styly pro tlačítko glóbus režimu */
+#toggleGlobeMode {
+    top: 60px; /* Pozice pod fullscreen tlačítkem */
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+#toggleGlobeMode:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#toggleGlobeMode.active {
+    background-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
 .map-3d-controls, .map-globe-controls {
     position: absolute;
     top: 70px;
@@ -3158,35 +3180,40 @@ body.fullscreen-mode {
 }
 
 .map-3d-control-btn, .map-globe-control-btn {
-    width: 30px;
-    height: 30px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 16px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-    transition: all 0.2s ease;
+    font-size: 18px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    margin: 5px;
 }
 
 .map-3d-control-btn:hover, .map-globe-control-btn:hover {
-    background-color: #f4f4f4;
-    transform: scale(1.05);
+    background-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
 
 body[data-theme="dark"] .map-3d-control-btn,
 body[data-theme="dark"] .map-globe-control-btn {
-    background-color: #2d3748;
+    background-color: rgba(45, 55, 72, 0.9);
     color: white;
-    border-color: #4a5568;
+    border-color: rgba(74, 85, 104, 0.5);
 }
 
 body[data-theme="dark"] .map-3d-control-btn:hover,
 body[data-theme="dark"] .map-globe-control-btn:hover {
-    background-color: #4a5568;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
 }
 
 /* Responzivní úpravy pro různé velikosti obrazovky */
