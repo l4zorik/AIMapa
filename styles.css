@@ -414,6 +414,94 @@ body[data-theme="dark"] .chat-input input {
     background-color: var(--primary-color-dark);
 }
 
+/* Tlačítko pro zobrazení příkazů */
+.commands-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.commands-btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+/* Premium sekce v dialogu příkazů */
+.premium-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(139, 92, 246, 0.1);
+    border-radius: 8px;
+}
+
+.premium-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.premium-icon {
+    font-size: 20px;
+    margin-right: 10px;
+    color: #f59e0b;
+}
+
+.premium-title {
+    margin: 0;
+    font-size: 16px;
+    color: #f59e0b;
+}
+
+.premium-description {
+    font-size: 14px;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.premium-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.premium-feature {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+}
+
+.premium-feature-icon {
+    margin-right: 8px;
+    color: #10b981;
+}
+
+.premium-cta {
+    display: flex;
+    justify-content: center;
+}
+
+.premium-button {
+    background-color: #f59e0b;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.premium-button:hover {
+    background-color: #d97706;
+}
+
 /* Custom Marker Styles */
 .custom-marker-container {
     position: relative;
@@ -498,6 +586,116 @@ body[data-theme="dark"] .chat-input input {
     100% {
         transform: translateY(0px);
         box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4), 0 5px 15px rgba(139, 92, 246, 0.2);
+    }
+}
+
+/* Dialogové okno příkazů */
+.commands-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: dialogFadeIn 0.3s ease;
+}
+
+.commands-dialog-header {
+    padding: 15px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.commands-dialog-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.commands-dialog-content {
+    padding: 10px;
+    overflow-y: auto;
+    max-height: calc(80vh - 60px);
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+.command-item:hover {
+    background-color: rgba(139, 92, 246, 0.1);
+}
+
+.command-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(139, 92, 246, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.command-description {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.command-shortcut {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.premium-badge {
+    background-color: #f59e0b;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+@keyframes dialogFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
     }
 }
 
@@ -2375,6 +2573,7 @@ body[data-theme="dark"] .leaflet-routing-line {
 
 /* Glóbus kontejner se zobrazí pouze po kliknutí na tlačítko glóbus */
 .map-globe-mode #simpleGlobeContainer {
+    z-index: 500;
     /* display: block; - Toto je nyní řízeno JavaScriptem */
 }
 
@@ -3613,31 +3812,66 @@ body[data-theme="dark"] .map-globe-control-btn:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
+    width: 420px;
     max-width: 90%;
     max-height: 80vh;
     background-color: #1a1b26;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
     z-index: 1000;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    animation: dialogFadeIn 0.3s ease-out;
+}
+
+@keyframes dialogFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 .commands-dialog-header {
-    padding: 16px;
-    background-color: #6366f1;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.commands-dialog-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 40%, rgba(255, 255, 255, 0.1) 60%, transparent 70%);
+    transform: rotate(45deg);
+    animation: headerShine 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes headerShine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
 }
 
 .commands-dialog-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
 }
 
 .commands-dialog-header .close-button {
@@ -3648,40 +3882,120 @@ body[data-theme="dark"] .map-globe-control-btn:hover {
     cursor: pointer;
     padding: 0;
     line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s, transform 0.2s;
+    position: relative;
+    z-index: 1;
+}
+
+.commands-dialog-header .close-button:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 .commands-dialog-content {
-    padding: 8px;
+    padding: 12px;
     overflow-y: auto;
     max-height: calc(80vh - 60px);
+    scrollbar-width: thin;
+    scrollbar-color: #4f46e5 #2d3748;
+}
+
+.commands-dialog-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.commands-dialog-content::-webkit-scrollbar-track {
+    background: #2d3748;
+    border-radius: 4px;
+}
+
+.commands-dialog-content::-webkit-scrollbar-thumb {
+    background-color: #4f46e5;
+    border-radius: 4px;
 }
 
 .command-item {
     display: flex;
     align-items: center;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
     background-color: #2d3748;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
 }
 
 .command-item:hover {
     background-color: #374151;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.command-item:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.command-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.command-item:hover::after {
+    opacity: 1;
 }
 
 .command-icon {
-    width: 40px;
-    height: 40px;
-    background-color: #4f46e5;
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-    margin-right: 12px;
+    font-size: 22px;
+    margin-right: 14px;
     flex-shrink: 0;
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.command-item:hover .command-icon {
+    transform: scale(1.05);
+}
+
+.command-icon::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 40%, rgba(255, 255, 255, 0.2) 60%, transparent 70%);
+    transform: rotate(45deg);
+    animation: iconShine 3s linear infinite;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+@keyframes iconShine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
 }
 
 .command-info {
@@ -3690,33 +4004,53 @@ body[data-theme="dark"] .map-globe-control-btn:hover {
 
 .command-title {
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     color: #f9fafb;
+    font-size: 15px;
+    letter-spacing: 0.3px;
 }
 
 .command-description {
-    font-size: 12px;
+    font-size: 13px;
     color: #d1d5db;
+    line-height: 1.4;
 }
 
 .premium-badge {
-    background-color: #f59e0b;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: white;
     font-size: 10px;
     font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
     margin-left: 8px;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: pulsePremium 2s infinite;
+}
+
+@keyframes pulsePremium {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
 
 .command-shortcut {
     color: #9ca3af;
     font-size: 14px;
     margin-left: 8px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
 }
 
+.command-item:hover .command-shortcut {
+    opacity: 1;
+}
+
+/* Tlačítko pro zobrazení příkazů */
 .commands-btn {
-    background-color: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
     color: white;
     border: none;
     border-radius: 50%;
@@ -3728,9 +4062,153 @@ body[data-theme="dark"] .map-globe-control-btn:hover {
     font-size: 16px;
     cursor: pointer;
     margin-right: 8px;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.commands-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 40%, rgba(255, 255, 255, 0.2) 60%, transparent 70%);
+    transform: rotate(45deg);
+    animation: btnShine 3s linear infinite;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+@keyframes btnShine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
 }
 
 .commands-btn:hover {
-    background-color: #6366f1;
+    background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.4);
+}
+
+.commands-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+}
+
+/* Sekce pro premium nabídku */
+.premium-section {
+    margin-top: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(245, 158, 11, 0.1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>');
+    background-repeat: repeat;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.premium-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.premium-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f59e0b;
+    margin: 0;
+    margin-left: 10px;
+}
+
+.premium-icon {
+    font-size: 20px;
+}
+
+.premium-description {
+    color: #d1d5db;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.premium-features {
+    margin-bottom: 16px;
+}
+
+.premium-feature {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    color: #e5e7eb;
+    font-size: 13px;
+}
+
+.premium-feature-icon {
+    color: #f59e0b;
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.premium-cta {
+    display: flex;
+    justify-content: center;
+}
+
+.premium-button {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 40%, rgba(255, 255, 255, 0.2) 60%, transparent 70%);
+    transform: rotate(45deg);
+    animation: premiumBtnShine 3s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes premiumBtnShine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+.premium-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(245, 158, 11, 0.4);
+}
+
+.premium-button:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 6px rgba(245, 158, 11, 0.3);
 }

@@ -48,7 +48,7 @@ function showCommandsDialog() {
         {
             id: 'route-without-steps',
             icon: '🚶',
-            title: 'trasa bez zkop',
+            title: 'trasa bez schodů',
             description: 'Vypočítá trasu s vyhnutím se schodům',
             premium: true
         },
@@ -75,6 +75,20 @@ function showCommandsDialog() {
             icon: '🚌',
             title: 'doprava',
             description: 'Informace o veřejné dopravě'
+        },
+        {
+            id: '3d-buildings',
+            icon: '🏘️',
+            title: '3D budovy',
+            description: 'Zobrazit budovy ve 3D režimu',
+            premium: true
+        },
+        {
+            id: 'custom-markers',
+            icon: '📍',
+            title: 'vlastní značky',
+            description: 'Použít vlastní ikony pro body na mapě',
+            premium: true
         }
     ];
 
@@ -99,6 +113,46 @@ function showCommandsDialog() {
 
         dialogContent.appendChild(commandItem);
     });
+
+    // Přidání sekce pro premium verzi
+    const premiumSection = document.createElement('div');
+    premiumSection.className = 'premium-section';
+    premiumSection.innerHTML = `
+        <div class="premium-header">
+            <div class="premium-icon">⭐</div>
+            <h4 class="premium-title">Upgrade na Premium</h4>
+        </div>
+        <div class="premium-description">
+            Získejte přístup ke všem premium funkcím a vylepšete svůj zážitek s mapou.
+        </div>
+        <div class="premium-features">
+            <div class="premium-feature">
+                <span class="premium-feature-icon">✔️</span>
+                <span>Navigace bez připojení k internetu</span>
+            </div>
+            <div class="premium-feature">
+                <span class="premium-feature-icon">✔️</span>
+                <span>Trasy bez schodů pro bezbariérový přístup</span>
+            </div>
+            <div class="premium-feature">
+                <span class="premium-feature-icon">✔️</span>
+                <span>Pokročilé 3D budovy a detailní mapy</span>
+            </div>
+            <div class="premium-feature">
+                <span class="premium-feature-icon">✔️</span>
+                <span>Vlastní ikony a styly pro body na mapě</span>
+            </div>
+            <div class="premium-feature">
+                <span class="premium-feature-icon">✔️</span>
+                <span>Bez reklam a neomezené použití</span>
+            </div>
+        </div>
+        <div class="premium-cta">
+            <button class="premium-button" onclick="showPremiumModal()">Získat Premium</button>
+        </div>
+    `;
+
+    dialogContent.appendChild(premiumSection);
 
     dialogContainer.appendChild(dialogContent);
 

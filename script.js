@@ -11,6 +11,12 @@ const map = L.map('map', {
     maxBoundsViscosity: 1.0 // Zajistí, že mapa nebude moci být posunuta mimo hranice
 }).setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
 
+// Inicializace rozšířených mapových funkcí pro verzi 0.2.9.0
+if (typeof MapFeatures !== 'undefined') {
+    MapFeatures.init(map);
+    console.log('Rozšířené mapové funkce inicializovány');
+}
+
 // Přidání OpenStreetMap podkladu
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
@@ -32,6 +38,12 @@ map.on('mousemove', function(e) {
     // Zobrazení souřadnic
     coordinatesDisplay.innerHTML = `Lat: ${lat} | Lng: ${lng}`;
 });
+
+// Inicializace uživatelských profilů pro verzi 0.2.9.0
+if (typeof UserProfiles !== 'undefined') {
+    // UserProfiles.init() je voláno automaticky při načtení dokumentu
+    console.log('Uživatelské profily připraveny k inicializaci');
+}
 
 // Skrytí ukazatele souřadnic, když myš opustí mapu
 map.on('mouseout', function() {
@@ -1223,6 +1235,241 @@ const fullscreenButton = document.getElementById('fullscreenButton');
 const mapWrapper = document.querySelector('.map-wrapper');
 const fullscreenOverlay = document.querySelector('.fullscreen-overlay');
 
+// Funkce pro zobrazení dialogu s úspěchy
+function showAchievementsDialog() {
+    if (typeof Achievements === 'undefined') return;
+
+    // Získání odemčených a zamčených achievemntů
+    const unlockedAchievements = Achievements.getUnlockedAchievements();
+    const lockedAchievements = Achievements.getLockedAchievements();
+
+    // Vytvoření elementu pro dialog
+    const dialog = document.createElement('div');
+    dialog.className = 'modal-dialog achievements-dialog';
+
+    // Vytvoření HTML pro odemčené achievementy
+    let unlockedHtml = '';
+    if (unlockedAchievements.length === 0) {
+        unlockedHtml = '<p class="text-center">Zatím nemáte žádné odemčené úspěchy.</p>';
+    } else {
+        unlockedHtml = unlockedAchievements.map(achievement => `
+            <div class="achievement-item unlocked">
+                <div class="achievement-icon">${achievement.icon}</div>
+                <div class="achievement-details">
+                    <div class="achievement-title">${achievement.name}</div>
+                    <div class="achievement-description">${achievement.description}</div>
+                    <div class="achievement-xp">+${achievement.xp} XP</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Vytvoření HTML pro zamčené achievementy
+    let lockedHtml = '';
+    if (lockedAchievements.length === 0) {
+        lockedHtml = '<p class="text-center">Všechny úspěchy jsou již odemčeny!</p>';
+    } else {
+        lockedHtml = lockedAchievements.map(achievement => `
+            <div class="achievement-item locked">
+                <div class="achievement-icon">?</div>
+                <div class="achievement-details">
+                    <div class="achievement-title">${achievement.name}</div>
+                    <div class="achievement-description">${achievement.description}</div>
+                    <div class="achievement-xp">+${achievement.xp} XP</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Získání informací o úrovni uživatele
+    const totalXP = Achievements.getTotalXP();
+    const currentLevel = Achievements.getUserLevel(totalXP);
+    const nextLevelInfo = Achievements.getNextLevelInfo(totalXP);
+
+    let levelProgressHtml = '';
+    if (nextLevelInfo) {
+        levelProgressHtml = `
+            <div class="level-progress">
+                <div class="level-info">
+                    <span>Úroveň ${currentLevel}</span>
+                    <span>Úroveň ${nextLevelInfo.nextLevel}</span>
+                </div>
+                <div class="xp-progress">
+                    <div class="xp-progress-bar" style="width: ${nextLevelInfo.progressPercentage}%"></div>
+                </div>
+                <div class="xp-text">
+                    <span>${nextLevelInfo.xpProgress} / ${nextLevelInfo.xpForNextLevel} XP</span>
+                    <span>Odměna: ${nextLevelInfo.reward}</span>
+                </div>
+            </div>
+        `;
+    } else {
+        levelProgressHtml = `
+            <div class="level-progress">
+                <div class="level-info">
+                    <span>Úroveň ${currentLevel} (Maximální)</span>
+                </div>
+                <div class="xp-progress">
+                    <div class="xp-progress-bar" style="width: 100%"></div>
+                </div>
+                <div class="xp-text">
+                    <span>${totalXP} XP</span>
+                    <span>Všechny odměny odemčeny!</span>
+                </div>
+            </div>
+        `;
+    }
+
+    dialog.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Moje úspěchy</h3>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                ${levelProgressHtml}
+                <div class="achievements-section">
+                    <h4>Odemčené úspěchy (${unlockedAchievements.length})</h4>
+                    <div class="achievements-container">
+                        ${unlockedHtml}
+                    </div>
+                </div>
+                <div class="achievements-section">
+                    <h4>Zamčené úspěchy (${lockedAchievements.length})</h4>
+                    <div class="achievements-container">
+                        ${lockedHtml}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Přidání dialogu do dokumentu
+    document.body.appendChild(dialog);
+
+    // Nastavení posluchačů událostí
+    const closeButton = dialog.querySelector('.close-button');
+    closeButton.addEventListener('click', () => {
+        dialog.remove();
+    });
+}
+
+// Funkce pro zobrazení dialogu s profilem uživatele
+function showUserProfileDialog() {
+    if (typeof UserProfiles === 'undefined') return;
+
+    // Získání informací o uživateli
+    const user = UserProfiles.currentUser;
+
+    // Získání informací o úrovni uživatele
+    let levelInfo = {};
+    if (typeof Achievements !== 'undefined') {
+        const totalXP = user.experience || 0;
+        const currentLevel = Achievements.getUserLevel(totalXP);
+        const nextLevelInfo = Achievements.getNextLevelInfo(totalXP);
+
+        levelInfo = {
+            level: currentLevel,
+            xp: totalXP,
+            nextLevel: nextLevelInfo ? nextLevelInfo.nextLevel : null,
+            progress: nextLevelInfo ? nextLevelInfo.progressPercentage : 100,
+            xpProgress: nextLevelInfo ? nextLevelInfo.xpProgress : totalXP,
+            xpForNextLevel: nextLevelInfo ? nextLevelInfo.xpForNextLevel : 0,
+            reward: nextLevelInfo ? nextLevelInfo.reward : 'Všechny odměny odemčeny!'
+        };
+    }
+
+    // Vytvoření elementu pro dialog
+    const dialog = document.createElement('div');
+    dialog.className = 'modal-dialog user-profile-dialog';
+
+    // Získání initiálů uživatele pro avatar
+    const initials = user.username.substring(0, 2).toUpperCase();
+
+    // Vytvoření HTML pro profil uživatele
+    dialog.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Můj profil</h3>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="user-profile">
+                    <div class="user-avatar">${initials}</div>
+                    <div class="user-info">
+                        <div class="user-name">${user.username}</div>
+                        <div class="user-level">Úroveň ${levelInfo.level}</div>
+                        <div class="xp-progress">
+                            <div class="xp-progress-bar" style="width: ${levelInfo.progress}%"></div>
+                        </div>
+                        <div class="xp-text">
+                            <span>${levelInfo.xpProgress} / ${levelInfo.xpForNextLevel} XP</span>
+                            <span>${levelInfo.reward}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">📍</div>
+                        <div class="stat-value">${user.history.places.length}</div>
+                        <div class="stat-label">Přidaných bodů</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🗺️</div>
+                        <div class="stat-value">${user.history.routes.length}</div>
+                        <div class="stat-label">Vytvořených tras</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-value">${user.achievements.length}</div>
+                        <div class="stat-label">Získaných úspěchů</div>
+                    </div>
+                </div>
+
+                <div class="user-actions">
+                    <button id="viewAppointments" class="btn btn-outline">Moje schůzky</button>
+                    <button id="viewShoppingLists" class="btn btn-outline">Moje nákupní seznamy</button>
+                    <button id="viewAchievements" class="btn btn-outline">Moje úspěchy</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Přidání dialogu do dokumentu
+    document.body.appendChild(dialog);
+
+    // Nastavení posluchačů událostí
+    const closeButton = dialog.querySelector('.close-button');
+    closeButton.addEventListener('click', () => {
+        dialog.remove();
+    });
+
+    // Nastavení posluchačů pro tlačítka akcí
+    const viewAppointmentsBtn = dialog.querySelector('#viewAppointments');
+    const viewShoppingListsBtn = dialog.querySelector('#viewShoppingLists');
+    const viewAchievementsBtn = dialog.querySelector('#viewAchievements');
+
+    viewAppointmentsBtn.addEventListener('click', () => {
+        dialog.remove();
+        if (typeof Features !== 'undefined') {
+            Features.showAppointmentsList();
+        }
+    });
+
+    viewShoppingListsBtn.addEventListener('click', () => {
+        dialog.remove();
+        if (typeof Features !== 'undefined') {
+            Features.showShoppingLists();
+        }
+    });
+
+    viewAchievementsBtn.addEventListener('click', () => {
+        dialog.remove();
+        showAchievementsDialog();
+    });
+}
+
 // Funkce pro přepnutí fullscreen režimu
 function toggleFullscreen() {
     isFullscreen = !isFullscreen;
@@ -1242,6 +1489,12 @@ function toggleFullscreen() {
         exitFullscreenButton.innerHTML = 'Zavřít celou obrazovku <i class="icon">⛵</i>';
         exitFullscreenButton.addEventListener('click', toggleFullscreen);
         mapWrapper.appendChild(exitFullscreenButton);
+
+        // Vytvoření hvězd na pozadí, pokud je dostupná funkce
+        if (typeof Features !== 'undefined' && typeof Features.createStars === 'function') {
+            Features.createStars();
+            Features.createShootingStars();
+        }
 
         // Přidání ovládacích tlačítek do fullscreen režimu
         const fullscreenControls = document.createElement('div');
@@ -1435,6 +1688,7 @@ function createFloatingChat() {
     chatInputContainer.className = 'floating-chat-input';
     chatInputContainer.innerHTML = `
         <input type="text" id="floatingMessageInput" placeholder="Napište zprávu...">
+        <button class="commands-btn" id="floatingCommandsBtn" title="Zobrazit dostupné příkazy">⌘</button>
         <button class="floating-send-btn" id="floatingSendMessage">➞</button>
     `;
 
@@ -1457,6 +1711,12 @@ function createFloatingChat() {
             sendFloatingChatMessage();
         }
     });
+
+    // Přidání event listeneru pro tlačítko příkazů v plovoucím chatu
+    const floatingCommandsBtn = document.getElementById('floatingCommandsBtn');
+    if (floatingCommandsBtn && typeof showCommandsDialog === 'function') {
+        floatingCommandsBtn.addEventListener('click', showCommandsDialog);
+    }
 
     // Přidání možnosti přesouvat chat
     makeChatDraggable(floatingChatContainer, chatHeader);
@@ -1537,9 +1797,39 @@ function generateResponseWithSuggestions(message) {
         suggestions.push('Glóbus');
     }
 
+    // Nové návrhy pro schůzky a nákupní seznamy
+    if (message.toLowerCase().includes('zubař') || message.toLowerCase().includes('zub') ||
+        response.toLowerCase().includes('zubař')) {
+        suggestions.push('Zubař', 'Nová schůzka');
+    }
+
+    if (message.toLowerCase().includes('úřad') || message.toLowerCase().includes('práce') ||
+        response.toLowerCase().includes('úřad práce')) {
+        suggestions.push('Úřad práce', 'Nová schůzka');
+    }
+
+    if (message.toLowerCase().includes('schůzk') || response.toLowerCase().includes('schůzk')) {
+        suggestions.push('Nová schůzka');
+    }
+
+    if (message.toLowerCase().includes('nákup') || message.toLowerCase().includes('obchod') ||
+        response.toLowerCase().includes('nákup')) {
+        suggestions.push('Nový nákupní seznam');
+    }
+
+    if (message.toLowerCase().includes('úspěch') || message.toLowerCase().includes('achievement') ||
+        response.toLowerCase().includes('úspěch')) {
+        suggestions.push('Úspěchy');
+    }
+
+    if (message.toLowerCase().includes('profil') || message.toLowerCase().includes('uživatel') ||
+        response.toLowerCase().includes('profil')) {
+        suggestions.push('Profil');
+    }
+
     // Pokud nemáme žádné specifické návrhy, přidáme obecné
     if (suggestions.length === 0) {
-        suggestions = ['Přidat aktivitu', 'Seznam bodů', 'Vypočítat trasu', 'Nastavení'];
+        suggestions = ['Přidat aktivitu', 'Nová schůzka', 'Nový nákupní seznam', 'Profil'];
     }
 
     // Omezení počtu návrhů na 4
@@ -1638,8 +1928,52 @@ function addMessage(message, isUser = false, suggestions = null) {
         suggestions.forEach(suggestion => {
             const suggestionBtn = document.createElement('button');
             suggestionBtn.className = 'suggestion-btn';
-            suggestionBtn.textContent = suggestion;
+
+            // Přidání ikony k návrhu, pokud je dostupná funkce
+            if (typeof Features !== 'undefined' && typeof Features.addIconToSuggestion === 'function') {
+                suggestionBtn.innerHTML = Features.addIconToSuggestion(suggestion);
+            } else {
+                suggestionBtn.textContent = suggestion;
+            }
+
             suggestionBtn.addEventListener('click', () => {
+                // Speciální akce pro některé návrhy
+                if (suggestion === 'Nová schůzka' && typeof Features !== 'undefined') {
+                    Features.createAppointmentDialog();
+                    return;
+                } else if (suggestion === 'Nový nákupní seznam' && typeof Features !== 'undefined') {
+                    Features.createShoppingListDialog();
+                    return;
+                } else if (suggestion === 'Zubař' && typeof Features !== 'undefined') {
+                    // Vytvoření schůzky u zubního lékaře
+                    Features.createAppointmentDialog();
+                    setTimeout(() => {
+                        const typeSelect = document.getElementById('appointmentType');
+                        if (typeSelect) typeSelect.value = 'dentist';
+                        const titleInput = document.getElementById('appointmentTitle');
+                        if (titleInput) titleInput.value = 'Návštěva zubního lékaře';
+                    }, 100);
+                    return;
+                } else if (suggestion === 'Úřad práce' && typeof Features !== 'undefined') {
+                    // Vytvoření schůzky na úřadu práce
+                    Features.createAppointmentDialog();
+                    setTimeout(() => {
+                        const typeSelect = document.getElementById('appointmentType');
+                        if (typeSelect) typeSelect.value = 'job_office';
+                        const titleInput = document.getElementById('appointmentTitle');
+                        if (titleInput) titleInput.value = 'Návštěva úřadu práce';
+                    }, 100);
+                    return;
+                } else if (suggestion === 'Úspěchy' && typeof Achievements !== 'undefined') {
+                    // Zobrazit seznam úspěchů
+                    showAchievementsDialog();
+                    return;
+                } else if (suggestion === 'Profil' && typeof UserProfiles !== 'undefined') {
+                    // Zobrazit profil uživatele
+                    showUserProfileDialog();
+                    return;
+                }
+
                 // Při kliknutí na návrh se chová jako by uživatel napsal zprávu
                 processMessage(suggestion);
             });
@@ -2543,7 +2877,7 @@ function saveAppState() {
         mapState: mapState,
         deletedMarkerCommands: deletedMarkerCommands,
         lastSaved: new Date().toISOString(),
-        version: '0.2.4.2' // Přidání verze pro lepší správu kompatibility
+        version: '0.2.9.1' // Přidání verze pro lepší správu kompatibility
     };
 
     // Uložení do localStorage s kompresí pro úsporu místa
@@ -2601,7 +2935,7 @@ function saveAppState() {
             const minimalState = {
                 mapState: mapState,
                 settings: settings,
-                version: '0.2.4.2',
+                version: '0.2.9.1',
                 lastSaved: new Date().toISOString(),
                 error: 'Kompletní data nemohla být uložena kvůli překročení limitu localStorage.'
             };
@@ -2684,7 +3018,7 @@ function loadAppState() {
         console.log('Načten stav aplikace:', appState);
 
         // Kontrola verze pro zajištění kompatibility
-        if (appState.version && appState.version !== '0.2.4.2') {
+        if (appState.version && appState.version !== '0.2.9.1') {
             console.log(`Načten stav z jiné verze aplikace (${appState.version}). Probíhá konverze...`);
             // Zde by mohla být logika pro konverzi dat mezi verzemi, pokud by bylo potřeba
         }
@@ -3079,53 +3413,189 @@ function updateAllMarkers() {
     });
 }
 
-// Inicializace chatu
+// Inicializace aplikace
 window.addEventListener('load', () => {
+    console.log('Inicializace aplikace AIMapa verze 0.2.9.1');
+
     // Vyčištění předem definovaných zpráv
     chatMessages.innerHTML = '';
 
+    // Inicializace komponent v správném pořadí
+    initializeComponents();
+
     // Přidání uvítací zprávy s návrhy akcí
-    addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?', false, ['Přidat aktivitu', 'Vypočítat trasu', 'Otevírací doba', 'Alexa']);
+    addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?', false, ['Přidat aktivitu', 'Vypočítat trasu', 'Profil', 'Nová schůzka']);
 
     // Pokus o načtení stavu aplikace
-    const stateLoaded = loadAppState();
-
-    if (!stateLoaded) {
+    if (!loadAppState()) {
         // Pokud se nepodařilo načíst stav, aktivujeme režim přidávání bodů
         document.getElementById('addActivity').classList.add('active');
-        addMessage('Režim přidávání bodů je aktivní. Klikněte na mapu pro přidání bodu.', false, ['Vypočítat trasu', 'Otevírací doba', 'Alexa']);
-    } else {
-        // Pokud se podařilo načíst stav, informujeme uživatele
-        addMessage('Stav aplikace byl úspěšně načten z předchozího sezení.', false, ['Seznam bodů', 'Vypočítat trasu', 'Otevírací doba']);
     }
 
-    // Nastavení výchozího data pro rezervaci tanečnice
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    document.getElementById('dancerReservationDate').value = tomorrow.toISOString().split('T')[0];
-
-    // Event listenery pro modální okno rezervace tanečnice
-    setupDancerReservationModal();
-
-    // Nastavení event listenerů pro styly markerů
-    setupMarkerStyleOptions();
-
-    // Přidání event listeneru pro tlačítko glóbus režimu
-    const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
-    if (toggleGlobeBtn) {
-        toggleGlobeBtn.addEventListener('click', toggleGlobeMode);
-    }
-
-    // Přidání event listeneru pro tlačítko návratu z glóbus režimu
-    const exitGlobeBtn = document.getElementById('exitGlobeMode');
-    if (exitGlobeBtn) {
-        exitGlobeBtn.addEventListener('click', toggleGlobeMode);
-    }
+    // Kontrola, zda byly všechny komponenty správně inicializovány
+    checkComponentsInitialization();
 
     // Nastavení automatického ukládání stavu aplikace při změnách
     map.on('moveend', saveAppState); // Ukládání při posunu mapy
     map.on('zoomend', saveAppState); // Ukládání při změně zoomu
 });
+
+// Funkce pro inicializaci všech komponent v správném pořadí
+function initializeComponents() {
+    try {
+        console.log('Inicializace komponent...');
+
+        // 1. Inicializace základních komponent
+        console.log('Inicializace základních komponent');
+        initializeBasicComponents();
+
+        // 2. Inicializace uživatelských profilů
+        console.log('Inicializace uživatelských profilů');
+        if (typeof window.UserProfiles !== 'undefined') {
+            window.UserProfiles.init();
+        } else {
+            console.warn('UserProfiles není definováno');
+        }
+
+        // 3. Inicializace systému achievemntů
+        console.log('Inicializace systému achievemntů');
+        if (typeof window.Achievements !== 'undefined') {
+            if (window.Achievements.init) {
+                window.Achievements.init();
+            }
+            console.log('Systém achievemntů připraven');
+        } else {
+            console.warn('Achievements není definováno');
+        }
+
+        // 4. Inicializace rozšířených funkcí
+        console.log('Inicializace rozšířených funkcí');
+        if (typeof window.Features !== 'undefined') {
+            if (window.Features.init) {
+                window.Features.init();
+            }
+            console.log('Rozšířené funkce připraveny');
+        } else {
+            console.warn('Features není definováno');
+        }
+
+        // 5. Inicializace stavového systému
+        console.log('Inicializace stavového systému');
+        if (typeof window.AppStatus !== 'undefined') {
+            if (window.AppStatus.init) {
+                window.AppStatus.init();
+            }
+            console.log('Stavový systém připraven');
+        } else {
+            console.warn('AppStatus není definováno');
+        }
+
+        console.log('Všechny komponenty byly úspěšně inicializovány');
+        return true;
+    } catch (error) {
+        console.error('Chyba při inicializaci komponent:', error);
+        return false;
+    }
+}
+
+// Funkce pro inicializaci základních komponent
+function initializeBasicComponents() {
+    try {
+        // Inicializace základních komponent
+        console.log('Inicializace základních komponent...');
+
+        // Nastavení tmavého režimu podle předchozího nastavení
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        if (darkModeToggle) {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            darkModeToggle.checked = isDarkMode;
+            if (isDarkMode) {
+                document.documentElement.style.setProperty('--dark-bg', '#1a1b26');
+                document.documentElement.style.setProperty('--card-bg', '#1F2937');
+                document.documentElement.style.setProperty('--text-color', '#fff');
+                document.body.setAttribute('data-theme', 'dark');
+            }
+        }
+
+        // Nastavení efektů markerů podle předchozího nastavení
+        const markerEffectsToggle = document.getElementById('markerEffectsToggle');
+        if (markerEffectsToggle) {
+            const areEffectsEnabled = localStorage.getItem('markerEffects') !== 'false';
+            markerEffectsToggle.checked = areEffectsEnabled;
+            markerEffectsEnabled = areEffectsEnabled;
+        }
+
+        console.log('Základní komponenty byly úspěšně inicializovány');
+        return true;
+    } catch (error) {
+        console.error('Chyba při inicializaci základních komponent:', error);
+        return false;
+    }
+}
+
+// Funkce pro kontrolu, zda byly všechny komponenty správně inicializovány
+function checkComponentsInitialization() {
+    console.log('Kontrola inicializace komponent...');
+
+    const components = [
+        { name: 'UserProfiles', object: typeof window.UserProfiles !== 'undefined' ? window.UserProfiles : null },
+        { name: 'Achievements', object: typeof window.Achievements !== 'undefined' ? window.Achievements : null },
+        { name: 'Features', object: typeof window.Features !== 'undefined' ? window.Features : null },
+        { name: 'AppStatus', object: typeof window.AppStatus !== 'undefined' ? window.AppStatus : null }
+    ];
+
+    let allInitialized = true;
+    const missingComponents = [];
+
+    components.forEach(component => {
+        if (!component.object) {
+            allInitialized = false;
+            missingComponents.push(component.name);
+            console.warn(`Komponenta ${component.name} nebyla správně inicializována`);
+        }
+    });
+
+    if (allInitialized) {
+        console.log('Všechny komponenty byly správně inicializovány');
+    } else {
+        console.warn(`Některé komponenty nebyly správně inicializovány: ${missingComponents.join(', ')}`);
+
+        // Pokud chybí nějaké komponenty, zobrazíme upozornění uživateli
+        if (missingComponents.length > 0) {
+            setTimeout(() => {
+                addMessage(`Některé funkce aplikace nemusejí být plně funkční. Zkuste obnovit stránku nebo kontaktujte podporu.`, false);
+            }, 3000);
+        }
+    }
+
+    return allInitialized;
+}
+
+// Nastavení výchozího data pro rezervaci tanečnice
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+const dancerReservationDateInput = document.getElementById('dancerReservationDate');
+if (dancerReservationDateInput) {
+    dancerReservationDateInput.value = tomorrow.toISOString().split('T')[0];
+}
+
+// Event listenery pro modální okno rezervace tanečnice
+setupDancerReservationModal();
+
+// Nastavení event listenerů pro styly markerů
+setupMarkerStyleOptions();
+
+// Přidání event listeneru pro tlačítko glóbus režimu
+const toggleGlobeBtn = document.getElementById('toggleGlobeMode');
+if (toggleGlobeBtn) {
+    toggleGlobeBtn.addEventListener('click', toggleGlobeMode);
+}
+
+// Přidání event listeneru pro tlačítko návratu z glóbus režimu
+const exitGlobeBtn = document.getElementById('exitGlobeMode');
+if (exitGlobeBtn) {
+    exitGlobeBtn.addEventListener('click', toggleGlobeMode);
+}
 
 // Nastavení event listenerů pro modální okno rezervace tanečnice
 function setupDancerReservationModal() {

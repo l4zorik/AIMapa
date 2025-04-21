@@ -6,8 +6,8 @@
     <title>AI Map - Into the known</title>
     <link rel="icon" href="icons8-favicon.gif" type="image/gif">
     <link rel="stylesheet" href="styles.css">
-    <!-- Modern UI CSS pro verzi 0.2.9.0 - dočasně deaktivováno -->
-    <!-- <link rel="stylesheet" href="modern-ui.css"> -->
+    <!-- Modern UI CSS pro verzi 0.2.9.0 -->
+    <link rel="stylesheet" href="modern-ui.css">
     <!-- Leaflet CSS pro mapu -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <!-- Leaflet Routing Machine CSS -->
@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
     <!-- Globe.gl pro 3D glóbus -->
-    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="https://unpkg.com/globe.gl@2.32.1/dist/globe.gl.min.js"></script>
     <!-- Cesium CSS a JS (ponecháno pro zpětnou kompatibilitu) -->
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
@@ -322,10 +322,16 @@
     <!-- Cesium JS je již načten v hlavičce -->
     <!-- Přímá implementace Globe.gl -->
     <script src="globe-simple.js"></script>
-    <!-- Rozšířené mapové funkce pro verzi 0.2.9.0 - dočasně deaktivováno -->
-    <!-- <script src="map-features.js"></script> -->
-    <!-- Uživatelské profily a personalizace - dočasně deaktivováno -->
-    <!-- <script src="user-profiles.js"></script> -->
+    <!-- Rozšířené mapové funkce pro verzi 0.2.9.1 -->
+    <script src="map-features.js"></script>
+    <!-- Uživatelské profily a personalizace -->
+    <script src="user-profiles.js"></script>
+    <!-- Systém úspěchů a achievementy -->
+    <script src="achievements.js"></script>
+    <!-- Rozšířené funkce a nástroje -->
+    <script src="features.js"></script>
+    <!-- Stavový systém aplikace -->
+    <script src="app-status.js"></script>
     <!-- Dialog dostupných příkazů -->
     <script src="commands-dialog.js"></script>
     <!-- Hlavní skript aplikace -->

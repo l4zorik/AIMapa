@@ -25,14 +25,31 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.2.9.0] - Plánovaná verze - CELKOVÉ ROZŠÍŘENÍ A VYLEPŠENÍ VZHLEDU
+## [0.2.9.1] - 2025-05-10 - ROZIŠÍŘENÉ FUNKCE A UŽIVATELSKÉ PROFILY
 
-### Aktuální postup
+### Nové funkce
+
+- Přidán systém uživatelských účtů a profilů
+- Implementován systém achievemntů a odměn
+- Přidány nové užitečné funkce (schůzky, nákupní seznamy)
+- Vylepšené návrhy v chatu s ikonami
+- Přidány vizulní efekty pro fullscreen režim (padající hvězdy)
+- Vylepšené animace a přechody
+- Rozšířené možnosti personalizace
+- Přidána stavová ikona s informacemi o aktualizacích
+- Optimalizována inicializace aplikace pro lepší stabilitu
+- Odstraněn zbytečný kód a vylepšena čitelnost
+
+## [0.2.9.0] - 2025-04-25 - CELKOVÉ ROZŠÍŘENÍ A VYLEPŠENÍ VZHLEDU
+
+### Implementované funkce
 
 - Přidán základní framework pro moderní redesign uživatelského rozhraní (modern-ui.css)
 - Přidána kostra pro rozšířené mapové funkce (map-features.js)
 - Přidána kostra pro uživatelské profily a personalizaci (user-profiles.js)
 - Připravena struktura pro implementaci nových funkcí
+- Dokončena dokumentace všech plánovaných funkcí v CHANGELOG.md
+- Připraveny základní komponenty pro postupnou implementaci
 
 ### Moderní redesign uživatelského rozhraní
 
