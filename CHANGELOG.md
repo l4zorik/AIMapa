@@ -2,6 +2,22 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.6.2] - 2025-04-23 - NOVÉ FUNKCE PRO MAPU A CHAT
+
+### Nové funkce pro mapu
+- Přidán noční režim mapy s tmavým pozadím a zvýrazněnými cestami
+- Implementována vrstva s počasím na mapě a widget s aktuálními informacemi
+- Přidána funkce pro zobrazení zajímavých míst v okolí (restaurace, hotely, památky)
+- Implementován nástroj pro měření vzdálenosti mezi body na mapě
+- Přidána funkce pro sdílení aktuální polohy nebo trasy přes URL a QR kód
+
+### Další vylepšení mapy
+- Přidána vrstva s dopravními informacemi pro zobrazení aktuální dopravní situace
+- Implementována vrstva s turistickými a cyklistickými trasami v okolí
+- Vylepšeno uživatelské rozhraní pro práci s mapovými vrstvami
+- Přidány tlačítka pro rychlé přepínání mezi různými vrstvami
+- Optimalizováno zobrazení všech nových funkcí na mobilních zařízeních
+
 ## [0.2.8.6.1] - 2025-04-22 - VYLEPŠENÍ MENU PŘÍKAZŮ
 
 ### Vylepšení menu příkazů

@@ -1,14 +1,27 @@
 /**
  * Modul pro zobrazení novinek a aktualizací v pravém horním rohu
- * Verze 0.2.8.6.1
+ * Verze 0.2.8.6.2
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.2.8.6.1',
+    currentVersion: '0.2.8.6.2',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.2.8.6.2',
+            date: '2024-04-23',
+            title: 'Nové funkce pro mapu a chat',
+            description: 'Přidáno 7 nových užitečných funkcí pro mapu',
+            changes: [
+                'Přidán noční režim mapy s tmavým pozadím a zvýrazněnými cestami',
+                'Implementována vrstva s počasím na mapě a widget s aktuálními informacemi',
+                'Přidána funkce pro zobrazení zajímavých míst v okolí',
+                'Implementován nástroj pro měření vzdálenosti mezi body na mapě',
+                'Přidána funkce pro sdílení aktuální polohy nebo trasy přes URL a QR kód'
+            ]
+        },
         {
             version: '0.2.8.6.1',
             date: '2024-04-22',

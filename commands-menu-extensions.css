@@ -1,0 +1,459 @@
+/**
+ * Styly pro rozšíření menu příkazů
+ * Verze 0.2.8.6.2
+ */
+
+/* Styly pro noční režim mapy */
+body[data-map-night-mode="true"] .leaflet-container {
+    filter: brightness(0.8) invert(1) contrast(1.2) hue-rotate(180deg) saturate(0.8);
+}
+
+/* Styly pro widget s počasím */
+.weather-widget {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 250px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.weather-widget-header {
+    background-color: #4CAF50;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.weather-widget-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 16px;
+}
+
+.weather-widget-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.weather-widget-body {
+    padding: 15px;
+}
+
+.weather-widget-main {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.weather-widget-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.weather-widget-temp {
+    font-size: 28px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.weather-widget-description {
+    text-transform: capitalize;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.weather-widget-details {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.weather-widget-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.weather-widget-detail:last-child {
+    margin-bottom: 0;
+}
+
+.weather-widget-detail-label {
+    color: #666;
+}
+
+.weather-widget-detail-value {
+    font-weight: bold;
+}
+
+/* Styly pro markery zajímavých míst */
+.poi-marker {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.poi-marker-inner {
+    font-size: 24px;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+.poi-popup {
+    padding: 5px;
+}
+
+.poi-popup h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+
+.poi-popup p {
+    margin: 0 0 5px 0;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Tlačítko pro skrytí zajímavých míst */
+.hide-poi-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1000;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.hide-poi-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Styly pro měření vzdálenosti */
+.measure-point {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.measure-point-inner {
+    width: 10px;
+    height: 10px;
+    background-color: #FF4500;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.distance-marker {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.distance-marker-inner {
+    padding: 5px 10px;
+    background-color: #FF4500;
+    color: white;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.stop-measurement-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1000;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.stop-measurement-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Styly pro sdílení polohy */
+.share-location-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.share-location-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.share-location-modal-content {
+    background-color: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.share-location-modal.show .share-location-modal-content {
+    transform: scale(1);
+}
+
+.share-location-modal-header {
+    background-color: #4CAF50;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.share-location-modal-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.share-location-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.share-location-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.share-location-option {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.share-location-option:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.share-location-option h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.share-location-url-container {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.share-location-url {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+}
+
+.copy-location-url {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.copy-location-url:hover {
+    background-color: #388E3C;
+}
+
+.copy-location-url.copied {
+    background-color: #388E3C;
+}
+
+.share-location-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.share-location-button {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.share-location-button:hover {
+    opacity: 0.9;
+}
+
+.share-location-button.facebook {
+    background-color: #3b5998;
+}
+
+.share-location-button.twitter {
+    background-color: #1da1f2;
+}
+
+.share-location-button.email {
+    background-color: #ea4335;
+}
+
+.share-location-button.whatsapp {
+    background-color: #25d366;
+}
+
+.share-location-qr-code {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.share-location-qr-code h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.share-location-qr-code-image {
+    display: inline-block;
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.share-location-qr-code-image img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Tlačítka pro skrytí vrstev */
+.hide-traffic-button,
+.hide-hiking-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1000;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.hide-traffic-button:hover,
+.hide-hiking-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .weather-widget {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .weather-widget-details {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="dark"] .weather-widget-detail-label {
+    color: #aaa;
+}
+
+body[data-theme="dark"] .poi-popup {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .poi-popup p {
+    color: #aaa;
+}
+
+body[data-theme="dark"] .share-location-modal-content {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .share-location-option {
+    border-bottom-color: #444;
+}
+
+body[data-theme="dark"] .share-location-url {
+    background-color: #444;
+    color: white;
+    border-color: #555;
+}
+
+body[data-theme="dark"] .share-location-qr-code-image {
+    background-color: white;
+    border-color: #444;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+    .weather-widget {
+        width: 200px;
+    }
+    
+    .share-location-modal-content {
+        width: 95%;
+    }
+    
+    .share-location-buttons {
+        flex-direction: column;
+    }
+    
+    .share-location-button {
+        width: 100%;
+    }
+}
