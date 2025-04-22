@@ -1,0 +1,299 @@
+/**
+ * Styly pro modul novinek a aktualizací
+ * Verze 0.2.8.6
+ */
+
+/* Ikona novinek v pravém horním rohu */
+.updates-icon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.updates-icon:hover {
+    transform: scale(1.1);
+    background-color: var(--primary-color-dark);
+}
+
+.updates-icon .icon {
+    font-size: 20px;
+    color: white;
+}
+
+/* Oznámení o aktualizaci */
+.update-notification {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    width: 300px;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    overflow: hidden;
+    transform: translateX(120%);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.update-notification.show {
+    transform: translateX(0);
+}
+
+.update-notification-header {
+    background-color: var(--primary-color);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.update-notification-title {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+}
+
+.update-notification-title .icon {
+    margin-right: 8px;
+}
+
+.update-notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.update-notification-content {
+    padding: 15px;
+}
+
+.update-notification-content h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.update-notification-content p {
+    margin-bottom: 10px;
+    color: var(--text-color-dark);
+}
+
+.update-notification-content ul {
+    margin: 0;
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.update-notification-content li {
+    margin-bottom: 5px;
+    color: var(--text-color-dark);
+}
+
+.update-notification-details {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.update-notification-details:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Modal s aktualizacemi */
+.updates-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.updates-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.updates-modal-content {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.updates-modal.show .updates-modal-content {
+    transform: scale(1);
+}
+
+.updates-modal-header {
+    background-color: var(--primary-color);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.updates-modal-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.updates-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.updates-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.updates-info {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.updates-version {
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.updates-list h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.updates-items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.update-item {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    transition: background-color 0.3s;
+}
+
+.update-item:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.update-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.update-version {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.update-date {
+    color: var(--text-color-dark);
+    font-size: 0.9rem;
+}
+
+.update-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.update-description {
+    margin-bottom: 10px;
+    color: var(--text-color-dark);
+}
+
+.update-changes {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.update-changes li {
+    margin-bottom: 5px;
+    color: var(--text-color-dark);
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+    .updates-icon {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .update-notification {
+        top: 60px;
+        right: 10px;
+        width: calc(100% - 20px);
+        max-width: 350px;
+    }
+    
+    .updates-modal-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .update-notification {
+    background-color: var(--popup-bg-dark);
+}
+
+body[data-theme="dark"] .update-item {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+body[data-theme="dark"] .update-item:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}

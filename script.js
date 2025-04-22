@@ -1435,6 +1435,7 @@ function createFloatingChat() {
     chatInputContainer.className = 'floating-chat-input';
     chatInputContainer.innerHTML = `
         <input type="text" id="floatingMessageInput" placeholder="Napište zprávu...">
+        <button class="commands-button" id="floatingCommandsButton" title="Menu příkazů"><i class="icon">📋</i></button>
         <button class="floating-send-btn" id="floatingSendMessage">➞</button>
     `;
 
@@ -1455,6 +1456,16 @@ function createFloatingChat() {
     document.getElementById('floatingMessageInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             sendFloatingChatMessage();
+        }
+    });
+
+    // Přidání event listeneru pro tlačítko menu příkazů
+    document.getElementById('floatingCommandsButton').addEventListener('click', () => {
+        if (typeof CommandsMenu !== 'undefined') {
+            CommandsMenu.toggleCommandsMenu();
+
+            // Aktualizace menu příkazů ve fullscreen režimu
+            CommandsMenu.updateFullscreenMenu();
         }
     });
 
@@ -1555,6 +1566,12 @@ function processMessage(message) {
     // Přidání zprávy uživatele do chatu
     addMessage(message, true);
 
+    // Kontrola, zda zpráva obsahuje příkaz z menu příkazů
+    if (typeof CommandsMenu !== 'undefined' && CommandsMenu.processCommand(message)) {
+        // Zpráva byla zpracována jako příkaz
+        return;
+    }
+
     // Simulace odpovědi AI s návrhy dalších akcí
     setTimeout(() => {
         const { response, suggestions } = generateResponseWithSuggestions(message);
@@ -1568,6 +1585,16 @@ function sendFloatingChatMessage() {
     const messageText = floatingMessageInput.value.trim();
 
     if (messageText) {
+        // Kontrola, zda zpráva obsahuje příkaz z menu příkazů
+        if (typeof CommandsMenu !== 'undefined' && CommandsMenu.processCommand(messageText)) {
+            // Zpráva byla zpracována jako příkaz
+            // Přidání zprávy do chatu
+            addMessage(messageText, true);
+            // Vyčištění vstupního pole
+            floatingMessageInput.value = '';
+            return;
+        }
+
         // Použití existující funkce pro zpracování zprávy
         processMessage(messageText);
 
