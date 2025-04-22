@@ -77,6 +77,20 @@ const CommandsMenu = {
             examples: ['Glóbus', '3D mapa', 'Zobrazit glóbus']
         },
         {
+            id: 'local-stories',
+            name: 'Příběhy z oblasti',
+            description: 'Zobrazí zajímavé příběhy a legendy z aktuální oblasti',
+            icon: '📜',
+            examples: ['Příběhy', 'Legendy', 'Historie místa']
+        },
+        {
+            id: 'local-food',
+            name: 'Místní speciality',
+            description: 'Zobrazí tipy na nejlepší jídlo a pití z aktuální oblasti',
+            icon: '🍽️',
+            examples: ['Jídlo', 'Speciality', 'Gastronomie']
+        },
+        {
             id: 'nearby-shops',
             name: 'Obchody v okolí',
             description: 'Zobrazí obchody v okolí s možností online nákupu',
@@ -352,6 +366,14 @@ const CommandsMenu = {
                 if (typeof toggleGlobeMode === 'function') {
                     toggleGlobeMode();
                 }
+                break;
+
+            case 'local-stories':
+                this.showLocalStories();
+                break;
+
+            case 'local-food':
+                this.showLocalFood();
                 break;
 
             case 'nearby-shops':
@@ -1401,6 +1423,761 @@ const CommandsMenu = {
         cartTotalElement.textContent = `${total} Kč`;
     },
 
+    // Zobrazení příběhů z oblasti
+    showLocalStories() {
+        // Zobrazení informace o načítání příběhů
+        addMessage('Hledám zajímavé příběhy z této oblasti...', false);
+
+        // Získání aktuální polohy
+        const center = map.getCenter();
+
+        // Získání názvu oblasti
+        this.getLocationName(center.lat, center.lng)
+            .then(locationName => {
+                // Získání příběhů pro danou oblast
+                const stories = this.getStoriesForLocation(locationName);
+
+                // Zobrazení modalu s příběhy
+                this.showStoriesModal(locationName, stories);
+
+                // Přidání markerů příběhů na mapu
+                this.addStoryMarkers(stories);
+
+                // Zobrazení informace o počtu nalezených příběhů
+                addMessage(`Nalezeno ${stories.length} příběhů z oblasti ${locationName}.`, false);
+
+                // Přidání XP za objevení příběhů
+                if (stories.length > 0 && typeof UserProgress !== 'undefined') {
+                    UserProgress.addExperience(10 * stories.length, `Objevení ${stories.length} příběhů z oblasti ${locationName}`);
+                }
+            })
+            .catch(error => {
+                console.error('Chyba při získávání názvu oblasti:', error);
+                addMessage('Nepodařilo se získat příběhy z této oblasti. Zkuste to prosím znovu.', false);
+            });
+    },
+
+    // Získání názvu oblasti podle souřadnic
+    getLocationName(lat, lng) {
+        return new Promise((resolve, reject) => {
+            // Použití Nominatim API pro získání názvu oblasti
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let locationName = 'Neznámá oblast';
+
+                    if (data && data.address) {
+                        // Pokus o získání názvu města nebo obce
+                        if (data.address.city) {
+                            locationName = data.address.city;
+                        } else if (data.address.town) {
+                            locationName = data.address.town;
+                        } else if (data.address.village) {
+                            locationName = data.address.village;
+                        } else if (data.address.county) {
+                            locationName = data.address.county;
+                        } else if (data.address.state) {
+                            locationName = data.address.state;
+                        }
+                    }
+
+                    resolve(locationName);
+                })
+                .catch(error => {
+                    console.error('Chyba při získávání názvu oblasti:', error);
+                    reject(error);
+                });
+        });
+    },
+
+    // Získání příběhů pro danou oblast
+    getStoriesForLocation(locationName) {
+        // Slovník příběhů pro různé oblasti
+        const storiesByLocation = {
+            'Praha': [
+                {
+                    title: 'Golem rabbiho Löwa',
+                    content: 'Podle legendy vytvořil rabbi Löw v 16. století umělého člověka z hlíny - Golema, který měl chránit židovskou komunitu. Golem byl oživen tím, že mu rabbi vložil do úst pergamen se šémem (Božím jménem). Když Golem začal být nebezpečný, rabbi mu pergamen vyjmul a Golem se rozpadl na prach. Říká se, že pozůstatky Golema jsou dodnes ukryty na půdě Staronové synagogy.',
+                    location: { lat: 50.0902, lng: 14.4195 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Staronova_synagoga2.jpg/320px-Staronova_synagoga2.jpg'
+                },
+                {
+                    title: 'Bruncvíkův meč',
+                    content: 'Podle pověsti je pod Karlým mostem ukrytý meč bájného knížete Bruncvíka. Až bude českému národu nejhůře, přijde sv. Václav v čele vojska blanických rytířů, vyzvedne Bruncvíkův meč a zachrání český národ před nepřáteli.',
+                    location: { lat: 50.0865, lng: 14.4115 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Charles_Bridge_Prague_from_Petrin_Tower_7343.jpg/320px-Charles_Bridge_Prague_from_Petrin_Tower_7343.jpg'
+                },
+                {
+                    title: 'Faustuv dům',
+                    content: 'V domě na Karlově náměstí č. 40 žil podle pověsti doktor Faust, který upsal svou duši ďáblu. Jednoho dne si pro něj ďábel přišel a odnesl ho dírou ve stropě přímo do pekla. Tato díra se prý nikdy nedala opravit a vždy se znovu objevila.',
+                    location: { lat: 50.0785, lng: 14.4205 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Faust_house_Prague_CZ_001.jpg/320px-Faust_house_Prague_CZ_001.jpg'
+                }
+            ],
+            'Brno': [
+                {
+                    title: 'Brněnský drak',
+                    content: 'V Brně na radnici visí vycpaný krokodýl, kterému se říká brněnský drak. Podle legendy terárizoval město a jeho okolí, až ho nakonec přemohl odvážný řezník, který mu podstrčil voličí kůži naplněnou vápnem. Když drak kůži sežral a napil se vody, vápno začalo reagovat a drak pukl.',
+                    location: { lat: 49.1951, lng: 16.6068 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Brno-Krokodyl.jpg/320px-Brno-Krokodyl.jpg'
+                },
+                {
+                    title: 'Proč zvoní poledne v Brně v 11 hodin',
+                    content: 'Během třicetileté války obléhali Brno Švédové. Jejich velitel prohlásil, že pokud se mu nepodaří dobýt město do poledne, odtáhne. Brňané se rozhodli zazvonit poledne už v 11 hodin, čímž Švédy oklamali. Ti skutečně odtáhli a od té doby zvoní v Brně poledne už v 11 hodin.',
+                    location: { lat: 49.1944, lng: 16.6080 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Brno%2C_Petrov%2C_katedr%C3%A1la_01.jpg/320px-Brno%2C_Petrov%2C_katedr%C3%A1la_01.jpg'
+                }
+            ],
+            'Olomouc': [
+                {
+                    title: 'Sloup Nejsvětější Trojice',
+                    content: 'Monumentální barokní sloup byl postaven na počest víry během morové epidemie v letech 1714-1716. Podle legendy, když byl sloup dokončen, mor ve městě ustal. Sloup je zapsán na seznamu UNESCO a obsahuje 18 soch světců.',
+                    location: { lat: 49.5938, lng: 17.2509 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Olomouc_-_Holy_Trinity_Column_1.jpg/320px-Olomouc_-_Holy_Trinity_Column_1.jpg'
+                }
+            ],
+            'Plzeň': [
+                {
+                    title: 'Andělíček v katedrále sv. Bartoloměje',
+                    content: 'Na jednom z pilířů katedrály sv. Bartoloměje je umístěna soška andělíčka. Podle pověsti, pokud se ho dotknete, splní se vám tajné přání. Především v lásce. Proto je andělíček oblíbeným cílem zamilovaných párů.',
+                    location: { lat: 49.7475, lng: 13.3775 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Plze%C5%88%2C_katedr%C3%A1la_sv._Bartolom%C4%9Bje%2C_and%C4%9Bl%C3%AD%C4%8Dek.jpg/320px-Plze%C5%88%2C_katedr%C3%A1la_sv._Bartolom%C4%9Bje%2C_and%C4%9Bl%C3%AD%C4%8Dek.jpg'
+                }
+            ],
+            'Český Krumlov': [
+                {
+                    title: 'Bílá paní na zámku',
+                    content: 'Podle legendy se na zámku v Českém Krumlově zjevuje duch Perchty z Rožmberka, známé jako Bílá paní. Perchta byla provdána proti své vůli a její manžel s ní špatně zacházel. Na smrtelné posteli jí odmítl odpustit, a tak jeho duše nenašla klid. Nyní se zjevuje jako ochránkyně rodu Rožmberků a přináší dobré zprávy, když se objeví s úsměvem, a špatné, když se mračí.',
+                    location: { lat: 48.8127, lng: 14.3152 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Cesky_Krumlov_Castle_view_from_bridge.jpg/320px-Cesky_Krumlov_Castle_view_from_bridge.jpg'
+                }
+            ]
+        };
+
+        // Pokud existují příběhy pro danou oblast, vrátíme je
+        if (storiesByLocation[locationName]) {
+            return storiesByLocation[locationName];
+        }
+
+        // Pokud neexistují příběhy pro konkrétní oblast, vrátíme obecné příběhy
+        return [
+            {
+                title: 'Tajemný poklad',
+                content: `Podle místní legendy je v oblasti ${locationName} ukrytý poklad, který zde zanechal bohatý šlechtic před mnoha staletími. Mnoho lidí se ho pokoušelo najít, ale zatím bez úspěchu. Říká se, že poklad může najít pouze člověk s čistým srdcem, který ho nebude chtít pro sebe, ale pro dobro ostatních.`,
+                location: { lat: lat, lng: lng },
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Treasure_chest_illustration.jpg/320px-Treasure_chest_illustration.jpg'
+            },
+            {
+                title: 'Zjevení v mlze',
+                content: `Místní obyvatelé oblasti ${locationName} vyprávějí o podivném zjevení, které se objevuje za mlhavých nocí. Někteří tvrdí, že jde o ducha dávného obyvatele, jiní věří, že jde o ochránce místa. Ti, kteří ho spatřili, popisují postavu v bílém rouchu, která se vznáší nad zemí a mizí, když se k ní někdo přiblíží.`,
+                location: { lat: lat + 0.01, lng: lng + 0.01 },
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Fog_1.jpg/320px-Fog_1.jpg'
+            },
+            {
+                title: 'Strom přání',
+                content: `V oblasti ${locationName} roste podle pověsti strom, který dokáže plnit přání. Musíte k němu přijít o úplňku, třikrát ho obejít proti směru hodinových ručiček a potichu vyslovit své přání. Pokud je vaše přání čisté a nesobecké, do roka a do dne se splní.`,
+                location: { lat: lat - 0.01, lng: lng - 0.01 },
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Wishing_tree%2C_Argyll%2C_Scotland.jpg/320px-Wishing_tree%2C_Argyll%2C_Scotland.jpg'
+            }
+        ];
+    },
+
+    // Zobrazení modalu s příběhy
+    showStoriesModal(locationName, stories) {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('storiesModal')) {
+            return;
+        }
+
+        // Vytvoření modalu
+        const modal = document.createElement('div');
+        modal.id = 'storiesModal';
+        modal.className = 'stories-modal';
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="stories-modal-content">
+                <div class="stories-modal-header">
+                    <h2>Příběhy z oblasti ${locationName}</h2>
+                    <button class="stories-modal-close">&times;</button>
+                </div>
+                <div class="stories-modal-body">
+                    ${stories.length > 0 ? `
+                        <div class="stories-list">
+                            ${stories.map((story, index) => `
+                                <div class="story-item" data-index="${index}">
+                                    <div class="story-item-header">
+                                        <h3>${story.title}</h3>
+                                        <button class="story-item-toggle">+</button>
+                                    </div>
+                                    <div class="story-item-content">
+                                        ${story.image ? `<img src="${story.image}" alt="${story.title}" class="story-image">` : ''}
+                                        <p>${story.content}</p>
+                                        <button class="story-item-show-on-map" data-lat="${story.location.lat}" data-lng="${story.location.lng}">Ukázat na mapě</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <div class="stories-empty">Pro tuto oblast nebyly nalezeny žádné příběhy.</div>
+                    `}
+                </div>
+            </div>
+        `;
+
+        // Přidání modalu do dokumentu
+        document.body.appendChild(modal);
+
+        // Animace zobrazení
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 100);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.stories-modal-close');
+        const storyItems = modal.querySelectorAll('.story-item');
+        const showOnMapButtons = modal.querySelectorAll('.story-item-show-on-map');
+
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            });
+        }
+
+        // Přidání event listenerů pro přepínání zobrazení příběhů
+        if (storyItems) {
+            storyItems.forEach(item => {
+                const toggleButton = item.querySelector('.story-item-toggle');
+                const content = item.querySelector('.story-item-content');
+
+                if (toggleButton && content) {
+                    toggleButton.addEventListener('click', () => {
+                        // Přepínání zobrazení obsahu
+                        if (content.style.display === 'block') {
+                            content.style.display = 'none';
+                            toggleButton.textContent = '+';
+                        } else {
+                            content.style.display = 'block';
+                            toggleButton.textContent = '-';
+                        }
+                    });
+                }
+            });
+        }
+
+        // Přidání event listenerů pro tlačítka "Ukázat na mapě"
+        if (showOnMapButtons) {
+            showOnMapButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const lat = parseFloat(button.getAttribute('data-lat'));
+                    const lng = parseFloat(button.getAttribute('data-lng'));
+
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        // Přesun mapy na danou lokaci
+                        map.setView([lat, lng], 16);
+
+                        // Zavření modalu
+                        modal.classList.remove('show');
+                        setTimeout(() => {
+                            modal.remove();
+                        }, 300);
+                    }
+                });
+            });
+        }
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            }
+        });
+    },
+
+    // Přidání markerů příběhů na mapu
+    addStoryMarkers(stories) {
+        // Odstranění existujících markerů příběhů
+        if (this.storyMarkers) {
+            this.storyMarkers.forEach(marker => map.removeLayer(marker));
+        }
+
+        // Vytvoření nového pole pro markery
+        this.storyMarkers = [];
+
+        // Přidání markerů pro každý příběh
+        stories.forEach(story => {
+            // Vytvoření markeru
+            const marker = L.marker([story.location.lat, story.location.lng], {
+                icon: L.divIcon({
+                    className: 'story-marker',
+                    html: `<div class="story-marker-inner">📜</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 30]
+                })
+            }).addTo(map);
+
+            // Vytvoření popup okna
+            marker.bindPopup(`
+                <div class="story-popup">
+                    <h3>${story.title}</h3>
+                    <p>${story.content.substring(0, 100)}...</p>
+                    <button class="story-popup-read-more" onclick="CommandsMenu.showStoryDetails('${story.title}', '${story.content.replace(/'/g, "\\'")}'${story.image ? `, '${story.image}'` : ''})">Přečíst celý příběh</button>
+                </div>
+            `);
+
+            // Přidání markeru do pole
+            this.storyMarkers.push(marker);
+        });
+
+        // Přidání tlačítka pro skrytí markerů příběhů
+        this.addHideStoriesButton();
+    },
+
+    // Zobrazení místních specialit
+    showLocalFood() {
+        // Zobrazení informace o načítání místních specialit
+        addMessage('Hledám místní speciality...', false);
+
+        // Získání aktuální polohy
+        const center = map.getCenter();
+
+        // Získání názvu oblasti
+        this.getLocationName(center.lat, center.lng)
+            .then(locationName => {
+                // Získání specialit pro danou oblast
+                const specialities = this.getFoodForLocation(locationName);
+
+                // Zobrazení modalu s místními specialitami
+                this.showFoodModal(locationName, specialities);
+
+                // Přidání markerů restaurací na mapu
+                this.addRestaurantMarkers(specialities);
+
+                // Zobrazení informace o počtu nalezených specialit
+                addMessage(`Nalezeno ${specialities.length} místních specialit z oblasti ${locationName}.`, false);
+
+                // Přidání XP za objevení místních specialit
+                if (specialities.length > 0 && typeof UserProgress !== 'undefined') {
+                    UserProgress.addExperience(8 * specialities.length, `Objevení ${specialities.length} místních specialit z oblasti ${locationName}`);
+                }
+            })
+            .catch(error => {
+                console.error('Chyba při získávání názvu oblasti:', error);
+                addMessage('Nepodařilo se získat místní speciality z této oblasti. Zkuste to prosím znovu.', false);
+            });
+    },
+
+    // Získání specialit pro danou oblast
+    getFoodForLocation(locationName) {
+        // Slovník specialit pro různé oblasti
+        const foodByLocation = {
+            'Praha': [
+                {
+                    name: 'Svičková na smetaně',
+                    description: 'Tradiční české jídlo z hovězího masa s krémovou omáčkou ze zeleniny a zakysané smetany, podávané s houskovým knedlíkem, brusinkami a šlehačkou.',
+                    type: 'main',
+                    price: '189 Kč',
+                    restaurant: 'U Fleku',
+                    address: 'Křemencova 11, Praha 1',
+                    location: { lat: 50.0813, lng: 14.4179 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Svickova_na_smetane.JPG/320px-Svickova_na_smetane.JPG'
+                },
+                {
+                    name: 'Trdelník',
+                    description: 'Sladké pečivo z kynutého těsta, které se peče na válci nad žhavými uhlíky a posypává směsí cukru a skořice. Oblíbená turistická pochoutka v centru Prahy.',
+                    type: 'dessert',
+                    price: '90 Kč',
+                    restaurant: 'Trdlo',
+                    address: 'Karlova 42, Praha 1',
+                    location: { lat: 50.0858, lng: 14.4185 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/K%C3%BCrt%C5%91skal%C3%A1cs_in_Prague.jpg/320px-K%C3%BCrt%C5%91skal%C3%A1cs_in_Prague.jpg'
+                },
+                {
+                    name: 'Pilsner Urquell',
+                    description: 'Světoznámý český ležák, který se začal vařit v Plzni v roce 1842. Jde o světlý ležák plné chuti s výraznou hořkostí.',
+                    type: 'drink',
+                    price: '55 Kč',
+                    restaurant: 'Lokál Dlouhá',
+                    address: 'Dlouhá 33, Praha 1',
+                    location: { lat: 50.0905, lng: 14.4248 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Pilsner_Urquell_mug.jpg/320px-Pilsner_Urquell_mug.jpg'
+                }
+            ],
+            'Brno': [
+                {
+                    name: 'Bramborák',
+                    description: 'Smažené bramborové placky s česnekem a majoránkou. V Brně se často podávají jako příloha k masům nebo samostatně s kyselým zelím.',
+                    type: 'main',
+                    price: '85 Kč',
+                    restaurant: 'Pegas',
+                    address: 'Jakubské náměstí 4, Brno',
+                    location: { lat: 49.1969, lng: 16.6082 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Kartoffelpuffer.jpg/320px-Kartoffelpuffer.jpg'
+                },
+                {
+                    name: 'Starobrno',
+                    description: 'Místní brněnské pivo s historií sahající do roku 1325. Jde o světlý ležák s jemnou hořkostí a sladkým dozvukem.',
+                    type: 'drink',
+                    price: '45 Kč',
+                    restaurant: 'Starobrno Brewery',
+                    address: 'Mendlovo náměstí 20, Brno',
+                    location: { lat: 49.1905, lng: 16.5958 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Starobrno_logo.svg/320px-Starobrno_logo.svg.png'
+                }
+            ],
+            'Plzeň': [
+                {
+                    name: 'Plzeňský Prazdroj',
+                    description: 'Originální plzeňský ležák přímo z místa jeho vzniku. Nejlépe chutná čerstvě natočený v pivovaru Plzeňský Prazdroj.',
+                    type: 'drink',
+                    price: '50 Kč',
+                    restaurant: 'Na Parkánu',
+                    address: 'Veleslavínova 4, Plzeň',
+                    location: { lat: 49.7477, lng: 13.3755 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Pilsner_Urquell_logo.svg/320px-Pilsner_Urquell_logo.svg.png'
+                },
+                {
+                    name: 'Plzeňské vdolky',
+                    description: 'Tradiční sladké pečivo z kynutého těsta, které se plní tvarohem a povidly a zdobí šlehačkou.',
+                    type: 'dessert',
+                    price: '65 Kč',
+                    restaurant: 'Cukrárna Romance',
+                    address: 'Americká 8, Plzeň',
+                    location: { lat: 49.7456, lng: 13.3772 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Moravsk%C3%A9_kolace.jpg/320px-Moravsk%C3%A9_kolace.jpg'
+                }
+            ],
+            'Český Krumlov': [
+                {
+                    name: 'Krumlovský medový dort',
+                    description: 'Specialita Českého Krumlova - dort s medovými plásty, ořechy a šlehačkou. Recept je tajný a předává se z generace na generaci.',
+                    type: 'dessert',
+                    price: '95 Kč',
+                    restaurant: 'Cukrárna pod zámkem',
+                    address: 'Radniční 29, Český Krumlov',
+                    location: { lat: 48.8110, lng: 14.3155 },
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Medovnik.jpg/320px-Medovnik.jpg'
+                }
+            ]
+        };
+
+        // Pokud existují speciality pro danou oblast, vrátíme je
+        if (foodByLocation[locationName]) {
+            return foodByLocation[locationName];
+        }
+
+        // Pokud neexistují speciality pro konkrétní oblast, vrátíme obecné české speciality
+        return [
+            {
+                name: 'Guláš s knedlíkem',
+                description: `Tradiční český guláš z hovězího masa s cibulí a paprikou, podávaný s houskovým knedlíkem. Oblíbené jídlo v oblasti ${locationName}.`,
+                type: 'main',
+                price: '165 Kč',
+                restaurant: `Restaurace U Zlatého lva`,
+                address: `Hlavní náměstí, ${locationName}`,
+                location: { lat: center.lat + 0.002, lng: center.lng + 0.002 },
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Guly%C3%A1s.jpg/320px-Guly%C3%A1s.jpg'
+            },
+            {
+                name: 'Smažený sýr',
+                description: `Obalovaný a smažený sýr eidam nebo hermelín, podávaný s hranolky a tatarskou omáčkou. Velmi populární jídlo v celé České republice, včetně oblasti ${locationName}.`,
+                type: 'main',
+                price: '155 Kč',
+                restaurant: `Hospoda Na Rozcestí`,
+                address: `Nádražní 15, ${locationName}`,
+                location: { lat: center.lat - 0.002, lng: center.lng - 0.002 },
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Sma%C5%BEen%C3%BD_s%C3%BDr%2C_hranolky%2C_tatarka_1.jpg/320px-Sma%C5%BEen%C3%BD_s%C3%BDr%2C_hranolky%2C_tatarka_1.jpg'
+            },
+            {
+                name: 'Kozel',
+                description: `Oblíbené české pivo, které se často čepuje v oblasti ${locationName}. Jde o světlý ležák s jemnou hořkostí a plnou chutí.`,
+                type: 'drink',
+                price: '45 Kč',
+                restaurant: `Pivnice U Černého orla`,
+                address: `Dolní 8, ${locationName}`,
+                location: { lat: center.lat + 0.001, lng: center.lng - 0.001 },
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Velkopopovick%C3%BD_Kozel_logo.svg/320px-Velkopopovick%C3%BD_Kozel_logo.svg.png'
+            }
+        ];
+    },
+
+    // Zobrazení modalu s místními specialitami
+    showFoodModal(locationName, specialities) {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('foodModal')) {
+            return;
+        }
+
+        // Vytvoření modalu
+        const modal = document.createElement('div');
+        modal.id = 'foodModal';
+        modal.className = 'food-modal';
+
+        // Rozdělení specialit podle typu
+        const mainDishes = specialities.filter(item => item.type === 'main');
+        const desserts = specialities.filter(item => item.type === 'dessert');
+        const drinks = specialities.filter(item => item.type === 'drink');
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="food-modal-content">
+                <div class="food-modal-header">
+                    <h2>Místní speciality z oblasti ${locationName}</h2>
+                    <button class="food-modal-close">&times;</button>
+                </div>
+                <div class="food-modal-body">
+                    ${specialities.length > 0 ? `
+                        <div class="food-categories">
+                            ${mainDishes.length > 0 ? `
+                                <div class="food-category">
+                                    <h3>Hlavní jídla</h3>
+                                    <div class="food-items">
+                                        ${mainDishes.map(item => this.createFoodItemHTML(item)).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${desserts.length > 0 ? `
+                                <div class="food-category">
+                                    <h3>Dezerty</h3>
+                                    <div class="food-items">
+                                        ${desserts.map(item => this.createFoodItemHTML(item)).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${drinks.length > 0 ? `
+                                <div class="food-category">
+                                    <h3>Nápoje</h3>
+                                    <div class="food-items">
+                                        ${drinks.map(item => this.createFoodItemHTML(item)).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : `
+                        <div class="food-empty">Pro tuto oblast nebyly nalezeny žádné místní speciality.</div>
+                    `}
+                </div>
+            </div>
+        `;
+
+        // Přidání modalu do dokumentu
+        document.body.appendChild(modal);
+
+        // Animace zobrazení
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 100);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.food-modal-close');
+        const showOnMapButtons = modal.querySelectorAll('.food-item-show-on-map');
+
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            });
+        }
+
+        // Přidání event listenerů pro tlačítka "Ukázat na mapě"
+        if (showOnMapButtons) {
+            showOnMapButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const lat = parseFloat(button.getAttribute('data-lat'));
+                    const lng = parseFloat(button.getAttribute('data-lng'));
+
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        // Přesun mapy na danou lokaci
+                        map.setView([lat, lng], 16);
+
+                        // Zavření modalu
+                        modal.classList.remove('show');
+                        setTimeout(() => {
+                            modal.remove();
+                        }, 300);
+                    }
+                });
+            });
+        }
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            }
+        });
+    },
+
+    // Vytvoření HTML pro položku jídla
+    createFoodItemHTML(item) {
+        return `
+            <div class="food-item">
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="food-image">` : ''}
+                <div class="food-item-info">
+                    <h4>${item.name}</h4>
+                    <p class="food-item-description">${item.description}</p>
+                    <p class="food-item-price"><strong>Cena:</strong> ${item.price}</p>
+                    <p class="food-item-restaurant"><strong>Kde ochutnat:</strong> ${item.restaurant}, ${item.address}</p>
+                    <button class="food-item-show-on-map" data-lat="${item.location.lat}" data-lng="${item.location.lng}">Ukázat restauraci na mapě</button>
+                </div>
+            </div>
+        `;
+    },
+
+    // Přidání markerů restaurací na mapu
+    addRestaurantMarkers(specialities) {
+        // Odstranění existujících markerů restaurací
+        if (this.restaurantMarkers) {
+            this.restaurantMarkers.forEach(marker => map.removeLayer(marker));
+        }
+
+        // Vytvoření nového pole pro markery
+        this.restaurantMarkers = [];
+
+        // Získání unikátních restaurací (odstranění duplicit)
+        const uniqueRestaurants = [];
+        const restaurantNames = new Set();
+
+        specialities.forEach(item => {
+            if (!restaurantNames.has(item.restaurant)) {
+                restaurantNames.add(item.restaurant);
+                uniqueRestaurants.push({
+                    name: item.restaurant,
+                    address: item.address,
+                    location: item.location,
+                    specialities: [item]
+                });
+            } else {
+                // Přidání speciality k existující restauraci
+                const restaurant = uniqueRestaurants.find(r => r.name === item.restaurant);
+                if (restaurant) {
+                    restaurant.specialities.push(item);
+                }
+            }
+        });
+
+        // Přidání markerů pro každou restauraci
+        uniqueRestaurants.forEach(restaurant => {
+            // Vytvoření markeru
+            const marker = L.marker([restaurant.location.lat, restaurant.location.lng], {
+                icon: L.divIcon({
+                    className: 'restaurant-marker',
+                    html: `<div class="restaurant-marker-inner">🍽️</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 30]
+                })
+            }).addTo(map);
+
+            // Vytvoření popup okna
+            marker.bindPopup(`
+                <div class="restaurant-popup">
+                    <h3>${restaurant.name}</h3>
+                    <p>${restaurant.address}</p>
+                    <h4>Speciality:</h4>
+                    <ul>
+                        ${restaurant.specialities.map(item => `<li>${item.name} (${item.price})</li>`).join('')}
+                    </ul>
+                    <button class="restaurant-popup-details" onclick="CommandsMenu.showRestaurantDetails('${restaurant.name}', '${restaurant.address}', ${JSON.stringify(restaurant.specialities).replace(/'/g, "\\'")}, ${restaurant.location.lat}, ${restaurant.location.lng})">Zobrazit detaily</button>
+                </div>
+            `);
+
+            // Přidání markeru do pole
+            this.restaurantMarkers.push(marker);
+        });
+
+        // Přidání tlačítka pro skrytí markerů restaurací
+        this.addHideRestaurantsButton();
+    },
+
+    // Přidání tlačítka pro skrytí markerů restaurací
+    addHideRestaurantsButton() {
+        // Odstranění existujícího tlačítka
+        const existingButton = document.getElementById('hideRestaurantsButton');
+        if (existingButton) {
+            existingButton.remove();
+        }
+
+        // Vytvoření tlačítka
+        const button = document.createElement('button');
+        button.id = 'hideRestaurantsButton';
+        button.className = 'hide-restaurants-button';
+        button.innerHTML = 'Skrýt restaurace';
+
+        // Přidání tlačítka do dokumentu
+        document.body.appendChild(button);
+
+        // Přidání event listeneru
+        button.addEventListener('click', () => {
+            // Odstranění markerů restaurací
+            if (this.restaurantMarkers) {
+                this.restaurantMarkers.forEach(marker => map.removeLayer(marker));
+                this.restaurantMarkers = [];
+            }
+
+            // Odstranění tlačítka
+            button.remove();
+
+            // Zobrazení informace o skrytí restaurací
+            addMessage('Restaurace byly skryty.', false);
+        });
+    },
+
+    // Přidání tlačítka pro skrytí markerů příběhů
+    addHideStoriesButton() {
+        // Odstranění existujícího tlačítka
+        const existingButton = document.getElementById('hideStoriesButton');
+        if (existingButton) {
+            existingButton.remove();
+        }
+
+        // Vytvoření tlačítka
+        const button = document.createElement('button');
+        button.id = 'hideStoriesButton';
+        button.className = 'hide-stories-button';
+        button.innerHTML = 'Skrýt příběhy';
+
+        // Přidání tlačítka do dokumentu
+        document.body.appendChild(button);
+
+        // Přidání event listeneru
+        button.addEventListener('click', () => {
+            // Odstranění markerů příběhů
+            if (this.storyMarkers) {
+                this.storyMarkers.forEach(marker => map.removeLayer(marker));
+                this.storyMarkers = [];
+            }
+
+            // Odstranění tlačítka
+            button.remove();
+
+            // Zobrazení informace o skrytí příběhů
+            addMessage('Příběhy byly skryty.', false);
+        });
+    },
+
     // Získání produktů podle typu obchodu
     getShopProducts(shopType) {
         switch (shopType) {
@@ -1878,6 +2655,185 @@ CommandsMenu.showShopProducts = function(shopName, shopType) {
     if (instance) {
         instance.showShopProducts(shopName, shopType);
     }
+};
+
+// Statická metoda pro zobrazení detailů příběhu
+CommandsMenu.showStoryDetails = function(title, content, image) {
+    // Kontrola, zda již modal neexistuje
+    if (document.getElementById('storyDetailsModal')) {
+        return;
+    }
+
+    // Vytvoření modalu
+    const modal = document.createElement('div');
+    modal.id = 'storyDetailsModal';
+    modal.className = 'story-details-modal';
+
+    // Vytvoření obsahu modalu
+    modal.innerHTML = `
+        <div class="story-details-modal-content">
+            <div class="story-details-modal-header">
+                <h2>${title}</h2>
+                <button class="story-details-modal-close">&times;</button>
+            </div>
+            <div class="story-details-modal-body">
+                ${image ? `<img src="${image}" alt="${title}" class="story-details-image">` : ''}
+                <p>${content}</p>
+            </div>
+        </div>
+    `;
+
+    // Přidání modalu do dokumentu
+    document.body.appendChild(modal);
+
+    // Animace zobrazení
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 100);
+
+    // Přidání event listenerů
+    const closeButton = modal.querySelector('.story-details-modal-close');
+
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+
+            // Odstranění elementu po dokončení animace
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        });
+    }
+
+    // Zavření modalu při kliknutí mimo obsah
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+
+            // Odstranění elementu po dokončení animace
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        }
+    });
+
+    // Přidání XP za přečtení příběhu
+    if (typeof UserProgress !== 'undefined') {
+        UserProgress.addExperience(5, `Přečtení příběhu: ${title}`);
+    }
+};
+
+// Statická metoda pro zobrazení detailů restaurace
+CommandsMenu.showRestaurantDetails = function(name, address, specialities, lat, lng) {
+    // Kontrola, zda již modal neexistuje
+    if (document.getElementById('restaurantDetailsModal')) {
+        return;
+    }
+
+    // Vytvoření modalu
+    const modal = document.createElement('div');
+    modal.id = 'restaurantDetailsModal';
+    modal.className = 'restaurant-details-modal';
+
+    // Vytvoření obsahu modalu
+    modal.innerHTML = `
+        <div class="restaurant-details-modal-content">
+            <div class="restaurant-details-modal-header">
+                <h2>${name}</h2>
+                <button class="restaurant-details-modal-close">&times;</button>
+            </div>
+            <div class="restaurant-details-modal-body">
+                <p class="restaurant-details-address"><strong>Adresa:</strong> ${address}</p>
+
+                <h3>Speciality:</h3>
+                <div class="restaurant-details-specialities">
+                    ${specialities.map(item => `
+                        <div class="restaurant-details-speciality">
+                            ${item.image ? `<img src="${item.image}" alt="${item.name}" class="restaurant-details-speciality-image">` : ''}
+                            <div class="restaurant-details-speciality-info">
+                                <h4>${item.name}</h4>
+                                <p>${item.description}</p>
+                                <p class="restaurant-details-speciality-price"><strong>Cena:</strong> ${item.price}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="restaurant-details-actions">
+                    <button class="restaurant-details-navigate" data-lat="${lat}" data-lng="${lng}">Navigovat</button>
+                    <button class="restaurant-details-visit">Označit jako navštívené</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Přidání modalu do dokumentu
+    document.body.appendChild(modal);
+
+    // Animace zobrazení
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 100);
+
+    // Přidání event listenerů
+    const closeButton = modal.querySelector('.restaurant-details-modal-close');
+    const navigateButton = modal.querySelector('.restaurant-details-navigate');
+    const visitButton = modal.querySelector('.restaurant-details-visit');
+
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+
+            // Odstranění elementu po dokončení animace
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        });
+    }
+
+    if (navigateButton) {
+        navigateButton.addEventListener('click', () => {
+            // Přesun mapy na danou lokaci
+            map.setView([lat, lng], 16);
+
+            // Zavření modalu
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        });
+    }
+
+    if (visitButton) {
+        visitButton.addEventListener('click', () => {
+            // Přidání XP za navštívení restaurace
+            if (typeof UserProgress !== 'undefined') {
+                UserProgress.addExperience(15, `Navštívení restaurace: ${name}`);
+                UserProgress.addAchievement('foodie', `Gurmán`, `Navštívili jste restauraci ${name}`);
+            }
+
+            // Zobrazení informace o navštívení restaurace
+            addMessage(`Restaurace ${name} byla označena jako navštívená. Získáváte 15 XP!`, false);
+
+            // Zavření modalu
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        });
+    }
+
+    // Zavření modalu při kliknutí mimo obsah
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+
+            // Odstranění elementu po dokončení animace
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        }
+    });
 };
 
 // Inicializace menu příkazů po načtení dokumentu
