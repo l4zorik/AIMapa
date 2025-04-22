@@ -42,6 +42,13 @@ const CommandsMenu = {
             examples: ['Glóbus', '3D mapa', 'Zobrazit glóbus']
         },
         {
+            id: 'premium',
+            name: 'Premium verze',
+            description: 'Získejte přístup k premium funkcím aplikace',
+            icon: '⭐',
+            examples: ['Premium', 'Upgrade', 'Rozšířené funkce']
+        },
+        {
             id: 'settings',
             name: 'Nastavení',
             description: 'Otevře dialog nastavení aplikace',
@@ -56,56 +63,56 @@ const CommandsMenu = {
             examples: ['Nápověda', 'Pomoc', 'Jak používat']
         }
     ],
-    
+
     // Inicializace menu příkazů
     init() {
         console.log('Inicializace menu příkazů...');
-        
+
         // Přidání tlačítka pro zobrazení menu příkazů
         this.createCommandsButton();
-        
+
         // Přidání menu příkazů vedle chatu
         this.createCommandsMenu();
-        
+
         // Nastavení event listenerů
         this.setupEventListeners();
-        
+
         console.log('Menu příkazů bylo inicializováno');
     },
-    
+
     // Vytvoření tlačítka pro zobrazení menu příkazů
     createCommandsButton() {
         // Kontrola, zda již tlačítko neexistuje
         if (document.getElementById('commandsButton')) {
             return;
         }
-        
+
         // Vytvoření tlačítka
         const commandsButton = document.createElement('button');
         commandsButton.id = 'commandsButton';
         commandsButton.className = 'commands-button';
         commandsButton.innerHTML = '<i class="icon">📋</i>';
         commandsButton.title = 'Menu příkazů';
-        
+
         // Přidání tlačítka do chatu
         const chatInput = document.querySelector('.chat-input');
         if (chatInput) {
             chatInput.appendChild(commandsButton);
         }
     },
-    
+
     // Vytvoření menu příkazů vedle chatu
     createCommandsMenu() {
         // Kontrola, zda již menu neexistuje
         if (document.getElementById('commandsMenu')) {
             return;
         }
-        
+
         // Vytvoření menu
         const commandsMenu = document.createElement('div');
         commandsMenu.id = 'commandsMenu';
         commandsMenu.className = 'commands-menu';
-        
+
         // Vytvoření obsahu menu
         commandsMenu.innerHTML = `
             <div class="commands-menu-header">
@@ -126,17 +133,17 @@ const CommandsMenu = {
                 </div>
             </div>
         `;
-        
+
         // Přidání menu do dokumentu
         const aiAssistant = document.querySelector('.ai-assistant');
         if (aiAssistant) {
             aiAssistant.appendChild(commandsMenu);
         }
-        
+
         // Skrytí menu na začátku
         commandsMenu.style.display = 'none';
     },
-    
+
     // Nastavení event listenerů
     setupEventListeners() {
         // Event listener pro tlačítko menu příkazů
@@ -146,7 +153,7 @@ const CommandsMenu = {
                 this.toggleCommandsMenu();
             });
         }
-        
+
         // Event listener pro zavření menu
         const closeButton = document.querySelector('.commands-menu-close');
         if (closeButton) {
@@ -154,7 +161,7 @@ const CommandsMenu = {
                 this.hideCommandsMenu();
             });
         }
-        
+
         // Event listener pro položky menu
         const commandItems = document.querySelectorAll('.command-item');
         commandItems.forEach(item => {
@@ -164,14 +171,14 @@ const CommandsMenu = {
                 this.hideCommandsMenu();
             });
         });
-        
+
         // Event listener pro fullscreen režim
         document.addEventListener('fullscreenChange', () => {
             // Aktualizace menu příkazů ve fullscreen režimu
             this.updateFullscreenMenu();
         });
     },
-    
+
     // Zobrazení/skrytí menu příkazů
     toggleCommandsMenu() {
         const commandsMenu = document.getElementById('commandsMenu');
@@ -183,39 +190,43 @@ const CommandsMenu = {
             }
         }
     },
-    
+
     // Zobrazení menu příkazů
     showCommandsMenu() {
         const commandsMenu = document.getElementById('commandsMenu');
         if (commandsMenu) {
             commandsMenu.style.display = 'block';
-            
+
             // Animace zobrazení
             setTimeout(() => {
                 commandsMenu.classList.add('show');
+                commandsMenu.style.transform = 'translate(-50%, -50%) scale(1)';
+                commandsMenu.style.opacity = '1';
             }, 10);
         }
     },
-    
+
     // Skrytí menu příkazů
     hideCommandsMenu() {
         const commandsMenu = document.getElementById('commandsMenu');
         if (commandsMenu) {
             commandsMenu.classList.remove('show');
-            
+            commandsMenu.style.transform = 'translate(-50%, -50%) scale(0.95)';
+            commandsMenu.style.opacity = '0';
+
             // Skrytí menu po dokončení animace
             setTimeout(() => {
                 commandsMenu.style.display = 'none';
             }, 300);
         }
     },
-    
+
     // Aktualizace menu příkazů ve fullscreen režimu
     updateFullscreenMenu() {
         const isFullscreen = document.fullscreenElement !== null;
         const commandsMenu = document.getElementById('commandsMenu');
         const commandsButton = document.getElementById('commandsButton');
-        
+
         if (isFullscreen) {
             // Přesunout menu a tlačítko do fullscreen kontejneru
             const fullscreenChat = document.querySelector('.fullscreen-chat');
@@ -233,7 +244,7 @@ const CommandsMenu = {
             }
         }
     },
-    
+
     // Provedení příkazu
     executeCommand(commandId) {
         switch (commandId) {
@@ -242,60 +253,64 @@ const CommandsMenu = {
                     addActivity();
                 }
                 break;
-                
+
             case 'calculate-route':
                 if (typeof calculateRoute === 'function') {
                     calculateRoute();
                 }
                 break;
-                
+
             case 'clear-map':
                 if (typeof clearMap === 'function') {
                     clearMap();
                 }
                 break;
-                
+
             case 'fullscreen':
                 if (typeof toggleFullscreen === 'function') {
                     toggleFullscreen();
                 }
                 break;
-                
+
             case 'globe-mode':
                 if (typeof toggleGlobeMode === 'function') {
                     toggleGlobeMode();
                 }
                 break;
-                
+
+            case 'premium':
+                this.showPremiumModal();
+                break;
+
             case 'settings':
                 const settingsModal = document.getElementById('settingsModal');
                 if (settingsModal) {
                     settingsModal.style.display = 'block';
                 }
                 break;
-                
+
             case 'help':
                 this.showHelpModal();
                 break;
-                
+
             default:
                 console.log('Neznámý příkaz:', commandId);
                 break;
         }
     },
-    
+
     // Zobrazení modalu s nápovědou
     showHelpModal() {
         // Kontrola, zda již modal neexistuje
         if (document.getElementById('helpModal')) {
             return;
         }
-        
+
         // Vytvoření modalu
         const modal = document.createElement('div');
         modal.id = 'helpModal';
         modal.className = 'help-modal';
-        
+
         // Vytvoření obsahu modalu
         modal.innerHTML = `
             <div class="help-modal-content">
@@ -319,7 +334,7 @@ const CommandsMenu = {
                             </div>
                         `).join('')}
                     </div>
-                    
+
                     <h3>Jak používat aplikaci</h3>
                     <ol>
                         <li>Přidejte body na mapu pomocí tlačítka "Přidat aktivitu" nebo kliknutím na mapu.</li>
@@ -331,34 +346,34 @@ const CommandsMenu = {
                 </div>
             </div>
         `;
-        
+
         // Přidání modalu do dokumentu
         document.body.appendChild(modal);
-        
+
         // Animace zobrazení
         setTimeout(() => {
             modal.classList.add('show');
         }, 100);
-        
+
         // Přidání event listenerů
         const closeButton = modal.querySelector('.help-modal-close');
-        
+
         if (closeButton) {
             closeButton.addEventListener('click', () => {
                 modal.classList.remove('show');
-                
+
                 // Odstranění elementu po dokončení animace
                 setTimeout(() => {
                     modal.remove();
                 }, 300);
             });
         }
-        
+
         // Zavření modalu při kliknutí mimo obsah
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.classList.remove('show');
-                
+
                 // Odstranění elementu po dokončení animace
                 setTimeout(() => {
                     modal.remove();
@@ -366,7 +381,97 @@ const CommandsMenu = {
             }
         });
     },
-    
+
+    // Zobrazení modalu s premium nabídkou
+    showPremiumModal() {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('premiumModal')) {
+            return;
+        }
+
+        // Vytvoření modalu
+        const modal = document.createElement('div');
+        modal.id = 'premiumModal';
+        modal.className = 'premium-modal';
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="premium-modal-content">
+                <div class="premium-modal-header">
+                    <h2>Premium verze</h2>
+                    <button class="premium-modal-close">&times;</button>
+                </div>
+                <div class="premium-modal-body">
+                    <div class="premium-icon">⭐</div>
+                    <h3>Získejte více s Premium verzí</h3>
+                    <p>Odemkněte všechny funkce a vylepšete svůj zážitek s mapou.</p>
+
+                    <div class="premium-features">
+                        <div class="premium-feature">
+                            <div class="premium-feature-icon">🔄</div>
+                            <div class="premium-feature-text">Neomezené trasy a body</div>
+                        </div>
+                        <div class="premium-feature">
+                            <div class="premium-feature-icon">🌙</div>
+                            <div class="premium-feature-text">Speciální tmavý režim</div>
+                        </div>
+                        <div class="premium-feature">
+                            <div class="premium-feature-icon">🔔</div>
+                            <div class="premium-feature-text">Upozornění a připomínky</div>
+                        </div>
+                        <div class="premium-feature">
+                            <div class="premium-feature-icon">📊</div>
+                            <div class="premium-feature-text">Pokročilé statistiky</div>
+                        </div>
+                    </div>
+
+                    <button class="premium-upgrade-button">Upgradovat na Premium</button>
+                </div>
+            </div>
+        `;
+
+        // Přidání modalu do dokumentu
+        document.body.appendChild(modal);
+
+        // Animace zobrazení
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 100);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.premium-modal-close');
+        const upgradeButton = modal.querySelector('.premium-upgrade-button');
+
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            });
+        }
+
+        if (upgradeButton) {
+            upgradeButton.addEventListener('click', () => {
+                alert('Děkujeme za zájem o Premium verzi! Tato funkce bude brzy k dispozici.');
+            });
+        }
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            }
+        });
+    },
+
     // Zpracování příkazu z chatu
     processCommand(text) {
         // Kontrola, zda text obsahuje nějaký příkaz
@@ -379,7 +484,7 @@ const CommandsMenu = {
                 }
             }
         }
-        
+
         // Žádný příkaz nebyl nalezen
         return false;
     }

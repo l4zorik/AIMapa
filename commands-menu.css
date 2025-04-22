@@ -30,25 +30,25 @@
 /* Menu příkazů */
 .commands-menu {
     position: absolute;
-    top: 0;
-    right: -250px;
-    width: 250px;
+    top: 50%;
+    left: 50%;
+    width: 300px;
     background-color: var(--card-bg);
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    z-index: 100;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 0 1000px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     overflow: hidden;
     transition: transform 0.3s ease, opacity 0.3s ease;
     opacity: 0;
-    transform: translateX(20px);
-    max-height: 100%;
+    transform: translate(-50%, -50%) scale(0.95);
+    max-height: 80vh;
     display: flex;
     flex-direction: column;
 }
 
 .commands-menu.show {
     opacity: 1;
-    transform: translateX(0);
+    transform: translate(-50%, -50%) scale(1);
 }
 
 .commands-menu-header {
@@ -127,11 +127,14 @@
 
 /* Fullscreen režim */
 .map-fullscreen .commands-menu {
-    position: absolute;
-    top: 0;
-    right: -250px;
-    height: 100%;
-    border-radius: 0 0 0 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    height: auto;
+    max-height: 80vh;
+    border-radius: 10px;
+    z-index: 10000;
 }
 
 /* Modal s nápovědou */
@@ -272,14 +275,160 @@
 /* Responzivní design */
 @media (max-width: 768px) {
     .commands-menu {
-        width: 220px;
-        right: -220px;
+        width: 280px;
+        max-width: 90%;
     }
-    
-    .help-modal-content {
+
+    .help-modal-content,
+    .premium-modal-content {
         width: 95%;
         max-height: 85vh;
     }
+
+    .premium-features {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Premium modal */
+.premium-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.premium-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.premium-modal-content {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.premium-modal.show .premium-modal-content {
+    transform: scale(1);
+}
+
+.premium-modal-header {
+    background-color: #ffc107;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.premium-modal-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.premium-modal-close {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.premium-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    text-align: center;
+}
+
+.premium-icon {
+    font-size: 48px;
+    margin: 10px 0;
+    color: #ffc107;
+}
+
+.premium-modal-body h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.premium-modal-body p {
+    margin-bottom: 20px;
+    color: var(--text-color-dark);
+}
+
+.premium-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.premium-feature {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.premium-feature:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.premium-feature-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.premium-feature-text {
+    font-weight: bold;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.premium-upgrade-button {
+    background-color: #ffc107;
+    color: #333;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+.premium-upgrade-button:hover {
+    background-color: #ffca2c;
 }
 
 /* Tmavý režim */
@@ -292,5 +441,13 @@ body[data-theme="dark"] .help-command-item {
 }
 
 body[data-theme="dark"] .help-command-item:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme="dark"] .premium-feature {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+body[data-theme="dark"] .premium-feature:hover {
     background-color: rgba(0, 0, 0, 0.5);
 }
