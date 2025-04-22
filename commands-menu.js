@@ -77,6 +77,13 @@ const CommandsMenu = {
             examples: ['Glóbus', '3D mapa', 'Zobrazit glóbus']
         },
         {
+            id: 'nearby-shops',
+            name: 'Obchody v okolí',
+            description: 'Zobrazí obchody v okolí s možností online nákupu',
+            icon: '🛍️',
+            examples: ['Obchody', 'Nákupy', 'Kde nakoupit']
+        },
+        {
             id: 'traffic-info',
             name: 'Dopravní situace',
             description: 'Zobrazí aktuální dopravní situaci, zácpy a uzavírky',
@@ -345,6 +352,10 @@ const CommandsMenu = {
                 if (typeof toggleGlobeMode === 'function') {
                     toggleGlobeMode();
                 }
+                break;
+
+            case 'nearby-shops':
+                this.showNearbyShops();
                 break;
 
             case 'traffic-info':
@@ -1111,6 +1122,454 @@ const CommandsMenu = {
         addMessage('Odkaz pro sdílení polohy byl vytvořen.', false);
     },
 
+    // Získání ikony pro typ obchodu
+    getShopIcon(type) {
+        switch (type) {
+            case 'supermarket': return '🛒';
+            case 'convenience': return '🛍️';
+            case 'clothes': return '👕';
+            case 'shoes': return '👟';
+            case 'electronics': return '📱';
+            case 'hardware': return '🔧';
+            case 'furniture': return '🛋️';
+            case 'bakery': return '🍞';
+            case 'butcher': return '🥩';
+            case 'books': return '📚';
+            case 'jewelry': return '💍';
+            case 'toys': return '🎁';
+            case 'sports': return '⚽';
+            case 'alcohol': return '🍷';
+            case 'florist': return '🌷';
+            case 'optician': return '👓';
+            case 'chemist': return '💊';
+            case 'department_store': return '🏬';
+            case 'mall': return '🛍️';
+            case 'beauty': return '💄';
+            case 'hairdresser': return '✂️';
+            default: return '🛍️';
+        }
+    },
+
+    // Získání názvu typu obchodu
+    getShopTypeName(type) {
+        switch (type) {
+            case 'supermarket': return 'Supermarket';
+            case 'convenience': return 'Potravinový obchod';
+            case 'clothes': return 'Obchod s oblečením';
+            case 'shoes': return 'Obchod s obuví';
+            case 'electronics': return 'Elektro';
+            case 'hardware': return 'Železnářství';
+            case 'furniture': return 'Nábytek';
+            case 'bakery': return 'Pekařství';
+            case 'butcher': return 'Řeznictví';
+            case 'books': return 'Knihkupectví';
+            case 'jewelry': return 'Klenotnictví';
+            case 'toys': return 'Hračkářství';
+            case 'sports': return 'Sportovní potřeby';
+            case 'alcohol': return 'Vinotéka/Lihoviny';
+            case 'florist': return 'Květinový obchod';
+            case 'optician': return 'Optika';
+            case 'chemist': return 'Drogerie';
+            case 'department_store': return 'Obchodní dům';
+            case 'mall': return 'Nákupní centrum';
+            case 'beauty': return 'Kosmetika';
+            case 'hairdresser': return 'Kadeřnictví';
+            default: return 'Obchod';
+        }
+    },
+
+    // Přidání tlačítka pro skrytí obchodů
+    addHideShopsButton() {
+        // Odstranění existujícího tlačítka
+        const existingButton = document.getElementById('hideShopsButton');
+        if (existingButton) {
+            existingButton.remove();
+        }
+
+        // Vytvoření tlačítka
+        const button = document.createElement('button');
+        button.id = 'hideShopsButton';
+        button.className = 'hide-shops-button';
+        button.innerHTML = 'Skrýt obchody';
+
+        // Přidání tlačítka do dokumentu
+        document.body.appendChild(button);
+
+        // Přidání event listeneru
+        button.addEventListener('click', () => {
+            // Odstranění markerů obchodů
+            if (this.shopMarkers) {
+                this.shopMarkers.forEach(marker => map.removeLayer(marker));
+                this.shopMarkers = [];
+            }
+
+            // Odstranění tlačítka
+            button.remove();
+
+            // Zobrazení informace o skrytí obchodů
+            addMessage('Obchody byly skryty.', false);
+        });
+    },
+
+    // Zobrazení produktů obchodu
+    showShopProducts(shopName, shopType) {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('shopProductsModal')) {
+            return;
+        }
+
+        // Získání produktů podle typu obchodu
+        const products = this.getShopProducts(shopType);
+
+        // Vytvoření modalu
+        const modal = document.createElement('div');
+        modal.id = 'shopProductsModal';
+        modal.className = 'shop-products-modal';
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="shop-products-modal-content">
+                <div class="shop-products-modal-header">
+                    <h2>${shopName}</h2>
+                    <button class="shop-products-modal-close">&times;</button>
+                </div>
+                <div class="shop-products-modal-body">
+                    <h3>Dostupné produkty</h3>
+                    <div class="shop-products-list">
+                        ${products.map(product => `
+                            <div class="shop-product">
+                                <div class="shop-product-image">${product.icon}</div>
+                                <div class="shop-product-info">
+                                    <div class="shop-product-name">${product.name}</div>
+                                    <div class="shop-product-price">${product.price} Kč</div>
+                                </div>
+                                <button class="shop-product-add-to-cart" data-product="${product.name}" data-price="${product.price}">Přidat do košíku</button>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="shop-cart">
+                        <h3>Nákupní košík</h3>
+                        <div class="shop-cart-items" id="shopCartItems">
+                            <div class="shop-cart-empty">Košík je prázdný</div>
+                        </div>
+                        <div class="shop-cart-total">
+                            <span>Celkem:</span>
+                            <span id="shopCartTotal">0 Kč</span>
+                        </div>
+                        <button class="shop-cart-checkout" id="shopCartCheckout">Objednat</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání modalu do dokumentu
+        document.body.appendChild(modal);
+
+        // Animace zobrazení
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 100);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.shop-products-modal-close');
+        const addToCartButtons = modal.querySelectorAll('.shop-product-add-to-cart');
+        const checkoutButton = modal.querySelector('#shopCartCheckout');
+
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            });
+        }
+
+        // Košík
+        const cart = [];
+
+        // Přidání event listenerů pro tlačítka "Přidat do košíku"
+        if (addToCartButtons) {
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const productName = button.getAttribute('data-product');
+                    const productPrice = parseInt(button.getAttribute('data-price'));
+
+                    // Přidání produktu do košíku
+                    cart.push({
+                        name: productName,
+                        price: productPrice
+                    });
+
+                    // Aktualizace zobrazení košíku
+                    this.updateCartDisplay(cart);
+
+                    // Animace tlačítka
+                    button.classList.add('added');
+                    setTimeout(() => {
+                        button.classList.remove('added');
+                    }, 500);
+                });
+            });
+        }
+
+        // Přidání event listeneru pro tlačítko "Objednat"
+        if (checkoutButton) {
+            checkoutButton.addEventListener('click', () => {
+                if (cart.length === 0) {
+                    alert('Košík je prázdný. Přidejte prosím nějaké produkty.');
+                    return;
+                }
+
+                // Výpočet celkové ceny
+                const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+                // Zobrazení potvrzovací zprávy
+                alert(`Děkujeme za objednávku! Celková cena: ${total} Kč. Objednávka bude doručena do 30 minut.`);
+
+                // Zavření modalu
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+
+                // Zobrazení informace o objednávce v chatu
+                addMessage(`Objednávka z obchodu ${shopName} byla úspěšně odeslana. Celková cena: ${total} Kč.`, false);
+            });
+        }
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            }
+        });
+    },
+
+    // Aktualizace zobrazení košíku
+    updateCartDisplay(cart) {
+        const cartItemsElement = document.getElementById('shopCartItems');
+        const cartTotalElement = document.getElementById('shopCartTotal');
+
+        if (!cartItemsElement || !cartTotalElement) {
+            return;
+        }
+
+        // Vyprázdnění košíku
+        cartItemsElement.innerHTML = '';
+
+        if (cart.length === 0) {
+            cartItemsElement.innerHTML = '<div class="shop-cart-empty">Košík je prázdný</div>';
+            cartTotalElement.textContent = '0 Kč';
+            return;
+        }
+
+        // Vytvoření položek košíku
+        cart.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'shop-cart-item';
+            itemElement.innerHTML = `
+                <div class="shop-cart-item-name">${item.name}</div>
+                <div class="shop-cart-item-price">${item.price} Kč</div>
+                <button class="shop-cart-item-remove" data-index="${index}">&times;</button>
+            `;
+
+            cartItemsElement.appendChild(itemElement);
+
+            // Přidání event listeneru pro tlačítko odstranění
+            const removeButton = itemElement.querySelector('.shop-cart-item-remove');
+            if (removeButton) {
+                removeButton.addEventListener('click', () => {
+                    // Odstranění položky z košíku
+                    cart.splice(index, 1);
+
+                    // Aktualizace zobrazení košíku
+                    this.updateCartDisplay(cart);
+                });
+            }
+        });
+
+        // Výpočet celkové ceny
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        cartTotalElement.textContent = `${total} Kč`;
+    },
+
+    // Získání produktů podle typu obchodu
+    getShopProducts(shopType) {
+        switch (shopType) {
+            case 'supermarket':
+                return [
+                    { name: 'Chléb', price: 35, icon: '🍞' },
+                    { name: 'Mléko', price: 25, icon: '🥛' },
+                    { name: 'Vejce (10ks)', price: 60, icon: '🥚' },
+                    { name: 'Sýr', price: 89, icon: '🧀' },
+                    { name: 'Jablka (1kg)', price: 45, icon: '🍎' },
+                    { name: 'Banány (1kg)', price: 39, icon: '🍌' },
+                    { name: 'Kuřecí maso (1kg)', price: 159, icon: '🍗' },
+                    { name: 'Těstoviny', price: 29, icon: '🍝' },
+                    { name: 'Rýže (1kg)', price: 49, icon: '🍚' },
+                    { name: 'Brambory (2kg)', price: 39, icon: '🥔' }
+                ];
+            case 'bakery':
+                return [
+                    { name: 'Chléb', price: 35, icon: '🍞' },
+                    { name: 'Rohlík', price: 3, icon: '🍞' },
+                    { name: 'Croissant', price: 25, icon: '🥐' },
+                    { name: 'Kobliha', price: 20, icon: '🍩' },
+                    { name: 'Koláč', price: 30, icon: '🥧' },
+                    { name: 'Bageta', price: 40, icon: '🍞' },
+                    { name: 'Muffin', price: 35, icon: '🥮' },
+                    { name: 'Dort', price: 250, icon: '🎂' }
+                ];
+            case 'butcher':
+                return [
+                    { name: 'Kuřecí prsa (1kg)', price: 159, icon: '🍗' },
+                    { name: 'Vepřová kotleta (1kg)', price: 189, icon: '🍖' },
+                    { name: 'Hovězí mleté (1kg)', price: 199, icon: '🍖' },
+                    { name: 'Kuřecí křídla (1kg)', price: 99, icon: '🍗' },
+                    { name: 'Šunka (100g)', price: 29, icon: '🍖' },
+                    { name: 'Salám (100g)', price: 25, icon: '🍖' },
+                    { name: 'Párky (10ks)', price: 69, icon: '🌭' }
+                ];
+            case 'electronics':
+                return [
+                    { name: 'Smartphone', price: 5999, icon: '📱' },
+                    { name: 'Sluchátka', price: 999, icon: '🎧' },
+                    { name: 'Nabíječka', price: 499, icon: '🔌' },
+                    { name: 'USB flash disk', price: 299, icon: '💾' },
+                    { name: 'Powerbank', price: 799, icon: '🔋' },
+                    { name: 'Tablet', price: 4999, icon: '💻' },
+                    { name: 'Bluetooth reproduktor', price: 1299, icon: '🔊' }
+                ];
+            case 'clothes':
+                return [
+                    { name: 'Tričko', price: 299, icon: '👕' },
+                    { name: 'Kalhoty', price: 699, icon: '👖' },
+                    { name: 'Mikina', price: 799, icon: '🧥' },
+                    { name: 'Šaty', price: 999, icon: '👗' },
+                    { name: 'Bunda', price: 1499, icon: '🥼' },
+                    { name: 'Ponožky', price: 99, icon: '🧦' },
+                    { name: 'Čepice', price: 249, icon: '🧤' }
+                ];
+            default:
+                return [
+                    { name: 'Produkt 1', price: 99, icon: '🛍️' },
+                    { name: 'Produkt 2', price: 199, icon: '🛍️' },
+                    { name: 'Produkt 3', price: 299, icon: '🛍️' },
+                    { name: 'Produkt 4', price: 399, icon: '🛍️' },
+                    { name: 'Produkt 5', price: 499, icon: '🛍️' }
+                ];
+        }
+    },
+
+    // Zobrazení obchodů v okolí s možností online nákupu
+    showNearbyShops() {
+        // Zobrazení informace o vyhledávání obchodů
+        addMessage('Vyhledávám obchody v okolí...', false);
+
+        // Získání aktuální polohy
+        const center = map.getCenter();
+
+        // Vytvoření URL pro API požadavek (použití Overpass API pro OpenStreetMap)
+        const radius = 2000; // 2 km radius
+        const overpassUrl = 'https://overpass-api.de/api/interpreter';
+
+        // Vytvoření dotazu pro Overpass API
+        const query = `
+            [out:json];
+            (
+                node["shop"](around:${radius},${center.lat},${center.lng});
+                way["shop"](around:${radius},${center.lat},${center.lng});
+                relation["shop"](around:${radius},${center.lat},${center.lng});
+            );
+            out body;
+            >;
+            out skel qt;
+        `;
+
+        // Odeslání požadavku
+        fetch(overpassUrl, {
+            method: 'POST',
+            body: `data=${encodeURIComponent(query)}`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Odstranění existujících markerů obchodů
+            if (this.shopMarkers) {
+                this.shopMarkers.forEach(marker => map.removeLayer(marker));
+            }
+
+            // Vytvoření nového pole pro markery
+            this.shopMarkers = [];
+
+            // Kontrola, zda byly nalezeny nějaké obchody
+            if (!data.elements || data.elements.length === 0) {
+                addMessage('V okolí nebyly nalezeny žádné obchody.', false);
+                return;
+            }
+
+            // Vytvoření markerů pro každý obchod
+            const shops = data.elements.filter(element => element.tags && element.tags.shop);
+
+            shops.forEach(shop => {
+                // Kontrola, zda má obchod souřadnice
+                if (!shop.lat || !shop.lon) {
+                    return;
+                }
+
+                // Získání informací o obchodu
+                const name = shop.tags.name || 'Neznámý obchod';
+                const type = shop.tags.shop || 'obchod';
+                const icon = this.getShopIcon(type);
+
+                // Vytvoření markeru
+                const marker = L.marker([shop.lat, shop.lon], {
+                    icon: L.divIcon({
+                        className: 'shop-marker',
+                        html: `<div class="shop-marker-inner">${icon}</div>`,
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30]
+                    })
+                }).addTo(map);
+
+                // Vytvoření popup okna
+                marker.bindPopup(`
+                    <div class="shop-popup">
+                        <h3>${name}</h3>
+                        <p>${this.getShopTypeName(type)}</p>
+                        ${shop.tags.opening_hours ? `<p><strong>Otevíraci doba:</strong> ${shop.tags.opening_hours}</p>` : ''}
+                        ${shop.tags.phone ? `<p><strong>Telefon:</strong> ${shop.tags.phone}</p>` : ''}
+                        ${shop.tags.website ? `<p><a href="${shop.tags.website}" target="_blank">Webové stránky</a></p>` : ''}
+                        <button class="shop-popup-button" onclick="CommandsMenu.showShopProducts('${name}', '${type}')">Zobrazit produkty</button>
+                    </div>
+                `);
+
+                // Přidání markeru do pole
+                this.shopMarkers.push(marker);
+            });
+
+            // Zobrazení informace o počtu nalezených obchodů
+            addMessage(`Nalezeno ${this.shopMarkers.length} obchodů v okolí.`, false);
+
+            // Přidání tlačítka pro skrytí obchodů
+            this.addHideShopsButton();
+        })
+        .catch(error => {
+            console.error('Chyba při získávání obchodů:', error);
+            addMessage('Nepodařilo se získat obchody v okolí. Zkuste to prosím znovu.', false);
+        });
+    },
+
     // Přepnutí vrstvy s dopravními informacemi
     toggleTrafficInfo() {
         // Kontrola, zda je vrstva s dopravními informacemi aktivní
@@ -1269,6 +1728,12 @@ const CommandsMenu = {
                 }).addTo(map);
             }
 
+            // Odstranění CSS filtru
+            const mapContainer = document.querySelector('.leaflet-container');
+            if (mapContainer) {
+                mapContainer.style.filter = 'none';
+            }
+
             // Zobrazení informace o vypnutí nočního režimu
             addMessage('Noční režim byl vypnut.', false);
         } else {
@@ -1399,6 +1864,19 @@ const CommandsMenu = {
 
         // Žádný příkaz nebyl nalezen
         return false;
+    }
+};
+
+// Statická metoda pro získání instance
+CommandsMenu.getInstance = function() {
+    return CommandsMenu;
+};
+
+// Statická metoda pro přístup k funkci showShopProducts z HTML
+CommandsMenu.showShopProducts = function(shopName, shopType) {
+    const instance = CommandsMenu.getInstance();
+    if (instance) {
+        instance.showShopProducts(shopName, shopType);
     }
 };
 

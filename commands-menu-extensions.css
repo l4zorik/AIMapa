@@ -439,13 +439,342 @@ body[data-theme="dark"] .share-location-qr-code-image {
     border-color: #444;
 }
 
+/* Styly pro obchody */
+.shop-marker {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.shop-marker-inner {
+    font-size: 24px;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+.shop-popup {
+    padding: 5px;
+}
+
+.shop-popup h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+
+.shop-popup p {
+    margin: 0 0 5px 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.shop-popup-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.shop-popup-button:hover {
+    background-color: #388E3C;
+}
+
+.hide-shops-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1000;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.hide-shops-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Modal s produkty obchodu */
+.shop-products-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.shop-products-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.shop-products-modal-content {
+    background-color: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.shop-products-modal.show .shop-products-modal-content {
+    transform: scale(1);
+}
+
+.shop-products-modal-header {
+    background-color: #4CAF50;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shop-products-modal-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.shop-products-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.shop-products-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.shop-products-modal-body h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+/* Seznam produktů */
+.shop-products-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+.shop-product {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.shop-product:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.shop-product-image {
+    font-size: 36px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.shop-product-info {
+    margin-bottom: 10px;
+}
+
+.shop-product-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.shop-product-price {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.shop-product-add-to-cart {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: auto;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.shop-product-add-to-cart:hover {
+    background-color: #388E3C;
+}
+
+.shop-product-add-to-cart.added {
+    background-color: #388E3C;
+}
+
+/* Košík */
+.shop-cart {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.shop-cart h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.shop-cart-items {
+    margin-bottom: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.shop-cart-empty {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+}
+
+.shop-cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.shop-cart-item:last-child {
+    border-bottom: none;
+}
+
+.shop-cart-item-name {
+    flex: 1;
+}
+
+.shop-cart-item-price {
+    font-weight: bold;
+    margin: 0 15px;
+}
+
+.shop-cart-item-remove {
+    background: none;
+    border: none;
+    color: #f44336;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.shop-cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    padding: 10px 0;
+    border-top: 2px solid #ddd;
+    margin-top: 10px;
+}
+
+.shop-cart-checkout {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.shop-cart-checkout:hover {
+    background-color: #388E3C;
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .shop-popup {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .shop-popup p {
+    color: #aaa;
+}
+
+body[data-theme="dark"] .shop-products-modal-content {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .shop-product {
+    background-color: #444;
+}
+
+body[data-theme="dark"] .shop-product-name {
+    color: white;
+}
+
+body[data-theme="dark"] .shop-cart {
+    background-color: #444;
+}
+
+body[data-theme="dark"] .shop-cart-item {
+    border-bottom-color: #555;
+}
+
+body[data-theme="dark"] .shop-cart-total {
+    border-top-color: #555;
+}
+
+body[data-theme="dark"] .shop-cart-empty {
+    color: #aaa;
+}
+
 /* Responzivní design */
 @media (max-width: 768px) {
     .weather-widget {
         width: 200px;
     }
 
-    .share-location-modal-content {
+    .share-location-modal-content,
+    .shop-products-modal-content {
         width: 95%;
     }
 
@@ -455,5 +784,9 @@ body[data-theme="dark"] .share-location-qr-code-image {
 
     .share-location-button {
         width: 100%;
+    }
+
+    .shop-products-list {
+        grid-template-columns: 1fr;
     }
 }
