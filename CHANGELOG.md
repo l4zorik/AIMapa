@@ -2,7 +2,7 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.2.8.6.2] - 2025-04-23 - NOVÉ FUNKCE PRO MAPU A CHAT
+## [0.2.8.6.3] - 2025-04-23 - NOVÉ FUNKCE PRO MAPU A CHAT
 
 ### Nové funkce pro mapu
 - Přidán noční režim mapy s tmavým pozadím a zvýrazněnými cestami

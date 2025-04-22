@@ -1,16 +1,16 @@
 /**
  * Modul pro zobrazení novinek a aktualizací v pravém horním rohu
- * Verze 0.2.8.6.2
+ * Verze 0.2.8.6.3
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.2.8.6.2',
+    currentVersion: '0.2.8.6.3',
 
     // Informace o aktualizacích
     updates: [
         {
-            version: '0.2.8.6.2',
+            version: '0.2.8.6.3',
             date: '2024-04-23',
             title: 'Nové funkce pro mapu a chat',
             description: 'Přidáno 7 nových užitečných funkcí pro mapu',

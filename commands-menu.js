@@ -1,6 +1,6 @@
 /**
  * Modul pro menu příkazů vedle chatu
- * Verze 0.2.8.6.2
+ * Verze 0.2.8.6.3
  */
 
 const CommandsMenu = {

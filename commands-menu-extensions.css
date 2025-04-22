@@ -1,6 +1,6 @@
 /**
  * Styly pro rozšíření menu příkazů
- * Verze 0.2.8.6.2
+ * Verze 0.2.8.6.3
  */
 
 /* Styly pro noční režim mapy */
@@ -444,15 +444,15 @@ body[data-theme="dark"] .share-location-qr-code-image {
     .weather-widget {
         width: 200px;
     }
-    
+
     .share-location-modal-content {
         width: 95%;
     }
-    
+
     .share-location-buttons {
         flex-direction: column;
     }
-    
+
     .share-location-button {
         width: 100%;
     }
