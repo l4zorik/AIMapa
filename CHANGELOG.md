@@ -20,6 +20,14 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidány tlačítka pro rychlé přepínání mezi různými vrstvami
 - Optimalizováno zobrazení všech nových funkcí na mobilních zařízeních
 
+### Exotické funkce a gamifikace
+- Přidána funkce pro zobrazení příběhů a legend z aktuální oblasti
+- Implementována funkce pro zobrazení místních specialit a gastronomických tipů
+- Přidán systém XP a levelů pro gamifikaci aplikace
+- Implementován systém achievmentů za objevování nových míst a funkcí
+- Přidán profil uživatele s přehledem úrovně a získaných achievmentů
+- Implementovány notifikace o získání XP a achievmentů
+
 ## [0.2.8.6.1] - 2025-04-22 - VYLEPŠENÍ MENU PŘÍKAZŮ
 
 ### Vylepšení menu příkazů
