@@ -1,3 +1,8 @@
+/**
+ * Hlavní skript aplikace
+ * Verze 0.2.8.6.4
+ */
+
 // Inicializace mapy
 const map = L.map('map', {
     zoomAnimation: true, // Povolit animaci zoomu
@@ -127,12 +132,13 @@ const routingOptions = {
     router: L.Routing.osrmv1({
         serviceUrl: 'https://router.project-osrm.org/route/v1',
         profile: 'driving', // Možnosti: driving, walking, cycling
-        timeout: 5000, // Časový limit pro API požadavek (5 sekund)
-        geometryOnly: false, // Optimalizace pro získání pouze geometrie trasy
+        timeout: 3000, // Snížený časový limit pro API požadavek (3 sekundy) pro rychlejší odezvu
+        geometryOnly: true, // Optimalizace pro získání pouze geometrie trasy - zrychlení
         urlParameters: {
             alternatives: false, // Nezobrazovat alternativní trasy
             steps: false, // Nezobrazovat kroky trasy
-            overview: 'full' // Získat plnou geometrii trasy
+            overview: 'full', // Získat plnou geometrii trasy
+            annotations: false // Vypnutí anotací pro rychlejší odezvu
         }
     }),
     lineOptions: {
@@ -146,7 +152,7 @@ const routingOptions = {
     },
     show: false, // Nezobrazovat instrukce pro trasu
     showAlternatives: false,
-    fitSelectedRoutes: false,
+    fitSelectedRoutes: false, // Vypnuto automatické přizpůsobení mapy
     draggableWaypoints: false,
     createMarker: function() { return null; }, // Nepoužívat výchozí markery
     routeWhileDragging: false, // Zabrání přepočítávání trasy při přesouvní mapy
@@ -154,8 +160,9 @@ const routingOptions = {
     addWaypoints: false, // Nezobrazovat průjezdní body
     waypointMode: 'connect', // Pouze propojit body bez možnosti přidávání nových
     autoRoute: true, // Automaticky vypočítat trasu
-    routeDragInterval: 500, // Interval pro přepočet trasy při přesouvní (vyšší hodnota = méně časté přepočty)
-    collapsible: true // Možnost sbalit panel s instrukcemi
+    routeDragInterval: 500, // Interval pro přepočet trasy při přesouvní
+    collapsible: true, // Možnost sbalit panel s instrukcemi
+    maxGeoJSONChunkSize: 1000 // Optimalizace pro velké trasy
 };
 
 // Reference na HTML elementy pro informace o trase
@@ -570,6 +577,11 @@ function addMarkerToMap(latlng) {
     // Přidání zprávy do chatu
     addMessage(`Přidán bod "${markerProperties[markerIndex].name}" na souřadnicích [${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}]. Klikněte na bod pro úpravu.`, false);
 
+    // Sledování interakce s mapou a přidání XP
+    if (typeof UserProgressExtensions !== 'undefined') {
+        UserProgressExtensions.trackMapInteraction('addPoint');
+    }
+
     // Přidání event listeneru pro přesunutí markeru
     marker.on('dragend', function() {
         const newPos = marker.getLatLng();
@@ -924,16 +936,26 @@ function calculateRouteFunction() {
     // Toto je rychlejší než použití Leaflet Routing Machine
     const fetchDirectRoute = async () => {
         try {
-            // Vytvoření URL pro OSRM API
+            // Zobrazení indikátoru načítání
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'route-loading-indicator';
+            loadingIndicator.innerHTML = '<div class="spinner"></div><div>Výpočet trasy...</div>';
+            document.body.appendChild(loadingIndicator);
+
+            // Vytvoření URL pro OSRM API s optimalizovanými parametry
             const coordinates = points.map(p => `${p.lng},${p.lat}`).join(';');
-            const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=polyline&steps=false&alternatives=false`;
+            const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=polyline&steps=false&alternatives=false&annotations=false&continue_straight=true`;
 
-            // Nastavení časového limitu pro fetch
+            // Nastavení časového limitu pro fetch - snížený na 3 sekundy pro rychlejší odezvu
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000);
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-            // Provedení požadavku na API
-            const response = await fetch(url, { signal: controller.signal });
+            // Provedení požadavku na API s prioritou
+            const response = await fetch(url, {
+                signal: controller.signal,
+                priority: 'high',
+                cache: 'no-store' // Zabrání cachování pro vždy aktuální data
+            });
             clearTimeout(timeoutId);
 
             if (!response.ok) {
@@ -949,19 +971,27 @@ function calculateRouteFunction() {
             // Získání trasy z odpovědi
             const routeData = data.routes[0];
 
-            // Dekódování polyline
+            // Dekódování polyline s optimalizací pro výkon
             const decodedRoute = L.Polyline.fromEncoded(routeData.geometry).getLatLngs();
 
-            // Vytvoření trasy na mapě
+            // Optimalizace počtu bodů pro dlouhé trasy (snížení počtu bodů pro lepší výkon)
+            let optimizedRoute = decodedRoute;
+            if (decodedRoute.length > 1000) {
+                // Použití algoritmu pro redukci bodů při zachování tvaru trasy
+                optimizedRoute = L.LineUtil.simplify(decodedRoute, 0.0001);
+            }
+
+            // Vytvoření trasy na mapě s optimalizovanými nastaveními
             if (route) {
                 map.removeLayer(route);
             }
 
-            route = L.polyline(decodedRoute, {
+            route = L.polyline(optimizedRoute, {
                 color: 'blue',
                 weight: 5,
                 opacity: 0.9,
-                smoothFactor: 1
+                smoothFactor: 1,
+                renderer: L.canvas() // Použití canvas rendereru pro lepší výkon
             }).addTo(map);
 
             // Výpočet vzdálenosti a času
@@ -981,15 +1011,83 @@ function calculateRouteFunction() {
             // Přidání zprávy do chatu s informacemi o trase
             addMessage(`Trasa vypočítána po skutečných silnicích. Celková vzdálenost: ${distanceKm} km, čas cesty: ${timeString}`, false);
 
-            // Přizpůsobení mapy, aby zobrazovala celou trasu
-            map.fitBounds(route.getBounds(), {padding: [50, 50]});
+            // Přidání XP za výpočet trasy, pokud je dostupný modul UserProgress
+            if (typeof UserProgress !== 'undefined') {
+                // XP závisí na délce trasy - čím delší trasa, tím více XP
+                const routeXP = Math.min(Math.ceil(distanceKm / 10), 20); // Maximum 20 XP
+                UserProgress.addExperience(routeXP, `Výpočet trasy o délce ${distanceKm} km`);
+
+                // Achievement za výpočet první trasy
+                UserProgress.addAchievement('navigator-bronze', 'Navigátor (bronz)', 'Vypočítali jste svou první trasu');
+
+                // Achievement za výpočet delší trasy
+                if (distanceKm > 50) {
+                    UserProgress.addAchievement('navigator-silver', 'Navigátor (stříbro)', 'Vypočítali jste trasu delší než 50 km');
+                }
+
+                // Achievement za výpočet velmi dlouhé trasy
+                if (distanceKm > 200) {
+                    UserProgress.addAchievement('navigator-gold', 'Navigátor (zlato)', 'Vypočítali jste trasu delší než 200 km');
+                }
+            }
+
+            // Aktualizace statistik tras, pokud je dostupné rozšíření
+            if (typeof UserProgressExtensions !== 'undefined') {
+                UserProgressExtensions.updateRouteStats(distanceKm);
+            }
+
+            // Odstranění indikátoru načítání
+            loadingIndicator.remove();
+
+            // Přidání tlačítka pro přizpůsobení mapy na trasu (místo automatického přizpůsobení)
+            const fitBoundsButton = document.createElement('button');
+            fitBoundsButton.className = 'fit-route-button new';
+            fitBoundsButton.textContent = 'Zobrazit celou trasu';
+            fitBoundsButton.addEventListener('click', () => {
+                map.fitBounds(route.getBounds(), {padding: [50, 50]});
+
+                // Přidání XP za použití funkce, pokud je dostupný modul UserProgress
+                if (typeof UserProgress !== 'undefined') {
+                    UserProgress.addExperience(2, 'Použití funkce zobrazení celé trasy');
+                }
+            });
+
+            // Odstranění existujícího tlačítka, pokud existuje
+            const existingButton = document.querySelector('.fit-route-button');
+            if (existingButton) {
+                existingButton.remove();
+            }
+
+            document.body.appendChild(fitBoundsButton);
+
+            // Odstranění třídy 'new' po 2 sekundách
+            setTimeout(() => {
+                fitBoundsButton.classList.remove('new');
+            }, 2000);
 
             // Uložení stavu aplikace po výpočtu trasy
             saveAppState();
 
+            // Vysílání události o vypočítané trase
+            const routeCalculatedEvent = new CustomEvent('routeCalculated', {
+                detail: {
+                    points: points,
+                    distance: distanceKm,
+                    time: timeString
+                }
+            });
+            document.dispatchEvent(routeCalculatedEvent);
+
             return true;
         } catch (error) {
             console.error('Chyba při přímém volání OSRM API:', error);
+
+            // Odstranění indikátoru načítání v případě chyby
+            const loadingIndicator = document.querySelector('.route-loading-indicator');
+            if (loadingIndicator) {
+                loadingIndicator.remove();
+            }
+
             return false;
         }
     };
@@ -1657,6 +1755,21 @@ function addMessage(message, isUser = false, suggestions = null) {
     messageDiv.textContent = message;
     messageContainer.appendChild(messageDiv);
 
+    // Přidání XP za rozhodnutí uživatele
+    if (isUser && typeof UserProgress !== 'undefined') {
+        // Získání XP za každé rozhodnutí uživatele (2-5 XP)
+        const messageLength = message.length;
+        let xpAmount = 2; // Základní hodnota XP
+
+        // Delší zprávy získávají více XP (až do maxima 5 XP)
+        if (messageLength > 20) xpAmount = 3;
+        if (messageLength > 50) xpAmount = 4;
+        if (messageLength > 100) xpAmount = 5;
+
+        // Přidání XP s kategorií 'decisions'
+        UserProgress.addExperience(xpAmount, 'Rozhodnutí v chatu', 'decisions');
+    }
+
     // Přidání návrhů dalších akcí, pokud existují
     if (!isUser && suggestions && Array.isArray(suggestions) && suggestions.length > 0) {
         const suggestionsContainer = document.createElement('div');
@@ -1739,6 +1852,11 @@ function toggle3DMode() {
 
         // Informace pro uživatele
         addMessage('3D režim byl aktivován. Nyní můžete vidět budovy ve 3D. Použijte ovládací prvky pro rotaci a náklon.', false);
+
+        // Sledování interakce s mapou a přidání XP
+        if (typeof UserProgressExtensions !== 'undefined') {
+            UserProgressExtensions.trackMapInteraction('threeDMode');
+        }
     } else {
         // Deaktivace 3D režimu
         toggle3DBtn.classList.remove('active');
@@ -1756,6 +1874,11 @@ function toggle3DMode() {
 
         // Informace pro uživatele
         addMessage('3D režim byl deaktivován. Mapa je nyní v klasickém 2D zobrazení.', false);
+
+        // Sledování interakce s mapou a přidání XP
+        if (typeof UserProgressExtensions !== 'undefined') {
+            UserProgressExtensions.trackMapInteraction('standardMode');
+        }
     }
 
     // Aktualizace velikosti mapy po změně režimu
@@ -1880,6 +2003,11 @@ function toggleGlobeMode() {
 
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
+
+        // Sledování interakce s mapou a přidání XP
+        if (typeof UserProgressExtensions !== 'undefined') {
+            UserProgressExtensions.trackMapInteraction('globeMode');
+        }
 
         // Uložení aktuálního středu mapy
         const center = map.getCenter();

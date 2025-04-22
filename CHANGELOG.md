@@ -2,6 +2,117 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.6.9] - 2025-04-29 - VYHLEDÁVÁNÍ SPOJENÍ VEŘEJNOU DOPRAVOU
+
+### Nová funkce vyhledávání spojení
+- Přidána funkce pro vyhledávání spojení veřejnou dopravou mezi Hodonínem a Hruškami
+- Implementováno zobrazení vlakových a autobusových spojení s reálnými časy
+- Přidána automatická aktualizace spojení v pravidelných intervalech
+- Zobrazení informací o zpoždění a zrušených spojeních
+
+### Rozšíření systému XP a achievementů
+- Přidána nová kategorie XP 'Vyhledávání spojení'
+- Přidány nové achievementy za vyhledávání spojení veřejnou dopravou
+- Implementováno získávání XP za vyhledávání spojení
+
+### Vylepšení uživatelského rozhraní
+- Přidáno tlačítko pro zobrazení spojení při výpočtu trasy mezi Hodonínem a Hruškami
+- Implementováno přehledné zobrazení spojení s možností filtrování podle typu dopravy
+- Přidány detailní informace o spojeních včetně ceny, nástupiště a dopravce
+
+## [0.2.8.6.8] - 2025-04-28 - ROZŠÍŘENÍ XP SYSTÉMU A NOVÉ FUNKCE
+
+### Rozšíření systému XP a achievementů
+- Přidáno získávání XP za interakce s mapou (zobrazování glóbusu, 3D režim, přidávání bodů)
+- Přidány nové achievementy za používání různých režimů mapy
+- Přidány nové kategorie XP pro lepší sledování zdrojů XP
+
+### Nové funkce
+- Přidána funkce hledání práce s nabídkami v okolí
+- Implementováno filtrování nabídek práce podle lokality
+- Přidána možnost reakce na nabídky práce a získávání XP
+- Přidány nové achievementy za hledání práce
+
+### Vylepšení uživatelského rozhraní
+- Vylepšena intuitivnost ovládání aplikace
+- Přidány vizualizace klikatelnosti prvků
+- Rozšířena nabídka příkazů o nové funkce
+
+## [0.2.8.6.7] - 2025-04-27 - VYLEPŠENÍ INTERAKCE S UŽIVATELSKÝM PROFILEM A ZÍSKÁVÁNÍ XP
+
+### Vylepšení uživatelského profilu
+- Přidána možnost zobrazit profil kliknutím na ukazatel úrovně v levém horním rohu
+- Vylepšena interakce s profilem pomocí vizualizace klikatelnosti (změna kurzoru)
+
+### Nové zdroje získávání XP
+- Přidáno získávání XP za každé rozhodnutí uživatele v chatu
+- Implementován systém odměňování za delší a propracovanější zprávy (2-5 XP)
+- Přidána nová kategorie XP 'Rozhodnutí v chatu' pro lepší sledování zdrojů XP
+
+### Vylepšení uživatelského rozhraní
+- Vylepšena intuitivnost ovládání aplikace
+- Přidány vizualizace klikatelnosti prvků
+
+## [0.2.8.6.6] - 2025-04-26 - VYLEPŠENÝ UŽIVATELSKÝ PROFIL A STATISTIKY
+
+### Vylepšený uživatelský profil
+- Přidány záložky pro různé sekce profilu (Přehled, Statistiky, Achievementy, Historie XP)
+- Implementovány detailní statistiky uživatele s vizualizací dat
+- Přidány grafy pro sledování postupu a získávání XP
+- Přidána historie získaných XP s důvody a časovými údaji
+
+### Nové statistiky a přehledy
+- Přidány časové statistiky (denní, týdenní, měsíční aktivita)
+- Implementován přehled zdrojů získání XP
+- Přidána vizualizace postupu k další úrovni
+- Přidán přehled dosažených a nedosažených achievementů
+
+### Vylepšení uživatelského rozhraní
+- Přidány animace pro lepší uživatelský zážitek
+- Optimalizováno zobrazení pro různé velikosti obrazovky
+- Vylepšena podpora tmavého režimu
+
+## [0.2.8.6.5] - 2025-04-25 - NOVÉ FUNKCE PRO NÁKUP ENERGETICKÝCH NÁPOJŮ A KRKOVIČKY
+
+### Nové funkce pro nákup
+- Přidána nová funkce pro nákup energetických nápojů z eshopu podpultovky.cz
+- Přidána nová funkce pro nákup krkovičky a dalších mas
+- Implementován moderní nákupní košík s možností přidávání a odebírání položek
+- Přidány detailní informace o produktech včetně obrázků a popisů
+
+### Rozšíření systému XP a achievementů
+- Přidány nové achievementy za nákup energetických nápojů a krkovičky
+- Přidány XP odměny za návštěvu obchodů a provedení nákupů
+- Výše XP odměn závisí na hodnotě nákupu
+
+### Vylepšení uživatelského rozhraní
+- Implementováno moderní uživatelské rozhraní pro obchody s energetickými nápoji a krkovičkou
+- Přidány animace pro lepší uživatelský zážitek při nakupování
+- Optimalizováno zobrazení pro různé velikosti obrazovky
+- Přidána podpora tmavého režimu pro nákupní rozhraní
+
+## [0.2.8.6.4] - 2025-04-24 - OPTIMALIZACE VÝPOČTU TRAS A VYLEPŠENÍ SYSTÉMU XP
+
+### Optimalizace výpočtu tras
+- Vylepšen výpočet trasy mezi body s optimalizací pro rychlejší odezvu
+- Přidán indikátor načítání trasy s animací pro lepší uživatelský zážitek
+- Odstraněno automatické přizpůsobení mapy při výpočtu trasy
+- Přidáno tlačítko pro zobrazení celé trasy s animací
+- Optimalizováno zobrazení dlouhých tras pro lepší výkon
+
+### Vylepšení systému XP a achievementů
+- Implementován systém denních bonusů s odměnami za pravidelné přihlášení
+- Přidán systém streaků s rostoucími bonusy za každý den v řadě
+- Rozšířen systém achievementů s novými kategoriemi a úrovněmi (bronz, stříbro, zlato, platina)
+- Přidány XP odměny za získání achievementů
+- Implementovány statistiky uživatele pro sledování pokroku
+
+### Opravy a vylepšení UI
+- Upraveno umístění prvků UI, aby se nepřekrývaly
+- Vylepšeny notifikace o získání XP a achievementů
+- Přidány nové animace pro lepší uživatelský zážitek
+- Optimalizován výkon aplikace pro plynulejší chod
+
 ## [0.2.8.6.3] - 2025-04-23 - NOVÉ FUNKCE PRO MAPU A CHAT
 
 ### Nové funkce pro mapu

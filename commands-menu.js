@@ -1,11 +1,32 @@
 /**
  * Modul pro menu příkazů vedle chatu
- * Verze 0.2.8.6.3
+ * Verze 0.2.8.6.5
  */
 
 const CommandsMenu = {
     // Seznam dostupných příkazů
     commands: [
+        {
+            id: 'job-search',
+            name: 'Hledání práce',
+            description: 'Zobrazí nabídky práce v okolí s možností reakce',
+            icon: '💼',
+            examples: ['Hledání práce', 'Nabídky práce', 'Zaměstnání']
+        },
+        {
+            id: 'energy-drinks',
+            name: 'Energetické nápoje',
+            description: 'Zobrazí nabídku nejlepších energetických nápojů s možností objednávky',
+            icon: '⚡',
+            examples: ['Energeťáky', 'Energy drinky', 'Energetické nápoje']
+        },
+        {
+            id: 'krkovicka',
+            name: 'Krkovička',
+            description: 'Zobrazí nabídku krkovičky a dalších mas s možností objednávky',
+            icon: '🥩',
+            examples: ['Krkovička', 'Maso', 'Gril']
+        },
         {
             id: 'add-point',
             name: 'Přidat bod',
@@ -318,6 +339,18 @@ const CommandsMenu = {
     // Provedení příkazu
     executeCommand(commandId) {
         switch (commandId) {
+            case 'job-search':
+                this.showJobSearch();
+                break;
+
+            case 'energy-drinks':
+                this.showEnergyDrinksShop();
+                break;
+
+            case 'krkovicka':
+                this.showKrkovickaShop();
+                break;
+
             case 'add-point':
                 if (typeof addActivity === 'function') {
                     addActivity();
@@ -407,6 +440,432 @@ const CommandsMenu = {
                 console.log('Neznámý příkaz:', commandId);
                 break;
         }
+    },
+
+    // Zobrazení nabídek práce
+    showJobSearch() {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('jobSearchModal')) {
+            return;
+        }
+
+        // Vytvoření modalu pro nabídky práce
+        const modal = document.createElement('div');
+        modal.id = 'jobSearchModal';
+        modal.className = 'job-search-modal';
+        document.body.appendChild(modal);
+
+        // Definice nabídek práce
+        const jobOffers = [
+            {
+                id: 1,
+                title: 'Vývojář webových aplikací',
+                company: 'TechSolutions s.r.o.',
+                location: 'Hodonín',
+                salary: '45 000 - 65 000 Kč',
+                description: 'Hledáme zkušeného vývojáře webových aplikací se znalostí JavaScript, React a Node.js. Nabízíme práci na zajímavých projektech a flexibilní pracovní dobu.',
+                requirements: ['JavaScript', 'React', 'Node.js', 'HTML/CSS', 'Git'],
+                benefits: ['Flexibilní pracovní doba', 'Home office', 'Stravenky', 'Vzdělávací kurzy', 'Firemní akce']
+            },
+            {
+                id: 2,
+                title: 'Marketingový specialista',
+                company: 'MarketPro a.s.',
+                location: 'Brno',
+                salary: '35 000 - 45 000 Kč',
+                description: 'Pro naši společnost hledáme marketingového specialistu se zaměřením na digitální marketing. Budete zodpovědný za správu sociálních sítí a PPC kampaní.',
+                requirements: ['Zkušenosti s digitálním marketingem', 'Znalost Google Analytics', 'Kreativní myšlení'],
+                benefits: ['Mladý kolektiv', 'Firemní notebook', 'Multisport karta', 'Občerstvení na pracovišti']
+            },
+            {
+                id: 3,
+                title: 'Skladník',
+                company: 'LogiTrans s.r.o.',
+                location: 'Hodonín',
+                salary: '25 000 - 30 000 Kč',
+                description: 'Hledáme skladníka pro naše logistické centrum. Náplň práce zahrnuje příjem a výdej zboží, kontrolu kvality a práci s vysokozdvižným vozíkem.',
+                requirements: ['Průkaz na VZV výhodou', 'Fyzická zdatnost', 'Spolehlivost', 'Ochota pracovat na směny'],
+                benefits: ['Příspěvek na dopravu', 'Stravenky', 'Stabilní zaměstnání', 'Kvártalní bonusy']
+            },
+            {
+                id: 4,
+                title: 'Asistent/ka ředitele',
+                company: 'Business Solutions a.s.',
+                location: 'Brno',
+                salary: '30 000 - 35 000 Kč',
+                description: 'Pro našeho klienta hledáme asistenta/ku ředitele. Budete zodpovědný/á za organizaci schůzek, komunikaci s klienty a administrativní podporu.',
+                requirements: ['Vynikající organizační schopnosti', 'Znalost MS Office', 'Komunikační dovednosti', 'Angličtina na úrovni B2'],
+                benefits: ['5 týdnů dovolené', 'Sick days', 'Jazykové kurzy', 'Mobilní telefon']
+            },
+            {
+                id: 5,
+                title: 'Kuchař/ka',
+                company: 'Restaurant Grand',
+                location: 'Hodonín',
+                salary: '28 000 - 35 000 Kč',
+                description: 'Do naší restaurace hledáme kuchaře/ku s praxí. Nabízíme práci v příjemném prostředí a možnost profesního růstu.',
+                requirements: ['Praxe v oboru min. 2 roky', 'Znalost české i mezinárodní kuchyně', 'Samostatnost', 'Kreativita'],
+                benefits: ['Strava zdarma', 'Flexibilní rozvrh směn', 'Profesní vzdělávání', 'Spřátelený kolektiv']
+            }
+        ];
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="job-search-modal-content">
+                <div class="job-search-modal-header">
+                    <h2>Nabídky práce</h2>
+                    <button class="job-search-modal-close">&times;</button>
+                </div>
+                <div class="job-search-modal-body">
+                    <div class="job-search-filters">
+                        <input type="text" id="jobSearchInput" placeholder="Hledat nabídky..." class="job-search-input">
+                        <select id="jobLocationFilter" class="job-location-filter">
+                            <option value="all">Všechny lokality</option>
+                            <option value="Hodonín">Hodonín</option>
+                            <option value="Brno">Brno</option>
+                        </select>
+                    </div>
+                    <div class="job-offers-list">
+                        ${jobOffers.map(job => `
+                            <div class="job-offer-item" data-job-id="${job.id}" data-location="${job.location}">
+                                <div class="job-offer-header">
+                                    <h3 class="job-title">${job.title}</h3>
+                                    <span class="job-salary">${job.salary}</span>
+                                </div>
+                                <div class="job-company-info">
+                                    <span class="job-company">${job.company}</span>
+                                    <span class="job-location">${job.location}</span>
+                                </div>
+                                <div class="job-description">${job.description}</div>
+                                <div class="job-requirements">
+                                    <h4>Požadavky:</h4>
+                                    <ul>
+                                        ${job.requirements.map(req => `<li>${req}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                <div class="job-benefits">
+                                    <h4>Benefity:</h4>
+                                    <ul>
+                                        ${job.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                <div class="job-actions">
+                                    <button class="job-apply-btn" data-job-id="${job.id}">Reagovat na nabídku</button>
+                                    <button class="job-save-btn" data-job-id="${job.id}">Uložit nabídku</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .job-search-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .job-search-modal.show {
+                opacity: 1;
+            }
+
+            .job-search-modal-content {
+                background-color: var(--card-bg);
+                border-radius: 10px;
+                width: 80%;
+                max-width: 800px;
+                max-height: 90vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .job-search-modal.show .job-search-modal-content {
+                transform: scale(1);
+            }
+
+            .job-search-modal-header {
+                background-color: var(--primary-color);
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .job-search-modal-header h2 {
+                margin: 0;
+                color: white;
+                font-size: 1.5rem;
+            }
+
+            .job-search-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .job-search-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .job-search-filters {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .job-search-input {
+                flex: 1;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 14px;
+            }
+
+            .job-location-filter {
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 14px;
+                min-width: 150px;
+            }
+
+            .job-offers-list {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .job-offer-item {
+                background-color: var(--card-bg-light);
+                border-radius: 8px;
+                padding: 15px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .job-offer-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .job-offer-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .job-title {
+                margin: 0;
+                font-size: 1.2rem;
+                color: var(--primary-color);
+            }
+
+            .job-salary {
+                font-weight: bold;
+                color: #4CAF50;
+            }
+
+            .job-company-info {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 15px;
+                font-size: 0.9rem;
+                color: var(--text-color-secondary);
+            }
+
+            .job-description {
+                margin-bottom: 15px;
+                line-height: 1.5;
+            }
+
+            .job-requirements, .job-benefits {
+                margin-bottom: 15px;
+            }
+
+            .job-requirements h4, .job-benefits h4 {
+                margin: 0 0 5px 0;
+                font-size: 1rem;
+                color: var(--text-color);
+            }
+
+            .job-requirements ul, .job-benefits ul {
+                margin: 0;
+                padding-left: 20px;
+            }
+
+            .job-requirements li, .job-benefits li {
+                margin-bottom: 3px;
+            }
+
+            .job-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .job-apply-btn, .job-save-btn {
+                padding: 8px 15px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background-color 0.2s ease;
+            }
+
+            .job-apply-btn {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+            .job-apply-btn:hover {
+                background-color: var(--primary-color-dark);
+            }
+
+            .job-save-btn {
+                background-color: #f0f0f0;
+                color: #333;
+            }
+
+            .job-save-btn:hover {
+                background-color: #e0e0e0;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Zobrazení modalu s animací
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.job-search-modal-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+        });
+
+        // Filtrování nabídek podle lokality
+        const locationFilter = modal.querySelector('#jobLocationFilter');
+        locationFilter.addEventListener('change', () => {
+            const selectedLocation = locationFilter.value;
+            const jobItems = modal.querySelectorAll('.job-offer-item');
+
+            jobItems.forEach(item => {
+                const jobLocation = item.getAttribute('data-location');
+                if (selectedLocation === 'all' || jobLocation === selectedLocation) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Vyhledávání v nabídkách
+        const searchInput = modal.querySelector('#jobSearchInput');
+        searchInput.addEventListener('input', () => {
+            const searchText = searchInput.value.toLowerCase();
+            const jobItems = modal.querySelectorAll('.job-offer-item');
+
+            jobItems.forEach(item => {
+                const jobTitle = item.querySelector('.job-title').textContent.toLowerCase();
+                const jobCompany = item.querySelector('.job-company').textContent.toLowerCase();
+                const jobDescription = item.querySelector('.job-description').textContent.toLowerCase();
+
+                if (jobTitle.includes(searchText) || jobCompany.includes(searchText) || jobDescription.includes(searchText)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Reakce na nabídku práce
+        const applyButtons = modal.querySelectorAll('.job-apply-btn');
+        applyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const jobId = button.getAttribute('data-job-id');
+                const jobItem = modal.querySelector(`.job-offer-item[data-job-id="${jobId}"]`);
+                const jobTitle = jobItem.querySelector('.job-title').textContent;
+                const jobCompany = jobItem.querySelector('.job-company').textContent;
+
+                // Zobrazení zprávy o úspěšné reakci
+                addMessage(`Reagovali jste na nabídku práce "${jobTitle}" ve společnosti ${jobCompany}. Vaše žádost byla odeslána.`, false);
+
+                // Přidání XP za reakci na nabídku práce
+                if (typeof UserProgressExtensions !== 'undefined') {
+                    UserProgressExtensions.trackJobSearch('apply', { id: jobId });
+                }
+
+                // Zavření modalu
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            });
+        });
+
+        // Uložení nabídky práce
+        const saveButtons = modal.querySelectorAll('.job-save-btn');
+        saveButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const jobId = button.getAttribute('data-job-id');
+                const jobItem = modal.querySelector(`.job-offer-item[data-job-id="${jobId}"]`);
+                const jobTitle = jobItem.querySelector('.job-title').textContent;
+
+                // Zobrazení zprávy o uložení nabídky
+                addMessage(`Nabídka práce "${jobTitle}" byla uložena do vašich oblíbených.`, false);
+
+                // Změna textu tlačítka
+                button.textContent = 'Uloženo';
+                button.disabled = true;
+                button.style.backgroundColor = '#4CAF50';
+                button.style.color = 'white';
+            });
+        });
+
+        // Přidání XP za zobrazení nabídek práce
+        if (typeof UserProgressExtensions !== 'undefined') {
+            UserProgressExtensions.trackJobSearch('view');
+        }
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            }
+        });
     },
 
     // Zobrazení modalu s nápovědou
@@ -1233,7 +1692,529 @@ const CommandsMenu = {
         });
     },
 
-    // Zobrazení produktů obchodu
+    // Zobrazení obchodu s energetickými nápoji
+    showEnergyDrinksShop() {
+        // Zobrazení informace o načítání obchodu
+        addMessage('Načítám nabídku energetických nápojů z eshopu podpultovky.cz...', false);
+
+        // Získání produktů pro energetické nápoje
+        const products = this.getShopProducts('energy-drinks');
+
+        // Zobrazení obchodu s produkty
+        this.showSpecialShop('Energetické nápoje - Podpultovky.cz', products, 'energy-drinks');
+
+        // Přidání XP za návštěvu obchodu
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(5, 'Návštěva obchodu s energetickými nápoji');
+        }
+    },
+
+    // Zobrazení obchodu s krkovičkou
+    showKrkovickaShop() {
+        // Zobrazení informace o načítání obchodu
+        addMessage('Načítám nabídku krkovičky a dalších mas z eshopu podpultovky.cz...', false);
+
+        // Získání produktů pro krkovičku
+        const products = this.getShopProducts('krkovicka');
+
+        // Zobrazení obchodu s produkty
+        this.showSpecialShop('Krkovička a maso - Podpultovky.cz', products, 'krkovicka');
+
+        // Přidání XP za návštěvu obchodu
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(5, 'Návštěva obchodu s krkovičkou');
+        }
+    },
+
+    // Zobrazení speciálního obchodu s detailními produkty
+    showSpecialShop(shopName, products, shopType) {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('specialShopModal')) {
+            return;
+        }
+
+        // Vytvoření modalu
+        const modal = document.createElement('div');
+        modal.id = 'specialShopModal';
+        modal.className = 'special-shop-modal';
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="special-shop-modal-content">
+                <div class="special-shop-modal-header">
+                    <h2>${shopName}</h2>
+                    <button class="special-shop-modal-close">&times;</button>
+                </div>
+                <div class="special-shop-modal-body">
+                    <div class="special-shop-products-list">
+                        ${products.map(product => `
+                            <div class="special-shop-product">
+                                <div class="special-shop-product-header">
+                                    <div class="special-shop-product-icon">${product.icon}</div>
+                                    <div class="special-shop-product-name">${product.name}</div>
+                                    <div class="special-shop-product-price">${product.price} Kč</div>
+                                </div>
+                                ${product.image ? `<img src="${product.image}" alt="${product.name}" class="special-shop-product-image">` : ''}
+                                <div class="special-shop-product-description">${product.description || ''}</div>
+                                <button class="special-shop-product-add-to-cart" data-product="${product.name}" data-price="${product.price}">Přidat do košíku</button>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="special-shop-cart">
+                        <h3>Nákupní košík</h3>
+                        <div class="special-shop-cart-items" id="specialShopCartItems">
+                            <div class="special-shop-cart-empty">Košík je prázdný</div>
+                        </div>
+                        <div class="special-shop-cart-total">
+                            <span>Celkem:</span>
+                            <span id="specialShopCartTotal">0 Kč</span>
+                        </div>
+                        <button class="special-shop-cart-checkout" id="specialShopCartCheckout">Objednat</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro speciální obchod
+        const style = document.createElement('style');
+        style.textContent = `
+            .special-shop-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .special-shop-modal.show {
+                opacity: 1;
+            }
+
+            .special-shop-modal-content {
+                background-color: white;
+                border-radius: 10px;
+                width: 90%;
+                max-width: 1200px;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                display: flex;
+                flex-direction: column;
+            }
+
+            .special-shop-modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px 20px;
+                border-bottom: 1px solid #eee;
+                position: sticky;
+                top: 0;
+                background-color: white;
+                z-index: 10;
+            }
+
+            .special-shop-modal-header h2 {
+                margin: 0;
+                color: #333;
+            }
+
+            .special-shop-modal-close {
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #999;
+            }
+
+            .special-shop-modal-body {
+                padding: 20px;
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+            }
+
+            .special-shop-products-list {
+                flex: 3;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+            }
+
+            .special-shop-product {
+                border: 1px solid #eee;
+                border-radius: 8px;
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+
+            .special-shop-product:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .special-shop-product-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .special-shop-product-icon {
+                font-size: 24px;
+            }
+
+            .special-shop-product-name {
+                font-weight: bold;
+                flex: 1;
+            }
+
+            .special-shop-product-price {
+                font-weight: bold;
+                color: #e74c3c;
+            }
+
+            .special-shop-product-image {
+                width: 100%;
+                height: 200px;
+                object-fit: contain;
+                border-radius: 4px;
+            }
+
+            .special-shop-product-description {
+                color: #666;
+                font-size: 14px;
+                line-height: 1.4;
+            }
+
+            .special-shop-product-add-to-cart {
+                background-color: #3498db;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.2s;
+            }
+
+            .special-shop-product-add-to-cart:hover {
+                background-color: #2980b9;
+            }
+
+            .special-shop-product-add-to-cart.added {
+                background-color: #2ecc71;
+            }
+
+            .special-shop-cart {
+                flex: 1;
+                background-color: #f9f9f9;
+                border-radius: 8px;
+                padding: 15px;
+                position: sticky;
+                top: 80px;
+                max-height: calc(90vh - 100px);
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .special-shop-cart h3 {
+                margin: 0 0 10px 0;
+                color: #333;
+            }
+
+            .special-shop-cart-items {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                flex: 1;
+            }
+
+            .special-shop-cart-empty {
+                color: #999;
+                font-style: italic;
+                text-align: center;
+                padding: 20px 0;
+            }
+
+            .special-shop-cart-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid #eee;
+            }
+
+            .special-shop-cart-item-name {
+                flex: 1;
+            }
+
+            .special-shop-cart-item-price {
+                font-weight: bold;
+                margin: 0 10px;
+            }
+
+            .special-shop-cart-item-remove {
+                background: none;
+                border: none;
+                color: #e74c3c;
+                cursor: pointer;
+                font-size: 18px;
+            }
+
+            .special-shop-cart-total {
+                display: flex;
+                justify-content: space-between;
+                font-weight: bold;
+                padding: 10px 0;
+                border-top: 2px solid #ddd;
+                margin-top: auto;
+            }
+
+            .special-shop-cart-checkout {
+                background-color: #2ecc71;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 10px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.2s;
+            }
+
+            .special-shop-cart-checkout:hover {
+                background-color: #27ae60;
+            }
+
+            @media (max-width: 768px) {
+                .special-shop-modal-body {
+                    flex-direction: column;
+                }
+
+                .special-shop-products-list {
+                    grid-template-columns: 1fr;
+                }
+
+                .special-shop-cart {
+                    position: static;
+                    max-height: none;
+                }
+            }
+
+            /* Tmavý režim */
+            body[data-theme="dark"] .special-shop-modal-content,
+            body[data-theme="dark"] .special-shop-modal-header {
+                background-color: #333;
+                color: #fff;
+            }
+
+            body[data-theme="dark"] .special-shop-modal-header h2 {
+                color: #fff;
+            }
+
+            body[data-theme="dark"] .special-shop-product {
+                background-color: #444;
+                border-color: #555;
+                color: #fff;
+            }
+
+            body[data-theme="dark"] .special-shop-product-description {
+                color: #ccc;
+            }
+
+            body[data-theme="dark"] .special-shop-cart {
+                background-color: #444;
+                color: #fff;
+            }
+
+            body[data-theme="dark"] .special-shop-cart h3 {
+                color: #fff;
+            }
+
+            body[data-theme="dark"] .special-shop-cart-item {
+                border-bottom-color: #555;
+            }
+
+            body[data-theme="dark"] .special-shop-cart-empty {
+                color: #aaa;
+            }
+        `;
+
+        document.head.appendChild(style);
+
+        // Přidání modalu do dokumentu
+        document.body.appendChild(modal);
+
+        // Animace zobrazení
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 100);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.special-shop-modal-close');
+        const addToCartButtons = modal.querySelectorAll('.special-shop-product-add-to-cart');
+        const checkoutButton = modal.querySelector('#specialShopCartCheckout');
+
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove(); // Odstranění CSS stylů
+                }, 300);
+            });
+        }
+
+        // Košík
+        const cart = [];
+
+        // Přidání event listenerů pro tlačítka "Přidat do košíku"
+        if (addToCartButtons) {
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const productName = button.getAttribute('data-product');
+                    const productPrice = parseInt(button.getAttribute('data-price'));
+
+                    // Přidání produktu do košíku
+                    cart.push({
+                        name: productName,
+                        price: productPrice
+                    });
+
+                    // Aktualizace zobrazení košíku
+                    this.updateSpecialCartDisplay(cart);
+
+                    // Animace tlačítka
+                    button.classList.add('added');
+                    button.textContent = 'Přidáno do košíku';
+                    setTimeout(() => {
+                        button.classList.remove('added');
+                        button.textContent = 'Přidat do košíku';
+                    }, 1000);
+                });
+            });
+        }
+
+        // Přidání event listeneru pro tlačítko "Objednat"
+        if (checkoutButton) {
+            checkoutButton.addEventListener('click', () => {
+                if (cart.length === 0) {
+                    alert('Košík je prázdný. Přidejte prosím nějaké produkty.');
+                    return;
+                }
+
+                // Výpočet celkové ceny
+                const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+                // Přidání XP a sledování nákupu
+                if (typeof UserProgress !== 'undefined' && typeof UserProgressExtensions !== 'undefined') {
+                    // Použití rozšířené funkce pro sledování nákupů
+                    UserProgressExtensions.trackPurchase(shopType, cart, total);
+                } else if (typeof UserProgress !== 'undefined') {
+                    // Záložní pro případ, že rozšíření není dostupné
+                    const purchaseXP = Math.min(Math.ceil(total / 50), 30); // Maximum 30 XP
+                    UserProgress.addExperience(purchaseXP, `Nákup v obchodě ${shopName}`);
+
+                    // Základní achievementy za nákup
+                    if (shopType === 'energy-drinks') {
+                        UserProgress.addAchievement('energy-buyer');
+                    } else if (shopType === 'krkovicka') {
+                        UserProgress.addAchievement('meat-lover');
+                    }
+                }
+
+                // Zobrazení potvrzovací zprávy
+                alert(`Děkujeme za objednávku! Celková cena: ${total} Kč. Objednávka bude doručena do 30 minut.`);
+
+                // Zavření modalu
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove(); // Odstranění CSS stylů
+                }, 300);
+
+                // Zobrazení informace o objednávce v chatu
+                addMessage(`Objednávka z obchodu ${shopName} byla úspěšně odeslana. Celková cena: ${total} Kč.`, false);
+            });
+        }
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+
+                // Odstranění elementu po dokončení animace
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove(); // Odstranění CSS stylů
+                }, 300);
+            }
+        });
+    },
+
+    // Aktualizace zobrazení košíku pro speciální obchod
+    updateSpecialCartDisplay(cart) {
+        const cartItemsElement = document.getElementById('specialShopCartItems');
+        const cartTotalElement = document.getElementById('specialShopCartTotal');
+
+        if (!cartItemsElement || !cartTotalElement) {
+            return;
+        }
+
+        // Vyprázdnění košíku
+        cartItemsElement.innerHTML = '';
+
+        if (cart.length === 0) {
+            cartItemsElement.innerHTML = '<div class="special-shop-cart-empty">Košík je prázdný</div>';
+            cartTotalElement.textContent = '0 Kč';
+            return;
+        }
+
+        // Vytvoření položek košíku
+        cart.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'special-shop-cart-item';
+            itemElement.innerHTML = `
+                <div class="special-shop-cart-item-name">${item.name}</div>
+                <div class="special-shop-cart-item-price">${item.price} Kč</div>
+                <button class="special-shop-cart-item-remove" data-index="${index}">&times;</button>
+            `;
+
+            cartItemsElement.appendChild(itemElement);
+
+            // Přidání event listeneru pro tlačítko odstranění
+            const removeButton = itemElement.querySelector('.special-shop-cart-item-remove');
+            if (removeButton) {
+                removeButton.addEventListener('click', () => {
+                    // Odstranění položky z košíku
+                    cart.splice(index, 1);
+
+                    // Aktualizace zobrazení košíku
+                    this.updateSpecialCartDisplay(cart);
+                });
+            }
+        });
+
+        // Výpočet celkové ceny
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        cartTotalElement.textContent = `${total} Kč`;
+    },
+
+    // Zobrazení produktů obchodu (původní implementace)
     showShopProducts(shopName, shopType) {
         // Kontrola, zda již modal neexistuje
         if (document.getElementById('shopProductsModal')) {
@@ -2181,6 +3162,138 @@ const CommandsMenu = {
     // Získání produktů podle typu obchodu
     getShopProducts(shopType) {
         switch (shopType) {
+            case 'energy-drinks':
+                return [
+                    {
+                        name: 'Monster Energy Ultra',
+                        price: 49,
+                        icon: '⚡',
+                        description: 'Nulový obsah cukru, plná dávka kofeinu a taurin pro maximální výkon. Svěží citrusová příchuť.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/monster-ultra-paradise-500ml.png'
+                    },
+                    {
+                        name: 'Red Bull Energy Drink',
+                        price: 45,
+                        icon: '⚡',
+                        description: 'Originální energetický nápoj, který ti dává křídla. Obsahuje taurin, kofein a vitaminy skupiny B.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/red-bull-energy-drink-250ml.png'
+                    },
+                    {
+                        name: 'Prime Energy Drink',
+                        price: 89,
+                        icon: '⚡',
+                        description: 'Limitovaná edice energetického nápoje od Logan Paula a KSI. Obsahuje BCAA, elektrolyty a 200mg kofeinu.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/prime-energy-drink-tropical-punch-355ml.png'
+                    },
+                    {
+                        name: 'Bang Energy',
+                        price: 69,
+                        icon: '⚡',
+                        description: 'Super silný energetický nápoj s 300mg kofeinu, BCAA a CoQ10. Bez cukru a kalorií.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/bang-energy-rainbow-unicorn-500ml.png'
+                    },
+                    {
+                        name: 'Reign Total Body Fuel',
+                        price: 59,
+                        icon: '⚡',
+                        description: 'Fitness energetický nápoj s BCAA, L-argininem a 300mg kofeinu. Ideální před tréninkem.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/reign-total-body-fuel-melon-mania-500ml.png'
+                    },
+                    {
+                        name: 'Monster Energy Pipeline Punch',
+                        price: 55,
+                        icon: '⚡',
+                        description: 'Ovocný energetický nápoj s příchutí marakuji, broskve a ananasu. Plná dávka energie.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/monster-energy-pipeline-punch-500ml.png'
+                    },
+                    {
+                        name: 'Rockstar Energy Original',
+                        price: 39,
+                        icon: '⚡',
+                        description: 'Klasický energetický nápoj s vysokou dávkou kofeinu a taurinu. Pro všechny, kdo jedou na plný plyn.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/rockstar-energy-original-500ml.png'
+                    },
+                    {
+                        name: 'Hell Energy Classic',
+                        price: 35,
+                        icon: '⚡',
+                        description: 'Cenově dostupný energetický nápoj s klasickou příchutí. Obsahuje kofein, taurin a vitaminy.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/hell-energy-classic-250ml.png'
+                    },
+                    {
+                        name: 'Monster Energy Mega Pack',
+                        price: 249,
+                        icon: '⚡',
+                        description: 'Balíček 6 plechovek Monster Energy. Ideální pro herní maraton nebo dlouhé noční programování.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/monster-energy-mega-pack-6x500ml.png'
+                    },
+                    {
+                        name: 'Energetický shot 5-Hour Energy',
+                        price: 79,
+                        icon: '⚡',
+                        description: 'Koncentrovaný energetický shot s dlouhotrvajícím účinkem. Bez cukru, pouze 4 kalorie.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/5-hour-energy-extra-strength-berry-57ml.png'
+                    }
+                ];
+            case 'krkovicka':
+                return [
+                    {
+                        name: 'Vepřová krkovička bez kosti (1kg)',
+                        price: 199,
+                        icon: '🥩',
+                        description: 'Kvalitní česká vepřová krkovička bez kosti. Ideální na gril nebo pečení. Šťavnatá a plna chuti.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/veprova-krkovicka-bez-kosti-1kg.png'
+                    },
+                    {
+                        name: 'Marináda na krkovičku - česneková',
+                        price: 59,
+                        icon: '🌿',
+                        description: 'Domácí česneková marináda s bylinkami. Dodá vaší krkovičce nezaměnitelné aroma a chuť.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/marinada-na-krkovicku-cesnekova-250ml.png'
+                    },
+                    {
+                        name: 'Marináda na krkovičku - BBQ',
+                        price: 59,
+                        icon: '🌿',
+                        description: 'Sladká a kořeněná BBQ marináda. Ideální pro grilovaní krkovičky v americkém stylu.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/marinada-na-krkovicku-bbq-250ml.png'
+                    },
+                    {
+                        name: 'Krkovička na grilu - hotové jídlo',
+                        price: 159,
+                        icon: '🍖',
+                        description: 'Hotová grilovaná krkovička s přílohou. Stačí ohřát a můžete servírovat.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/krkovicka-na-grilu-hotove-jidlo-400g.png'
+                    },
+                    {
+                        name: 'Krkovička s kostí (1kg)',
+                        price: 179,
+                        icon: '🥩',
+                        description: 'Tradiční vepřová krkovička s kostí. Perfektní pro pečení v troubě nebo na grilu.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/veprova-krkovicka-s-kosti-1kg.png'
+                    },
+                    {
+                        name: 'Krkovička plněná sýrem a šunkou (500g)',
+                        price: 149,
+                        icon: '🥩',
+                        description: 'Speciální krkovička plněná sýrem a šunkou. Lahodná kombinace chutí pro speciální příležitosti.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/krkovicka-plnena-syrem-a-sunkou-500g.png'
+                    },
+                    {
+                        name: 'Grilovací balíček - krkovička a kuřecí',
+                        price: 299,
+                        icon: '🍗',
+                        description: 'Mix krkovičky a kuřecího masa na gril. Ideální pro rodinné grilování.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/grilovaci-balicek-krkovicka-a-kureci-1kg.png'
+                    },
+                    {
+                        name: 'Koření na krkovičku',
+                        price: 49,
+                        icon: '🌿',
+                        description: 'Speciální směs koření pro přípravu dokonalé krkovičky. Obsahuje papriku, česnek, kmín a další bylinky.',
+                        image: 'https://www.podpultovky.cz/wp-content/uploads/2023/05/koreni-na-krkovicku-50g.png'
+                    }
+                ];
             case 'supermarket':
                 return [
                     { name: 'Chléb', price: 35, icon: '🍞' },
