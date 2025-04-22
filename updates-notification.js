@@ -13,13 +13,13 @@ const UpdatesNotification = {
             version: '0.2.8.6.3',
             date: '2024-04-23',
             title: 'Nové funkce pro mapu a chat',
-            description: 'Přidáno 7 nových užitečných funkcí pro mapu',
+            description: 'Přidáno 8 nových užitečných funkcí pro mapu',
             changes: [
                 'Přidán noční režim mapy s tmavým pozadím a zvýrazněnými cestami',
                 'Implementována vrstva s počasím na mapě a widget s aktuálními informacemi',
                 'Přidána funkce pro zobrazení zajímavých míst v okolí',
-                'Implementován nástroj pro měření vzdálenosti mezi body na mapě',
-                'Přidána funkce pro sdílení aktuální polohy nebo trasy přes URL a QR kód'
+                'Přidána funkce pro zobrazení obchodů v okolí s možností online nákupu',
+                'Opraveno vypnutí nočního režimu - nyní se mapa správně vrací do původního stavu'
             ]
         },
         {

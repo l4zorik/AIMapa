@@ -14,6 +14,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 ### Další vylepšení mapy
 - Přidána vrstva s dopravními informacemi pro zobrazení aktuální dopravní situace
 - Implementována vrstva s turistickými a cyklistickými trasami v okolí
+- Přidána funkce pro zobrazení obchodů v okolí s možností online nákupu
+- Opraveno vypnutí nočního režimu - nyní se mapa správně vrací do původního stavu
 - Vylepšeno uživatelské rozhraní pro práci s mapovými vrstvami
 - Přidány tlačítka pro rychlé přepínání mezi různými vrstvami
 - Optimalizováno zobrazení všech nových funkcí na mobilních zařízeních
