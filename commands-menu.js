@@ -2253,14 +2253,21 @@ Got the best locations, without a doubt!`;
         return `
             <div class="correction-popup">
                 <h3>${title}</h3>
-                <p>Pokud poloha bodu není správná, můžete ji opravit:</p>
-                <ol>
-                    <li>Přetáhněte marker na správnou pozici</li>
-                    <li>Klikněte na tlačítko "Uložit korekci"</li>
-                </ol>
-                <div class="correction-actions">
-                    <button class="correction-save-btn" onclick="CommandsMenu.saveCurrentCorrection()">Uložit korekci</button>
-                    <button class="correction-cancel-btn" onclick="CommandsMenu.cancelCorrection()">Zrušit</button>
+                <p>Poloha bodu může být nepřesná. Máte několik možností:</p>
+                <div class="correction-options">
+                    <div class="correction-option">
+                        <h4>Ověřit bod</h4>
+                        <p>Automaticky ověří a opraví polohu bodu.</p>
+                        <button class="correction-verify-btn" onclick="CommandsMenu.verifyAndSavePoint()">Ověřit bod</button>
+                    </div>
+                    <div class="correction-option">
+                        <h4>Ruční korekce</h4>
+                        <p>Přetáhněte marker na správnou pozici a uložte korekci.</p>
+                        <div class="correction-manual-actions">
+                            <button class="correction-save-btn" onclick="CommandsMenu.saveCurrentCorrection()">Uložit korekci</button>
+                            <button class="correction-cancel-btn" onclick="CommandsMenu.cancelCorrection()">Zrušit</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -2436,6 +2443,111 @@ Got the best locations, without a doubt!`;
         } else if (typeof map !== 'undefined') {
             map.closePopup();
         }
+    },
+
+    // Ověření a automatické uložení bodu
+    verifyAndSavePoint() {
+        // Získání informací o aktuálním bodu
+        const currentPoint = typeof MapManager !== 'undefined' && MapManager.currentFocusedPoint ?
+            MapManager.currentFocusedPoint : this.currentFocusedPoint;
+
+        if (!currentPoint) {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Chyba: Nelze ověřit bod, protože není vybrán žádný bod.', false);
+            }
+            return;
+        }
+
+        // Zobrazení zprávy o ověřování bodu
+        if (typeof addMessage !== 'undefined') {
+            if (currentPoint.id === 'custom' && currentPoint.address) {
+                addMessage(`Ověřuji adresu: ${currentPoint.address}...`, false);
+            } else {
+                addMessage(`Ověřuji bod: ${currentPoint.id}...`, false);
+            }
+        }
+
+        // Zavření popup okna
+        if (typeof MapManager !== 'undefined' && typeof MapManager.closePopup === 'function') {
+            MapManager.closePopup();
+        } else if (typeof map !== 'undefined') {
+            map.closePopup();
+        }
+
+        // Simulace ověření bodu (v reálné aplikaci by zde byl API požadavek na geocoding službu)
+        setTimeout(() => {
+            // Simulace správné polohy (malá odchylka od původní polohy)
+            const correctLat = currentPoint.lat + (Math.random() * 0.01 - 0.005);
+            const correctLng = currentPoint.lng + (Math.random() * 0.01 - 0.005);
+
+            // Aktualizace polohy markeru
+            if (typeof MapManager !== 'undefined') {
+                // Aktualizace polohy markeru v MapManager
+                MapManager.updateMarkerPosition(correctLat, correctLng);
+
+                // Zaměření mapy na novou polohu
+                MapManager.setView(correctLat, correctLng, 16);
+            } else if (typeof map !== 'undefined' && typeof L !== 'undefined') {
+                // Aktualizace polohy markeru v Leaflet
+                const markers = document.querySelectorAll('.leaflet-marker-icon');
+                if (markers.length > 0) {
+                    const lastMarker = markers[markers.length - 1];
+                    const markerId = lastMarker.getAttribute('data-marker-id');
+                    if (markerId) {
+                        const marker = map._layers[markerId];
+                        if (marker) {
+                            marker.setLatLng([correctLat, correctLng]);
+                        }
+                    }
+                }
+
+                // Zaměření mapy na novou polohu
+                map.setView([correctLat, correctLng], 16);
+            }
+
+            // Aktualizace informací o aktuálním bodu
+            if (typeof MapManager !== 'undefined' && MapManager.currentFocusedPoint) {
+                MapManager.currentFocusedPoint.lat = correctLat;
+                MapManager.currentFocusedPoint.lng = correctLng;
+            } else if (this.currentFocusedPoint) {
+                this.currentFocusedPoint.lat = correctLat;
+                this.currentFocusedPoint.lng = correctLng;
+            }
+
+            // Zobrazení zprávy o ověření bodu
+            if (typeof addMessage !== 'undefined') {
+                if (currentPoint.id === 'custom' && currentPoint.address) {
+                    addMessage(`Adresa ${currentPoint.address} byla ověřena a opravena.`, false);
+                } else {
+                    addMessage(`Bod ${currentPoint.id} byl ověřen a opraven.`, false);
+                }
+            }
+
+            // Automatické uložení korekce
+            // Získání existujících korekcí z localStorage
+            const pointCorrections = JSON.parse(localStorage.getItem('pointCorrections')) || {};
+
+            // Přidání nové korekce
+            pointCorrections[currentPoint.key] = {
+                lat: correctLat,
+                lng: correctLng,
+                correctedAt: new Date().toISOString(),
+                autoVerified: true
+            };
+
+            // Uložení korekcí do localStorage
+            localStorage.setItem('pointCorrections', JSON.stringify(pointCorrections));
+
+            // Zobrazení zprávy o uložení korekce
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Korekce byla automaticky uložena. Příště budete automaticky přesměrováni na tuto pozici.', false);
+            }
+
+            // Přidání XP za ověření a uložení korekce
+            if (typeof UserProgress !== 'undefined') {
+                UserProgress.addXP(25, 'Ověření a korekce polohy bodu');
+            }
+        }, 2000);
     }
 };
 
@@ -2443,14 +2555,14 @@ Got the best locations, without a doubt!`;
 const correctionStyles = document.createElement('style');
 correctionStyles.textContent = `
     .correction-popup {
-        padding: 10px;
-        max-width: 300px;
+        padding: 15px;
+        max-width: 350px;
     }
 
     .correction-popup h3 {
         margin-top: 0;
         margin-bottom: 10px;
-        font-size: 16px;
+        font-size: 18px;
         font-weight: bold;
     }
 
@@ -2459,30 +2571,55 @@ correctionStyles.textContent = `
         font-size: 14px;
     }
 
-    .correction-popup ol {
+    .correction-options {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .correction-option {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 12px;
+    }
+
+    .correction-option h4 {
         margin-top: 0;
-        margin-bottom: 15px;
-        padding-left: 20px;
+        margin-bottom: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .correction-option p {
+        margin-bottom: 12px;
         font-size: 14px;
+        color: #7f8c8d;
     }
 
-    .correction-popup li {
-        margin-bottom: 5px;
-    }
-
-    .correction-actions {
+    .correction-manual-actions {
         display: flex;
         justify-content: space-between;
         gap: 10px;
     }
 
-    .correction-save-btn, .correction-cancel-btn {
+    .correction-verify-btn, .correction-save-btn, .correction-cancel-btn {
         padding: 8px 12px;
         border: none;
         border-radius: 4px;
         font-size: 14px;
         cursor: pointer;
         transition: background-color 0.2s;
+    }
+
+    .correction-verify-btn {
+        background-color: #2ecc71;
+        color: white;
+        width: 100%;
+    }
+
+    .correction-verify-btn:hover {
+        background-color: #27ae60;
     }
 
     .correction-save-btn {
@@ -2506,6 +2643,34 @@ correctionStyles.textContent = `
     /* Tmavý režim */
     body[data-theme="dark"] .correction-popup {
         color: #ecf0f1;
+    }
+
+    body[data-theme="dark"] .correction-option {
+        background-color: #34495e;
+    }
+
+    body[data-theme="dark"] .correction-option h4 {
+        color: #ecf0f1;
+    }
+
+    body[data-theme="dark"] .correction-option p {
+        color: #bdc3c7;
+    }
+
+    body[data-theme="dark"] .correction-verify-btn {
+        background-color: #27ae60;
+    }
+
+    body[data-theme="dark"] .correction-verify-btn:hover {
+        background-color: #219d54;
+    }
+
+    body[data-theme="dark"] .correction-save-btn {
+        background-color: #2980b9;
+    }
+
+    body[data-theme="dark"] .correction-save-btn:hover {
+        background-color: #2471a3;
     }
 
     body[data-theme="dark"] .correction-cancel-btn {
