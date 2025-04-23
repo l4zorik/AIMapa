@@ -2,6 +2,77 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.7.4] - 2025-05-05 - OPRAVA VÝPOČTU CESTY A MENU PŘÍKAZŮ, PŘIDÁNÍ ROZVÁŽKY PIZZY
+
+### Nové funkce
+- Přidána nová funkce rozvážky pizzy do menu příkazů
+- Implementováno interaktivní UI pro výběr pizzerie a objednávku
+- Přidáno získávání XP za použití funkce rozvážky pizzy
+
+### Opravy a vylepšení
+- Optimalizován výpočet cesty pro výrazně lepší výkon
+- Snížen timeout pro API volání pro rychlejší odezvu
+- Přidána optimalizace počtu bodů pro výpočet trasy
+- Vylepšeno vykreslování trasy pomocí optimalizovaných parametrů
+- Opravena inicializace menu příkazů při načtení stránky
+- Přidáno lepší scrollování v menu příkazů
+- Vylepšena podpora pro dotyková zařízení
+
+## [0.2.8.7.3] - 2025-05-03 - VYLEPŠENÍ MENU PŘÍKAZŮ A IKONY AKTUALIZACÍ
+
+### Vylepšení menu příkazů
+- Přidáno překrytí při zobrazení menu příkazů
+- Menu příkazů nyní zobrazeno uprostřed obrazovky
+- Vylepšeny animace a efekty pro menu příkazů
+
+### Přidání ikony aktualizací
+- Přidána ikona aktualizací v pravém horním rohu
+- Opravena inicializace ikony aktualizací
+- Vylepšeno zobrazení informací o aktualizacích
+
+## [0.2.8.7.2] - 2025-05-02 - OPRAVA ZOBRAZENÍ MENU PŘÍKAZŮ
+
+### Opravy chyb
+- Opraveno zobrazení menu příkazů z chatu
+- Vylepšeno tlačítko pro zobrazení menu příkazů
+- Přidány lepší animace a efekty pro menu příkazů
+- Opravena inicializace menu příkazů při načtení stránky
+
+## [0.2.8.7.1] - 2025-05-01 - NOVÉ FUNKCE A VYLEPŠENÍ MENU PŘÍKAZŮ
+
+### Nové funkce
+- Přidána funkce "Chci jít do práce" pro vytvoření trasy do práce a správu úkolů
+- Přidána základní podpora pro rapové akce
+- Přidány nové služby: taxi, zubař, lékař a úřad práce
+
+### Vylepšení menu příkazů
+- Přidáno funkční scrollování v menu příkazů
+- Vylepšen design a organizace menu příkazů
+- Opraveno zobrazení menu příkazů z chatu
+- Vylepšeno tlačítko pro zobrazení menu příkazů
+
+### Rozšíření systému XP a achievementů
+- Přidány nové kategorie XP: Práce a úkoly, Asistenti a služby, Zábava
+- Implementováno získávání XP za používání nových funkcí
+
+## [0.2.8.7.0] - 2025-04-30 - VYLEPŠENÍ MENU PŘÍKAZŮ A NOVÉ FUNKCE
+
+### Vylepšení menu příkazů
+- Kompletní redesign menu příkazů s moderním a přehledným vzhledem
+- Přidány kategorie pro lepší organizaci příkazů
+- Implementováno vyhledávání a filtrování příkazů
+- Vylepšeny animace a přechody pro plynulejší uživatelský zážitek
+
+### Nové funkce
+- Přidán hlasový asistent Alexa pro hlasové ovládání aplikace
+- Implementována funkce pro zobrazení otevírací doby obchodů a služeb v okolí
+- Přidána možnost filtrování a vyhledávání v otevíracích dobách
+- Implementována detekce aktuálně otevřených míst
+
+### Rozšíření systému XP a achievementů
+- Přidáno získávání XP za používání nových funkcí
+- Implementována nová kategorie XP 'Asistenti a služby'
+
 ## [0.2.8.6.9] - 2025-04-29 - VYHLEDÁVÁNÍ SPOJENÍ VEŘEJNOU DOPRAVOU
 
 ### Nová funkce vyhledávání spojení
