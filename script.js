@@ -1,6 +1,6 @@
 /**
  * Hlavní skript aplikace
- * Verze 0.2.8.7.4
+ * Verze 0.2.8.7.7
  */
 
 // Inicializace mapy
@@ -2682,7 +2682,8 @@ function saveAppState() {
         darkMode: document.getElementById('darkModeToggle').checked,
         colorScheme: document.querySelector('.color-option.active')?.getAttribute('data-color') || 'blue',
         markerStyle: markerStyle,
-        markerEffectsEnabled: markerEffectsEnabled
+        markerEffectsEnabled: markerEffectsEnabled,
+        commandsMenuEnabled: document.getElementById('commandsMenuToggle')?.checked !== false
     };
 
     // Uložení stavu mapy
@@ -2927,6 +2928,20 @@ function loadAppState() {
                 const markerEffectsToggle = document.getElementById('markerEffectsToggle');
                 if (markerEffectsToggle) {
                     markerEffectsToggle.checked = markerEffectsEnabled;
+                }
+            }
+
+            // Nastavení menu příkazů
+            if (appState.settings.commandsMenuEnabled !== undefined) {
+                // Aktualizace přepínače v UI
+                const commandsMenuToggle = document.getElementById('commandsMenuToggle');
+                if (commandsMenuToggle) {
+                    commandsMenuToggle.checked = appState.settings.commandsMenuEnabled;
+                }
+
+                // Odeslat událost o změně nastavení menu příkazů
+                if (typeof CommandsMenu !== 'undefined') {
+                    CommandsMenu.setEnabled(appState.settings.commandsMenuEnabled);
                 }
             }
         }
@@ -3222,6 +3237,30 @@ function setupMarkerStyleOptions() {
                 'Efekty bodů na mapě byly zapnuty.' :
                 'Efekty bodů na mapě byly vypnuty.';
             addMessage(message, false);
+        });
+    }
+
+    // Přidání event listeneru pro přepínač menu příkazů
+    const commandsMenuToggle = document.getElementById('commandsMenuToggle');
+    if (commandsMenuToggle) {
+        commandsMenuToggle.addEventListener('change', () => {
+            // Uložení stavu aplikace
+            saveAppState();
+
+            // Odeslat událost o změně nastavení menu příkazů
+            if (typeof CommandsMenu !== 'undefined') {
+                CommandsMenu.setEnabled(commandsMenuToggle.checked);
+            }
+
+            // Informace pro uživatele
+            const message = commandsMenuToggle.checked ?
+                'Menu příkazů bylo povoleno.' :
+                'Menu příkazů bylo zakázáno.';
+            addMessage(message, false);
+
+            // Vytvoření a odeslání události o změně nastavení
+            const event = new CustomEvent('settingsChanged');
+            window.dispatchEvent(event);
         });
     }
 }

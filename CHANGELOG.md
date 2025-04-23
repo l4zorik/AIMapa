@@ -2,6 +2,35 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.7.7] - 2025-05-08 - PANEL MOŽNOSTÍ VEDLE CHATU
+
+### Nové funkce
+- Přidán panel možností vedle chatu s tlačítkem pro zobrazení/skrytí
+- Přidána možnost manuálně vypnout panel možností v nastavení
+- Rozšířen panel možností o kategorie a příkazy (mapa, zobrazení, služby, nastavení, zábava)
+- Přidáno vyhledávání v panelu možností
+
+### Vylepšení
+- Upraven dotazník zpětné vazby, aby se zobrazil pouze jednou
+- Vylepšeno ukládání nastavení panelu možností do localStorage
+- Optimalizováno zobrazení panelu možností pro různé velikosti obrazovky
+
+### Poznámka
+- Tato verze obsahuje pouze základní implementaci panelu možností bez funkčního propojení všech tlačítek
+
+## [0.2.8.7.6] - 2025-05-07 - MENU PŘÍKAZŮ VEDLE CHATU A DOTAZNÍK POUZE JEDNOU
+
+### Nové funkce
+- Přidáno menu příkazů vedle chatu s možností zobrazení/skrytí
+- Přidána možnost manuálně vypnout menu příkazů v nastavení
+- Rozšířeno menu příkazů o nové služby (lékař, zubař, pizza, atd.)
+- Přidána nová kategorie "Zábava" s příkazy pro rap a práci
+
+### Vylepšení
+- Upraven dotazník zpětné vazby, aby se zobrazil pouze jednou
+- Vylepšeno ukládání nastavení menu příkazů do localStorage
+- Optimalizováno zobrazení menu příkazů pro různé velikosti obrazovky
+
 ## [0.2.8.7.5] - 2025-05-06 - ODSTRANĚNÍ MENU PŘÍKAZŮ
 
 ### Odstraněné funkce

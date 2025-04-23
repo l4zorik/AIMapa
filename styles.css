@@ -1,5 +1,6 @@
 :root {
     --primary-color: #8B5CF6;
+    --primary-color-rgb: 139, 92, 246;
     --primary-color-dark: #7c4ddf;
     --dark-bg: #1a1b26;
     --card-bg: #1F2937;
@@ -383,6 +384,8 @@ body[data-theme="dark"] .message.ai {
 .chat-input {
     display: flex;
     gap: 10px;
+    align-items: center;
+    position: relative;
 }
 
 .chat-input input {
@@ -412,6 +415,206 @@ body[data-theme="dark"] .chat-input input {
 
 .send-btn:hover {
     background-color: var(--primary-color-dark);
+}
+
+/* Command Menu Styles */
+.commands-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.commands-button:hover {
+    background-color: var(--primary-color-dark);
+    transform: scale(1.05);
+}
+
+.commands-button .icon {
+    margin: 0;
+    font-size: 18px;
+}
+
+.commands-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.commands-overlay.show {
+    opacity: 1;
+}
+
+.commands-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.commands-menu.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.commands-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.commands-menu-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-color);
+}
+
+.commands-menu-close {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.commands-menu-search {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.commands-search-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg-dark);
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.commands-menu-body {
+    flex: 1;
+    overflow: hidden;
+}
+
+.commands-menu-scroll-container {
+    height: 100%;
+    max-height: calc(80vh - 120px);
+    overflow-y: auto;
+    padding: 10px 20px 20px;
+}
+
+.commands-category {
+    margin-bottom: 15px;
+}
+
+.commands-category-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.commands-category-header:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.commands-category-icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.commands-category-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.commands-category-toggle {
+    font-size: 12px;
+}
+
+.commands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 5px 0 5px 35px;
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.command-item:hover {
+    background-color: rgba(139, 92, 246, 0.1);
+}
+
+.command-icon {
+    margin-right: 10px;
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.command-description {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.no-commands-results {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.7;
 }
 
 /* Custom Marker Styles */
@@ -2375,7 +2578,8 @@ body[data-theme="dark"] .leaflet-routing-line {
 
 /* Glóbus kontejner se zobrazí pouze po kliknutí na tlačítko glóbus */
 .map-globe-mode #simpleGlobeContainer {
-    /* display: block; - Toto je nyní řízeno JavaScriptem */
+    display: block;
+    z-index: 1000;
 }
 
 /* Zvýraznění tlačítka návratu z glóbus režimu v glóbus režimu */
@@ -3077,6 +3281,243 @@ body.fullscreen-mode {
         padding: 8px 12px;
         font-size: 12px;
     }
+}
+
+/* Styly pro tlačítko menu příkazů */
+.commands-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+.commands-button:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.commands-button .icon {
+    font-size: 18px;
+}
+
+/* Styly pro tlačítko menu příkazů ve fullscreen režimu */
+.map-fullscreen .commands-button {
+    background-color: rgba(139, 92, 246, 0.8);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.map-fullscreen .commands-button:hover {
+    background-color: rgba(139, 92, 246, 1);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Překrytí pro menu příkazů */
+.commands-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.commands-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Styly pro menu příkazů */
+.commands-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(-10px);
+    width: 320px;
+    max-height: 500px;
+    background-color: rgba(31, 41, 55, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+}
+
+.commands-menu.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+
+.commands-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.commands-menu-header h3 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.commands-menu-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.commands-menu-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.commands-menu-search {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.commands-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    font-size: 14px;
+}
+
+.commands-menu-body {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.commands-menu-scroll-container {
+    height: 100%;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.commands-category {
+    margin-bottom: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.commands-category-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s;
+}
+
+.commands-category-header:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.commands-category-icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.commands-category-name {
+    flex: 1;
+    font-weight: bold;
+}
+
+.commands-category-toggle {
+    font-size: 12px;
+}
+
+.commands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.command-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.command-icon {
+    margin-right: 10px;
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-name {
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.command-description {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.no-commands-results {
+    padding: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
 }
 
 /* Styly pro 3D režim */

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Map - Into the known v0.2.8.7.4</title>
+    <title>AI Map - Into the known v0.2.8.7.7</title>
     <link rel="icon" href="icons8-favicon.gif" type="image/gif">
     <link rel="stylesheet" href="styles.css">
     <!-- Leaflet CSS pro mapu -->
@@ -145,6 +145,17 @@
                     </div>
                 </div>
 
+                <div class="settings-section">
+                    <h3>Menu příkazů</h3>
+                    <div class="toggle-container">
+                        <span>Vypnuto</span>
+                        <label class="switch">
+                            <input type="checkbox" id="commandsMenuToggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                        <span>Zapnuto</span>
+                    </div>
+                </div>
 
 
                 <div class="settings-section">
@@ -353,5 +364,7 @@
     <script src="transport-connections.js"></script>
     <!-- Skript pro dotazník zpětné vazby -->
     <script src="feedback-survey.js"></script>
+    <!-- Skript pro menu příkazů -->
+    <script src="commands-menu.js"></script>
 </body>
 </html>

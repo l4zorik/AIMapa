@@ -50,6 +50,9 @@ const UserProgress = {
             map: 0,        // Interakce s mapou
             jobs: 0,       // Hledání práce
             transport: 0,  // Vyhledávání spojení
+            work: 0,       // Práce a úkoly
+            assistants: 0, // Asistenti a služby
+            entertainment: 0, // Zábava
             other: 0       // Ostatní
         },
         byTimeframe: {
@@ -1013,6 +1016,9 @@ const UserProgress = {
             'map': 'Interakce s mapou',
             'jobs': 'Hledání práce',
             'transport': 'Vyhledávání spojení',
+            'work': 'Práce a úkoly',
+            'assistants': 'Asistenti a služby',
+            'entertainment': 'Zábava',
             'other': 'Ostatní'
         };
 

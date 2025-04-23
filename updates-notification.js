@@ -1,14 +1,95 @@
 /**
  * Modul pro zobrazení novinek a aktualizací v pravém horním rohu
- * Verze 0.2.8.6.3
+ * Verze 0.2.8.7.4
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.2.8.6.3',
+    currentVersion: '0.2.8.7.4',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.2.8.7.4',
+            date: '2025-05-04',
+            title: 'Oprava menu příkazů ve fullscreen režimu a dotazník zpětné vazby',
+            description: 'Kompletní přepracování inicializace menu příkazů a přidání dotazníku zpětné vazby',
+            changes: [
+                'Přidán dotazník zpětné vazby o používání aplikace',
+                'Přidán dialog pro odmítnutí dotazníku s možností uvést důvod',
+                'Přidán soubor PROJECT_STRUCTURE.md s přehledem souborů v projektu',
+                'Opravena inicializace menu příkazů při načtení stránky',
+                'Opravena funkce tlačítka menu příkazů ve fullscreen režimu',
+                'Vylepšena detekce fullscreen režimu',
+                'Přidáno automatické vytvoření menu příkazů, pokud neexistuje',
+                'Přidáno záložní řešení pro případ, že není nalezen chat-input'
+            ]
+        },
+        {
+            version: '0.2.8.7.3',
+            date: '2025-05-03',
+            title: 'Vylepšení menu příkazů a ikony aktualizací',
+            description: 'Kompletní přepracování menu příkazů a ikony aktualizací',
+            changes: [
+                'Přidáno překrytí při zobrazení menu příkazů',
+                'Menu příkazů nyní zobrazeno uprostřed obrazovky',
+                'Přidána ikona aktualizací v pravém horním rohu',
+                'Vylepšeny animace a efekty pro menu příkazů',
+                'Opravena inicializace menu příkazů a ikony aktualizací'
+            ]
+        },
+        {
+            version: '0.2.8.7.2',
+            date: '2025-05-02',
+            title: 'Oprava zobrazení menu příkazů',
+            description: 'Opraveno zobrazení menu příkazů z chatu a vylepšeny animace',
+            changes: [
+                'Opraveno zobrazení menu příkazů z chatu',
+                'Vylepšeno tlačítko pro zobrazení menu příkazů',
+                'Přidány lepší animace a efekty pro menu příkazů',
+                'Opravena inicializace menu příkazů při načtení stránky'
+            ]
+        },
+        {
+            version: '0.2.8.7.1',
+            date: '2025-05-01',
+            title: 'Nové funkce a vylepšení menu příkazů',
+            description: 'Přidány nové funkce a vylepšeno menu příkazů',
+            changes: [
+                'Přidána funkce "Chci jít do práce" pro vytvoření trasy do práce a správu úkolů',
+                'Přidány nové služby: taxi, zubař, lékař a úřad práce',
+                'Přidáno funkční scrollování v menu příkazů',
+                'Opraveno zobrazení menu příkazů z chatu',
+                'Přidány nové kategorie XP: Práce a úkoly, Asistenti a služby, Zábava',
+                'Přidána základní podpora pro rapové akce'
+            ]
+        },
+        {
+            version: '0.2.8.7.0',
+            date: '2025-04-30',
+            title: 'Vylepšení menu příkazů a nové funkce',
+            description: 'Kompletní redesign menu příkazů a přidání nových funkcí',
+            changes: [
+                'Kompletní redesign menu příkazů s kategoriemi a vyhledáváním',
+                'Přidán hlasový asistent Alexa pro hlasové ovládání aplikace',
+                'Implementována funkce pro zobrazení otevírací doby obchodů a služeb v okolí',
+                'Přidána detekce aktuálně otevřených míst s filtrováním podle kategorií',
+                'Rozšířen systém XP a achievementů o novou kategorii "Asistenti a služby"'
+            ]
+        },
+        {
+            version: '0.2.8.6.9',
+            date: '2025-04-29',
+            title: 'Vyhledávání spojení veřejnou dopravou',
+            description: 'Přidána funkce pro vyhledávání spojení veřejnou dopravou mezi Hodonínem a Hruškami',
+            changes: [
+                'Implementováno vyhledávání spojení veřejnou dopravou mezi Hodonínem a Hruškami',
+                'Zobrazení vlakových a autobusových spojení s reálnými časy',
+                'Automatická aktualizace spojení v pravidelných intervalech',
+                'Přidány nové achievementy za vyhledávání spojení',
+                'Implementována nová kategorie XP "Vyhledávání spojení"'
+            ]
+        },
         {
             version: '0.2.8.6.3',
             date: '2024-04-23',
@@ -377,7 +458,4 @@ const UpdatesNotification = {
     }
 };
 
-// Inicializace modulu po načtení dokumentu
-document.addEventListener('DOMContentLoaded', () => {
-    UpdatesNotification.init();
-});
+// Inicializace modulu je nyní přímo v index.html

@@ -1,6 +1,6 @@
 /**
  * Styly pro modul novinek a aktualizací
- * Verze 0.2.8.6
+ * Verze 0.2.8.7.4
  */
 
 /* Ikona novinek v pravém horním rohu */
@@ -271,14 +271,14 @@
         width: 36px;
         height: 36px;
     }
-    
+
     .update-notification {
         top: 60px;
         right: 10px;
         width: calc(100% - 20px);
         max-width: 350px;
     }
-    
+
     .updates-modal-content {
         width: 95%;
         max-height: 85vh;
