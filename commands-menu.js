@@ -24,6 +24,18 @@ const CommandsMenu = {
             ]
         },
         {
+            id: 'tasks',
+            name: 'Úkoly',
+            icon: '📝',
+            isOpen: false,
+            commands: [
+                { id: 'tasks', name: 'Úkoly a questy', description: 'Zobrazí přehled všech úkolů a denních questů', icon: '📝', command: 'úkoly' },
+                { id: 'daily-quest', name: 'Denní quest', description: 'Zobrazí aktuální denní quest', icon: '⭐', command: 'denní quest' },
+                { id: 'rent-money', name: 'Peníze na nájem', description: 'Zobrazí úkol na sehnat peníze na nájem', icon: '💰', command: 'nájem' },
+                { id: 'car-sales', name: 'Prodej aut', description: 'Zobrazí nabídku aut k prodeji', icon: '🚗', command: 'prodej aut' }
+            ]
+        },
+        {
             id: 'view',
             name: 'Zobrazení',
             icon: '👁️',
@@ -397,6 +409,116 @@ const CommandsMenu = {
 
     // Zpracování speciálních příkazů
     handleSpecialCommand(command) {
+        // Úkoly a questy
+        if (command === 'úkoly') {
+            if (typeof TaskSystem !== 'undefined') {
+                TaskSystem.showTasksDialog();
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Zobrazuji přehled úkolů a questů...', false);
+                    setTimeout(() => {
+                        addMessage('Modul úkolů není dostupný. Zkuste aktualizovat stránku.', false);
+                    }, 1000);
+                }
+            }
+            return true;
+        }
+
+        if (command === 'denní quest') {
+            if (typeof TaskSystem !== 'undefined') {
+                const activeQuest = TaskSystem.getActiveDailyQuest();
+                if (activeQuest) {
+                    TaskSystem.showTasksDialog();
+                    // Přepnutí na záložku questů
+                    setTimeout(() => {
+                        const questTab = document.querySelector('.tasks-dialog-tab[data-tab="quests"]');
+                        if (questTab) {
+                            questTab.click();
+                        }
+                    }, 100);
+                } else {
+                    if (typeof addMessage !== 'undefined') {
+                        addMessage('Dnes nemáte žádný aktivní denní quest. Zkuste to znovu zítra.', false);
+                    }
+                }
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Zobrazuji denní quest...', false);
+                    setTimeout(() => {
+                        addMessage('Modul úkolů není dostupný. Zkuste aktualizovat stránku.', false);
+                    }, 1000);
+                }
+            }
+            return true;
+        }
+
+        if (command === 'nájem') {
+            if (typeof TaskSystem !== 'undefined') {
+                const rentTask = TaskSystem.tasks.find(task => task.id === 'rent-money');
+                if (rentTask) {
+                    TaskSystem.showTasksDialog();
+                } else {
+                    if (typeof addMessage !== 'undefined') {
+                        addMessage('Vytvářím nový úkol: Sehnat peníze na nájem...', false);
+                        setTimeout(() => {
+                            TaskSystem.addTask({
+                                id: 'rent-money',
+                                title: 'Sehnat peníze na nájem',
+                                description: 'Potřebuješ sehnat 5000 Kč na zaplacení nájmu do 10 dnů.',
+                                type: 'main',
+                                status: 'active',
+                                progress: 0,
+                                goal: 5000,
+                                reward: {
+                                    xp: 500,
+                                    questPoints: 100
+                                },
+                                location: {
+                                    lat: 48.8484,
+                                    lng: 17.1259,
+                                    name: 'Hodonín'
+                                },
+                                deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+                                createdAt: new Date().toISOString()
+                            });
+                            TaskSystem.showTasksDialog();
+                        }, 1000);
+                    }
+                }
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Zobrazuji úkol na sehnat peníze na nájem...', false);
+                    setTimeout(() => {
+                        addMessage('Modul úkolů není dostupný. Zkuste aktualizovat stránku.', false);
+                    }, 1000);
+                }
+            }
+            return true;
+        }
+
+        if (command === 'prodej aut') {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Zobrazuji nabídku aut k prodeji...', false);
+                setTimeout(() => {
+                    const message = `Nabídka aut k prodeji v Hodoníně:
+
+Škoda Octavia (2018) - 320 000 Kč
+Volkswagen Golf (2019) - 350 000 Kč
+Hyundai i30 (2020) - 380 000 Kč
+Toyota Corolla (2017) - 290 000 Kč
+
+Pro koupi auta použijte příkaz "koupit auto [název]"`;
+                    addMessage(message, false);
+
+                    // Přidání XP za zobrazení nabídky aut
+                    if (typeof UserProgress !== 'undefined') {
+                        UserProgress.addXP(5, 'Prohlížení nabídky aut');
+                    }
+                }, 1000);
+            }
+            return true;
+        }
+
         // Finance a kryptoměny
         if (command === 'peníze') {
             this.showFinanceInfo('all');

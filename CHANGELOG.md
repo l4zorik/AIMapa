@@ -2,6 +2,22 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9.5] - 2025-05-15 - SYSTÉM ÚKOLŮ A DENNÍCH QUESTŮ
+
+### Nové funkce
+- Přidán systém úkolů a denních questů s možností sledování postupu na mapě
+- Implementován první hlavní úkol "Sehnat peníze na nájem" s odměnou XP a bodů
+- Přidán systém náhodných denních questů (navštívit místo, najít předmět, doručit balíček)
+- Vytvořen přehledný dialog pro zobrazení všech úkolů a questů s možností filtrování
+- Přidána nová měna "body z questů" získávaná za plnění úkolů a questů
+- Implementováno zobrazení úkolů a questů na mapě pomocí speciálních markerů
+
+### Přidání do menu příkazů
+- Přidána nová kategorie "Úkoly" do menu příkazů
+- Přidány příkazy pro zobrazení úkolů, denních questů a úkolu na nájem
+- Přidán příkaz "prodej aut" pro zobrazení nabídky aut k prodeji
+- Implementováno získávání XP za používání nových příkazů
+
 ## [0.2.9.4] - 2025-05-14 - ZVĚTŠENÍ MAPY A PŘESUN FINANCÍ DO MENU
 
 ### Vylepšení mapy
