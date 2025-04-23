@@ -2,6 +2,17 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.7.5] - 2025-05-06 - ODSTRANĚNÍ MENU PŘÍKAZŮ
+
+### Odstraněné funkce
+- Odstraněno menu příkazů a všechny související soubory (commands-menu.js, commands-menu.css, commands-menu-extensions.css)
+- Odstraněny všechny reference na menu příkazů z ostatních souborů
+- Odstraněno tlačítko pro zobrazení menu příkazů z chatu
+
+### Opravy a vylepšení
+- Optimalizován kód pro lepší výkon bez menu příkazů
+- Aktualizována dokumentace projektu
+
 ## [0.2.8.7.4] - 2025-05-05 - OPRAVA VÝPOČTU CESTY A MENU PŘÍKAZŮ, PŘIDÁNÍ ROZVÁŽKY PIZZY
 
 ### Nové funkce

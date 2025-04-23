@@ -1458,13 +1458,7 @@ function toggleFullscreen() {
         // Přidání plovoucího chatu do fullscreen režimu
         createFloatingChat();
 
-        // Aktualizace menu příkazů ve fullscreen režimu
-        if (typeof CommandsMenu !== 'undefined') {
-            console.log('Aktualizace CommandsMenu po přepnutí do fullscreen režimu');
-            setTimeout(() => {
-                CommandsMenu.updateFullscreenMenu();
-            }, 500);
-        }
+        // Menu příkazů bylo odstraněno
 
         // Zobrazení informace o fullscreen režimu
         addMessage('Mapa je nyní v režimu celé obrazovky. Pro návrat stiskněte klávesu ESC nebo klikněte na tlačítko v pravém horním rohu.', false);
@@ -1561,7 +1555,6 @@ function createFloatingChat() {
     chatInputContainer.className = 'floating-chat-input';
     chatInputContainer.innerHTML = `
         <input type="text" id="floatingMessageInput" placeholder="Napište zprávu...">
-        <button class="commands-button" id="floatingCommandsButton" title="Menu příkazů"><i class="icon">📋</i></button>
         <button class="floating-send-btn" id="floatingSendMessage">➞</button>
     `;
 
@@ -1575,13 +1568,7 @@ function createFloatingChat() {
     // Přidání kontejneru do mapy
     mapWrapper.appendChild(floatingChatContainer);
 
-    // Inicializace CommandsMenu pro fullscreen režim
-    if (typeof CommandsMenu !== 'undefined') {
-        console.log('Inicializace CommandsMenu pro fullscreen režim');
-        setTimeout(() => {
-            CommandsMenu.updateFullscreenMenu();
-        }, 300);
-    }
+    // Menu příkazů bylo odstraněno
 
     // Přidání event listenerů pro ovládací prvky chatu
     document.getElementById('minimizeChat').addEventListener('click', toggleChatMinimize);
@@ -1593,25 +1580,7 @@ function createFloatingChat() {
         }
     });
 
-    // Přidání event listeneru pro tlačítko menu příkazů
-    const floatingCommandsButton = document.getElementById('floatingCommandsButton');
-    if (floatingCommandsButton) {
-        floatingCommandsButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            console.log('Kliknuto na plovoucí tlačítko menu příkazů');
-            if (typeof CommandsMenu !== 'undefined') {
-                CommandsMenu.toggleCommandsMenu();
-                // Aktualizace menu příkazů ve fullscreen režimu
-                CommandsMenu.updateFullscreenMenu();
-            } else {
-                console.error('CommandsMenu modul nebyl nalezen!');
-            }
-        });
-        console.log('Event listener přidán k plovoucímu tlačítku menu příkazů');
-    } else {
-        console.error('Plovoucí tlačítko menu příkazů nebylo nalezeno!');
-    }
+    // Tlačítko menu příkazů bylo odstraněno
 
     // Přidání možnosti přesouvat chat
     makeChatDraggable(floatingChatContainer, chatHeader);
@@ -1710,11 +1679,7 @@ function processMessage(message) {
     // Přidání zprávy uživatele do chatu
     addMessage(message, true);
 
-    // Kontrola, zda zpráva obsahuje příkaz z menu příkazů
-    if (typeof CommandsMenu !== 'undefined' && CommandsMenu.processCommand(message)) {
-        // Zpráva byla zpracována jako příkaz
-        return;
-    }
+    // Menu příkazů bylo odstraněno
 
     // Simulace odpovědi AI s návrhy dalších akcí
     setTimeout(() => {
@@ -1729,15 +1694,7 @@ function sendFloatingChatMessage() {
     const messageText = floatingMessageInput.value.trim();
 
     if (messageText) {
-        // Kontrola, zda zpráva obsahuje příkaz z menu příkazů
-        if (typeof CommandsMenu !== 'undefined' && CommandsMenu.processCommand(messageText)) {
-            // Zpráva byla zpracována jako příkaz
-            // Přidání zprávy do chatu
-            addMessage(messageText, true);
-            // Vyčištění vstupního pole
-            floatingMessageInput.value = '';
-            return;
-        }
+        // Menu příkazů bylo odstraněno
 
         // Použití existující funkce pro zpracování zprávy
         processMessage(messageText);
@@ -3282,20 +3239,7 @@ function updateAllMarkers() {
 
 // Inicializace chatu
 window.addEventListener('load', () => {
-    // Inicializace menu příkazů
-    try {
-        if (typeof CommandsMenu !== 'undefined') {
-            console.log('Inicializace CommandsMenu...');
-            setTimeout(() => {
-                CommandsMenu.init();
-                console.log('CommandsMenu inicializován');
-            }, 500); // Zpoždění pro jistotu, že DOM je plně načtený
-        } else {
-            console.error('CommandsMenu modul nebyl nalezen!');
-        }
-    } catch (error) {
-        console.error('Chyba při inicializaci CommandsMenu:', error);
-    }
+    // Menu příkazů bylo odstraněno
 
     // Vyčištění předem definovaných zpráv
     chatMessages.innerHTML = '';
