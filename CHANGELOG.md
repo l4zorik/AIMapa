@@ -2,6 +2,22 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.8.7.8] - 2025-05-09 - FUNKČNÍ PANEL MOŽNOSTÍ VEDLE CHATU
+
+### Nové funkce
+- Přidány funkční moduly pro služby jídla a pití (jídlo, pizza, energy drinky, krkovička)
+- Přidány funkční moduly pro lékařské služby (lékař, zubař, lékárna)
+- Přidán funkční modul pro veřejnou dopravu s vyhledáváním spojení
+- Implementováno zobrazení prodejních oken s možností objednávky
+- Přidána možnost objednání k lékaři a zubaři
+- Přidána možnost nákupu jízdenek na veřejnou dopravu
+
+### Vylepšení
+- Přidána funkčnost všem tlačítkům v panelu možností
+- Vylepšena interakce s uživatelem při použití příkazů
+- Optimalizováno zobrazení všech nových oken a dialogů
+- Přidáno získávání XP za použití různých služeb
+
 ## [0.2.8.7.7] - 2025-05-08 - PANEL MOŽNOSTÍ VEDLE CHATU
 
 ### Nové funkce

@@ -1,6 +1,6 @@
 /**
  * Modul pro zpětnou vazbu a dotazník o používání aplikace
- * Verze 0.2.8.7.7
+ * Verze 0.2.8.7.8
  */
 
 const FeedbackSurvey = {

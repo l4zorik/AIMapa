@@ -1,6 +1,6 @@
 /**
  * Hlavní skript aplikace
- * Verze 0.2.8.7.7
+ * Verze 0.2.8.7.8
  */
 
 // Inicializace mapy

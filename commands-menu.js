@@ -1,6 +1,6 @@
 /**
  * Modul pro menu příkazů vedle chatu
- * Verze 0.2.8.7.7
+ * Verze 0.2.8.7.8
  */
 
 const CommandsMenu = {
@@ -352,6 +352,11 @@ const CommandsMenu = {
         // Skrytí menu
         this.toggleCommandsMenu();
 
+        // Zpracování speciálních příkazů
+        if (this.handleSpecialCommand(command)) {
+            return;
+        }
+
         // Vložení příkazu do chatu
         const chatInput = document.getElementById('messageInput');
         const floatingChatInput = document.getElementById('floatingMessageInput');
@@ -373,6 +378,224 @@ const CommandsMenu = {
                 sendButton.click();
             }
         }
+    },
+
+    // Zpracování speciálních příkazů
+    handleSpecialCommand(command) {
+        // Služby jídla a pití
+        if (command === 'jídlo' && typeof FoodServices !== 'undefined') {
+            FoodServices.showService('food');
+            return true;
+        }
+
+        if (command === 'pizza' && typeof FoodServices !== 'undefined') {
+            FoodServices.showService('pizza');
+            return true;
+        }
+
+        if (command === 'energy drink' && typeof FoodServices !== 'undefined') {
+            FoodServices.showService('energyDrink');
+            return true;
+        }
+
+        if (command === 'krkovička' && typeof FoodServices !== 'undefined') {
+            FoodServices.showService('meat');
+            return true;
+        }
+
+        // Lékařské služby
+        if (command === 'lékař' && typeof MedicalServices !== 'undefined') {
+            MedicalServices.showService('doctor');
+            return true;
+        }
+
+        if (command === 'zubař' && typeof MedicalServices !== 'undefined') {
+            MedicalServices.showService('dentist');
+            return true;
+        }
+
+        if (command === 'lékárna' && typeof MedicalServices !== 'undefined') {
+            MedicalServices.showService('pharmacy');
+            return true;
+        }
+
+        // Veřejná doprava
+        if (command === 'veřejná doprava' && typeof TransportServices !== 'undefined') {
+            TransportServices.showService();
+            return true;
+        }
+
+        // Ostatní příkazy
+        if (command === 'tmavý režim') {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (darkModeToggle) {
+                darkModeToggle.checked = !darkModeToggle.checked;
+                darkModeToggle.dispatchEvent(new Event('change'));
+            }
+            return true;
+        }
+
+        if (command === 'nastavení') {
+            const settingsModal = document.getElementById('settingsModal');
+            if (settingsModal) {
+                settingsModal.style.display = 'block';
+            }
+            return true;
+        }
+
+        if (command === 'fullscreen') {
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            if (fullscreenBtn) {
+                fullscreenBtn.click();
+            }
+            return true;
+        }
+
+        if (command === 'glóbus') {
+            const globeBtn = document.getElementById('globeBtn');
+            if (globeBtn) {
+                globeBtn.click();
+            }
+            return true;
+        }
+
+        if (command === 'počasí') {
+            if (typeof WeatherLayer !== 'undefined') {
+                WeatherLayer.processCommand('počasí');
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Zobrazuji aktuální počasí...', false);
+                    setTimeout(() => {
+                        addMessage('Hodonín: 22°C, polojasno, vítr 5 km/h, vlhkost 65%', false);
+                    }, 1000);
+                }
+            }
+            return true;
+        }
+
+        if (command === 'sdílet mapu') {
+            if (typeof MapSharing !== 'undefined') {
+                MapSharing.processCommand('sdílet mapu');
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Vytvářím odkaz pro sdílení mapy...', false);
+                    setTimeout(() => {
+                        addMessage('Odkaz pro sdílení mapy byl vytvořen: https://aimapa.cz/share?id=123456', false);
+                    }, 1000);
+                }
+            }
+            return true;
+        }
+
+        if (command === 'oteviracidoba') {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Zobrazuji otevírací doby obchodů v Hodoníně...', false);
+                setTimeout(() => {
+                    const message = `Otevírací doby v Hodoníně:
+
+Albert: Po-Ne 7:00-21:00
+Lidl: Po-Ne 7:00-20:00
+Kaufland: Po-Ne 7:00-22:00
+Tesco: Po-Ne 6:00-22:00
+Billa: Po-Ne 7:00-20:00`;
+                    addMessage(message, false);
+                }, 1000);
+            }
+            return true;
+        }
+
+        if (command === 'alexa') {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Zobrazuji informace o nočním klubu Alexa...', false);
+                setTimeout(() => {
+                    const message = `Noční klub Alexa:
+
+Adresa: Masarykovo náměstí 5, Hodonín
+Otevírací doba: St-So 21:00-5:00
+Vstupné: 100 Kč
+Dnešní akce: Ladies Night - vstup pro dámy zdarma`;
+                    addMessage(message, false);
+                }, 1000);
+            }
+            return true;
+        }
+
+        if (command === 'taxi') {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Zobrazuji dostupné taxi služby v Hodoníně...', false);
+                setTimeout(() => {
+                    const message = `Taxi služby v Hodoníně:
+
+City Taxi: 518 321 321
+Hodonín Taxi: 518 352 352
+Eko Taxi: 777 666 333
+Non-stop Taxi: 777 777 777`;
+                    addMessage(message, false);
+                }, 1000);
+            }
+            return true;
+        }
+
+        if (command === 'úřad práce') {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Zobrazuji informace o úřadu práce v Hodoníně...', false);
+                setTimeout(() => {
+                    const message = `Úřad práce Hodonín:
+
+Adresa: Lipová alej 3846/8, Hodonín
+Otevírací doba: Po, St 8:00-17:00, Út, Čt 8:00-13:00, Pá 8:00-13:00
+Telefon: 950 115 111
+Email: podatelna@ho.mpsv.cz`;
+                    addMessage(message, false);
+                }, 1000);
+            }
+            return true;
+        }
+
+        if (command === 'rap') {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Yo, let me drop some beats for you!', false);
+                setTimeout(() => {
+                    const message = `AI Map on the mic, I'm mapping your way,
+Navigating streets, making your day,
+From Hodonín to Hrušky, I know the route,
+Got the best locations, without a doubt!`;
+                    addMessage(message, false);
+
+                    // Přidání XP za použití rapu
+                    if (typeof UserProgress !== 'undefined') {
+                        UserProgress.addXP(10, 'Rapová akce');
+                    }
+                }, 1500);
+            }
+            return true;
+        }
+
+        if (command === 'chci jít do práce') {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Vytvářím trasu do práce...', false);
+                setTimeout(() => {
+                    const message = `Trasa do práce byla vytvořena.
+
+Vzdálenost: 2.5 km
+Čas: 30 minut pěšky / 10 minut autem
+Dnešní úkoly:
+- Dokončit projekt AI Mapa
+- Schůzka s klientem ve 14:00
+- Odeslat měsíční report`;
+                    addMessage(message, false);
+
+                    // Přidání XP za použití funkce jít do práce
+                    if (typeof UserProgress !== 'undefined') {
+                        UserProgress.addXP(15, 'Cesta do práce');
+                    }
+                }, 2000);
+            }
+            return true;
+        }
+
+        // Pokud není speciální příkaz, vrátíme false
+        return false;
     },
 
     // Filtrování příkazů podle vyhledávání
