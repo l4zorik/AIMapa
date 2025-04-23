@@ -497,24 +497,15 @@ const CommandsMenu = {
         }
 
         if (command === 'prodej aut') {
-            if (typeof addMessage !== 'undefined') {
-                addMessage('Zobrazuji nabídku aut k prodeji...', false);
-                setTimeout(() => {
-                    const message = `Nabídka aut k prodeji v Hodoníně:
-
-Škoda Octavia (2018) - 320 000 Kč
-Volkswagen Golf (2019) - 350 000 Kč
-Hyundai i30 (2020) - 380 000 Kč
-Toyota Corolla (2017) - 290 000 Kč
-
-Pro koupi auta použijte příkaz "koupit auto [název]"`;
-                    addMessage(message, false);
-
-                    // Přidání XP za zobrazení nabídky aut
-                    if (typeof UserProgress !== 'undefined') {
-                        UserProgress.addXP(5, 'Prohlížení nabídky aut');
-                    }
-                }, 1000);
+            if (typeof CarSales !== 'undefined') {
+                CarSales.showCarSalesDialog();
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Zobrazuji nabídku aut k prodeji...', false);
+                    setTimeout(() => {
+                        addMessage('Modul prodeje aut není dostupný. Zkuste aktualizovat stránku.', false);
+                    }, 1000);
+                }
             }
             return true;
         }

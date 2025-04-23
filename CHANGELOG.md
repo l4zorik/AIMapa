@@ -2,6 +2,22 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9.6] - 2025-05-16 - PRODEJ AUT S FOTKAMI
+
+### Nové funkce
+- Vytvořen nový modul pro prodej aut s fotkami a detailními informacemi
+- Implementováno moderní rozhraní pro prohlížení nabídky aut s možností filtrování
+- Přidány detailní stránky aut s fotogalerií, technickými údaji a výbavou
+- Implementována možnost koupit auto, objednat testovací jízdu nebo kontaktovat prodejce
+- Přidána kontrola dostatku peněz při nákupu auta
+- Implementováno získávání XP za prohlížení a nákup aut
+
+### Vylepšení designu
+- Vytvořeny moderní CSS styly pro okno prodeje aut s podporou tmavého režimu
+- Přidány animace a přechody pro lepší uživatelský zážitek
+- Implementován responzivní design pro různé velikosti obrazovky
+- Přidány interaktivní prvky jako filtry, miniatury obrázků a tlačítka akcí
+
 ## [0.2.9.5] - 2025-05-15 - SYSTÉM ÚKOLŮ A DENNÍCH QUESTŮ
 
 ### Nové funkce
