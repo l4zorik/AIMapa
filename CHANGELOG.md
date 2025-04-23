@@ -2,6 +2,23 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.0.4] - 2025-05-24 - PŘESNÉ A MODIFIKOVATELNÉ VYHLEDÁVÁNÍ PRÁCE
+
+### Nové funkce
+- Přepracováno vyhledávání práce s přesnými výpočty vzdáleností
+- Implementováno automatické vyhledání nejbližší práce při použití příkazu "chci jít do práce"
+- Přidána možnost přidání nových pracovišť s vlastními parametry
+- Implementováno ukládání pracovišť do localStorage pro budoucí použití
+- Přidána možnost výběru typu práce (kancelářská, programování, manuální) s různými odměnami
+- Implementováno vytváření trasy do práce na mapě
+
+### Vylepšení uživatelského rozhraní
+- Vytvořeno moderní rozhraní pro přidání nových pracovišť
+- Přidány detailní informace o pracovištích včetně vzdálenosti a času cesty
+- Implementováno dynamické generování možností výběru typu práce podle dostupných pracovišť
+- Přidána podpora tmavého režimu pro všechny nové prvky
+- Vylepšeny animace a přechody pro lepší uživatelský zážitek
+
 ## [0.3.0.3] - 2025-05-23 - ZJEDNODUŠENÉ ZOBRAZENÍ FOTKY BODU
 
 ### Nové funkce

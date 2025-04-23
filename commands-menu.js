@@ -846,6 +846,9 @@ Got the best locations, without a doubt!`;
             if (typeof addMessage !== 'undefined') {
                 addMessage('Vytvářím virtuální cestu do práce...', false);
 
+                // Automatické vyhledání nejbližší práce
+                this.findNearestWorkplace();
+
                 // Vytvoření virtuálního dialogu pro poslání sebe do práce
                 setTimeout(() => {
                     // Vytvoření dialogu
@@ -860,36 +863,20 @@ Got the best locations, without a doubt!`;
                             <div class="work-info">
                                 <p>Místo toho, abyste šli do práce fyzicky, můžete se tam poslat virtuálně!</p>
                                 <div class="work-details">
-                                    <div class="work-detail"><span class="work-label">Vzdálenost:</span> <span class="work-value">2.5 km</span></div>
-                                    <div class="work-detail"><span class="work-label">Čas cesty:</span> <span class="work-value">10 minut</span></div>
+                                    <div class="work-detail"><span class="work-label">Nejbližší pracoviště:</span> <span class="work-value">${this.nearestWorkplace ? this.nearestWorkplace.name : 'Není k dispozici'}</span></div>
+                                    <div class="work-detail"><span class="work-label">Vzdálenost:</span> <span class="work-value">${this.nearestWorkplace ? this.nearestWorkplace.distance.toFixed(2) + ' km' : 'Neznámá'}</span></div>
+                                    <div class="work-detail"><span class="work-label">Čas cesty:</span> <span class="work-value">${this.nearestWorkplace ? Math.ceil(this.nearestWorkplace.distance * 12) + ' minut' : 'Neznámý'}</span></div>
                                     <div class="work-detail"><span class="work-label">Pracovní doba:</span> <span class="work-value">8 hodin</span></div>
-                                    <div class="work-detail"><span class="work-label">Odměna:</span> <span class="work-value">1000 Kč</span></div>
+                                    <div class="work-detail"><span class="work-label">Odměna:</span> <span class="work-value">${this.nearestWorkplace ? this.nearestWorkplace.pay + ' Kč' : '1000 Kč'}</span></div>
                                 </div>
                             </div>
                             <div class="work-options">
-                                <h4>Vyberte typ práce:</h4>
+                                <div class="work-options-header">
+                                    <h4>Vyberte typ práce:</h4>
+                                    <button class="work-add-btn" title="Přidat nové pracoviště">+ Přidat pracoviště</button>
+                                </div>
                                 <div class="work-option-list">
-                                    <div class="work-option" data-work-type="office" data-work-pay="1000">
-                                        <div class="work-option-icon">💼</div>
-                                        <div class="work-option-info">
-                                            <div class="work-option-title">Kancelářská práce</div>
-                                            <div class="work-option-pay">1000 Kč / den</div>
-                                        </div>
-                                    </div>
-                                    <div class="work-option" data-work-type="programming" data-work-pay="1500">
-                                        <div class="work-option-icon">💻</div>
-                                        <div class="work-option-info">
-                                            <div class="work-option-title">Programování</div>
-                                            <div class="work-option-pay">1500 Kč / den</div>
-                                        </div>
-                                    </div>
-                                    <div class="work-option" data-work-type="manual" data-work-pay="800">
-                                        <div class="work-option-icon">🔨</div>
-                                        <div class="work-option-info">
-                                            <div class="work-option-title">Manuální práce</div>
-                                            <div class="work-option-pay">800 Kč / den</div>
-                                        </div>
-                                    </div>
+                                    ${this.generateWorkOptions()}
                                 </div>
                             </div>
                             <div class="work-actions">
@@ -971,9 +958,30 @@ Got the best locations, without a doubt!`;
                             color: #333;
                         }
 
-                        .work-options h4 {
-                            margin-top: 0;
+                        .work-options-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
                             margin-bottom: 10px;
+                        }
+
+                        .work-options h4 {
+                            margin: 0;
+                        }
+
+                        .work-add-btn {
+                            background-color: #3498db;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            padding: 5px 10px;
+                            font-size: 14px;
+                            cursor: pointer;
+                            transition: background-color 0.2s;
+                        }
+
+                        .work-add-btn:hover {
+                            background-color: #2980b9;
                         }
 
                         .work-option-list {
@@ -1016,6 +1024,18 @@ Got the best locations, without a doubt!`;
                         .work-option-pay {
                             color: #27ae60;
                             font-size: 14px;
+                        }
+
+                        .work-option-subtitle {
+                            color: #7f8c8d;
+                            font-size: 12px;
+                            margin-bottom: 3px;
+                        }
+
+                        .work-option-distance {
+                            color: #3498db;
+                            font-size: 12px;
+                            margin-top: 3px;
                         }
 
                         .work-actions {
@@ -1078,6 +1098,14 @@ Got the best locations, without a doubt!`;
                             color: #ecf0f1;
                         }
 
+                        body[data-theme="dark"] .work-add-btn {
+                            background-color: #2980b9;
+                        }
+
+                        body[data-theme="dark"] .work-add-btn:hover {
+                            background-color: #3498db;
+                        }
+
                         body[data-theme="dark"] .work-option {
                             border-color: #34495e;
                             background-color: #2c3e50;
@@ -1095,6 +1123,14 @@ Got the best locations, without a doubt!`;
 
                         body[data-theme="dark"] .work-option-pay {
                             color: #2ecc71;
+                        }
+
+                        body[data-theme="dark"] .work-option-subtitle {
+                            color: #bdc3c7;
+                        }
+
+                        body[data-theme="dark"] .work-option-distance {
+                            color: #3498db;
                         }
 
                         body[data-theme="dark"] .work-cancel-btn {
@@ -1119,6 +1155,7 @@ Got the best locations, without a doubt!`;
                     const closeButton = dialog.querySelector('.work-dialog-close');
                     const cancelButton = dialog.querySelector('.work-cancel-btn');
                     const sendButton = dialog.querySelector('.work-send-btn');
+                    const addButton = dialog.querySelector('.work-add-btn');
                     const workOptions = dialog.querySelectorAll('.work-option');
 
                     // Zavření dialogu
@@ -1130,9 +1167,21 @@ Got the best locations, without a doubt!`;
                     closeButton.addEventListener('click', closeDialog);
                     cancelButton.addEventListener('click', closeDialog);
 
+                    // Přidání event listeneru pro tlačítko přidání pracoviště
+                    if (addButton) {
+                        addButton.addEventListener('click', () => {
+                            // Zavření aktuálního dialogu
+                            closeDialog();
+
+                            // Zobrazení dialogu pro přidání nového pracoviště
+                            this.showAddWorkplaceDialog();
+                        });
+                    }
+
                     // Výběr typu práce
                     let selectedWorkType = null;
                     let selectedWorkPay = 0;
+                    let selectedWorkId = null;
 
                     workOptions.forEach(option => {
                         option.addEventListener('click', () => {
@@ -1142,12 +1191,33 @@ Got the best locations, without a doubt!`;
                             // Přidání výběru na kliknutou možnost
                             option.classList.add('selected');
 
-                            // Uložení vybraného typu práce a odměny
+                            // Uložení vybraného typu práce, odměny a ID
                             selectedWorkType = option.dataset.workType;
                             selectedWorkPay = parseInt(option.dataset.workPay);
+                            selectedWorkId = option.dataset.workId || null;
 
                             // Povolení tlačítka pro poslání do práce
                             sendButton.disabled = false;
+
+                            // Aktualizace informací o vybraném pracovišti
+                            if (selectedWorkId) {
+                                const savedWorkplaces = JSON.parse(localStorage.getItem('workplaces')) || [];
+                                const selectedWorkplace = savedWorkplaces.find(wp => wp.id === selectedWorkId);
+
+                                if (selectedWorkplace) {
+                                    // Aktualizace informací v dialogu
+                                    const workDetails = dialog.querySelector('.work-details');
+                                    if (workDetails) {
+                                        const detailItems = workDetails.querySelectorAll('.work-detail');
+                                        if (detailItems.length >= 5) {
+                                            detailItems[0].querySelector('.work-value').textContent = selectedWorkplace.name;
+                                            detailItems[1].querySelector('.work-value').textContent = selectedWorkplace.distance.toFixed(2) + ' km';
+                                            detailItems[2].querySelector('.work-value').textContent = Math.ceil(selectedWorkplace.distance * 12) + ' minut';
+                                            detailItems[4].querySelector('.work-value').textContent = selectedWorkplace.pay + ' Kč';
+                                        }
+                                    }
+                                }
+                            }
                         });
                     });
 
@@ -2180,6 +2250,519 @@ Got the best locations, without a doubt!`;
                 this.focusPointOnMap(pointId, lat, lng);
             });
         });
+    },
+
+    // Automatické vyhledání nejbližší práce
+    findNearestWorkplace() {
+        // Získání aktuální polohy uživatele
+        let userLocation;
+
+        if (typeof map !== 'undefined') {
+            // Použití středu mapy jako výchozí polohy
+            userLocation = map.getCenter();
+        } else {
+            // Výchozí poloha pro Hodonín, pokud není dostupná mapa
+            userLocation = { lat: 48.8484, lng: 17.1259 };
+        }
+
+        // Získání uložených pracovišť z localStorage
+        const savedWorkplaces = JSON.parse(localStorage.getItem('workplaces')) || [];
+
+        // Pokud nejsou žádná uložená pracoviště, vytvoříme výchozí
+        if (savedWorkplaces.length === 0) {
+            // Výchozí pracoviště v Hodoníně
+            const defaultWorkplaces = [
+                { id: 'office1', name: 'Kancelářská budova', type: 'office', lat: 48.8534, lng: 17.1289, pay: 1000, distance: 0 },
+                { id: 'tech1', name: 'IT firma', type: 'programming', lat: 48.8484, lng: 17.1359, pay: 1500, distance: 0 },
+                { id: 'factory1', name: 'Továrna', type: 'manual', lat: 48.8384, lng: 17.1159, pay: 800, distance: 0 }
+            ];
+
+            // Uložení výchozích pracovišť do localStorage
+            localStorage.setItem('workplaces', JSON.stringify(defaultWorkplaces));
+
+            // Použití výchozích pracovišť
+            this.calculateWorkplaceDistances(defaultWorkplaces, userLocation);
+        } else {
+            // Použití uložených pracovišť
+            this.calculateWorkplaceDistances(savedWorkplaces, userLocation);
+        }
+    },
+
+    // Výpočet vzdáleností k pracovištím
+    calculateWorkplaceDistances(workplaces, userLocation) {
+        // Výpočet vzdálenosti pro každé pracoviště
+        workplaces.forEach(workplace => {
+            // Výpočet vzdálenosti pomocí Haversine formule
+            workplace.distance = this.calculateDistance(
+                userLocation.lat, userLocation.lng,
+                workplace.lat, workplace.lng
+            );
+        });
+
+        // Seřazení pracovišť podle vzdálenosti
+        workplaces.sort((a, b) => a.distance - b.distance);
+
+        // Uložení nejbližšího pracoviště
+        this.nearestWorkplace = workplaces[0];
+
+        // Zobrazení zprávy o nalezení nejbližšího pracoviště
+        if (typeof addMessage !== 'undefined') {
+            addMessage(`Nalezeno nejbližší pracoviště: ${this.nearestWorkplace.name} (${this.nearestWorkplace.distance.toFixed(2)} km)`, false);
+        }
+
+        // Vytvoření trasy do práce, pokud je dostupný MapManager
+        if (typeof MapManager !== 'undefined') {
+            // Přidání markeru pro pracoviště
+            MapManager.addMarker({
+                lat: this.nearestWorkplace.lat,
+                lng: this.nearestWorkplace.lng,
+                title: this.nearestWorkplace.name,
+                icon: this.nearestWorkplace.type === 'office' ? 'office' :
+                      this.nearestWorkplace.type === 'programming' ? 'tech' : 'factory'
+            });
+
+            // Vytvoření trasy do práce
+            MapManager.createRoute(userLocation, {
+                lat: this.nearestWorkplace.lat,
+                lng: this.nearestWorkplace.lng
+            });
+        } else if (typeof map !== 'undefined' && typeof L !== 'undefined') {
+            // Použití základních funkcí Leaflet pro zobrazení trasy
+            // Přidání markeru pro pracoviště
+            const workMarker = L.marker([this.nearestWorkplace.lat, this.nearestWorkplace.lng])
+                .addTo(map)
+                .bindPopup(`<b>${this.nearestWorkplace.name}</b><br>Plat: ${this.nearestWorkplace.pay} Kč/den`)
+                .openPopup();
+
+            // Vytvoření přímé trasy (v reálné aplikaci by zde byl routing API požadavek)
+            const routePoints = [
+                [userLocation.lat, userLocation.lng],
+                [this.nearestWorkplace.lat, this.nearestWorkplace.lng]
+            ];
+
+            L.polyline(routePoints, { color: 'blue', weight: 5, opacity: 0.7 }).addTo(map);
+        }
+    },
+
+    // Výpočet vzdálenosti mezi dvěma body pomocí Haversine formule
+    calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Poloměr Země v km
+        const dLat = this.deg2rad(lat2 - lat1);
+        const dLon = this.deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c; // Vzdálenost v km
+        return distance;
+    },
+
+    // Převod stupňů na radiány
+    deg2rad(deg) {
+        return deg * (Math.PI/180);
+    },
+
+    // Generování možností výběru typu práce
+    generateWorkOptions() {
+        // Získání uložených pracovišť z localStorage
+        const savedWorkplaces = JSON.parse(localStorage.getItem('workplaces')) || [];
+
+        // Pokud nejsou žádná uložená pracoviště, použijeme výchozí
+        if (savedWorkplaces.length === 0) {
+            return `
+                <div class="work-option" data-work-type="office" data-work-pay="1000">
+                    <div class="work-option-icon">💼</div>
+                    <div class="work-option-info">
+                        <div class="work-option-title">Kancelářská práce</div>
+                        <div class="work-option-pay">1000 Kč / den</div>
+                    </div>
+                </div>
+                <div class="work-option" data-work-type="programming" data-work-pay="1500">
+                    <div class="work-option-icon">💻</div>
+                    <div class="work-option-info">
+                        <div class="work-option-title">Programování</div>
+                        <div class="work-option-pay">1500 Kč / den</div>
+                    </div>
+                </div>
+                <div class="work-option" data-work-type="manual" data-work-pay="800">
+                    <div class="work-option-icon">🔨</div>
+                    <div class="work-option-info">
+                        <div class="work-option-title">Manuální práce</div>
+                        <div class="work-option-pay">800 Kč / den</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generování možností podle uložených pracovišť
+        return savedWorkplaces.map(workplace => {
+            // Určení ikony podle typu práce
+            const icon = workplace.type === 'office' ? '💼' :
+                         workplace.type === 'programming' ? '💻' : '🔨';
+
+            // Určení názvu typu práce
+            const typeName = workplace.type === 'office' ? 'Kancelářská práce' :
+                             workplace.type === 'programming' ? 'Programování' : 'Manuální práce';
+
+            // Vytvoření HTML pro možnost
+            return `
+                <div class="work-option" data-work-type="${workplace.type}" data-work-pay="${workplace.pay}" data-work-id="${workplace.id}">
+                    <div class="work-option-icon">${icon}</div>
+                    <div class="work-option-info">
+                        <div class="work-option-title">${workplace.name}</div>
+                        <div class="work-option-subtitle">${typeName}</div>
+                        <div class="work-option-pay">${workplace.pay} Kč / den</div>
+                        <div class="work-option-distance">${workplace.distance.toFixed(2)} km</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    // Zobrazení dialogu pro přidání nového pracoviště
+    showAddWorkplaceDialog() {
+        // Vytvoření dialogu
+        const dialog = document.createElement('div');
+        dialog.className = 'add-workplace-dialog';
+        dialog.innerHTML = `
+            <div class="add-workplace-header">
+                <h3>Přidat nové pracoviště</h3>
+                <button class="add-workplace-close">&times;</button>
+            </div>
+            <div class="add-workplace-body">
+                <div class="add-workplace-form">
+                    <div class="form-group">
+                        <label for="workplace-name">Název pracoviště:</label>
+                        <input type="text" id="workplace-name" class="workplace-input" placeholder="např. Moje kancelář">
+                    </div>
+                    <div class="form-group">
+                        <label for="workplace-type">Typ práce:</label>
+                        <select id="workplace-type" class="workplace-select">
+                            <option value="office">Kancelářská práce</option>
+                            <option value="programming">Programování</option>
+                            <option value="manual">Manuální práce</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="workplace-pay">Denní odměna (Kč):</label>
+                        <input type="number" id="workplace-pay" class="workplace-input" value="1000" min="100" max="10000">
+                    </div>
+                    <div class="form-group">
+                        <label>Poloha:</label>
+                        <div class="location-options">
+                            <label class="location-option">
+                                <input type="radio" name="location-type" value="current" checked>
+                                Použít aktuální polohu
+                            </label>
+                            <label class="location-option">
+                                <input type="radio" name="location-type" value="custom">
+                                Zadat vlastní souřadnice
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group custom-location" style="display: none;">
+                        <div class="coordinates-inputs">
+                            <div class="coordinate-group">
+                                <label for="workplace-lat">Zeměpisná šířka:</label>
+                                <input type="number" id="workplace-lat" class="workplace-input" value="48.8484" step="0.0001">
+                            </div>
+                            <div class="coordinate-group">
+                                <label for="workplace-lng">Zeměpisná délka:</label>
+                                <input type="number" id="workplace-lng" class="workplace-input" value="17.1259" step="0.0001">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-workplace-actions">
+                    <button class="add-workplace-action-btn add-workplace-save-btn">Přidat pracoviště</button>
+                    <button class="add-workplace-action-btn add-workplace-cancel-btn">Zrušit</button>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů
+        const addWorkplaceStyles = document.createElement('style');
+        addWorkplaceStyles.textContent = `
+            .add-workplace-dialog {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                border-radius: 15px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                z-index: 1100;
+                width: 90%;
+                max-width: 500px;
+                overflow: hidden;
+                animation: fadeIn 0.3s ease-in-out;
+            }
+
+            .add-workplace-header {
+                background-color: #3498db;
+                color: white;
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .add-workplace-header h3 {
+                margin: 0;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .add-workplace-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+            }
+
+            .add-workplace-body {
+                padding: 20px;
+            }
+
+            .add-workplace-form {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .form-group label {
+                font-weight: bold;
+                color: #555;
+            }
+
+            .workplace-input, .workplace-select {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+            }
+
+            .location-options {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 5px;
+            }
+
+            .location-option {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: normal;
+                cursor: pointer;
+            }
+
+            .coordinates-inputs {
+                display: flex;
+                gap: 15px;
+            }
+
+            .coordinate-group {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .add-workplace-actions {
+                display: flex;
+                justify-content: space-between;
+                gap: 15px;
+            }
+
+            .add-workplace-action-btn {
+                flex: 1;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 5px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .add-workplace-save-btn {
+                background-color: #3498db;
+                color: white;
+            }
+
+            .add-workplace-save-btn:hover {
+                background-color: #2980b9;
+            }
+
+            .add-workplace-cancel-btn {
+                background-color: #e0e0e0;
+                color: #333;
+            }
+
+            .add-workplace-cancel-btn:hover {
+                background-color: #bdc3c7;
+            }
+
+            /* Tmavý režim */
+            body[data-theme="dark"] .add-workplace-dialog {
+                background-color: #2c3e50;
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .add-workplace-header {
+                background-color: #2980b9;
+            }
+
+            body[data-theme="dark"] .form-group label {
+                color: #bdc3c7;
+            }
+
+            body[data-theme="dark"] .workplace-input,
+            body[data-theme="dark"] .workplace-select {
+                background-color: #34495e;
+                border-color: #2c3e50;
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .add-workplace-cancel-btn {
+                background-color: #34495e;
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .add-workplace-cancel-btn:hover {
+                background-color: #2c3e50;
+            }
+        `;
+
+        document.head.appendChild(addWorkplaceStyles);
+        document.body.appendChild(dialog);
+
+        // Přidání event listenerů
+        const closeButton = dialog.querySelector('.add-workplace-close');
+        const cancelButton = dialog.querySelector('.add-workplace-cancel-btn');
+        const saveButton = dialog.querySelector('.add-workplace-save-btn');
+        const locationTypeRadios = dialog.querySelectorAll('input[name="location-type"]');
+        const customLocationGroup = dialog.querySelector('.custom-location');
+
+        // Zavření dialogu
+        const closeDialog = () => {
+            dialog.remove();
+            addWorkplaceStyles.remove();
+        };
+
+        closeButton.addEventListener('click', closeDialog);
+        cancelButton.addEventListener('click', closeDialog);
+
+        // Přepínání mezi typy polohy
+        locationTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.value === 'custom') {
+                    customLocationGroup.style.display = 'block';
+                } else {
+                    customLocationGroup.style.display = 'none';
+                }
+            });
+        });
+
+        // Uložení nového pracoviště
+        saveButton.addEventListener('click', () => {
+            // Získání hodnot z formuláře
+            const name = dialog.querySelector('#workplace-name').value.trim();
+            const type = dialog.querySelector('#workplace-type').value;
+            const pay = parseInt(dialog.querySelector('#workplace-pay').value);
+            const locationType = dialog.querySelector('input[name="location-type"]:checked').value;
+
+            // Kontrola, zda jsou vyplněny povinné údaje
+            if (!name) {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Zadejte název pracoviště.', false);
+                }
+                return;
+            }
+
+            // Získání souřadnic
+            let lat, lng;
+
+            if (locationType === 'current') {
+                // Použití aktuální polohy
+                if (typeof map !== 'undefined') {
+                    const center = map.getCenter();
+                    lat = center.lat;
+                    lng = center.lng;
+                } else {
+                    // Výchozí poloha pro Hodonín, pokud není dostupná mapa
+                    lat = 48.8484;
+                    lng = 17.1259;
+                }
+            } else {
+                // Použití vlastních souřadnic
+                lat = parseFloat(dialog.querySelector('#workplace-lat').value);
+                lng = parseFloat(dialog.querySelector('#workplace-lng').value);
+            }
+
+            // Přidání nového pracoviště
+            const newWorkplace = this.addWorkplace(name, type, lat, lng, pay);
+
+            // Zavření dialogu
+            closeDialog();
+
+            // Zobrazení zprávy o přidání nového pracoviště
+            if (typeof addMessage !== 'undefined') {
+                addMessage(`Nové pracoviště "${name}" bylo přidáno.`, false);
+            }
+
+            // Znovu otevření dialogu pro cestu do práce
+            setTimeout(() => {
+                this.handleSpecialCommand('chci jít do práce');
+            }, 1000);
+        });
+    },
+
+    // Přidání nového pracoviště
+    addWorkplace(name, type, lat, lng, pay) {
+        // Získání uložených pracovišť z localStorage
+        const savedWorkplaces = JSON.parse(localStorage.getItem('workplaces')) || [];
+
+        // Vytvoření ID pro nové pracoviště
+        const id = `${type}${savedWorkplaces.length + 1}`;
+
+        // Vytvoření nového pracoviště
+        const newWorkplace = {
+            id,
+            name,
+            type,
+            lat,
+            lng,
+            pay,
+            distance: 0 // Bude vypočítáno později
+        };
+
+        // Přidání nového pracoviště do pole
+        savedWorkplaces.push(newWorkplace);
+
+        // Uložení aktualizovaných pracovišť do localStorage
+        localStorage.setItem('workplaces', JSON.stringify(savedWorkplaces));
+
+        // Zobrazení zprávy o přidání nového pracoviště
+        if (typeof addMessage !== 'undefined') {
+            addMessage(`Přidáno nové pracoviště: ${name}`, false);
+        }
+
+        // Přidání XP za přidání nového pracoviště
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addXP(20, 'Přidání nového pracoviště');
+        }
+
+        return newWorkplace;
     },
 
     // Zaměření bodu na mapě
