@@ -1,14 +1,26 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.2.9.2
+ * Verze 0.2.9.3
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.2.9.2',
+    currentVersion: '0.2.9.3',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.2.9.3',
+            date: '2025-05-13',
+            title: 'Přesunutelné prvky rozhraní',
+            description: 'Přidána možnost přesouvat všechny prvky uživatelského rozhraní (chat, ukazatele peněz a bitcoinu)',
+            changes: [
+                'Přidána možnost přesouvat všechny prvky uživatelského rozhraní (chat, ukazatele peněz a bitcoinu)',
+                'Implementován obecný modul pro přesouvatelnost prvků s ukládáním pozic',
+                'Přidána možnost minimalizace chatu a ukazatelů peněz/bitcoinu',
+                'Vylepšen design hlaviček přesunutelných prvků pro lepší uživatelský zážitek'
+            ]
+        },
         {
             version: '0.2.9.2',
             date: '2025-05-12',

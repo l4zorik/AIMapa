@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Map - Into the known v0.2.9.2</title>
+    <title>AI Map - Into the known v0.2.9.4</title>
     <link rel="icon" href="icons8-favicon.gif" type="image/gif">
     <link rel="stylesheet" href="styles.css">
     <!-- Leaflet CSS pro mapu -->
@@ -91,22 +91,24 @@
                 </div>
             </div>
 
-            <div class="ai-assistant">
-                <h2>AI Asistent</h2>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai">
-                        Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
-                    </div>
-                    <div class="message ai">
-                        Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
-                    </div>
-                    <div class="message ai">
-                        Trasa byde vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
+            <div class="ai-assistant" id="aiAssistant">
+                <div class="chat-header">
+                    <div class="chat-drag-handle">⋮⋮</div>
+                    <h2>AI Asistent</h2>
+                    <div class="chat-controls">
+                        <button id="minimizeMainChat" class="chat-control-btn minimize-btn" title="Minimalizovat chat">−</button>
                     </div>
                 </div>
-                <div class="chat-input">
-                    <input type="text" id="messageInput" placeholder="Napište zprávu...">
-                    <button class="send-btn" id="sendMessage">➤</button>
+                <div class="chat-content">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="messageInput" placeholder="Napište zprávu...">
+                        <button class="send-btn" id="sendMessage">➤</button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -369,6 +371,8 @@
     <script src="transport-services.js"></script>
     <!-- Skript pro efekty tmavé oblohy -->
     <script src="dark-sky-effects.js"></script>
+    <!-- Skript pro přesunutelné prvky -->
+    <script src="draggable-elements.js"></script>
     <!-- Skript pro ukazatel peněz -->
     <script src="money-indicator.js"></script>
     <!-- Skript pro menu příkazů -->

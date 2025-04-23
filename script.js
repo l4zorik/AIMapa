@@ -1,6 +1,6 @@
 /**
  * Hlavní skript aplikace
- * Verze 0.2.8.7.8
+ * Verze 0.2.9.4
  */
 
 // Inicializace mapy
@@ -1458,6 +1458,12 @@ function toggleFullscreen() {
         // Přidání plovoucího chatu do fullscreen režimu
         createFloatingChat();
 
+        // Skrytí hlavního chatu v fullscreen režimu
+        const aiAssistant = document.getElementById('aiAssistant');
+        if (aiAssistant) {
+            aiAssistant.style.display = 'none';
+        }
+
         // Menu příkazů bylo odstraněno
 
         // Zobrazení informace o fullscreen režimu
@@ -1489,15 +1495,21 @@ function toggleFullscreen() {
 
         // Odstranění plovoucího chatu
         removeFloatingChat();
+
+        // Zobrazení hlavního chatu po návratu z fullscreen režimu
+        const aiAssistant = document.getElementById('aiAssistant');
+        if (aiAssistant) {
+            aiAssistant.style.display = 'flex';
+        }
     }
 
     // Aktualizace velikosti mapy po změně režimu
     setTimeout(() => {
-        map.invalidateSize();
+        map.invalidateSize({animate: true});
         if (route) {
             map.fitBounds(route.getBounds(), {padding: [50, 50]});
         }
-    }, 300); // Zvýšení času pro lepší přechod
+    }, 500); // Zvýšení času pro lepší přechod
 
     // Vytvoření a odeslání události o změně fullscreen režimu
     const event = new CustomEvent('fullscreenChange', {
@@ -1506,6 +1518,15 @@ function toggleFullscreen() {
         }
     });
     document.dispatchEvent(event);
+
+    // Nastavení přesouvatelnosti chatu podle režimu
+    if (typeof DraggableElements !== 'undefined') {
+        const aiAssistant = document.getElementById('aiAssistant');
+        if (aiAssistant) {
+            // V normálním režimu chat není přesunutelný
+            DraggableElements.setElementDraggable(aiAssistant, false);
+        }
+    }
 }
 
 // Přidání event listeneru pro tlačítko fullscreen
@@ -1591,7 +1612,13 @@ function createFloatingChat() {
     // Tlačítko menu příkazů bylo odstraněno
 
     // Přidání možnosti přesouvat chat
-    makeChatDraggable(floatingChatContainer, chatHeader);
+    if (typeof DraggableElements !== 'undefined') {
+        DraggableElements.makeDraggable(floatingChatContainer, chatHeader, 'floatingChatContainer');
+        DraggableElements.setElementDraggable(floatingChatContainer, true);
+    } else {
+        // Fallback na základní implementaci
+        makeChatDraggable(floatingChatContainer, chatHeader);
+    }
 }
 
 // Funkce pro odstranění plovoucího chatu
@@ -1715,8 +1742,10 @@ function sendFloatingChatMessage() {
 // Funkce pro přidání možnosti přesouvat chat
 function makeChatDraggable(element, handle) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    let isDragging = false;
 
     handle.onmousedown = dragMouseDown;
+    handle.style.cursor = 'move'; // Nastavení kurzoru pro indikaci přesouvatelnosti
 
     function dragMouseDown(e) {
         e.preventDefault();
@@ -1726,27 +1755,111 @@ function makeChatDraggable(element, handle) {
         document.onmouseup = closeDragElement;
         // Volat funkci při pohybu myši
         document.onmousemove = elementDrag;
+        isDragging = true;
+        element.classList.add('dragging'); // Přidání třídy pro indikaci přesouvatelnosti
     }
 
     function elementDrag(e) {
+        if (!isDragging) return;
+
         e.preventDefault();
         // Výpočet nové pozice
         pos1 = pos3 - e.clientX;
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
+
         // Nastavení nové pozice elementu
         element.style.top = (element.offsetTop - pos2) + "px";
         element.style.left = (element.offsetLeft - pos1) + "px";
 
         // Odstranění tříd pro pozici, pokud jsou přítomny
         element.classList.remove('chat-left', 'chat-right');
+
+        // Kontrola, zda element neopustil okno
+        checkElementBounds(element);
     }
 
     function closeDragElement() {
         // Zastavení pohybu při uvolnění tlačítka myši
         document.onmouseup = null;
         document.onmousemove = null;
+        isDragging = false;
+        element.classList.remove('dragging');
+
+        // Uložení pozice, pokud je dostupný modul DraggableElements
+        if (typeof DraggableElements !== 'undefined' && element.id) {
+            DraggableElements.saveElementPosition(element.id, element);
+        }
+    }
+
+    // Kontrola, zda element neopustil okno
+    function checkElementBounds(el) {
+        const rect = el.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // Kontrola, zda element neopustil okno
+        if (rect.right < 50) {
+            el.style.left = (-rect.width + 50) + 'px';
+        } else if (rect.left > windowWidth - 50) {
+            el.style.left = (windowWidth - 50) + 'px';
+        }
+
+        if (rect.bottom < 50) {
+            el.style.top = (-rect.height + 50) + 'px';
+        } else if (rect.top > windowHeight - 50) {
+            el.style.top = (windowHeight - 50) + 'px';
+        }
+    }
+}
+
+// Funkce pro nastavení přesouvatelnosti hlavního chatu
+function setupMainChatDraggable(draggable = false) {
+    const aiAssistant = document.getElementById('aiAssistant');
+    const chatHeader = aiAssistant.querySelector('.chat-header');
+    const minimizeBtn = document.getElementById('minimizeMainChat');
+
+    // Přidání možnosti přesouvat chat pomocí DraggableElements modulu
+    if (typeof DraggableElements !== 'undefined') {
+        // Nejprve vytvoříme prvek jako přesunutelný
+        DraggableElements.makeDraggable(aiAssistant, chatHeader, 'aiAssistant');
+
+        // Pak nastavíme, zda má být přesunutelný nebo ne
+        DraggableElements.setElementDraggable(aiAssistant, draggable);
+    } else {
+        // Fallback na základní implementaci
+        if (draggable) {
+            makeChatDraggable(aiAssistant, chatHeader);
+        }
+    }
+
+    // Přidání event listeneru pro minimalizaci chatu
+    if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', toggleMainChatMinimize);
+    }
+}
+
+// Funkce pro přepnutí minimalizace hlavního chatu
+function toggleMainChatMinimize() {
+    const aiAssistant = document.getElementById('aiAssistant');
+    const chatContent = aiAssistant.querySelector('.chat-content');
+    const minimizeBtn = document.getElementById('minimizeMainChat');
+
+    if (!aiAssistant || !chatContent || !minimizeBtn) return;
+
+    if (aiAssistant.classList.contains('minimized')) {
+        // Maximalizovat chat
+        aiAssistant.classList.remove('minimized');
+        chatContent.style.display = 'flex';
+        minimizeBtn.textContent = '−'; // Symbol minus
+        minimizeBtn.title = 'Minimalizovat chat';
+    } else {
+        // Minimalizovat chat
+        aiAssistant.classList.add('minimized');
+        chatContent.style.display = 'none';
+        minimizeBtn.textContent = '+'; // Symbol plus
+        minimizeBtn.title = 'Maximalizovat chat';
     }
 }
 
@@ -3284,15 +3397,25 @@ function updateAllMarkers() {
     });
 }
 
-// Inicializace chatu
+// Inicializace chatu a přizpůsobení mapy
 window.addEventListener('load', () => {
     // Menu příkazů bylo odstraněno
+
+    // Aktualizace velikosti mapy po načtení stránky
+    setTimeout(() => {
+        map.invalidateSize({animate: true});
+    }, 300);
 
     // Vyčištění předem definovaných zpráv
     chatMessages.innerHTML = '';
 
     // Přidání uvítací zprávy s návrhy akcí
     addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?', false, ['Přidat aktivitu', 'Vypočítat trasu', 'Otevírací doba', 'Alexa']);
+
+    // Přidání možnosti přesouvat hlavní chat pouze ve fullscreen režimu
+    setTimeout(() => {
+        setupMainChatDraggable(false); // Chat není přesunutelný v normálním režimu
+    }, 500); // Zpoždění pro zajištění, že DraggableElements modul je inicializován
 
     // Pokus o načtení stavu aplikace
     const stateLoaded = loadAppState();

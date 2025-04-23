@@ -2,6 +2,39 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9.4] - 2025-05-14 - ZVĚTŠENÍ MAPY A UKAZATELE FINANCÍ
+
+### Vylepšení mapy
+- Zvětšena velikost mapy z 600px na 850px pro lepší využití prostoru na stránce
+- Upraveno rozložení stránky pro větší poměr mapy (4:1 místo 2:1)
+- Zvětšen celkový kontejner stránky z 1200px na 1400px pro lepší využití širokých obrazovek
+- Optimalizováno zobrazení mapy na mobilních zařízeních (650px výška)
+- Vylepšena aktualizace velikosti mapy při změnách režimu a načtení stránky
+
+### Vylepšení přesunutelných prvků
+- Upraveno ukládání pozice chatu - nyní zůstává na místě, kam ho uživatel přesunul
+- Výrazně zvětšen ukazatel financí pro lepší čitelnost (větší písmo, ikony a rozměry)
+- Zvětšeny ikony peněz a kryptoměn z 36px na 42px pro lepší viditelnost
+- Zvětšeno písmo ukazatele financí z 18px na 20px (a 22px pro fullscreen režim)
+- Zvětšena šířka ukazatele financí z 320px na 380px (a 420px pro fullscreen režim)
+- Vylepšen design ukazatele financí s většími mezerami a lepším kontrastem
+- Zvětšeny ovládací prvky ukazatele financí pro snadnější použití
+- Vylepšeno přesouvání prvků - nyní se pohybují 1.5x rychleji pro lepší ovládání
+
+## [0.2.9.3] - 2025-05-13 - PŘESUNUTELNÉ PRVKY ROZHRANÍ
+
+### Nové funkce
+- Přidána možnost přesouvat všechny prvky uživatelského rozhraní (chat, ukazatele peněz a bitcoinu)
+- Implementován obecný modul pro přesouvatelnost prvků s ukládáním pozic
+- Přidána možnost minimalizace chatu a ukazatelů peněz/bitcoinu
+- Vylepšen design hlaviček přesunutelných prvků pro lepší uživatelský zážitek
+
+### Vylepšení
+- Vylepšen design AI chatu s přidáním hlavičky pro přesouvatelnost
+- Optimalizováno zobrazení všech přesunutelných prvků pro různé velikosti obrazovky
+- Implementováno automatické ukládání pozic prvků do localStorage
+- Přidána kontrola viditelnosti prvků při změně velikosti okna
+
 ## [0.2.9.2] - 2025-05-12 - VYLEPŠENÍ UKAZATELŮ PENĚZ A BITCOINU
 
 ### Vylepšení

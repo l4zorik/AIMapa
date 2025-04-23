@@ -25,7 +25,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -56,7 +56,7 @@ header h1 {
 
 main {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 4fr 1fr;
     gap: 30px;
     margin-bottom: 30px;
 }
@@ -88,7 +88,7 @@ main {
 }
 
 #map {
-    height: 600px;
+    height: 850px;
     border-radius: 8px;
     width: 100%;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -287,24 +287,90 @@ body[data-theme="dark"] .btn:hover {
 
 .ai-assistant {
     background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    width: 320px; /* Omezená šířka */
+    height: auto; /* Automatická výška */
+    max-height: 500px; /* Maximální výška */
+    overflow: hidden;
+    position: fixed; /* Fixní pozicování na stránce */
+    top: 20px; /* Výchozí pozice od horního okraje */
+    right: 20px; /* Výchozí pozice od pravého okraje */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000; /* Zajištění, že bude nad mapou */
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: default; /* Normální kurzor v normálním režimu */
+}
+
+/* Kurzor pro přesunutelný chat ve fullscreen režimu */
+.map-fullscreen .chat-header {
+    cursor: move;
+}
+
+.chat-drag-handle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: move;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 14px;
+    flex: 1;
+    text-align: center;
+}
+
+.chat-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.chat-control-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.chat-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 10px;
 }
 
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    margin-bottom: 20px;
-    padding: 10px;
+    margin-bottom: 10px;
+    padding: 8px;
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    max-height: 500px;
+    gap: 8px;
+    max-height: 300px; /* Snížená maximální výška */
     transition: background-color 0.3s;
 }
 
@@ -313,10 +379,11 @@ body[data-theme="dark"] .chat-messages {
 }
 
 .message {
-    padding: 10px;
+    padding: 8px;
     border-radius: 5px;
-    max-width: 90%;
+    max-width: 85%;
     white-space: pre-line;
+    font-size: 0.9rem; /* Menší velikost písma */
 }
 
 .message.ai {
@@ -383,19 +450,20 @@ body[data-theme="dark"] .message.ai {
 
 .chat-input {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
     position: relative;
 }
 
 .chat-input input {
     flex: 1;
-    padding: 10px;
+    padding: 8px;
     border: none;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.2);
     color: white;
     transition: background-color 0.3s, color 0.3s;
+    font-size: 0.9rem;
 }
 
 body[data-theme="dark"] .chat-input input {
@@ -407,10 +475,11 @@ body[data-theme="dark"] .chat-input input {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-size: 0.9rem;
 }
 
 .send-btn:hover {
@@ -3204,6 +3273,7 @@ body.fullscreen-mode {
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: move; /* Ukazatel, že lze přesouvat */
 }
 
 /* Pozice chatu vlevo/vpravo */
@@ -3233,30 +3303,6 @@ body.fullscreen-mode {
 .chat-title {
     font-weight: bold;
     font-size: 16px;
-}
-
-.chat-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.chat-control-btn {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.chat-control-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Obsah chatu */
@@ -3319,6 +3365,11 @@ body.fullscreen-mode {
 .floating-chat-container.minimized {
     height: 48px;
     max-height: 48px;
+}
+
+/* Minimalizovaný hlavní chat */
+.ai-assistant.minimized .chat-content {
+    display: none;
 }
 
 /* Optimalizace pro mobilní zařízení */
@@ -4101,6 +4152,10 @@ body[data-theme="dark"] .map-globe-control-btn:hover {
 @media (max-width: 768px) {
     main {
         grid-template-columns: 1fr;
+    }
+
+    #map {
+        height: 650px; /* Větší výška na mobilních zařízeních, ale stále menší než na desktopu */
     }
 
     .controls {
