@@ -91,23 +91,31 @@ const TaskSystem = {
             // Přidání výchozího úkolu "sehnat peníze na nájem"
             this.addTask({
                 id: 'rent-money',
-                title: 'Sehnat peníze na nájem',
-                description: 'Potřebuješ sehnat 5000 Kč na zaplacení nájmu do 10 dnů.',
-                type: 'main',
+                title: 'EXTRÉMNĚ URGENTNÍ: Sehnat peníze na nájem',
+                description: 'EXTRÉMNĚ DŮLEŽITÉ! Potřebuješ sehnat 15000 Kč na zaplacení nájmu do 10 dnů, jinak přijdeš o bydlení! Toto je tvůj nejdůležitější úkol!',
+                type: 'critical',
                 status: 'active',
                 progress: 0,
-                goal: 5000,
+                goal: 15000,
                 reward: {
-                    xp: 500,
-                    questPoints: 100
+                    xp: 2000,
+                    questPoints: 500
                 },
                 location: {
                     lat: 48.8484,
                     lng: 17.1259,
                     name: 'Hodonín'
                 },
+                priority: 'critical',
                 deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 dní od nyní
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                isMainStoryQuest: true, // Označení jako hlavní příběhový úkol
+                moneyLocations: [
+                    { name: 'Autobazar Hodonín', description: 'Prodej auta za 290000-380000 Kč', lat: 48.8514, lng: 17.1319, amount: 290000 },
+                    { name: 'Taneční klub Hodonín', description: 'Práce jako tanečnice - 5000 Kč za večer', lat: 48.8534, lng: 17.1289, amount: 5000 },
+                    { name: 'Úřad práce', description: 'Podpora v nezaměstnanosti - 3500 Kč měsíčně', lat: 48.8464, lng: 17.1279, amount: 3500 },
+                    { name: 'Restaurace U Zlatého lva', description: 'Práce číšníka/číšnice - 150 Kč/hod', lat: 48.8494, lng: 17.1269, amount: 150 }
+                ]
             });
 
             console.log('Přidán výchozí úkol "sehnat peníze na nájem"');

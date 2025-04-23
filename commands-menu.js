@@ -775,23 +775,366 @@ Got the best locations, without a doubt!`;
 
         if (command === 'chci jít do práce') {
             if (typeof addMessage !== 'undefined') {
-                addMessage('Vytvářím trasu do práce...', false);
+                addMessage('Vytvářím virtuální cestu do práce...', false);
+
+                // Vytvoření virtuálního dialogu pro poslání sebe do práce
                 setTimeout(() => {
-                    const message = `Trasa do práce byla vytvořena.
+                    // Vytvoření dialogu
+                    const dialog = document.createElement('div');
+                    dialog.className = 'work-dialog';
+                    dialog.innerHTML = `
+                        <div class="work-dialog-header">
+                            <h3>Virtuální cesta do práce</h3>
+                            <button class="work-dialog-close">&times;</button>
+                        </div>
+                        <div class="work-dialog-body">
+                            <div class="work-info">
+                                <p>Místo toho, abyste šli do práce fyzicky, můžete se tam poslat virtuálně!</p>
+                                <div class="work-details">
+                                    <div class="work-detail"><span class="work-label">Vzdálenost:</span> <span class="work-value">2.5 km</span></div>
+                                    <div class="work-detail"><span class="work-label">Čas cesty:</span> <span class="work-value">10 minut</span></div>
+                                    <div class="work-detail"><span class="work-label">Pracovní doba:</span> <span class="work-value">8 hodin</span></div>
+                                    <div class="work-detail"><span class="work-label">Odměna:</span> <span class="work-value">1000 Kč</span></div>
+                                </div>
+                            </div>
+                            <div class="work-options">
+                                <h4>Vyberte typ práce:</h4>
+                                <div class="work-option-list">
+                                    <div class="work-option" data-work-type="office" data-work-pay="1000">
+                                        <div class="work-option-icon">💼</div>
+                                        <div class="work-option-info">
+                                            <div class="work-option-title">Kancelářská práce</div>
+                                            <div class="work-option-pay">1000 Kč / den</div>
+                                        </div>
+                                    </div>
+                                    <div class="work-option" data-work-type="programming" data-work-pay="1500">
+                                        <div class="work-option-icon">💻</div>
+                                        <div class="work-option-info">
+                                            <div class="work-option-title">Programování</div>
+                                            <div class="work-option-pay">1500 Kč / den</div>
+                                        </div>
+                                    </div>
+                                    <div class="work-option" data-work-type="manual" data-work-pay="800">
+                                        <div class="work-option-icon">🔨</div>
+                                        <div class="work-option-info">
+                                            <div class="work-option-title">Manuální práce</div>
+                                            <div class="work-option-pay">800 Kč / den</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="work-actions">
+                                <button class="work-action-btn work-send-btn" disabled>Poslat se do práce</button>
+                                <button class="work-action-btn work-cancel-btn">Zrušit</button>
+                            </div>
+                        </div>
+                    `;
 
-Vzdálenost: 2.5 km
-Čas: 30 minut pěšky / 10 minut autem
-Dnešní úkoly:
-- Dokončit projekt AI Mapa
-- Schůzka s klientem ve 14:00
-- Odeslat měsíční report`;
-                    addMessage(message, false);
+                    // Přidání CSS stylů
+                    const workStyles = document.createElement('style');
+                    workStyles.textContent = `
+                        .work-dialog {
+                            position: fixed;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            background-color: white;
+                            border-radius: 15px;
+                            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                            z-index: 1100;
+                            width: 90%;
+                            max-width: 500px;
+                            overflow: hidden;
+                            animation: fadeIn 0.3s ease-in-out;
+                        }
 
-                    // Přidání XP za použití funkce jít do práce
-                    if (typeof UserProgress !== 'undefined') {
-                        UserProgress.addXP(15, 'Cesta do práce');
-                    }
-                }, 2000);
+                        .work-dialog-header {
+                            background-color: #3498db;
+                            color: white;
+                            padding: 15px 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+
+                        .work-dialog-header h3 {
+                            margin: 0;
+                            font-size: 20px;
+                            font-weight: bold;
+                        }
+
+                        .work-dialog-close {
+                            background: none;
+                            border: none;
+                            color: white;
+                            font-size: 24px;
+                            cursor: pointer;
+                        }
+
+                        .work-dialog-body {
+                            padding: 20px;
+                        }
+
+                        .work-info p {
+                            margin-top: 0;
+                            font-size: 16px;
+                        }
+
+                        .work-details {
+                            background-color: #f8f9fa;
+                            border-radius: 10px;
+                            padding: 15px;
+                            margin-bottom: 20px;
+                        }
+
+                        .work-detail {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 8px;
+                        }
+
+                        .work-label {
+                            font-weight: bold;
+                            color: #555;
+                        }
+
+                        .work-value {
+                            color: #333;
+                        }
+
+                        .work-options h4 {
+                            margin-top: 0;
+                            margin-bottom: 10px;
+                        }
+
+                        .work-option-list {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                            gap: 15px;
+                            margin-bottom: 20px;
+                        }
+
+                        .work-option {
+                            border: 2px solid #e0e0e0;
+                            border-radius: 10px;
+                            padding: 15px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            display: flex;
+                            align-items: center;
+                        }
+
+                        .work-option:hover {
+                            border-color: #3498db;
+                            background-color: #f0f7fc;
+                        }
+
+                        .work-option.selected {
+                            border-color: #3498db;
+                            background-color: #ebf5fb;
+                        }
+
+                        .work-option-icon {
+                            font-size: 24px;
+                            margin-right: 15px;
+                        }
+
+                        .work-option-title {
+                            font-weight: bold;
+                            margin-bottom: 5px;
+                        }
+
+                        .work-option-pay {
+                            color: #27ae60;
+                            font-size: 14px;
+                        }
+
+                        .work-actions {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-top: 20px;
+                        }
+
+                        .work-action-btn {
+                            padding: 10px 20px;
+                            border: none;
+                            border-radius: 5px;
+                            font-size: 16px;
+                            cursor: pointer;
+                            transition: background-color 0.2s;
+                        }
+
+                        .work-send-btn {
+                            background-color: #3498db;
+                            color: white;
+                        }
+
+                        .work-send-btn:hover:not(:disabled) {
+                            background-color: #2980b9;
+                        }
+
+                        .work-send-btn:disabled {
+                            background-color: #bdc3c7;
+                            cursor: not-allowed;
+                        }
+
+                        .work-cancel-btn {
+                            background-color: #e0e0e0;
+                            color: #333;
+                        }
+
+                        .work-cancel-btn:hover {
+                            background-color: #bdc3c7;
+                        }
+
+                        /* Tmavý režim */
+                        body[data-theme="dark"] .work-dialog {
+                            background-color: #2c3e50;
+                            color: #ecf0f1;
+                        }
+
+                        body[data-theme="dark"] .work-dialog-header {
+                            background-color: #2980b9;
+                        }
+
+                        body[data-theme="dark"] .work-details {
+                            background-color: #34495e;
+                        }
+
+                        body[data-theme="dark"] .work-label {
+                            color: #bdc3c7;
+                        }
+
+                        body[data-theme="dark"] .work-value {
+                            color: #ecf0f1;
+                        }
+
+                        body[data-theme="dark"] .work-option {
+                            border-color: #34495e;
+                            background-color: #2c3e50;
+                        }
+
+                        body[data-theme="dark"] .work-option:hover {
+                            border-color: #3498db;
+                            background-color: #34495e;
+                        }
+
+                        body[data-theme="dark"] .work-option.selected {
+                            border-color: #3498db;
+                            background-color: #2980b9;
+                        }
+
+                        body[data-theme="dark"] .work-option-pay {
+                            color: #2ecc71;
+                        }
+
+                        body[data-theme="dark"] .work-cancel-btn {
+                            background-color: #34495e;
+                            color: #ecf0f1;
+                        }
+
+                        body[data-theme="dark"] .work-cancel-btn:hover {
+                            background-color: #2c3e50;
+                        }
+
+                        @keyframes fadeIn {
+                            from { opacity: 0; transform: translate(-50%, -60%); }
+                            to { opacity: 1; transform: translate(-50%, -50%); }
+                        }
+                    `;
+
+                    document.head.appendChild(workStyles);
+                    document.body.appendChild(dialog);
+
+                    // Přidání event listenerů
+                    const closeButton = dialog.querySelector('.work-dialog-close');
+                    const cancelButton = dialog.querySelector('.work-cancel-btn');
+                    const sendButton = dialog.querySelector('.work-send-btn');
+                    const workOptions = dialog.querySelectorAll('.work-option');
+
+                    // Zavření dialogu
+                    const closeDialog = () => {
+                        dialog.remove();
+                        workStyles.remove();
+                    };
+
+                    closeButton.addEventListener('click', closeDialog);
+                    cancelButton.addEventListener('click', closeDialog);
+
+                    // Výběr typu práce
+                    let selectedWorkType = null;
+                    let selectedWorkPay = 0;
+
+                    workOptions.forEach(option => {
+                        option.addEventListener('click', () => {
+                            // Odstranění výběru ze všech možností
+                            workOptions.forEach(opt => opt.classList.remove('selected'));
+
+                            // Přidání výběru na kliknutou možnost
+                            option.classList.add('selected');
+
+                            // Uložení vybraného typu práce a odměny
+                            selectedWorkType = option.dataset.workType;
+                            selectedWorkPay = parseInt(option.dataset.workPay);
+
+                            // Povolení tlačítka pro poslání do práce
+                            sendButton.disabled = false;
+                        });
+                    });
+
+                    // Poslání do práce
+                    sendButton.addEventListener('click', () => {
+                        if (!selectedWorkType) return;
+
+                        // Zavření dialogu
+                        closeDialog();
+
+                        // Zobrazení zprávy o odeslání do práce
+                        addMessage(`Posílám vás do práce (${selectedWorkType === 'office' ? 'kancelářská práce' : selectedWorkType === 'programming' ? 'programování' : 'manuální práce'})...`, false);
+
+                        // Simulace práce
+                        setTimeout(() => {
+                            // Přidání peněz
+                            if (typeof MoneyIndicator !== 'undefined') {
+                                MoneyIndicator.addMoney(selectedWorkPay, `Výdělek z práce (${selectedWorkType === 'office' ? 'kancelářská práce' : selectedWorkType === 'programming' ? 'programování' : 'manuální práce'})`);
+                            } else {
+                                // Pokud není dostupný MoneyIndicator, přidáme peníze přímo do localStorage
+                                const appState = JSON.parse(localStorage.getItem('appState')) || {};
+                                const currentMoney = appState.money !== undefined ? appState.money : 500;
+                                appState.money = currentMoney + selectedWorkPay;
+                                localStorage.setItem('appState', JSON.stringify(appState));
+                            }
+
+                            // Přidání XP za práci
+                            if (typeof UserProgress !== 'undefined') {
+                                UserProgress.addXP(30, `Práce (${selectedWorkType === 'office' ? 'kancelářská práce' : selectedWorkType === 'programming' ? 'programování' : 'manuální práce'})`);
+                            }
+
+                            // Zobrazení zprávy o dokončení práce
+                            addMessage(`Práce dokončena! Vydělali jste ${selectedWorkPay} Kč.`, false);
+
+                            // Aktualizace úkolu na nájem, pokud existuje
+                            if (typeof TaskSystem !== 'undefined') {
+                                const rentTask = TaskSystem.tasks.find(task => task.id === 'rent-money' && task.status === 'active');
+                                if (rentTask) {
+                                    // Vytvoření události přidání peněz pro aktualizaci úkolu
+                                    const moneyEvent = new CustomEvent('moneyAdded', { detail: { amount: selectedWorkPay } });
+                                    document.dispatchEvent(moneyEvent);
+
+                                    // Zobrazení zprávy o postupu v úkolu
+                                    setTimeout(() => {
+                                        const updatedTask = TaskSystem.tasks.find(task => task.id === 'rent-money');
+                                        if (updatedTask && updatedTask.status === 'active') {
+                                            addMessage(`Postup v úkolu "${updatedTask.title}": ${updatedTask.progress} / ${updatedTask.goal} Kč`, false);
+                                        } else if (updatedTask && updatedTask.status === 'completed') {
+                                            addMessage(`Gratulujeme! Úkol "${updatedTask.title}" byl dokončen!`, false);
+                                        }
+                                    }, 1000);
+                                }
+                            }
+                        }, 3000);
+                    });
+                }, 1000);
             }
             return true;
         }

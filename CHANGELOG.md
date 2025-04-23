@@ -2,6 +2,21 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9.7] - 2025-05-17 - VIRTUÁLNÍ CESTA DO PRÁCE
+
+### Nové funkce
+- Implementována možnost "poslat se do práce" místo fyzického docházení
+- Přidány tři typy práce: kancelářská práce, programování a manuální práce
+- Každý typ práce má jinou výši odměny (800-1500 Kč za den)
+- Vydělané peníze se automaticky započítávají do úkolu "sehnat peníze na nájem"
+- Přidáno získávání XP za práci
+
+### Vylepšení designu
+- Vytvořeno moderní rozhraní pro výběr typu práce
+- Implementována animace práce s informacemi o postupu
+- Přidána podpora tmavého režimu pro dialog práce
+- Vylepšena interakce s uživatelem při výběru typu práce
+
 ## [0.2.9.6] - 2025-05-16 - PRODEJ AUT S FOTKAMI
 
 ### Nové funkce
