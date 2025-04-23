@@ -58,6 +58,19 @@ const CommandsMenu = {
             ]
         },
         {
+            id: 'finance',
+            name: 'Finance',
+            icon: '💰',
+            isOpen: false,
+            commands: [
+                { id: 'money', name: 'Stav peněz', description: 'Zobrazí aktuální stav peněz a kryptoměn', icon: '💰', command: 'peníze' },
+                { id: 'bitcoin', name: 'Bitcoin', description: 'Zobrazí stav bitcoinu a jeho aktuální cenu', icon: '₿', command: 'bitcoin' },
+                { id: 'ethereum', name: 'Ethereum', description: 'Zobrazí stav etherea a jeho aktuální cenu', icon: 'Ξ', command: 'ethereum' },
+                { id: 'dogecoin', name: 'Dogecoin', description: 'Zobrazí stav dogecoinu a jeho aktuální cenu', icon: '🐶', command: 'dogecoin' },
+                { id: 'ripple', name: 'Ripple', description: 'Zobrazí stav ripple a jeho aktuální cenu', icon: 'X', command: 'ripple' }
+            ]
+        },
+        {
             id: 'settings',
             name: 'Nastavení',
             icon: '⚙️',
@@ -384,6 +397,32 @@ const CommandsMenu = {
 
     // Zpracování speciálních příkazů
     handleSpecialCommand(command) {
+        // Finance a kryptoměny
+        if (command === 'peníze') {
+            this.showFinanceInfo('all');
+            return true;
+        }
+
+        if (command === 'bitcoin') {
+            this.showFinanceInfo('BTC');
+            return true;
+        }
+
+        if (command === 'ethereum') {
+            this.showFinanceInfo('ETH');
+            return true;
+        }
+
+        if (command === 'dogecoin') {
+            this.showFinanceInfo('DOGE');
+            return true;
+        }
+
+        if (command === 'ripple') {
+            this.showFinanceInfo('XRP');
+            return true;
+        }
+
         // Služby jídla a pití
         if (command === 'jídlo' && typeof FoodServices !== 'undefined') {
             FoodServices.showService('food');
@@ -757,6 +796,319 @@ Dnešní úkoly:
             this.loadSettings();
             this.updateUI();
         });
+    },
+
+    // Zobrazení informací o financích
+    showFinanceInfo(type = 'all') {
+        // Načtení dat z localStorage
+        const appState = JSON.parse(localStorage.getItem('appState')) || {};
+        const money = appState.money !== undefined ? appState.money : 500;
+        const crypto = appState.crypto || {
+            BTC: 0.05,
+            ETH: 0.5,
+            DOGE: 1000,
+            XRP: 100
+        };
+
+        // Simulace získání cen kryptoměn
+        const cryptoPrices = {
+            BTC: Math.floor(50000 + Math.random() * 10000), // Cena BTC mezi 50000-60000 USD
+            ETH: Math.floor(3000 + Math.random() * 1000),   // Cena ETH mezi 3000-4000 USD
+            DOGE: (0.1 + Math.random() * 0.2).toFixed(4),   // Cena DOGE mezi 0.1-0.3 USD
+            XRP: (0.5 + Math.random() * 0.5).toFixed(4)     // Cena XRP mezi 0.5-1.0 USD
+        };
+
+        // Formátování peněz
+        const formatMoney = (amount) => `${amount.toLocaleString()} Kč`;
+
+        // Formátování kryptoměny
+        const formatCrypto = (amount, symbol) => {
+            switch (symbol) {
+                case 'BTC':
+                    return `${amount.toFixed(5)} BTC`;
+                case 'ETH':
+                    return `${amount.toFixed(4)} ETH`;
+                case 'DOGE':
+                    return `${amount.toFixed(1)} DOGE`;
+                case 'XRP':
+                    return `${amount.toFixed(2)} XRP`;
+                default:
+                    return `${amount.toFixed(5)} ${symbol}`;
+            }
+        };
+
+        // Formátování ceny kryptoměny
+        const formatCryptoPrice = (price, symbol) => {
+            if (!price) return '$ --';
+
+            switch (symbol) {
+                case 'BTC':
+                case 'ETH':
+                    return `$ ${Number(price).toLocaleString()}`;
+                case 'DOGE':
+                case 'XRP':
+                    return `$ ${Number(price)}`;
+                default:
+                    return `$ ${Number(price).toLocaleString()}`;
+            }
+        };
+
+        // Získání ikony pro kryptoměnu
+        const getCryptoIcon = (symbol) => {
+            switch (symbol) {
+                case 'BTC': return '₿'; // Bitcoin symbol
+                case 'ETH': return 'Ξ'; // Ethereum symbol (Xi)
+                case 'DOGE': return '🐶'; // Dog emoji
+                case 'XRP': return 'X'; // XRP symbol
+                default: return '₿';
+            }
+        };
+
+        // Vytvoření dialogu
+        const dialog = document.createElement('div');
+        dialog.className = 'finance-dialog';
+
+        // Vytvoření obsahu dialogu
+        let dialogContent = '';
+
+        if (type === 'all') {
+            // Zobrazení všech financí
+            dialogContent = `
+                <div class="finance-dialog-header">
+                    <h3>Stav financí</h3>
+                    <button class="finance-dialog-close">&times;</button>
+                </div>
+                <div class="finance-dialog-body">
+                    <div class="finance-item money-item">
+                        <span class="finance-icon">💰</span>
+                        <span class="finance-value">${formatMoney(money)}</span>
+                    </div>
+                    <div class="finance-item crypto-item" data-crypto="BTC">
+                        <span class="finance-icon">${getCryptoIcon('BTC')}</span>
+                        <span class="finance-value">${formatCrypto(crypto.BTC, 'BTC')}</span>
+                        <span class="finance-price">${formatCryptoPrice(cryptoPrices.BTC, 'BTC')}</span>
+                    </div>
+                    <div class="finance-item crypto-item" data-crypto="ETH">
+                        <span class="finance-icon">${getCryptoIcon('ETH')}</span>
+                        <span class="finance-value">${formatCrypto(crypto.ETH, 'ETH')}</span>
+                        <span class="finance-price">${formatCryptoPrice(cryptoPrices.ETH, 'ETH')}</span>
+                    </div>
+                    <div class="finance-item crypto-item" data-crypto="DOGE">
+                        <span class="finance-icon">${getCryptoIcon('DOGE')}</span>
+                        <span class="finance-value">${formatCrypto(crypto.DOGE, 'DOGE')}</span>
+                        <span class="finance-price">${formatCryptoPrice(cryptoPrices.DOGE, 'DOGE')}</span>
+                    </div>
+                    <div class="finance-item crypto-item" data-crypto="XRP">
+                        <span class="finance-icon">${getCryptoIcon('XRP')}</span>
+                        <span class="finance-value">${formatCrypto(crypto.XRP, 'XRP')}</span>
+                        <span class="finance-price">${formatCryptoPrice(cryptoPrices.XRP, 'XRP')}</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Zobrazení konkrétní kryptoměny
+            const cryptoValue = crypto[type] || 0;
+            const cryptoPrice = cryptoPrices[type] || 0;
+
+            dialogContent = `
+                <div class="finance-dialog-header">
+                    <h3>${type === 'BTC' ? 'Bitcoin' : type === 'ETH' ? 'Ethereum' : type === 'DOGE' ? 'Dogecoin' : 'Ripple'}</h3>
+                    <button class="finance-dialog-close">&times;</button>
+                </div>
+                <div class="finance-dialog-body">
+                    <div class="finance-item crypto-item large" data-crypto="${type}">
+                        <span class="finance-icon">${getCryptoIcon(type)}</span>
+                        <span class="finance-value">${formatCrypto(cryptoValue, type)}</span>
+                        <span class="finance-price">${formatCryptoPrice(cryptoPrice, type)}</span>
+                    </div>
+                    <div class="crypto-details">
+                        <p>Aktuální cena: <strong>${formatCryptoPrice(cryptoPrice, type)}</strong></p>
+                        <p>Hodnota v Kč: <strong>${formatMoney(Math.round(cryptoValue * cryptoPrice * 22.5))}</strong></p>
+                        <p>Změna za 24h: <strong>${Math.floor(Math.random() * 20) - 10}%</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        dialog.innerHTML = dialogContent;
+
+        // Přidání dialogu do dokumentu
+        document.body.appendChild(dialog);
+
+        // Přidání event listenerů
+        const closeButton = dialog.querySelector('.finance-dialog-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                dialog.remove();
+            });
+        }
+
+        // Přidání CSS stylů
+        const financeStyles = document.createElement('style');
+        financeStyles.textContent = `
+            .finance-dialog {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: rgba(0, 0, 0, 0.9);
+                color: white;
+                border-radius: 15px;
+                z-index: 1100;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+                min-width: 400px;
+                max-width: 600px;
+                overflow: hidden;
+                animation: fadeIn 0.3s ease-in-out;
+            }
+
+            .finance-dialog-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px 20px;
+                background-color: rgba(0, 0, 0, 0.3);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .finance-dialog-header h3 {
+                margin: 0;
+                font-size: 22px;
+                font-weight: bold;
+            }
+
+            .finance-dialog-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                transition: background-color 0.2s;
+            }
+
+            .finance-dialog-close:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .finance-dialog-body {
+                padding: 20px;
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+
+            .finance-item {
+                display: flex;
+                align-items: center;
+                padding: 15px;
+                background-color: rgba(255, 255, 255, 0.05);
+                border-radius: 10px;
+                margin-bottom: 15px;
+                font-size: 20px;
+            }
+
+            .finance-item.large {
+                font-size: 24px;
+                padding: 20px;
+            }
+
+            .finance-icon {
+                font-size: 1.8em;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 50px;
+                height: 50px;
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                margin-right: 15px;
+            }
+
+            .finance-value {
+                font-size: 1.2em;
+                font-weight: bold;
+                flex-grow: 1;
+            }
+
+            .finance-price {
+                font-size: 1em;
+                opacity: 0.9;
+                background-color: rgba(255, 255, 255, 0.1);
+                padding: 8px 12px;
+                border-radius: 8px;
+                margin-left: 10px;
+            }
+
+            .crypto-details {
+                background-color: rgba(255, 255, 255, 0.05);
+                border-radius: 10px;
+                padding: 15px 20px;
+                margin-top: 10px;
+                font-size: 18px;
+            }
+
+            .crypto-details p {
+                margin: 10px 0;
+            }
+
+            /* Styly pro různé kryptoměny */
+            .crypto-item[data-crypto="BTC"] .finance-icon,
+            .crypto-item[data-crypto="BTC"] .finance-value {
+                color: #f7931a;
+            }
+
+            .crypto-item[data-crypto="ETH"] .finance-icon,
+            .crypto-item[data-crypto="ETH"] .finance-value {
+                color: #627eea;
+            }
+
+            .crypto-item[data-crypto="DOGE"] .finance-icon,
+            .crypto-item[data-crypto="DOGE"] .finance-value {
+                color: #c3a634;
+            }
+
+            .crypto-item[data-crypto="XRP"] .finance-icon,
+            .crypto-item[data-crypto="XRP"] .finance-value {
+                color: #23292f;
+            }
+
+            /* Animace */
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translate(-50%, -60%); }
+                to { opacity: 1; transform: translate(-50%, -50%); }
+            }
+
+            /* Tmavý režim */
+            body[data-theme="dark"] .finance-dialog {
+                background-color: rgba(30, 30, 30, 0.95);
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.7);
+            }
+
+            body[data-theme="dark"] .finance-item {
+                background-color: rgba(255, 255, 255, 0.07);
+            }
+
+            body[data-theme="dark"] .crypto-details {
+                background-color: rgba(255, 255, 255, 0.07);
+            }
+        `;
+
+        document.head.appendChild(financeStyles);
+
+        // Odstranění stylů při zavření dialogu
+        dialog.addEventListener('remove', () => {
+            financeStyles.remove();
+        });
+
+        // Přidání XP za zobrazení financí
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addXP(5, 'Kontrola financí');
+        }
     },
 
     // Aktualizace UI podle nastavení
