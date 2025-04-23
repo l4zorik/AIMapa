@@ -2,6 +2,14 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9] - 2025-05-10 - VYLEPŠENÍ PŘÍSTUPU K NOVINKÁM
+
+### Vylepšení
+- Odstraněn zvoneček pro novinky z pravého horního rohu
+- Přidána možnost zobrazení novinek přes menu příkazů
+- Upravena pozice ukazatele peněz, aby se nepřekrýval s jinými prvky
+- Vylepšeno zobrazení souhvězdí na obloze v režimu glóbusu
+
 ## [0.2.8.7.8] - 2025-05-09 - FUNKČNÍ PANEL MOŽNOSTÍ VEDLE CHATU
 
 ### Nové funkce
@@ -11,12 +19,25 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementováno zobrazení prodejních oken s možností objednávky
 - Přidána možnost objednání k lékaři a zubaři
 - Přidána možnost nákupu jízdenek na veřejnou dopravu
+- Přidán efekt souhvězdí a padajících hvězd v tmavém režimu
+- Přidána možnost zobrazení souhvězdí na obloze v režimu glóbusu
+- Přidán ukazatel peněz s výchozí hodnotou 500 Kč
 
 ### Vylepšení
+- Vylepšen design menu příkazů - větší, přehlednější a vizuálně atraktivnější
+- Vylepšen tmavý režim s efektem noční oblohy a souhvězdí
 - Přidána funkčnost všem tlačítkům v panelu možností
+- Přidána položka "Novinky a aktualizace" do menu příkazů
 - Vylepšena interakce s uživatelem při použití příkazů
 - Optimalizováno zobrazení všech nových oken a dialogů
 - Přidáno získávání XP za použití různých služeb
+- Přidány skripty pro snadné nahrání na GitHub
+
+### Opravy
+- Odstraněn zvoneček pro novinky z pravého horního rohu
+- Přidána možnost zobrazení novinek přes menu příkazů
+- Upravena pozice ukazatele peněz, aby se nepřekrýval s jinými prvky
+- Vylepšeno zobrazení souhvězdí na obloze v režimu glóbusu
 
 ## [0.2.8.7.7] - 2025-05-08 - PANEL MOŽNOSTÍ VEDLE CHATU
 

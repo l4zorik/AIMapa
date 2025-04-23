@@ -466,17 +466,18 @@ body[data-theme="dark"] .chat-input input {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
-    width: 80%;
-    max-width: 600px;
-    max-height: 80vh;
+    width: 85%;
+    max-width: 800px;
+    max-height: 85vh;
     background-color: var(--card-bg);
-    border-radius: 10px;
+    border-radius: 15px;
     z-index: 1001;
     display: none;
     flex-direction: column;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     opacity: 0;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .commands-menu.show {
@@ -488,39 +489,64 @@ body[data-theme="dark"] .chat-input input {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 20px 25px;
     border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(to right, rgba(139, 92, 246, 0.1), rgba(0, 0, 0, 0));
+    border-radius: 15px 15px 0 0;
 }
 
 .commands-menu-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 22px;
     color: var(--text-color);
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .commands-menu-close {
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: var(--text-color);
     font-size: 24px;
     cursor: pointer;
-    padding: 0;
+    padding: 5px 10px;
     line-height: 1;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.commands-menu-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
 }
 
 .commands-menu-search {
-    padding: 10px 20px;
+    padding: 15px 25px;
     border-bottom: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .commands-search-input {
     width: 100%;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border-radius: 8px;
     border: 1px solid var(--border-color);
     background-color: var(--input-bg-dark);
     color: var(--text-color);
-    font-size: 14px;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) inset;
+    transition: all 0.3s ease;
+}
+
+.commands-search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+    outline: none;
 }
 
 .commands-menu-body {
@@ -542,58 +568,99 @@ body[data-theme="dark"] .chat-input input {
 .commands-category-header {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 15px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.2s ease;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    margin-bottom: 5px;
+    background-color: rgba(139, 92, 246, 0.05);
+    border-left: 3px solid transparent;
 }
 
 .commands-category-header:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(139, 92, 246, 0.1);
+    border-left: 3px solid var(--primary-color);
+    transform: translateX(5px);
 }
 
 .commands-category-icon {
-    margin-right: 10px;
-    font-size: 18px;
+    margin-right: 12px;
+    font-size: 22px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(139, 92, 246, 0.1);
+    border-radius: 50%;
+    padding: 5px;
 }
 
 .commands-category-name {
     flex: 1;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 16px;
 }
 
 .commands-category-toggle {
-    font-size: 12px;
-}
-
-.commands-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 5px 0 5px 35px;
-}
-
-.command-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.command-item:hover {
-    background-color: rgba(139, 92, 246, 0.1);
-}
-
-.command-icon {
-    margin-right: 10px;
-    font-size: 18px;
+    font-size: 14px;
     width: 24px;
     height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.commands-category-header:hover .commands-category-toggle {
+    background-color: rgba(139, 92, 246, 0.2);
+    transform: rotate(180deg);
+}
+
+.commands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 5px 0 15px 45px;
+    margin-top: 5px;
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-left: 2px solid transparent;
+}
+
+.command-item:hover {
+    background-color: rgba(139, 92, 246, 0.1);
+    transform: translateX(5px);
+    border-left: 2px solid var(--primary-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.command-icon {
+    margin-right: 12px;
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(139, 92, 246, 0.1);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.command-item:hover .command-icon {
+    transform: scale(1.1);
+    background-color: rgba(139, 92, 246, 0.2);
 }
 
 .command-info {
@@ -601,13 +668,15 @@ body[data-theme="dark"] .chat-input input {
 }
 
 .command-name {
-    font-weight: 500;
-    margin-bottom: 2px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 15px;
 }
 
 .command-description {
-    font-size: 12px;
-    opacity: 0.7;
+    font-size: 13px;
+    opacity: 0.8;
+    line-height: 1.4;
 }
 
 .no-commands-results {

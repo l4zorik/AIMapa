@@ -1,6 +1,6 @@
 /**
  * Modul pro menu příkazů vedle chatu
- * Verze 0.2.8.7.8
+ * Verze 0.2.9
  */
 
 const CommandsMenu = {
@@ -31,6 +31,7 @@ const CommandsMenu = {
             commands: [
                 { id: 'fullscreen', name: 'Celá obrazovka', description: 'Přepne aplikaci do režimu celé obrazovky', icon: '⛶', command: 'fullscreen' },
                 { id: 'globe', name: 'Glóbus', description: 'Přepne mapu do 3D glóbusu', icon: '🌎', command: 'glóbus' },
+                { id: 'constellations', name: 'Souhvězdí', description: 'Zobrazí souhvězdí na obloze v režimu glóbusu', icon: '✨', command: 'souhvězdí' },
                 { id: 'weather', name: 'Počasí', description: 'Zobrazí vrstvu s aktuálním počasím na mapě', icon: '☁️', command: 'počasí' },
                 { id: 'share-map', name: 'Sdílet mapu', description: 'Vytvoří odkaz pro sdílení aktuálního stavu mapy', icon: '🔗', command: 'sdílet mapu' },
                 { id: 'export-data', name: 'Exportovat data', description: 'Exportuje body a trasy do různých formátů', icon: '📤', command: 'exportovat data' }
@@ -64,6 +65,7 @@ const CommandsMenu = {
             commands: [
                 { id: 'settings', name: 'Nastavení aplikace', description: 'Otevře dialog nastavení aplikace', icon: '⚙️', command: 'nastavení' },
                 { id: 'dark-mode', name: 'Tmavý režim', description: 'Přepne tmavý režim aplikace', icon: '🌙', command: 'tmavý režim' },
+                { id: 'updates', name: 'Novinky a aktualizace', description: 'Zobrazí informace o novinkách a aktualizacích', icon: '🔔', command: 'novinky' },
                 { id: 'help', name: 'Nápověda', description: 'Zobrazí nápovědu k používání aplikace', icon: '❓', command: 'nápověda' },
                 { id: 'premium', name: 'Premium verze', description: 'Zobrazí informace o premium verzi', icon: '⭐', command: 'premium' }
             ]
@@ -431,6 +433,11 @@ const CommandsMenu = {
             if (darkModeToggle) {
                 darkModeToggle.checked = !darkModeToggle.checked;
                 darkModeToggle.dispatchEvent(new Event('change'));
+
+                // Přidání XP za použití tmavého režimu
+                if (typeof UserProgress !== 'undefined') {
+                    UserProgress.addXP(5, 'Přepnutí tmavého režimu');
+                }
             }
             return true;
         }
@@ -467,6 +474,49 @@ const CommandsMenu = {
                     addMessage('Zobrazuji aktuální počasí...', false);
                     setTimeout(() => {
                         addMessage('Hodonín: 22°C, polojasno, vítr 5 km/h, vlhkost 65%', false);
+                    }, 1000);
+                }
+            }
+            return true;
+        }
+
+        if (command === 'souhvězdí') {
+            if (typeof DarkSkyEffects !== 'undefined') {
+                const result = DarkSkyEffects.toggleGlobeConstellations();
+                if (!result) {
+                    // Pokud není glóbus režim aktivní, aktivujeme ho
+                    if (typeof toggleGlobeMode === 'function') {
+                        toggleGlobeMode();
+                        // Po aktivaci glóbusu zkusíme znovu aktivovat souhvězdí
+                        setTimeout(() => {
+                            DarkSkyEffects.toggleGlobeConstellations();
+                        }, 1000);
+                    }
+                }
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Aktivuji souhvězdí na obloze...', false);
+                    setTimeout(() => {
+                        addMessage('Souhvězdí byla úspěšně aktivována. Nyní můžete vidět hvězdy a souhvězdí na obloze.', false);
+                    }, 1000);
+                }
+            }
+            return true;
+        }
+
+        if (command === 'novinky') {
+            if (typeof UpdatesNotification !== 'undefined') {
+                UpdatesNotification.showUpdatesModal();
+
+                // Přidání XP za zobrazení novinek
+                if (typeof UserProgress !== 'undefined') {
+                    UserProgress.addXP(5, 'Zobrazení novinek a aktualizací');
+                }
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Zobrazuji novinky a aktualizace...', false);
+                    setTimeout(() => {
+                        addMessage('Modul novinek není dostupný. Zkuste aktualizovat stránku.', false);
                     }, 1000);
                 }
             }

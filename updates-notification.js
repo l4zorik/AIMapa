@@ -1,14 +1,26 @@
 /**
- * Modul pro zobrazení novinek a aktualizací v pravém horním rohu
- * Verze 0.2.8.7.4
+ * Modul pro zobrazení novinek a aktualizací
+ * Verze 0.2.9
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.2.8.7.4',
+    currentVersion: '0.2.9',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.2.9',
+            date: '2025-05-10',
+            title: 'Vylepšení přístupu k novinkám a aktualizacím',
+            description: 'Odstranění zvonečku pro novinky a přidání možnosti zobrazení novinek přes menu příkazů',
+            changes: [
+                'Odstraněn zvoneček pro novinky z pravého horního rohu',
+                'Přidána možnost zobrazení novinek přes menu příkazů',
+                'Upravena pozice ukazatele peněz, aby se nepřekrýval s jinými prvky',
+                'Vylepšeno zobrazení souhvězdí na obloze v režimu glóbusu'
+            ]
+        },
         {
             version: '0.2.8.7.4',
             date: '2025-05-04',
@@ -248,27 +260,11 @@ const UpdatesNotification = {
         console.log('Modul novinek byl inicializován');
     },
 
-    // Vytvoření ikony novinek
+    // Vytvoření ikony novinek - funkce odstraněna, ikona se již nezobrazuje
     createUpdatesIcon() {
-        // Kontrola, zda již ikona neexistuje
-        if (document.getElementById('updatesIcon')) {
-            return;
-        }
-
-        // Vytvoření ikony
-        const updatesIcon = document.createElement('div');
-        updatesIcon.id = 'updatesIcon';
-        updatesIcon.className = 'updates-icon';
-        updatesIcon.innerHTML = '<i class="icon">🔔</i>';
-        updatesIcon.title = `AIMapa v${this.currentVersion}`;
-
-        // Přidání ikony do dokumentu
-        document.body.appendChild(updatesIcon);
-
-        // Přidání event listeneru
-        updatesIcon.addEventListener('click', () => {
-            this.showUpdatesModal();
-        });
+        // Funkce byla odstraněna, ikona se již nezobrazuje
+        // Novinky jsou nyní dostupné pouze přes menu příkazů
+        console.log('Ikona novinek byla odstraněna, novinky jsou dostupné přes menu příkazů');
     },
 
     // Kontrola, zda je potřeba zobrazit informace o aktualizaci
@@ -293,6 +289,12 @@ const UpdatesNotification = {
 
         if (!currentVersionInfo) {
             return;
+        }
+
+        // Odstranění existujícího oznámení, pokud existuje
+        const existingNotification = document.querySelector('.update-notification');
+        if (existingNotification) {
+            existingNotification.remove();
         }
 
         // Vytvoření elementu pro oznámení
@@ -357,9 +359,10 @@ const UpdatesNotification = {
 
     // Zobrazení modalu s aktualizacemi
     showUpdatesModal() {
-        // Kontrola, zda již modal neexistuje
-        if (document.getElementById('updatesModal')) {
-            return;
+        // Odstranění existujícího modalu, pokud existuje
+        const existingModal = document.getElementById('updatesModal');
+        if (existingModal) {
+            existingModal.remove();
         }
 
         // Vytvoření modalu

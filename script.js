@@ -1498,6 +1498,14 @@ function toggleFullscreen() {
             map.fitBounds(route.getBounds(), {padding: [50, 50]});
         }
     }, 300); // Zvýšení času pro lepší přechod
+
+    // Vytvoření a odeslání události o změně fullscreen režimu
+    const event = new CustomEvent('fullscreenChange', {
+        detail: {
+            isFullscreen: isFullscreen
+        }
+    });
+    document.dispatchEvent(event);
 }
 
 // Přidání event listeneru pro tlačítko fullscreen

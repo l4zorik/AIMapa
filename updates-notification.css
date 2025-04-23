@@ -1,35 +1,10 @@
 /**
  * Styly pro modul novinek a aktualizací
- * Verze 0.2.8.7.4
+ * Verze 0.2.9
  */
 
-/* Ikona novinek v pravém horním rohu */
-.updates-icon {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    background-color: var(--primary-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    transition: all 0.3s ease;
-}
-
-.updates-icon:hover {
-    transform: scale(1.1);
-    background-color: var(--primary-color-dark);
-}
-
-.updates-icon .icon {
-    font-size: 20px;
-    color: white;
-}
+/* Ikona novinek v pravém horním rohu - odstraněna */
+/* Ikona novinek byla odstraněna, novinky jsou nyní dostupné pouze přes menu příkazů */
 
 /* Oznámení o aktualizaci */
 .update-notification {
