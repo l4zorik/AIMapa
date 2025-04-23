@@ -2,6 +2,22 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9.2] - 2025-05-12 - VYLEPŠENÍ UKAZATELŮ PENĚZ A BITCOINU
+
+### Vylepšení
+- Vylepšeno uspořádání ukazatelů peněz a bitcoinu pro lepší čitelnost
+- Změněno vertikální uspořádání na horizontální pro úsporu místa
+- Přidány CSS styly pro lepší zarovnání a zabránění překrývání
+- Optimalizováno zobrazení pro různé velikosti obrazovky
+
+## [0.2.9.1] - 2025-05-11 - PŘIDÁNÍ UKAZATELE BITCOINU
+
+### Nové funkce
+- Přidán ukazatel bitcoinu vedle ukazatele peněz s výchozí hodnotou 0.05 BTC
+- Implementovány metody pro přidávání a odebírání bitcoinu
+- Přidáno získávání XP za získání bitcoinu
+- Vylepšen design ukazatele peněz a bitcoinu s barevným rozlišením
+
 ## [0.2.9] - 2025-05-10 - VYLEPŠENÍ PŘÍSTUPU K NOVINKÁM
 
 ### Vylepšení

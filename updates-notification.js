@@ -1,14 +1,38 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.2.9
+ * Verze 0.2.9.2
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.2.9',
+    currentVersion: '0.2.9.2',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.2.9.2',
+            date: '2025-05-12',
+            title: 'Vylepšení ukazatelů peněz a bitcoinu',
+            description: 'Vylepšeno uspořádání ukazatelů peněz a bitcoinu pro lepší čitelnost a zabránění překrývání',
+            changes: [
+                'Vylepšeno uspořádání ukazatelů peněz a bitcoinu pro lepší čitelnost',
+                'Změněno vertikální uspořádání na horizontální pro úsporu místa',
+                'Přidány CSS styly pro lepší zarovnání a zabránění překrývání',
+                'Optimalizováno zobrazení pro různé velikosti obrazovky'
+            ]
+        },
+        {
+            version: '0.2.9.1',
+            date: '2025-05-11',
+            title: 'Přidání ukazatele bitcoinu',
+            description: 'Přidán ukazatel bitcoinu vedle ukazatele peněz s výchozí hodnotou 0.05 BTC',
+            changes: [
+                'Přidán ukazatel bitcoinu vedle ukazatele peněz s výchozí hodnotou 0.05 BTC',
+                'Implementovány metody pro přidávání a odebírání bitcoinu',
+                'Přidáno získávání XP za získání bitcoinu',
+                'Vylepšen design ukazatele peněz a bitcoinu s barevným rozlišením'
+            ]
+        },
         {
             version: '0.2.9',
             date: '2025-05-10',
