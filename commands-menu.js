@@ -408,6 +408,69 @@ const CommandsMenu = {
         }
     },
 
+    // Databáze fotek pro různé typy bodů
+    pointImages: {
+        // Speciální body
+        'home': [
+            'https://cdn.pixabay.com/photo/2016/11/18/17/46/house-1836070_1280.jpg',
+            'https://cdn.pixabay.com/photo/2017/07/08/02/16/house-2483336_1280.jpg'
+        ],
+        'work': [
+            'https://cdn.pixabay.com/photo/2015/07/13/14/40/office-843574_1280.jpg',
+            'https://cdn.pixabay.com/photo/2014/08/12/00/01/office-416392_1280.jpg'
+        ],
+        'rent': [
+            'https://cdn.pixabay.com/photo/2016/11/18/17/20/living-room-1835923_1280.jpg',
+            'https://cdn.pixabay.com/photo/2017/03/22/17/39/kitchen-2165756_1280.jpg'
+        ],
+        'alexa': [
+            'https://cdn.pixabay.com/photo/2015/11/07/11/17/bar-1031078_1280.jpg',
+            'https://cdn.pixabay.com/photo/2014/09/03/20/15/disco-435265_1280.jpg'
+        ],
+        'hospital': [
+            'https://cdn.pixabay.com/photo/2016/11/23/14/37/blur-1853262_1280.jpg',
+            'https://cdn.pixabay.com/photo/2016/11/18/17/20/operating-room-1835608_1280.jpg'
+        ],
+        'station': [
+            'https://cdn.pixabay.com/photo/2018/01/17/07/06/train-3087342_1280.jpg',
+            'https://cdn.pixabay.com/photo/2015/03/09/18/34/station-666439_1280.jpg'
+        ],
+        'square': [
+            'https://cdn.pixabay.com/photo/2016/01/19/19/26/city-square-1150026_1280.jpg',
+            'https://cdn.pixabay.com/photo/2015/03/26/10/01/plaza-691544_1280.jpg'
+        ],
+        'park': [
+            'https://cdn.pixabay.com/photo/2015/07/31/06/50/forest-868715_1280.jpg',
+            'https://cdn.pixabay.com/photo/2016/11/29/04/17/adult-1867485_1280.jpg'
+        ],
+        'shopping': [
+            'https://cdn.pixabay.com/photo/2016/11/22/19/08/hangers-1850082_1280.jpg',
+            'https://cdn.pixabay.com/photo/2016/11/18/22/21/architecture-1837150_1280.jpg'
+        ],
+        'restaurant': [
+            'https://cdn.pixabay.com/photo/2017/09/23/19/01/restaurant-2779677_1280.jpg',
+            'https://cdn.pixabay.com/photo/2015/03/26/10/28/restaurant-691397_1280.jpg'
+        ],
+
+        // Výchozí obrázky pro vlastní adresy podle typu
+        'custom_residential': [
+            'https://cdn.pixabay.com/photo/2016/11/29/03/53/house-1867187_1280.jpg',
+            'https://cdn.pixabay.com/photo/2017/06/21/20/23/apartment-2428066_1280.jpg'
+        ],
+        'custom_commercial': [
+            'https://cdn.pixabay.com/photo/2016/11/18/17/46/architecture-1836070_1280.jpg',
+            'https://cdn.pixabay.com/photo/2016/11/18/17/41/apartment-1836061_1280.jpg'
+        ],
+        'custom_industrial': [
+            'https://cdn.pixabay.com/photo/2016/11/18/17/41/factory-1836056_1280.jpg',
+            'https://cdn.pixabay.com/photo/2017/08/01/00/38/factory-2562592_1280.jpg'
+        ],
+        'custom_default': [
+            'https://cdn.pixabay.com/photo/2016/11/18/17/46/house-1836070_1280.jpg',
+            'https://cdn.pixabay.com/photo/2017/08/01/09/33/building-2563315_1280.jpg'
+        ]
+    },
+
     // Zpracování speciálních příkazů
     handleSpecialCommand(command) {
         // Příkazy pro mapu
@@ -2445,6 +2508,313 @@ Got the best locations, without a doubt!`;
         }
     },
 
+    // Zobrazení fotky bodu
+    showPointImage(pointId, customAddress, lat, lng) {
+        // Odstranění existujícího dialogu s fotkou, pokud existuje
+        const existingDialog = document.querySelector('.point-image-dialog');
+        if (existingDialog) {
+            existingDialog.remove();
+        }
+
+        // Určení typu bodu a výběr fotky
+        let imageUrl;
+        let pointName;
+
+        if (pointId === 'custom' && customAddress) {
+            // Pro vlastní adresu použijeme výchozí obrázek podle typu adresy
+            // Simulace určení typu adresy (v reálné aplikaci by zde byl API požadavek na geocoding službu)
+            const addressTypes = ['custom_residential', 'custom_commercial', 'custom_industrial', 'custom_default'];
+            const addressType = addressTypes[Math.floor(Math.random() * 3)]; // Náhodný výběr typu adresy
+
+            // Výběr náhodné fotky z databáze pro daný typ adresy
+            const images = this.pointImages[addressType] || this.pointImages['custom_default'];
+            imageUrl = images[Math.floor(Math.random() * images.length)];
+            pointName = customAddress;
+        } else {
+            // Pro předdefinovaný bod použijeme fotku z databáze
+            const images = this.pointImages[pointId] || this.pointImages['custom_default'];
+            imageUrl = images[Math.floor(Math.random() * images.length)];
+
+            // Určení názvu bodu
+            const pointNames = {
+                'home': 'Domů',
+                'work': 'Práce',
+                'rent': 'Nájem',
+                'alexa': 'Noční klub Alexa',
+                'hospital': 'Nemocnice',
+                'station': 'Nádraží',
+                'square': 'Náměstí',
+                'park': 'Park',
+                'shopping': 'Nákupní centrum',
+                'restaurant': 'Restaurace'
+            };
+            pointName = pointNames[pointId] || pointId;
+        }
+
+        // Vytvoření dialogu s fotkou
+        const dialog = document.createElement('div');
+        dialog.className = 'point-image-dialog';
+
+        // Vytvoření obsahu dialogu
+        dialog.innerHTML = `
+            <div class="point-image-header">
+                <h3>${pointName}</h3>
+                <button class="point-image-close">&times;</button>
+            </div>
+            <div class="point-image-content">
+                <div class="point-image-container">
+                    <img src="${imageUrl}" alt="${pointName}" class="point-image">
+                </div>
+                <div class="point-image-info">
+                    <div class="point-image-coordinates">
+                        <span class="point-image-label">Souřadnice:</span>
+                        <span class="point-image-value">${lat.toFixed(6)}, ${lng.toFixed(6)}</span>
+                    </div>
+                    <div class="point-image-address">
+                        <span class="point-image-label">Adresa:</span>
+                        <span class="point-image-value">${customAddress || pointName}</span>
+                    </div>
+                    <div class="point-image-verified">
+                        <span class="point-image-label">Stav:</span>
+                        <span class="point-image-value point-image-verified-status">Ověřeno a opraveno</span>
+                    </div>
+                </div>
+                <div class="point-image-actions">
+                    <button class="point-image-action-btn point-image-navigate-btn">Navigovat</button>
+                    <button class="point-image-action-btn point-image-share-btn">Sdílet</button>
+                    <button class="point-image-action-btn point-image-close-btn">Zavřít</button>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů
+        const pointImageStyles = document.createElement('style');
+        pointImageStyles.textContent = `
+            .point-image-dialog {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                border-radius: 15px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                z-index: 1200;
+                width: 90%;
+                max-width: 600px;
+                max-height: 85vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                animation: fadeIn 0.3s ease-in-out;
+            }
+
+            .point-image-header {
+                background-color: #3498db;
+                color: white;
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .point-image-header h3 {
+                margin: 0;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .point-image-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+            }
+
+            .point-image-content {
+                padding: 20px;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .point-image-container {
+                width: 100%;
+                height: 300px;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            .point-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .point-image-info {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                background-color: #f8f9fa;
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            .point-image-coordinates, .point-image-address, .point-image-verified {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .point-image-label {
+                font-weight: bold;
+                color: #555;
+            }
+
+            .point-image-value {
+                color: #333;
+            }
+
+            .point-image-verified-status {
+                color: #27ae60;
+                font-weight: bold;
+            }
+
+            .point-image-actions {
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .point-image-action-btn {
+                flex: 1;
+                padding: 10px 15px;
+                border: none;
+                border-radius: 5px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .point-image-navigate-btn {
+                background-color: #3498db;
+                color: white;
+            }
+
+            .point-image-navigate-btn:hover {
+                background-color: #2980b9;
+            }
+
+            .point-image-share-btn {
+                background-color: #2ecc71;
+                color: white;
+            }
+
+            .point-image-share-btn:hover {
+                background-color: #27ae60;
+            }
+
+            .point-image-close-btn {
+                background-color: #e0e0e0;
+                color: #333;
+            }
+
+            .point-image-close-btn:hover {
+                background-color: #bdc3c7;
+            }
+
+            /* Tmavý režim */
+            body[data-theme="dark"] .point-image-dialog {
+                background-color: #2c3e50;
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .point-image-header {
+                background-color: #2980b9;
+            }
+
+            body[data-theme="dark"] .point-image-info {
+                background-color: #34495e;
+            }
+
+            body[data-theme="dark"] .point-image-label {
+                color: #bdc3c7;
+            }
+
+            body[data-theme="dark"] .point-image-value {
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .point-image-verified-status {
+                color: #2ecc71;
+            }
+
+            body[data-theme="dark"] .point-image-close-btn {
+                background-color: #34495e;
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .point-image-close-btn:hover {
+                background-color: #2c3e50;
+            }
+
+            @media (max-width: 768px) {
+                .point-image-container {
+                    height: 200px;
+                }
+
+                .point-image-actions {
+                    flex-direction: column;
+                }
+            }
+        `;
+
+        document.head.appendChild(pointImageStyles);
+        document.body.appendChild(dialog);
+
+        // Přidání event listenerů
+        const closeButtons = dialog.querySelectorAll('.point-image-close, .point-image-close-btn');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                dialog.remove();
+                pointImageStyles.remove();
+            });
+        });
+
+        // Přidání event listeneru pro tlačítko navigace
+        const navigateButton = dialog.querySelector('.point-image-navigate-btn');
+        if (navigateButton) {
+            navigateButton.addEventListener('click', () => {
+                // Simulace navigace (v reálné aplikaci by zde byla implementace navigace)
+                if (typeof addMessage !== 'undefined') {
+                    addMessage(`Navigace na ${pointName} byla zahájena.`, false);
+                }
+
+                // Zavření dialogu
+                dialog.remove();
+                pointImageStyles.remove();
+            });
+        }
+
+        // Přidání event listeneru pro tlačítko sdílení
+        const shareButton = dialog.querySelector('.point-image-share-btn');
+        if (shareButton) {
+            shareButton.addEventListener('click', () => {
+                // Simulace sdílení (v reálné aplikaci by zde byla implementace sdílení)
+                if (typeof addMessage !== 'undefined') {
+                    addMessage(`Odkaz na ${pointName} byl zkopírován do schránky.`, false);
+                }
+            });
+        }
+
+        // Přidání XP za zobrazení fotky bodu
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addXP(5, `Zobrazení fotky bodu: ${pointName}`);
+        }
+    },
+
     // Ověření a automatické uložení bodu
     verifyAndSavePoint() {
         // Získání informací o aktuálním bodu
@@ -2522,6 +2892,9 @@ Got the best locations, without a doubt!`;
                     addMessage(`Bod ${currentPoint.id} byl ověřen a opraven.`, false);
                 }
             }
+
+            // Zobrazení fotky bodu
+            this.showPointImage(currentPoint.id, currentPoint.address, correctLat, correctLng);
 
             // Automatické uložení korekce
             // Získání existujících korekcí z localStorage

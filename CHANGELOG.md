@@ -2,6 +2,21 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.0.2] - 2025-05-22 - FOTKY BODŮ
+
+### Nové funkce
+- Přidáno zobrazení fotky bodu po ověření
+- Implementována databáze fotek pro různé typy bodů
+- Přidána funkce showPointImage() pro zobrazení fotky bodu s detaily
+- Implementováno automatické zobrazení fotky po ověření bodu
+- Přidány tlačítka pro navigaci a sdílení bodu
+
+### Vylepšení uživatelského rozhraní
+- Vytvořeno moderní rozhraní pro zobrazení fotky bodu
+- Přidány detailní informace o bodu včetně souřadnic a adresy
+- Implementována podpora tmavého režimu pro dialog s fotkou
+- Přidány responzivní styly pro mobilní zařízení
+
 ## [0.3.0.1] - 2025-05-21 - VYLEPŠENÍ OVĚŘENÍ BODŮ
 
 ### Nové funkce
