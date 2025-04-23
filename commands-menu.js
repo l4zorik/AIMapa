@@ -18,6 +18,7 @@ const CommandsMenu = {
             commands: [
                 { id: 'add-point', name: 'Přidat bod', description: 'Přidá nový bod na mapu', icon: '📍', command: 'přidej bod' },
                 { id: 'calculate-route', name: 'Vypočítat trasu', description: 'Vypočítá trasu mezi body na mapě', icon: '🚗', command: 'vypočítej trasu' },
+                { id: 'focus-point', name: 'Zaměřit bod', description: 'Zaměří a přejde na speciální bod na mapě', icon: '🔎', command: 'zaměřit bod' },
                 { id: 'clear-map', name: 'Vymazat mapu', description: 'Odstraní všechny body a trasy z mapy', icon: '🧹', command: 'vymaž mapu' },
                 { id: 'measure-distance', name: 'Měření vzdálenosti', description: 'Aktivuje nástroj pro měření vzdálenosti', icon: '📏', command: 'měření vzdálenosti' },
                 { id: 'search', name: 'Vyhledat', description: 'Vyhledá místo nebo adresu na mapě', icon: '🔍', command: 'vyhledat' }
@@ -409,6 +410,11 @@ const CommandsMenu = {
 
     // Zpracování speciálních příkazů
     handleSpecialCommand(command) {
+        // Příkazy pro mapu
+        if (command === 'zaměřit bod') {
+            this.showFocusPointDialog();
+            return true;
+        }
         // Úkoly a questy
         if (command === 'úkoly') {
             if (typeof TaskSystem !== 'undefined') {
@@ -1604,6 +1610,304 @@ Got the best locations, without a doubt!`;
     setEnabled(enabled) {
         this.isEnabled = enabled;
         this.updateUI();
+    },
+
+    // Zobrazení dialogu pro zaměření speciálních bodů
+    showFocusPointDialog() {
+        // Speciální body k zaměření
+        const specialPoints = [
+            { id: 'home', name: 'Domů', description: 'Váš domov', icon: '🏠', lat: 48.8484, lng: 17.1259 },
+            { id: 'work', name: 'Práce', description: 'Vaše pracoviště', icon: '💼', lat: 48.8514, lng: 17.1319 },
+            { id: 'rent', name: 'Nájem', description: 'Místo pro zaplacení nájmu', icon: '💰', lat: 48.8464, lng: 17.1279 },
+            { id: 'alexa', name: 'Alexa', description: 'Noční klub Alexa', icon: '💃', lat: 48.8534, lng: 17.1289 },
+            { id: 'hospital', name: 'Nemocnice', description: 'Nemocnice Hodonín', icon: '🏥', lat: 48.8494, lng: 17.1269 },
+            { id: 'station', name: 'Nádraží', description: 'Vlakové nádraží Hodonín', icon: '🚂', lat: 48.8504, lng: 17.1299 },
+            { id: 'square', name: 'Náměstí', description: 'Masarykovo náměstí', icon: '🎭', lat: 48.8524, lng: 17.1309 },
+            { id: 'park', name: 'Park', description: 'Městský park', icon: '🌳', lat: 48.8544, lng: 17.1329 },
+            { id: 'shopping', name: 'Nákupní centrum', description: 'Nákupní centrum Hodonín', icon: '🛍️', lat: 48.8554, lng: 17.1339 },
+            { id: 'restaurant', name: 'Restaurace', description: 'Restaurace U Zlatého lva', icon: '🍴', lat: 48.8564, lng: 17.1349 }
+        ];
+
+        // Odstranění existujícího dialogu, pokud existuje
+        const existingDialog = document.querySelector('.focus-point-dialog');
+        if (existingDialog) {
+            existingDialog.remove();
+        }
+
+        // Vytvoření dialogu
+        const dialog = document.createElement('div');
+        dialog.className = 'focus-point-dialog';
+
+        // Vytvoření obsahu dialogu
+        dialog.innerHTML = `
+            <div class="focus-point-header">
+                <h3>Zaměřit speciální bod</h3>
+                <button class="focus-point-close">&times;</button>
+            </div>
+            <div class="focus-point-content">
+                <div class="focus-point-search">
+                    <input type="text" class="focus-point-search-input" placeholder="Hledat bod...">
+                </div>
+                <div class="focus-point-list">
+                    ${specialPoints.map(point => `
+                        <div class="focus-point-item" data-point-id="${point.id}" data-lat="${point.lat}" data-lng="${point.lng}">
+                            <div class="focus-point-icon">${point.icon}</div>
+                            <div class="focus-point-info">
+                                <div class="focus-point-name">${point.name}</div>
+                                <div class="focus-point-description">${point.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů
+        const focusPointStyles = document.createElement('style');
+        focusPointStyles.textContent = `
+            .focus-point-dialog {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                border-radius: 15px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                z-index: 1100;
+                width: 90%;
+                max-width: 500px;
+                max-height: 85vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                animation: fadeIn 0.3s ease-in-out;
+            }
+
+            .focus-point-header {
+                background-color: #3498db;
+                color: white;
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .focus-point-header h3 {
+                margin: 0;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .focus-point-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+            }
+
+            .focus-point-content {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .focus-point-search {
+                margin-bottom: 15px;
+            }
+
+            .focus-point-search-input {
+                width: 100%;
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+            }
+
+            .focus-point-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .focus-point-item {
+                display: flex;
+                align-items: center;
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .focus-point-item:hover {
+                background-color: #e9ecef;
+            }
+
+            .focus-point-icon {
+                font-size: 24px;
+                margin-right: 15px;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #e9ecef;
+                border-radius: 50%;
+            }
+
+            .focus-point-info {
+                flex: 1;
+            }
+
+            .focus-point-name {
+                font-weight: bold;
+                font-size: 16px;
+                margin-bottom: 5px;
+            }
+
+            .focus-point-description {
+                color: #6c757d;
+                font-size: 14px;
+            }
+
+            /* Tmavý režim */
+            body[data-theme="dark"] .focus-point-dialog {
+                background-color: #2c3e50;
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .focus-point-header {
+                background-color: #2980b9;
+            }
+
+            body[data-theme="dark"] .focus-point-search-input {
+                background-color: #34495e;
+                border-color: #2c3e50;
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .focus-point-item {
+                background-color: #34495e;
+            }
+
+            body[data-theme="dark"] .focus-point-item:hover {
+                background-color: #2c3e50;
+            }
+
+            body[data-theme="dark"] .focus-point-icon {
+                background-color: #2c3e50;
+            }
+
+            body[data-theme="dark"] .focus-point-name {
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .focus-point-description {
+                color: #bdc3c7;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translate(-50%, -60%); }
+                to { opacity: 1; transform: translate(-50%, -50%); }
+            }
+        `;
+
+        document.head.appendChild(focusPointStyles);
+        document.body.appendChild(dialog);
+
+        // Přidání event listenerů
+        const closeButton = dialog.querySelector('.focus-point-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                dialog.remove();
+                focusPointStyles.remove();
+            });
+        }
+
+        // Přidání event listenerů pro vyhledávání
+        const searchInput = dialog.querySelector('.focus-point-search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const searchText = e.target.value.toLowerCase();
+                const pointItems = dialog.querySelectorAll('.focus-point-item');
+
+                pointItems.forEach(item => {
+                    const name = item.querySelector('.focus-point-name').textContent.toLowerCase();
+                    const description = item.querySelector('.focus-point-description').textContent.toLowerCase();
+
+                    if (name.includes(searchText) || description.includes(searchText)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Přidání event listenerů pro kliknutí na bod
+        const pointItems = dialog.querySelectorAll('.focus-point-item');
+        pointItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const pointId = item.dataset.pointId;
+                const lat = parseFloat(item.dataset.lat);
+                const lng = parseFloat(item.dataset.lng);
+
+                // Zavření dialogu
+                dialog.remove();
+                focusPointStyles.remove();
+
+                // Zaměření bodu na mapě
+                this.focusPointOnMap(pointId, lat, lng);
+            });
+        });
+    },
+
+    // Zaměření bodu na mapě
+    focusPointOnMap(pointId, lat, lng) {
+        if (typeof addMessage !== 'undefined') {
+            addMessage(`Zaměřuji bod: ${pointId}...`, false);
+        }
+
+        // Pokud existuje MapManager, použijeme ho pro zaměření bodu
+        if (typeof MapManager !== 'undefined') {
+            // Přidání markeru na mapu
+            MapManager.addMarker({
+                lat: lat,
+                lng: lng,
+                title: pointId,
+                icon: 'special'
+            });
+
+            // Zaměření mapy na bod
+            MapManager.setView(lat, lng, 16);
+
+            // Přidání XP za použití funkce zaměření bodu
+            if (typeof UserProgress !== 'undefined') {
+                UserProgress.addXP(10, `Zaměření bodu: ${pointId}`);
+            }
+        } else {
+            // Pokud MapManager neexistuje, použijeme základní funkce pro zaměření bodu
+            if (typeof map !== 'undefined') {
+                map.setView([lat, lng], 16);
+
+                // Přidání markeru na mapu
+                if (typeof L !== 'undefined') {
+                    L.marker([lat, lng]).addTo(map)
+                        .bindPopup(`<b>${pointId}</b>`)
+                        .openPopup();
+                }
+
+                // Přidání XP za použití funkce zaměření bodu
+                if (typeof UserProgress !== 'undefined') {
+                    UserProgress.addXP(10, `Zaměření bodu: ${pointId}`);
+                }
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage(`Bod ${pointId} byl zaměřen na souřadnicích [${lat}, ${lng}].`, false);
+                }
+            }
+        }
     }
 };
 

@@ -2,6 +2,22 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9.8] - 2025-05-18 - ZAMĚŘENÍ SPECIÁLNÍCH BODŮ
+
+### Nové funkce
+- Přidán nový příkaz "zaměřit bod" do kategorie Mapa v menu příkazů
+- Implementován dialog pro výběr speciálních bodů na mapě
+- Přidáno 10 předdefinovaných speciálních bodů (domů, práce, nájem, nemocnice, nádraží, atd.)
+- Implementováno vyhledávání mezi speciálními body
+- Přidána funkce pro zaměření a přechod na vybraný bod na mapě
+- Implementováno získávání XP za použití funkce zaměření bodu
+
+### Vylepšení designu
+- Vytvořeno moderní rozhraní pro výběr speciálních bodů
+- Přidány ikony pro jednotlivé typy bodů
+- Implementována podpora tmavého režimu pro dialog zaměření bodů
+- Přidány animace a přechody pro lepší uživatelský zážitek
+
 ## [0.2.9.7] - 2025-05-17 - VIRTUÁLNÍ CESTA DO PRÁCE
 
 ### Nové funkce
