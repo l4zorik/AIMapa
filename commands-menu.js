@@ -2555,259 +2555,146 @@ Got the best locations, without a doubt!`;
         const dialog = document.createElement('div');
         dialog.className = 'point-image-dialog';
 
-        // Vytvoření obsahu dialogu
+        // Vytvoření obsahu dialogu - jednodušší verze pouze s fotkou a tlačítkem nastavení
         dialog.innerHTML = `
-            <div class="point-image-header">
-                <h3>${pointName}</h3>
-                <button class="point-image-close">&times;</button>
-            </div>
-            <div class="point-image-content">
-                <div class="point-image-container">
-                    <img src="${imageUrl}" alt="${pointName}" class="point-image">
-                </div>
-                <div class="point-image-info">
-                    <div class="point-image-coordinates">
-                        <span class="point-image-label">Souřadnice:</span>
-                        <span class="point-image-value">${lat.toFixed(6)}, ${lng.toFixed(6)}</span>
-                    </div>
-                    <div class="point-image-address">
-                        <span class="point-image-label">Adresa:</span>
-                        <span class="point-image-value">${customAddress || pointName}</span>
-                    </div>
-                    <div class="point-image-verified">
-                        <span class="point-image-label">Stav:</span>
-                        <span class="point-image-value point-image-verified-status">Ověřeno a opraveno</span>
-                    </div>
-                </div>
-                <div class="point-image-actions">
-                    <button class="point-image-action-btn point-image-navigate-btn">Navigovat</button>
-                    <button class="point-image-action-btn point-image-share-btn">Sdílet</button>
-                    <button class="point-image-action-btn point-image-close-btn">Zavřít</button>
+            <div class="point-image-simple">
+                <img src="${imageUrl}" alt="${pointName}" class="point-image-simple-img">
+                <div class="point-image-simple-overlay">
+                    <div class="point-image-simple-title">${pointName}</div>
+                    <button class="point-image-simple-settings" title="Nastavení bodu">⚙️</button>
                 </div>
             </div>
         `;
 
-        // Přidání CSS stylů
+        // Přidání CSS stylů pro jednodušší zobrazení
         const pointImageStyles = document.createElement('style');
         pointImageStyles.textContent = `
             .point-image-dialog {
                 position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: white;
-                border-radius: 15px;
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                bottom: 20px;
+                right: 20px;
                 z-index: 1200;
-                width: 90%;
-                max-width: 600px;
-                max-height: 85vh;
-                display: flex;
-                flex-direction: column;
+                width: 200px;
+                height: 150px;
+                border-radius: 10px;
                 overflow: hidden;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
                 animation: fadeIn 0.3s ease-in-out;
             }
 
-            .point-image-header {
-                background-color: #3498db;
-                color: white;
-                padding: 15px 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .point-image-header h3 {
-                margin: 0;
-                font-size: 20px;
-                font-weight: bold;
-            }
-
-            .point-image-close {
-                background: none;
-                border: none;
-                color: white;
-                font-size: 24px;
-                cursor: pointer;
-            }
-
-            .point-image-content {
-                padding: 20px;
-                overflow-y: auto;
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .point-image-container {
+            .point-image-simple {
+                position: relative;
                 width: 100%;
-                height: 300px;
-                border-radius: 10px;
-                overflow: hidden;
+                height: 100%;
             }
 
-            .point-image {
+            .point-image-simple-img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
             }
 
-            .point-image-info {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                background-color: #f8f9fa;
-                padding: 15px;
-                border-radius: 10px;
-            }
-
-            .point-image-coordinates, .point-image-address, .point-image-verified {
+            .point-image-simple-overlay {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+                padding: 10px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
             }
 
-            .point-image-label {
+            .point-image-simple-title {
+                color: white;
                 font-weight: bold;
-                color: #555;
+                font-size: 14px;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 75%;
             }
 
-            .point-image-value {
-                color: #333;
-            }
-
-            .point-image-verified-status {
-                color: #27ae60;
-                font-weight: bold;
-            }
-
-            .point-image-actions {
-                display: flex;
-                justify-content: space-between;
-                gap: 10px;
-            }
-
-            .point-image-action-btn {
-                flex: 1;
-                padding: 10px 15px;
+            .point-image-simple-settings {
+                background: none;
                 border: none;
-                border-radius: 5px;
+                color: white;
                 font-size: 16px;
-                font-weight: bold;
                 cursor: pointer;
+                padding: 5px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(0, 0, 0, 0.3);
                 transition: background-color 0.2s;
             }
 
-            .point-image-navigate-btn {
-                background-color: #3498db;
-                color: white;
+            .point-image-simple-settings:hover {
+                background-color: rgba(0, 0, 0, 0.5);
             }
 
-            .point-image-navigate-btn:hover {
-                background-color: #2980b9;
+            /* Animace */
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
             }
 
-            .point-image-share-btn {
-                background-color: #2ecc71;
-                color: white;
+            /* Tmavý režim - není potřeba měnit mnoho, protože overlay je tmavý */
+            body[data-theme="dark"] .point-image-simple-settings {
+                background-color: rgba(0, 0, 0, 0.5);
             }
 
-            .point-image-share-btn:hover {
-                background-color: #27ae60;
-            }
-
-            .point-image-close-btn {
-                background-color: #e0e0e0;
-                color: #333;
-            }
-
-            .point-image-close-btn:hover {
-                background-color: #bdc3c7;
-            }
-
-            /* Tmavý režim */
-            body[data-theme="dark"] .point-image-dialog {
-                background-color: #2c3e50;
-                color: #ecf0f1;
-            }
-
-            body[data-theme="dark"] .point-image-header {
-                background-color: #2980b9;
-            }
-
-            body[data-theme="dark"] .point-image-info {
-                background-color: #34495e;
-            }
-
-            body[data-theme="dark"] .point-image-label {
-                color: #bdc3c7;
-            }
-
-            body[data-theme="dark"] .point-image-value {
-                color: #ecf0f1;
-            }
-
-            body[data-theme="dark"] .point-image-verified-status {
-                color: #2ecc71;
-            }
-
-            body[data-theme="dark"] .point-image-close-btn {
-                background-color: #34495e;
-                color: #ecf0f1;
-            }
-
-            body[data-theme="dark"] .point-image-close-btn:hover {
-                background-color: #2c3e50;
-            }
-
-            @media (max-width: 768px) {
-                .point-image-container {
-                    height: 200px;
-                }
-
-                .point-image-actions {
-                    flex-direction: column;
-                }
+            body[data-theme="dark"] .point-image-simple-settings:hover {
+                background-color: rgba(0, 0, 0, 0.7);
             }
         `;
 
         document.head.appendChild(pointImageStyles);
         document.body.appendChild(dialog);
 
-        // Přidání event listenerů
-        const closeButtons = dialog.querySelectorAll('.point-image-close, .point-image-close-btn');
-        closeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                dialog.remove();
-                pointImageStyles.remove();
-            });
-        });
+        // Přidání event listenerů pro jednodušší zobrazení
 
-        // Přidání event listeneru pro tlačítko navigace
-        const navigateButton = dialog.querySelector('.point-image-navigate-btn');
-        if (navigateButton) {
-            navigateButton.addEventListener('click', () => {
-                // Simulace navigace (v reálné aplikaci by zde byla implementace navigace)
-                if (typeof addMessage !== 'undefined') {
-                    addMessage(`Navigace na ${pointName} byla zahájena.`, false);
-                }
-
-                // Zavření dialogu
+        // Kliknutí na obrázek zavře dialog
+        const imageElement = dialog.querySelector('.point-image-simple-img');
+        if (imageElement) {
+            imageElement.addEventListener('click', () => {
                 dialog.remove();
                 pointImageStyles.remove();
             });
         }
 
-        // Přidání event listeneru pro tlačítko sdílení
-        const shareButton = dialog.querySelector('.point-image-share-btn');
-        if (shareButton) {
-            shareButton.addEventListener('click', () => {
-                // Simulace sdílení (v reálné aplikaci by zde byla implementace sdílení)
+        // Přidání event listeneru pro tlačítko nastavení
+        const settingsButton = dialog.querySelector('.point-image-simple-settings');
+        if (settingsButton) {
+            settingsButton.addEventListener('click', () => {
+                // Zobrazení dialogu pro nastavení bodu
+                dialog.remove();
+                pointImageStyles.remove();
+
+                // Simulace otevření nastavení bodu (v reálné aplikaci by zde bylo otevření nastavení)
                 if (typeof addMessage !== 'undefined') {
-                    addMessage(`Odkaz na ${pointName} byl zkopírován do schránky.`, false);
+                    addMessage(`Otevírám nastavení bodu: ${pointName}...`, false);
+
+                    // Simulace zobrazení nastavení po krátké prodlevě
+                    setTimeout(() => {
+                        // Zde by bylo zobrazení dialogu pro nastavení bodu
+                        // Pro účely demonstrace použijeme původní dialog pro korekci bodu
+                        this.showFocusPointDialog();
+                    }, 500);
                 }
             });
         }
+
+        // Automatické zavření dialogu po 10 sekundách
+        setTimeout(() => {
+            if (document.body.contains(dialog)) {
+                dialog.remove();
+                pointImageStyles.remove();
+            }
+        }, 10000);
 
         // Přidání XP za zobrazení fotky bodu
         if (typeof UserProgress !== 'undefined') {

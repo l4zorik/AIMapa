@@ -2,6 +2,20 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.0.3] - 2025-05-23 - ZJEDNODUŠENÉ ZOBRAZENÍ FOTKY BODU
+
+### Nové funkce
+- Přepracováno zobrazení fotky bodu na jednodušší kompaktní verzi
+- Přidáno malé tlačítko nastavení pro případné změny
+- Implementováno automatické zavření fotky po 10 sekundách
+- Přidána možnost zavřít fotku kliknutím na obrázek
+
+### Vylepšení uživatelského rozhraní
+- Vytvořeno minimalistické rozhraní s fotkou a názvem bodu
+- Přesunuto zobrazení fotky do pravého dolního rohu obrazovky
+- Přidán průhledný overlay s názvem bodu a tlačítkem nastavení
+- Implementována animace při zobrazení a skrytí fotky
+
 ## [0.3.0.2] - 2025-05-22 - FOTKY BODŮ
 
 ### Nové funkce
