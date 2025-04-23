@@ -1,23 +1,92 @@
 /**
  * Modul pro menu příkazů vedle chatu
- * Verze 0.2.8.6.5
+ * Verze 0.2.8.7.4
  */
 
 const CommandsMenu = {
     // Seznam dostupných příkazů
     commands: [
+        // Kategorie: Asistenti a služby
+        {
+            id: 'alexa',
+            name: 'Alexa',
+            description: 'Aktivuje hlasového asistenta Alexa pro hlasové ovládání aplikace',
+            icon: '🎤',
+            category: 'assistants',
+            examples: ['Alexa', 'Hlasový asistent', 'Hlasové ovládání']
+        },
+        {
+            id: 'opening-hours',
+            name: 'Otevírací doba',
+            description: 'Zobrazí otevírací dobu obchodů a služeb v okolí',
+            icon: '🕐',
+            category: 'assistants',
+            examples: ['Otevírací doba', 'Kdy má otevřeno', 'Otevíraci doba']
+        },
         {
             id: 'job-search',
             name: 'Hledání práce',
             description: 'Zobrazí nabídky práce v okolí s možností reakce',
             icon: '💼',
+            category: 'assistants',
             examples: ['Hledání práce', 'Nabídky práce', 'Zaměstnání']
         },
+        {
+            id: 'go-to-work',
+            name: 'Chci jít do práce',
+            description: 'Vytvoří trasu do práce a zobrazí úkoly a výdělek',
+            icon: '💰',
+            category: 'assistants',
+            examples: ['Chci jít do práce', 'Jít do práce', 'Pracovat']
+        },
+        {
+            id: 'taxi',
+            name: 'Taxi služba',
+            description: 'Objednání taxi s výběrem typu vozidla a odhad ceny',
+            icon: '🚖',
+            category: 'assistants',
+            examples: ['Taxi', 'Objednat taxi', 'Odvoz']
+        },
+        {
+            id: 'dentist',
+            name: 'Zubař',
+            description: 'Vyhledání zubaře v okolí a objednání termínu',
+            icon: '🦷',
+            category: 'assistants',
+            examples: ['Zubař', 'Zubař', 'Zubní lékař']
+        },
+        {
+            id: 'doctor',
+            name: 'Lékař',
+            description: 'Vyhledání lékaře v okolí a objednání termínu',
+            icon: '💉',
+            category: 'assistants',
+            examples: ['Lékař', 'Doktor', 'Praktický lékař']
+        },
+        {
+            id: 'labor-office',
+            name: 'Úřad práce',
+            description: 'Informace o úřadu práce, otevírací době a rezervace termínu',
+            icon: '🏢',
+            category: 'assistants',
+            examples: ['Úřad práce', 'Pracovní úřad', 'Evidence uchazečů']
+        },
+        {
+            id: 'rap-action',
+            name: 'Rapové akce',
+            description: 'Zobrazí seznam rapových akcí v okolí a možnost rezervace vstupenek',
+            icon: '🎤',
+            category: 'assistants',
+            examples: ['Rap', 'Rapové akce', 'Hip hop koncerty']
+        },
+
+        // Kategorie: Nákupy
         {
             id: 'energy-drinks',
             name: 'Energetické nápoje',
             description: 'Zobrazí nabídku nejlepších energetických nápojů s možností objednávky',
             icon: '⚡',
+            category: 'shopping',
             examples: ['Energeťáky', 'Energy drinky', 'Energetické nápoje']
         },
         {
@@ -25,13 +94,24 @@ const CommandsMenu = {
             name: 'Krkovička',
             description: 'Zobrazí nabídku krkovičky a dalších mas s možností objednávky',
             icon: '🥩',
+            category: 'shopping',
             examples: ['Krkovička', 'Maso', 'Gril']
         },
+        {
+            id: 'pizza-delivery',
+            name: 'Rozvážka pizzy',
+            description: 'Zobrazí nabídku pizzerií v okolí s možností objednávky a doručení',
+            icon: '🍕',
+            category: 'shopping',
+            examples: ['Pizza', 'Rozvážka pizzy', 'Objednat pizzu']
+        },
+        // Kategorie: Mapové nástroje
         {
             id: 'add-point',
             name: 'Přidat bod',
             description: 'Přidá nový bod na mapu',
             icon: '📍',
+            category: 'map-tools',
             examples: ['Přidej bod', 'Nový bod', 'Přidat místo']
         },
         {
@@ -39,6 +119,7 @@ const CommandsMenu = {
             name: 'Vypočítat trasu',
             description: 'Vypočítá trasu mezi body na mapě',
             icon: '🗺️',
+            category: 'map-tools',
             examples: ['Vypočítej trasu', 'Najdi cestu', 'Plánovat trasu']
         },
         {
@@ -46,34 +127,15 @@ const CommandsMenu = {
             name: 'Vymazat mapu',
             description: 'Odebere všechny body a trasy z mapy',
             icon: '🗑️',
+            category: 'map-tools',
             examples: ['Vymaž mapu', 'Smaž vše', 'Vyčisti mapu']
-        },
-        {
-            id: 'night-mode',
-            name: 'Noční režim',
-            description: 'Přepne mapu do nočního režimu s tmavým pozadím a zvýrazněnými cestami',
-            icon: '🌙',
-            examples: ['Noční režim', 'Tmavá mapa', 'Noční mapa']
-        },
-        {
-            id: 'weather-overlay',
-            name: 'Počasí na mapě',
-            description: 'Zobrazí aktuální počasí a předpověď na mapě',
-            icon: '☀️',
-            examples: ['Počasí', 'Předpověď', 'Teplota']
-        },
-        {
-            id: 'points-of-interest',
-            name: 'Zajímavá místa',
-            description: 'Zobrazí zajímavá místa v okolí - restaurace, hotely, památky',
-            icon: '🏰',
-            examples: ['Zajímavá místa', 'Atrakce', 'Co navštívit']
         },
         {
             id: 'measure-distance',
             name: 'Měření vzdálenosti',
             description: 'Nástroj pro měření vzdálenosti mezi body na mapě',
             icon: '📍',
+            category: 'map-tools',
             examples: ['Měření', 'Vzdálenost', 'Změřit']
         },
         {
@@ -81,13 +143,25 @@ const CommandsMenu = {
             name: 'Sdílet polohu',
             description: 'Vytvoří odkaz pro sdílení aktuální polohy nebo trasy',
             icon: '🔗',
+            category: 'map-tools',
             examples: ['Sdílet', 'Odkaz', 'Poslat polohu']
+        },
+
+        // Kategorie: Zobrazení mapy
+        {
+            id: 'night-mode',
+            name: 'Noční režim',
+            description: 'Přepne mapu do nočního režimu s tmavým pozadím a zvýrazněnými cestami',
+            icon: '🌙',
+            category: 'map-display',
+            examples: ['Noční režim', 'Tmavá mapa', 'Noční mapa']
         },
         {
             id: 'fullscreen',
             name: 'Fullscreen režim',
             description: 'Přepne aplikaci do režimu celé obrazovky',
             icon: '⛶',
+            category: 'map-display',
             examples: ['Celá obrazovka', 'Fullscreen', 'Maximální zobrazení']
         },
         {
@@ -95,34 +169,33 @@ const CommandsMenu = {
             name: 'Glóbus režim',
             description: 'Přepne mapu do 3D glóbusu',
             icon: '🌎',
+            category: 'map-display',
             examples: ['Glóbus', '3D mapa', 'Zobrazit glóbus']
         },
+
+        // Kategorie: Informace a vrstvy
         {
-            id: 'local-stories',
-            name: 'Příběhy z oblasti',
-            description: 'Zobrazí zajímavé příběhy a legendy z aktuální oblasti',
-            icon: '📜',
-            examples: ['Příběhy', 'Legendy', 'Historie místa']
+            id: 'weather-overlay',
+            name: 'Počasí na mapě',
+            description: 'Zobrazí aktuální počasí a předpověď na mapě',
+            icon: '☀️',
+            category: 'info-layers',
+            examples: ['Počasí', 'Předpověď', 'Teplota']
         },
         {
-            id: 'local-food',
-            name: 'Místní speciality',
-            description: 'Zobrazí tipy na nejlepší jídlo a pití z aktuální oblasti',
-            icon: '🍽️',
-            examples: ['Jídlo', 'Speciality', 'Gastronomie']
-        },
-        {
-            id: 'nearby-shops',
-            name: 'Obchody v okolí',
-            description: 'Zobrazí obchody v okolí s možností online nákupu',
-            icon: '🛍️',
-            examples: ['Obchody', 'Nákupy', 'Kde nakoupit']
+            id: 'points-of-interest',
+            name: 'Zajímavá místa',
+            description: 'Zobrazí zajímavá místa v okolí - restaurace, hotely, památky',
+            icon: '🏰',
+            category: 'info-layers',
+            examples: ['Zajímavá místa', 'Atrakce', 'Co navštívit']
         },
         {
             id: 'traffic-info',
             name: 'Dopravní situace',
             description: 'Zobrazí aktuální dopravní situaci, zácpy a uzavírky',
             icon: '🚗',
+            category: 'info-layers',
             examples: ['Doprava', 'Zácpy', 'Dopravní info']
         },
         {
@@ -130,13 +203,43 @@ const CommandsMenu = {
             name: 'Turistické trasy',
             description: 'Zobrazí turistické a cyklistické trasy v okolí',
             icon: '🚶',
+            category: 'info-layers',
             examples: ['Turistika', 'Cyklotrasy', 'Pěší trasy']
         },
+
+        // Kategorie: Místní informace
+        {
+            id: 'local-stories',
+            name: 'Příběhy z oblasti',
+            description: 'Zobrazí zajímavé příběhy a legendy z aktuální oblasti',
+            icon: '📜',
+            category: 'local-info',
+            examples: ['Příběhy', 'Legendy', 'Historie místa']
+        },
+        {
+            id: 'local-food',
+            name: 'Místní speciality',
+            description: 'Zobrazí tipy na nejlepší jídlo a pití z aktuální oblasti',
+            icon: '🍽️',
+            category: 'local-info',
+            examples: ['Jídlo', 'Speciality', 'Gastronomie']
+        },
+        {
+            id: 'nearby-shops',
+            name: 'Obchody v okolí',
+            description: 'Zobrazí obchody v okolí s možností online nákupu',
+            icon: '🛍️',
+            category: 'local-info',
+            examples: ['Obchody', 'Nákupy', 'Kde nakoupit']
+        },
+
+        // Kategorie: Nastavení a nápověda
         {
             id: 'premium',
             name: 'Premium verze',
             description: 'Získejte přístup k premium funkcím aplikace',
             icon: '⭐',
+            category: 'settings',
             examples: ['Premium', 'Upgrade', 'Rozšířené funkce']
         },
         {
@@ -144,6 +247,7 @@ const CommandsMenu = {
             name: 'Nastavení',
             description: 'Otevře dialog nastavení aplikace',
             icon: '⚙️',
+            category: 'settings',
             examples: ['Nastavení', 'Konfigurace', 'Možnosti']
         },
         {
@@ -151,6 +255,7 @@ const CommandsMenu = {
             name: 'Nápověda',
             description: 'Zobrazí nápovědu k používání aplikace',
             icon: '❓',
+            category: 'settings',
             examples: ['Nápověda', 'Pomoc', 'Jak používat']
         }
     ],
@@ -173,8 +278,19 @@ const CommandsMenu = {
 
     // Vytvoření tlačítka pro zobrazení menu příkazů
     createCommandsButton() {
+        console.log('Vytvářím tlačítko pro menu příkazů...');
+
         // Kontrola, zda již tlačítko neexistuje
-        if (document.getElementById('commandsButton')) {
+        const existingButton = document.getElementById('commandsButton');
+        if (existingButton) {
+            console.log('Tlačítko již existuje, přeskakuji vytvoření');
+            // Ujistíme se, že tlačítko má správné event listenery
+            existingButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('Kliknuto na existující tlačítko menu příkazů');
+                this.toggleCommandsMenu();
+            });
             return;
         }
 
@@ -185,24 +301,110 @@ const CommandsMenu = {
         commandsButton.innerHTML = '<i class="icon">📋</i>';
         commandsButton.title = 'Menu příkazů';
 
-        // Přidání tlačítka do chatu
-        const chatInput = document.querySelector('.chat-input');
-        if (chatInput) {
-            chatInput.appendChild(commandsButton);
+        // Přidání tlačítka do chatu - zkusíme více způsobů
+        let chatInputFound = false;
+
+        // 1. Zkusíme najít .chat-input v .ai-assistant
+        const aiAssistant = document.querySelector('.ai-assistant');
+        if (aiAssistant) {
+            const chatInput = aiAssistant.querySelector('.chat-input');
+            if (chatInput) {
+                console.log('Nalezen element .chat-input v .ai-assistant, přidávám tlačítko');
+                // Vložíme tlačítko před input pole
+                const inputField = chatInput.querySelector('input');
+                if (inputField) {
+                    chatInput.insertBefore(commandsButton, inputField);
+                    console.log('Tlačítko přidáno před input pole');
+                } else {
+                    chatInput.appendChild(commandsButton);
+                    console.log('Input pole nenalezeno, tlačítko přidáno na konec');
+                }
+                chatInputFound = true;
+            }
+        }
+
+        // 2. Pokud se nepodařilo najít v .ai-assistant, zkusíme globální vyhledání
+        if (!chatInputFound) {
+            const chatInputs = document.querySelectorAll('.chat-input');
+            if (chatInputs.length > 0) {
+                console.log(`Nalezeno ${chatInputs.length} elementů .chat-input, použiji první`);
+                const chatInput = chatInputs[0];
+                // Vložíme tlačítko před input pole
+                const inputField = chatInput.querySelector('input');
+                if (inputField) {
+                    chatInput.insertBefore(commandsButton, inputField);
+                    console.log('Tlačítko přidáno před input pole');
+                } else {
+                    chatInput.appendChild(commandsButton);
+                    console.log('Input pole nenalezeno, tlačítko přidáno na konec');
+                }
+                chatInputFound = true;
+            }
+        }
+
+        // 3. Pokud se stále nepodařilo najít, vytvoříme nový .chat-input
+        if (!chatInputFound) {
+            console.error('Element .chat-input nebyl nalezen!');
+            // Záložní řešení - přidáme tlačítko přímo do body
+            console.log('Používám záložní řešení - přidávám tlačítko do body');
+            const chatInputDiv = document.createElement('div');
+            chatInputDiv.className = 'chat-input';
+            chatInputDiv.style.position = 'fixed';
+            chatInputDiv.style.bottom = '20px';
+            chatInputDiv.style.right = '20px';
+            chatInputDiv.style.zIndex = '1000';
+            chatInputDiv.appendChild(commandsButton);
+            document.body.appendChild(chatInputDiv);
         }
     },
 
     // Vytvoření menu příkazů vedle chatu
     createCommandsMenu() {
+        console.log('Vytvářím menu příkazů...');
+
         // Kontrola, zda již menu neexistuje
         if (document.getElementById('commandsMenu')) {
+            console.log('Menu příkazů již existuje, přeskakuji vytvoření');
             return;
         }
+
+        // Vytvoření překrytí
+        const overlay = document.createElement('div');
+        overlay.id = 'commandsOverlay';
+        overlay.className = 'commands-overlay';
+        document.body.appendChild(overlay);
+        console.log('Překrytí pro menu příkazů vytvořeno');
+
+        // Přidání event listeneru pro zavření menu při kliknutí na překrytí
+        overlay.addEventListener('click', () => {
+            this.hideCommandsMenu();
+        });
 
         // Vytvoření menu
         const commandsMenu = document.createElement('div');
         commandsMenu.id = 'commandsMenu';
         commandsMenu.className = 'commands-menu';
+
+        // Definice kategorií
+        const categories = {
+            'assistants': { name: 'Asistenti a služby', icon: '💬' },
+            'shopping': { name: 'Nákupy', icon: '🛍️' },
+            'map-tools': { name: 'Mapové nástroje', icon: '🗺️' },
+            'map-display': { name: 'Zobrazení mapy', icon: '💻' },
+            'info-layers': { name: 'Informace a vrstvy', icon: '📈' },
+            'local-info': { name: 'Místní informace', icon: '🏠' },
+            'settings': { name: 'Nastavení a nápověda', icon: '⚙️' }
+        };
+
+        // Seskupení příkazů podle kategorií
+        const commandsByCategory = {};
+        this.commands.forEach(command => {
+            const category = command.category || 'settings';
+            if (!commandsByCategory[category]) {
+                commandsByCategory[category] = [];
+            }
+            commandsByCategory[category].push(command);
+        });
 
         // Vytvoření obsahu menu
         commandsMenu.innerHTML = `
@@ -210,14 +412,28 @@ const CommandsMenu = {
                 <h3>Dostupné příkazy</h3>
                 <button class="commands-menu-close">&times;</button>
             </div>
+            <div class="commands-menu-search">
+                <input type="text" id="commandsSearch" placeholder="Hledat příkazy..." class="commands-search-input">
+            </div>
             <div class="commands-menu-body">
-                <div class="commands-list">
-                    ${this.commands.map(command => `
-                        <div class="command-item" data-command-id="${command.id}">
-                            <div class="command-icon">${command.icon}</div>
-                            <div class="command-info">
-                                <div class="command-name">${command.name}</div>
-                                <div class="command-description">${command.description}</div>
+                <div class="commands-menu-scroll-container">
+                    ${Object.keys(categories).map(categoryId => `
+                        <div class="commands-category expanded" data-category="${categoryId}">
+                            <div class="commands-category-header">
+                                <div class="commands-category-icon">${categories[categoryId].icon}</div>
+                                <div class="commands-category-name">${categories[categoryId].name}</div>
+                                <div class="commands-category-toggle">▼</div>
+                            </div>
+                            <div class="commands-list" style="display: flex;">
+                                ${(commandsByCategory[categoryId] || []).map(command => `
+                                    <div class="command-item" data-command-id="${command.id}" data-category="${categoryId}">
+                                        <div class="command-icon">${command.icon}</div>
+                                        <div class="command-info">
+                                            <div class="command-name">${command.name}</div>
+                                            <div class="command-description">${command.description}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
                             </div>
                         </div>
                     `).join('')}
@@ -225,24 +441,32 @@ const CommandsMenu = {
             </div>
         `;
 
-        // Přidání menu do dokumentu
-        const aiAssistant = document.querySelector('.ai-assistant');
-        if (aiAssistant) {
-            aiAssistant.appendChild(commandsMenu);
-        }
+        // Přidání menu do dokumentu - nejprve zkusíme přidat do body
+        console.log('Přidávám menu příkazů do dokumentu...');
+        document.body.appendChild(commandsMenu);
+        console.log('Menu příkazů přidáno do body');
 
         // Skrytí menu na začátku
         commandsMenu.style.display = 'none';
+        console.log('Menu příkazů vytvořeno a skryto');
     },
 
     // Nastavení event listenerů
     setupEventListeners() {
+        console.log('Nastavuji event listenery pro CommandsMenu...');
+
         // Event listener pro tlačítko menu příkazů
         const commandsButton = document.getElementById('commandsButton');
         if (commandsButton) {
-            commandsButton.addEventListener('click', () => {
+            console.log('Tlačítko menu příkazů nalezeno, přidávám event listener');
+            commandsButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('Kliknuto na tlačítko menu příkazů');
                 this.toggleCommandsMenu();
             });
+        } else {
+            console.error('Tlačítko menu příkazů nebylo nalezeno!');
         }
 
         // Event listener pro zavření menu
@@ -263,84 +487,279 @@ const CommandsMenu = {
             });
         });
 
-        // Event listener pro fullscreen režim
-        document.addEventListener('fullscreenChange', () => {
+        // Event listener pro přepínání kategorií
+        const categoryHeaders = document.querySelectorAll('.commands-category-header');
+        categoryHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const category = header.closest('.commands-category');
+                const commandsList = category.querySelector('.commands-list');
+                const toggle = header.querySelector('.commands-category-toggle');
+
+                // Přepnutí zobrazení seznamu příkazů
+                if (commandsList.style.display === 'none') {
+                    commandsList.style.display = 'flex';
+                    toggle.textContent = '▼'; // ▼ = ▼
+                    category.classList.add('expanded');
+                } else {
+                    commandsList.style.display = 'none';
+                    toggle.textContent = '▶'; // ▶ = ▶
+                    category.classList.remove('expanded');
+                }
+            });
+        });
+
+        // Event listener pro vyhledávání příkazů
+        const searchInput = document.getElementById('commandsSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                const searchText = searchInput.value.toLowerCase();
+                const commandItems = document.querySelectorAll('.command-item');
+                const categories = document.querySelectorAll('.commands-category');
+
+                // Pokud je vyhledávací pole prázdné, zobrazit všechny kategorie
+                if (searchText === '') {
+                    categories.forEach(category => {
+                        category.style.display = 'block';
+                        const commandsList = category.querySelector('.commands-list');
+                        const commandItems = category.querySelectorAll('.command-item');
+                        commandItems.forEach(item => item.style.display = 'flex');
+
+                        // Pokud byla kategorie před vyhledáváním rozbalená, zůstane rozbalená
+                        if (category.classList.contains('expanded')) {
+                            commandsList.style.display = 'flex';
+                        } else {
+                            commandsList.style.display = 'none';
+                        }
+                    });
+                    return;
+                }
+
+                // Vyhledávání příkazů
+                let hasVisibleCommands = false;
+                categories.forEach(category => {
+                    let categoryHasVisibleCommands = false;
+                    const commandItems = category.querySelectorAll('.command-item');
+
+                    commandItems.forEach(item => {
+                        const commandName = item.querySelector('.command-name').textContent.toLowerCase();
+                        const commandDesc = item.querySelector('.command-description').textContent.toLowerCase();
+
+                        if (commandName.includes(searchText) || commandDesc.includes(searchText)) {
+                            item.style.display = 'flex';
+                            categoryHasVisibleCommands = true;
+                            hasVisibleCommands = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Zobrazit/skrýt kategorii podle toho, zda obsahuje odpovídající příkazy
+                    if (categoryHasVisibleCommands) {
+                        category.style.display = 'block';
+                        category.querySelector('.commands-list').style.display = 'flex';
+                    } else {
+                        category.style.display = 'none';
+                    }
+                });
+
+                // Pokud není nalezen žádný příkaz, zobrazit zprávu
+                const noResultsMessage = document.getElementById('noCommandsResults');
+                if (!hasVisibleCommands) {
+                    if (!noResultsMessage) {
+                        const message = document.createElement('div');
+                        message.id = 'noCommandsResults';
+                        message.className = 'no-commands-results';
+                        message.textContent = 'Nebyly nalezeny žádné příkazy';
+                        document.querySelector('.commands-menu-body').appendChild(message);
+                    }
+                } else if (noResultsMessage) {
+                    noResultsMessage.remove();
+                }
+            });
+        }
+
+        // Event listenery pro fullscreen režim
+        document.addEventListener('fullscreenchange', () => {
+            console.log('Fullscreen změna detekovaná');
             // Aktualizace menu příkazů ve fullscreen režimu
             this.updateFullscreenMenu();
         });
+
+        // Sledování změn tříd na body elementu pro detekci fullscreen režimu
+        const bodyObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    const fullscreenModeAdded = document.body.classList.contains('fullscreen-mode');
+                    console.log('Změna tříd na body, fullscreen-mode:', fullscreenModeAdded);
+                    this.updateFullscreenMenu();
+                }
+            });
+        });
+
+        bodyObserver.observe(document.body, { attributes: true });
     },
 
     // Zobrazení/skrytí menu příkazů
     toggleCommandsMenu() {
-        const commandsMenu = document.getElementById('commandsMenu');
-        if (commandsMenu) {
-            if (commandsMenu.style.display === 'none') {
-                this.showCommandsMenu();
-            } else {
-                this.hideCommandsMenu();
+        console.log('toggleCommandsMenu vyvoláno');
+        let commandsMenu = document.getElementById('commandsMenu');
+
+        // Pokud menu neexistuje, vytvoříme ho
+        if (!commandsMenu) {
+            console.log('Menu příkazů nebylo nalezeno, vytvářím nové');
+            this.createCommandsMenu();
+            commandsMenu = document.getElementById('commandsMenu');
+
+            if (!commandsMenu) {
+                console.error('Nepodařilo se vytvořit menu příkazů!');
+                return;
             }
+        }
+
+        console.log('Aktuální stav menu:', commandsMenu.style.display);
+        if (commandsMenu.style.display === 'none' || commandsMenu.style.display === '') {
+            console.log('Zobrazuji menu příkazů');
+            this.showCommandsMenu();
+        } else {
+            console.log('Skrývám menu příkazů');
+            this.hideCommandsMenu();
         }
     },
 
     // Zobrazení menu příkazů
     showCommandsMenu() {
+        console.log('showCommandsMenu vyvoláno');
         const commandsMenu = document.getElementById('commandsMenu');
-        if (commandsMenu) {
-            commandsMenu.style.display = 'block';
+        const overlay = document.getElementById('commandsOverlay');
 
-            // Animace zobrazení
+        if (commandsMenu) {
+            // Nejprve nastavíme display: flex, aby menu bylo viditelné
+            commandsMenu.style.display = 'flex';
+            console.log('Menu příkazů nastaveno na display: flex');
+
+            // Animace zobrazení - přidáme třídu show po krátkém zpoždění
             setTimeout(() => {
                 commandsMenu.classList.add('show');
-                commandsMenu.style.transform = 'translate(-50%, -50%) scale(1)';
-                commandsMenu.style.opacity = '1';
+                console.log('Přidána třída show k menu příkazů');
+
+                // Zobrazíme také překrytí
+                if (overlay) {
+                    overlay.classList.add('show');
+                    console.log('Přidána třída show k překrytí');
+                }
             }, 10);
+        } else {
+            console.error('Menu příkazů nebylo nalezeno při pokusu o zobrazení!');
         }
     },
 
     // Skrytí menu příkazů
     hideCommandsMenu() {
+        console.log('hideCommandsMenu vyvoláno');
         const commandsMenu = document.getElementById('commandsMenu');
+        const overlay = document.getElementById('commandsOverlay');
+
         if (commandsMenu) {
+            // Nejprve odebrat třídu show pro animaci
             commandsMenu.classList.remove('show');
-            commandsMenu.style.transform = 'translate(-50%, -50%) scale(0.95)';
-            commandsMenu.style.opacity = '0';
+            console.log('Odebrána třída show z menu příkazů');
+
+            // Skryjeme také překrytí
+            if (overlay) {
+                overlay.classList.remove('show');
+                console.log('Odebrána třída show z překrytí');
+            }
 
             // Skrytí menu po dokončení animace
             setTimeout(() => {
                 commandsMenu.style.display = 'none';
+                console.log('Menu příkazů nastaveno na display: none');
             }, 300);
+        } else {
+            console.error('Menu příkazů nebylo nalezeno při pokusu o skrytí!');
         }
     },
 
     // Aktualizace menu příkazů ve fullscreen režimu
     updateFullscreenMenu() {
-        const isFullscreen = document.fullscreenElement !== null;
+        console.log('Aktualizace menu příkazů ve fullscreen režimu');
+
+        // Kontrola, zda jsme ve fullscreen režimu
+        const isFullscreen = document.body.classList.contains('fullscreen-mode') || document.fullscreenElement !== null;
+        console.log('Fullscreen režim:', isFullscreen);
+
         const commandsMenu = document.getElementById('commandsMenu');
         const commandsButton = document.getElementById('commandsButton');
+        const floatingCommandsButton = document.getElementById('floatingCommandsButton');
+
+        if (!commandsMenu) {
+            console.log('Menu příkazů neexistuje, vytvářím nové');
+            this.createCommandsMenu();
+        }
 
         if (isFullscreen) {
-            // Přesunout menu a tlačítko do fullscreen kontejneru
-            const fullscreenChat = document.querySelector('.fullscreen-chat');
-            if (fullscreenChat && commandsMenu && commandsButton) {
-                fullscreenChat.appendChild(commandsMenu);
-                fullscreenChat.querySelector('.chat-input').appendChild(commandsButton);
+            console.log('Jsme ve fullscreen režimu, aktualizuji menu');
+
+            // Pokud existuje plovoucí tlačítko, přidáme mu event listener
+            if (floatingCommandsButton) {
+                console.log('Nalezeno plovoucí tlačítko pro menu příkazů');
+
+                // Odstraníme původní event listenery
+                const newBtn = floatingCommandsButton.cloneNode(true);
+                floatingCommandsButton.parentNode.replaceChild(newBtn, floatingCommandsButton);
+
+                // Přidáme nový event listener
+                newBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    console.log('Kliknuto na plovoucí tlačítko menu příkazů');
+                    this.toggleCommandsMenu();
+                });
+            } else {
+                console.log('Plovoucí tlačítko pro menu příkazů nebylo nalezeno');
             }
         } else {
-            // Vrátit menu a tlačítko zpět do normálního chatu
-            const aiAssistant = document.querySelector('.ai-assistant');
-            const chatInput = document.querySelector('.ai-assistant .chat-input');
-            if (aiAssistant && chatInput && commandsMenu && commandsButton) {
-                aiAssistant.appendChild(commandsMenu);
-                chatInput.appendChild(commandsButton);
-            }
+            console.log('Nejsme ve fullscreen režimu');
         }
     },
 
     // Provedení příkazu
     executeCommand(commandId) {
         switch (commandId) {
+            case 'alexa':
+                this.activateAlexa();
+                break;
+
+            case 'opening-hours':
+                this.showOpeningHours();
+                break;
+
             case 'job-search':
                 this.showJobSearch();
+                break;
+
+            case 'go-to-work':
+                this.showGoToWork();
+                break;
+
+            case 'taxi':
+                this.showTaxiService();
+                break;
+
+            case 'dentist':
+                this.showDentistSearch();
+                break;
+
+            case 'doctor':
+                this.showDoctorSearch();
+                break;
+
+            case 'labor-office':
+                this.showLaborOffice();
+                break;
+
+            case 'rap-action':
+                this.showRapActions();
                 break;
 
             case 'energy-drinks':
@@ -349,6 +768,10 @@ const CommandsMenu = {
 
             case 'krkovicka':
                 this.showKrkovickaShop();
+                break;
+
+            case 'pizza-delivery':
+                this.showPizzaDelivery();
                 break;
 
             case 'add-point':
@@ -439,6 +862,2783 @@ const CommandsMenu = {
             default:
                 console.log('Neznámý příkaz:', commandId);
                 break;
+        }
+    },
+
+    // Zobrazení otevírací doby
+    showOpeningHours() {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('openingHoursModal')) {
+            return;
+        }
+
+        // Vytvoření modalu pro otevírací dobu
+        const modal = document.createElement('div');
+        modal.id = 'openingHoursModal';
+        modal.className = 'opening-hours-modal';
+        document.body.appendChild(modal);
+
+        // Definice míst s otevírací dobou
+        const places = [
+            {
+                name: 'Klub Alexa',
+                category: 'Zábava',
+                address: 'Masarykovo náměstí 25, Hodonín',
+                phone: '+420 123 456 789',
+                website: 'www.klub-alexa.cz',
+                hours: {
+                    monday: '20:00 - 04:00',
+                    tuesday: '20:00 - 04:00',
+                    wednesday: '20:00 - 04:00',
+                    thursday: '20:00 - 04:00',
+                    friday: '20:00 - 06:00',
+                    saturday: '20:00 - 06:00',
+                    sunday: 'Zavřeno'
+                },
+                icon: '🕺'
+            },
+            {
+                name: 'Restaurace U Zlatého lva',
+                category: 'Restaurace',
+                address: 'Hlavní 42, Hodonín',
+                phone: '+420 987 654 321',
+                website: 'www.zlatylev.cz',
+                hours: {
+                    monday: '11:00 - 22:00',
+                    tuesday: '11:00 - 22:00',
+                    wednesday: '11:00 - 22:00',
+                    thursday: '11:00 - 22:00',
+                    friday: '11:00 - 23:00',
+                    saturday: '12:00 - 23:00',
+                    sunday: '12:00 - 21:00'
+                },
+                icon: '🍽️'
+            },
+            {
+                name: 'Supermarket Globus',
+                category: 'Nákupní centrum',
+                address: 'Nákupní 123, Hodonín',
+                phone: '+420 111 222 333',
+                website: 'www.globus.cz',
+                hours: {
+                    monday: '08:00 - 21:00',
+                    tuesday: '08:00 - 21:00',
+                    wednesday: '08:00 - 21:00',
+                    thursday: '08:00 - 21:00',
+                    friday: '08:00 - 21:00',
+                    saturday: '08:00 - 21:00',
+                    sunday: '08:00 - 20:00'
+                },
+                icon: '🛍️'
+            },
+            {
+                name: 'Fitness centrum Power',
+                category: 'Sport',
+                address: 'Sportovní 78, Hodonín',
+                phone: '+420 444 555 666',
+                website: 'www.powerfit.cz',
+                hours: {
+                    monday: '06:00 - 22:00',
+                    tuesday: '06:00 - 22:00',
+                    wednesday: '06:00 - 22:00',
+                    thursday: '06:00 - 22:00',
+                    friday: '06:00 - 22:00',
+                    saturday: '08:00 - 20:00',
+                    sunday: '08:00 - 20:00'
+                },
+                icon: '🏋️'
+            },
+            {
+                name: 'Lékárna U Nemocnice',
+                category: 'Zdravotnictví',
+                address: 'Nemocniční 15, Hodonín',
+                phone: '+420 777 888 999',
+                website: 'www.lekarna-nemocnice.cz',
+                hours: {
+                    monday: '08:00 - 18:00',
+                    tuesday: '08:00 - 18:00',
+                    wednesday: '08:00 - 18:00',
+                    thursday: '08:00 - 18:00',
+                    friday: '08:00 - 18:00',
+                    saturday: '09:00 - 13:00',
+                    sunday: 'Zavřeno'
+                },
+                icon: '💊'
+            },
+            {
+                name: 'Kavárna Moka',
+                category: 'Kavárna',
+                address: 'Náměstí 5, Hodonín',
+                phone: '+420 333 444 555',
+                website: 'www.mokacafe.cz',
+                hours: {
+                    monday: '08:00 - 20:00',
+                    tuesday: '08:00 - 20:00',
+                    wednesday: '08:00 - 20:00',
+                    thursday: '08:00 - 20:00',
+                    friday: '08:00 - 22:00',
+                    saturday: '09:00 - 22:00',
+                    sunday: '10:00 - 18:00'
+                },
+                icon: '☕'
+            }
+        ];
+
+        // Získání aktuálního dne v týdnu
+        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const today = days[new Date().getDay()];
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="opening-hours-modal-content">
+                <div class="opening-hours-modal-header">
+                    <h2>Otevírací doba</h2>
+                    <button class="opening-hours-modal-close">&times;</button>
+                </div>
+                <div class="opening-hours-modal-search">
+                    <input type="text" id="openingHoursSearch" placeholder="Hledat místo..." class="opening-hours-search-input">
+                    <div class="opening-hours-filter">
+                        <select id="openingHoursFilter" class="opening-hours-filter-select">
+                            <option value="all">Všechny kategorie</option>
+                            <option value="Zábava">Zábava</option>
+                            <option value="Restaurace">Restaurace</option>
+                            <option value="Nákupní centrum">Nákupní centra</option>
+                            <option value="Sport">Sport</option>
+                            <option value="Zdravotnictví">Zdravotnictví</option>
+                            <option value="Kavárna">Kavárny</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="opening-hours-modal-body">
+                    <div class="opening-hours-places">
+                        ${places.map(place => `
+                            <div class="opening-hours-place" data-category="${place.category}">
+                                <div class="opening-hours-place-header">
+                                    <div class="opening-hours-place-icon">${place.icon}</div>
+                                    <div class="opening-hours-place-name">${place.name}</div>
+                                    <div class="opening-hours-place-status ${this.isOpenNow(place.hours) ? 'open' : 'closed'}">
+                                        ${this.isOpenNow(place.hours) ? 'Otevřeno' : 'Zavřeno'}
+                                    </div>
+                                </div>
+                                <div class="opening-hours-place-info">
+                                    <div class="opening-hours-place-category">${place.category}</div>
+                                    <div class="opening-hours-place-address">
+                                        <i class="opening-hours-icon">📍</i> ${place.address}
+                                    </div>
+                                    <div class="opening-hours-place-phone">
+                                        <i class="opening-hours-icon">📞</i> ${place.phone}
+                                    </div>
+                                    <div class="opening-hours-place-website">
+                                        <i class="opening-hours-icon">🌐</i> ${place.website}
+                                    </div>
+                                </div>
+                                <div class="opening-hours-place-hours">
+                                    <div class="opening-hours-place-hours-header">
+                                        <i class="opening-hours-icon">🕐</i> Otevírací doba
+                                    </div>
+                                    <div class="opening-hours-place-hours-list">
+                                        <div class="opening-hours-place-hours-item ${today === 'monday' ? 'today' : ''}">
+                                            <div class="opening-hours-day">Pondělí:</div>
+                                            <div class="opening-hours-time">${place.hours.monday}</div>
+                                        </div>
+                                        <div class="opening-hours-place-hours-item ${today === 'tuesday' ? 'today' : ''}">
+                                            <div class="opening-hours-day">Úterý:</div>
+                                            <div class="opening-hours-time">${place.hours.tuesday}</div>
+                                        </div>
+                                        <div class="opening-hours-place-hours-item ${today === 'wednesday' ? 'today' : ''}">
+                                            <div class="opening-hours-day">Středa:</div>
+                                            <div class="opening-hours-time">${place.hours.wednesday}</div>
+                                        </div>
+                                        <div class="opening-hours-place-hours-item ${today === 'thursday' ? 'today' : ''}">
+                                            <div class="opening-hours-day">Čtvrtek:</div>
+                                            <div class="opening-hours-time">${place.hours.thursday}</div>
+                                        </div>
+                                        <div class="opening-hours-place-hours-item ${today === 'friday' ? 'today' : ''}">
+                                            <div class="opening-hours-day">Pátek:</div>
+                                            <div class="opening-hours-time">${place.hours.friday}</div>
+                                        </div>
+                                        <div class="opening-hours-place-hours-item ${today === 'saturday' ? 'today' : ''}">
+                                            <div class="opening-hours-day">Sobota:</div>
+                                            <div class="opening-hours-time">${place.hours.saturday}</div>
+                                        </div>
+                                        <div class="opening-hours-place-hours-item ${today === 'sunday' ? 'today' : ''}">
+                                            <div class="opening-hours-day">Neděle:</div>
+                                            <div class="opening-hours-time">${place.hours.sunday}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .opening-hours-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .opening-hours-modal.show {
+                opacity: 1;
+            }
+
+            .opening-hours-modal-content {
+                background-color: var(--card-bg);
+                border-radius: 10px;
+                width: 90%;
+                max-width: 800px;
+                max-height: 90vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .opening-hours-modal.show .opening-hours-modal-content {
+                transform: scale(1);
+            }
+
+            .opening-hours-modal-header {
+                background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .opening-hours-modal-header h2 {
+                margin: 0;
+                color: white;
+                font-size: 1.5rem;
+            }
+
+            .opening-hours-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .opening-hours-modal-search {
+                padding: 15px 20px;
+                background-color: rgba(0, 0, 0, 0.1);
+                display: flex;
+                gap: 10px;
+            }
+
+            .opening-hours-search-input {
+                flex: 1;
+                padding: 10px 15px;
+                border: none;
+                border-radius: 25px;
+                background-color: rgba(255, 255, 255, 0.1);
+                color: var(--text-color);
+                font-size: 1rem;
+            }
+
+            .opening-hours-search-input:focus {
+                outline: none;
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+
+            .opening-hours-filter-select {
+                padding: 10px 15px;
+                border: none;
+                border-radius: 25px;
+                background-color: rgba(255, 255, 255, 0.1);
+                color: var(--text-color);
+                font-size: 1rem;
+                cursor: pointer;
+            }
+
+            .opening-hours-filter-select:focus {
+                outline: none;
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+
+            .opening-hours-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .opening-hours-places {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 20px;
+            }
+
+            .opening-hours-place {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+                overflow: hidden;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .opening-hours-place:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .opening-hours-place-header {
+                padding: 15px;
+                background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 100%);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .opening-hours-place-icon {
+                font-size: 24px;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+            }
+
+            .opening-hours-place-name {
+                flex: 1;
+                font-weight: bold;
+                font-size: 1.1rem;
+                color: var(--text-color);
+            }
+
+            .opening-hours-place-status {
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                font-weight: bold;
+            }
+
+            .opening-hours-place-status.open {
+                background-color: #4CAF50;
+                color: white;
+            }
+
+            .opening-hours-place-status.closed {
+                background-color: #F44336;
+                color: white;
+            }
+
+            .opening-hours-place-info {
+                padding: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .opening-hours-place-category {
+                display: inline-block;
+                padding: 3px 8px;
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
+                font-size: 0.8rem;
+                margin-bottom: 10px;
+                color: var(--text-color-dark);
+            }
+
+            .opening-hours-place-address,
+            .opening-hours-place-phone,
+            .opening-hours-place-website {
+                margin-bottom: 5px;
+                color: var(--text-color-dark);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .opening-hours-icon {
+                font-style: normal;
+                opacity: 0.7;
+            }
+
+            .opening-hours-place-hours {
+                padding: 15px;
+            }
+
+            .opening-hours-place-hours-header {
+                margin-bottom: 10px;
+                font-weight: bold;
+                color: var(--text-color);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .opening-hours-place-hours-list {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .opening-hours-place-hours-item {
+                display: flex;
+                justify-content: space-between;
+                color: var(--text-color-dark);
+                padding: 3px 0;
+            }
+
+            .opening-hours-place-hours-item.today {
+                background-color: rgba(76, 175, 80, 0.2);
+                border-radius: 5px;
+                padding: 3px 8px;
+                font-weight: bold;
+                color: var(--text-color);
+            }
+
+            .opening-hours-day {
+                flex: 1;
+            }
+
+            .opening-hours-time {
+                font-weight: bold;
+            }
+
+            @media (max-width: 768px) {
+                .opening-hours-places {
+                    grid-template-columns: 1fr;
+                }
+
+                .opening-hours-modal-search {
+                    flex-direction: column;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Zobrazení modalu s animací
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.opening-hours-modal-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+        });
+
+        // Event listener pro vyhledávání
+        const searchInput = document.getElementById('openingHoursSearch');
+        const filterSelect = document.getElementById('openingHoursFilter');
+        const placeElements = document.querySelectorAll('.opening-hours-place');
+
+        const filterPlaces = () => {
+            const searchText = searchInput.value.toLowerCase();
+            const filterValue = filterSelect.value;
+
+            placeElements.forEach(place => {
+                const placeName = place.querySelector('.opening-hours-place-name').textContent.toLowerCase();
+                const placeAddress = place.querySelector('.opening-hours-place-address').textContent.toLowerCase();
+                const placeCategory = place.getAttribute('data-category');
+
+                const matchesSearch = placeName.includes(searchText) || placeAddress.includes(searchText);
+                const matchesFilter = filterValue === 'all' || placeCategory === filterValue;
+
+                if (matchesSearch && matchesFilter) {
+                    place.style.display = 'block';
+                } else {
+                    place.style.display = 'none';
+                }
+            });
+        };
+
+        searchInput.addEventListener('input', filterPlaces);
+        filterSelect.addEventListener('change', filterPlaces);
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            }
+        });
+
+        // Přidání XP za zobrazení otevírací doby
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(3, 'Zobrazení otevírací doby', 'assistants');
+        }
+    },
+
+    // Kontrola, zda je místo aktuálně otevřeno
+    isOpenNow(hours) {
+        // Získání aktuálního dne a času
+        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const today = days[new Date().getDay()];
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+
+        // Získání otevírací doby pro dnešní den
+        const todayHours = hours[today];
+
+        // Pokud je zavřeno, vrátíme false
+        if (todayHours === 'Zavřeno') {
+            return false;
+        }
+
+        // Parsování otevírací doby
+        const [openTime, closeTime] = todayHours.split(' - ');
+        const [openHour, openMinute] = openTime.split(':').map(Number);
+        const [closeHour, closeMinute] = closeTime.split(':').map(Number);
+
+        // Vytvoření Date objektů pro otevírací a zavírací čas
+        const openDate = new Date();
+        openDate.setHours(openHour, openMinute, 0, 0);
+
+        const closeDate = new Date();
+        closeDate.setHours(closeHour, closeMinute, 0, 0);
+
+        // Pokud je zavírací čas menší než otevírací, znamená to, že zavírá až další den
+        if (closeDate < openDate) {
+            closeDate.setDate(closeDate.getDate() + 1);
+        }
+
+        // Kontrola, zda je aktuální čas mezi otevíracím a zavíracím časem
+        return now >= openDate && now <= closeDate;
+    },
+
+    // Zobrazení služby taxi
+    showTaxiService() {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('taxiModal')) {
+            return;
+        }
+
+        // Vytvoření modalu pro taxi službu
+        const modal = document.createElement('div');
+        modal.id = 'taxiModal';
+        modal.className = 'taxi-modal';
+        document.body.appendChild(modal);
+
+        // Definice typů vozidel
+        const vehicleTypes = [
+            {
+                id: 'standard',
+                name: 'Standard',
+                description: 'Běžné osobní vozidlo pro až 4 osoby',
+                icon: '🚕',
+                pricePerKm: 20,
+                basePrice: 40
+            },
+            {
+                id: 'comfort',
+                name: 'Comfort',
+                description: 'Pohodlné vozidlo s klimatizací a větším prostorem',
+                icon: '🚘',
+                pricePerKm: 25,
+                basePrice: 50
+            },
+            {
+                id: 'premium',
+                name: 'Premium',
+                description: 'Luxusní vozidlo s nadstandardními službami',
+                icon: '🚙',
+                pricePerKm: 35,
+                basePrice: 70
+            },
+            {
+                id: 'van',
+                name: 'Minivan',
+                description: 'Větší vozidlo pro až 8 osob nebo objemná zavazadla',
+                icon: '🚜',
+                pricePerKm: 30,
+                basePrice: 60
+            }
+        ];
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="taxi-modal-content">
+                <div class="taxi-modal-header">
+                    <h2>Objednání taxi</h2>
+                    <button class="taxi-modal-close">&times;</button>
+                </div>
+                <div class="taxi-modal-body">
+                    <div class="taxi-form">
+                        <div class="taxi-form-group">
+                            <label for="taxiPickupLocation">Místo vyzvednutí:</label>
+                            <input type="text" id="taxiPickupLocation" class="taxi-input" placeholder="Zadejte adresu vyzvednutí" value="Hodonín, náměstí">
+                        </div>
+                        <div class="taxi-form-group">
+                            <label for="taxiDestination">Cíl:</label>
+                            <input type="text" id="taxiDestination" class="taxi-input" placeholder="Zadejte cílovou adresu" value="Hodonín, nádraží">
+                        </div>
+                        <div class="taxi-form-group">
+                            <label for="taxiTime">Datum a čas:</label>
+                            <input type="datetime-local" id="taxiTime" class="taxi-input">
+                        </div>
+                        <div class="taxi-form-group">
+                            <label for="taxiPassengers">Počet osob:</label>
+                            <select id="taxiPassengers" class="taxi-select">
+                                <option value="1">1 osoba</option>
+                                <option value="2">2 osoby</option>
+                                <option value="3">3 osoby</option>
+                                <option value="4" selected>4 osoby</option>
+                                <option value="5">5 osob</option>
+                                <option value="6">6 osob</option>
+                                <option value="7">7 osob</option>
+                                <option value="8">8 osob</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="taxi-vehicle-types">
+                        <h3>Vyberte typ vozidla:</h3>
+                        <div class="taxi-vehicle-list">
+                            ${vehicleTypes.map(vehicle => `
+                                <div class="taxi-vehicle-item" data-vehicle-id="${vehicle.id}">
+                                    <div class="taxi-vehicle-icon">${vehicle.icon}</div>
+                                    <div class="taxi-vehicle-info">
+                                        <div class="taxi-vehicle-name">${vehicle.name}</div>
+                                        <div class="taxi-vehicle-description">${vehicle.description}</div>
+                                    </div>
+                                    <div class="taxi-vehicle-price">
+                                        <div class="taxi-price-estimate">Odhad: <span class="taxi-price-value">150-200 Kč</span></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="taxi-payment-methods">
+                        <h3>Způsob platby:</h3>
+                        <div class="taxi-payment-options">
+                            <label class="taxi-payment-option">
+                                <input type="radio" name="taxiPayment" value="cash" checked>
+                                <span class="taxi-payment-icon">💵</span>
+                                <span class="taxi-payment-label">Hotovost</span>
+                            </label>
+                            <label class="taxi-payment-option">
+                                <input type="radio" name="taxiPayment" value="card">
+                                <span class="taxi-payment-icon">💳</span>
+                                <span class="taxi-payment-label">Platba kartou</span>
+                            </label>
+                            <label class="taxi-payment-option">
+                                <input type="radio" name="taxiPayment" value="app">
+                                <span class="taxi-payment-icon">📱</span>
+                                <span class="taxi-payment-label">Platba přes aplikaci</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="taxi-notes">
+                        <label for="taxiNotes">Poznámky pro řidiče:</label>
+                        <textarea id="taxiNotes" class="taxi-textarea" placeholder="Např. potřebuji pomoc se zavazadly, mám psa, apod."></textarea>
+                    </div>
+
+                    <div class="taxi-actions">
+                        <button id="taxiOrderButton" class="taxi-order-button">Objednat taxi</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .taxi-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .taxi-modal.show {
+                opacity: 1;
+            }
+
+            .taxi-modal-content {
+                background-color: var(--card-bg);
+                border-radius: 10px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 90vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .taxi-modal.show .taxi-modal-content {
+                transform: scale(1);
+            }
+
+            .taxi-modal-header {
+                background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .taxi-modal-header h2 {
+                margin: 0;
+                color: white;
+                font-size: 1.5rem;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            }
+
+            .taxi-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .taxi-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .taxi-form {
+                margin-bottom: 20px;
+            }
+
+            .taxi-form-group {
+                margin-bottom: 15px;
+            }
+
+            .taxi-form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+                color: var(--text-color);
+            }
+
+            .taxi-input, .taxi-select, .taxi-textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+                background-color: rgba(0, 0, 0, 0.2);
+                color: var(--text-color);
+                font-size: 1rem;
+            }
+
+            .taxi-input:focus, .taxi-select:focus, .taxi-textarea:focus {
+                outline: none;
+                border-color: #FFC107;
+                box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+            }
+
+            .taxi-textarea {
+                min-height: 80px;
+                resize: vertical;
+            }
+
+            .taxi-vehicle-types {
+                margin-bottom: 20px;
+            }
+
+            .taxi-vehicle-types h3 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                color: var(--text-color);
+                font-size: 1.1rem;
+            }
+
+            .taxi-vehicle-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .taxi-vehicle-item {
+                display: flex;
+                align-items: center;
+                padding: 12px;
+                border-radius: 8px;
+                background-color: rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .taxi-vehicle-item:hover {
+                background-color: rgba(0, 0, 0, 0.3);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .taxi-vehicle-item.selected {
+                background-color: rgba(255, 193, 7, 0.2);
+                border: 1px solid #FFC107;
+            }
+
+            .taxi-vehicle-icon {
+                font-size: 24px;
+                margin-right: 15px;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+            }
+
+            .taxi-vehicle-info {
+                flex: 1;
+            }
+
+            .taxi-vehicle-name {
+                font-weight: bold;
+                margin-bottom: 5px;
+                color: var(--text-color);
+            }
+
+            .taxi-vehicle-description {
+                font-size: 0.9rem;
+                color: var(--text-color-dark);
+            }
+
+            .taxi-vehicle-price {
+                text-align: right;
+                padding-left: 10px;
+            }
+
+            .taxi-price-estimate {
+                font-size: 0.9rem;
+                color: var(--text-color-dark);
+            }
+
+            .taxi-price-value {
+                font-weight: bold;
+                color: #FFC107;
+            }
+
+            .taxi-payment-methods {
+                margin-bottom: 20px;
+            }
+
+            .taxi-payment-methods h3 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                color: var(--text-color);
+                font-size: 1.1rem;
+            }
+
+            .taxi-payment-options {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .taxi-payment-option {
+                display: flex;
+                align-items: center;
+                padding: 10px 15px;
+                border-radius: 5px;
+                background-color: rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            .taxi-payment-option:hover {
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+
+            .taxi-payment-option input {
+                margin-right: 8px;
+            }
+
+            .taxi-payment-icon {
+                margin-right: 8px;
+                font-size: 18px;
+            }
+
+            .taxi-payment-label {
+                color: var(--text-color);
+            }
+
+            .taxi-notes {
+                margin-bottom: 20px;
+            }
+
+            .taxi-notes label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+                color: var(--text-color);
+            }
+
+            .taxi-actions {
+                display: flex;
+                justify-content: center;
+            }
+
+            .taxi-order-button {
+                padding: 12px 30px;
+                background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+                color: white;
+                border: none;
+                border-radius: 25px;
+                font-size: 1.1rem;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            }
+
+            .taxi-order-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(255, 152, 0, 0.4);
+                background: linear-gradient(135deg, #FFD54F 0%, #FFA726 100%);
+            }
+
+            @media (max-width: 768px) {
+                .taxi-payment-options {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Zobrazení modalu s animací
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        // Nastavení výchozího data a času (za 15 minut)
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 15);
+        const dateTimeString = now.toISOString().slice(0, 16);
+        document.getElementById('taxiTime').value = dateTimeString;
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.taxi-modal-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+        });
+
+        // Výběr typu vozidla
+        const vehicleItems = modal.querySelectorAll('.taxi-vehicle-item');
+        vehicleItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Odstranění třídy selected ze všech položek
+                vehicleItems.forEach(i => i.classList.remove('selected'));
+
+                // Přidání třídy selected na vybranou položku
+                item.classList.add('selected');
+
+                // Aktualizace odhadu ceny
+                const vehicleId = item.getAttribute('data-vehicle-id');
+                const vehicle = vehicleTypes.find(v => v.id === vehicleId);
+
+                if (vehicle) {
+                    // Získání vzdálenosti mezi místy (simulace)
+                    const distance = Math.floor(Math.random() * 5) + 3; // 3-7 km
+
+                    // Výpočet ceny
+                    const minPrice = Math.round((vehicle.basePrice + vehicle.pricePerKm * distance) * 0.9);
+                    const maxPrice = Math.round((vehicle.basePrice + vehicle.pricePerKm * distance) * 1.1);
+
+                    // Aktualizace zobrazené ceny
+                    const priceElement = item.querySelector('.taxi-price-value');
+                    priceElement.textContent = `${minPrice}-${maxPrice} Kč`;
+                }
+            });
+        });
+
+        // Automatický výběr prvního vozidla
+        if (vehicleItems.length > 0) {
+            vehicleItems[0].click();
+        }
+
+        // Objednání taxi
+        const orderButton = document.getElementById('taxiOrderButton');
+        orderButton.addEventListener('click', () => {
+            // Získání hodnot z formuláře
+            const pickupLocation = document.getElementById('taxiPickupLocation').value;
+            const destination = document.getElementById('taxiDestination').value;
+            const time = document.getElementById('taxiTime').value;
+            const passengers = document.getElementById('taxiPassengers').value;
+            const notes = document.getElementById('taxiNotes').value;
+            const paymentMethod = document.querySelector('input[name="taxiPayment"]:checked').value;
+
+            // Získání vybraného vozidla
+            const selectedVehicle = document.querySelector('.taxi-vehicle-item.selected');
+            const vehicleId = selectedVehicle ? selectedVehicle.getAttribute('data-vehicle-id') : null;
+
+            if (!pickupLocation || !destination || !time || !vehicleId) {
+                alert('Vyplňte prosím všechny povinné údaje.');
+                return;
+            }
+
+            // Simulace objednání taxi
+            const vehicle = vehicleTypes.find(v => v.id === vehicleId);
+            const vehicleName = vehicle ? vehicle.name : 'Standard';
+
+            // Zobrazení potvrzovací zprávy
+            modal.innerHTML = `
+                <div class="taxi-modal-content">
+                    <div class="taxi-modal-header">
+                        <h2>Objednávka potvrzena</h2>
+                        <button class="taxi-modal-close">&times;</button>
+                    </div>
+                    <div class="taxi-modal-body">
+                        <div class="taxi-confirmation">
+                            <div class="taxi-confirmation-icon">✅</div>
+                            <h3>Vaše taxi bylo úspěšně objednáno!</h3>
+                            <div class="taxi-confirmation-details">
+                                <p><strong>Místo vyzvednutí:</strong> ${pickupLocation}</p>
+                                <p><strong>Cíl:</strong> ${destination}</p>
+                                <p><strong>Čas:</strong> ${new Date(time).toLocaleString()}</p>
+                                <p><strong>Typ vozidla:</strong> ${vehicleName}</p>
+                                <p><strong>Počet osob:</strong> ${passengers}</p>
+                                <p><strong>Způsob platby:</strong> ${{
+                                    'cash': 'Hotovost',
+                                    'card': 'Platba kartou',
+                                    'app': 'Platba přes aplikaci'
+                                }[paymentMethod] || 'Hotovost'}</p>
+                                ${notes ? `<p><strong>Poznámky:</strong> ${notes}</p>` : ''}
+                            </div>
+                            <div class="taxi-confirmation-info">
+                                <p>Očekávejte SMS s informacemi o vašem řidiči.</p>
+                                <p>Taxi dorazí na místo vyzvednutí v čase: <strong>${new Date(time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</strong></p>
+                            </div>
+                            <button class="taxi-close-button">Zavřít</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Přidání CSS stylů pro potvrzovací zprávu
+            const confirmationStyle = `
+                .taxi-confirmation {
+                    text-align: center;
+                    padding: 20px 0;
+                }
+
+                .taxi-confirmation-icon {
+                    font-size: 48px;
+                    margin-bottom: 20px;
+                }
+
+                .taxi-confirmation h3 {
+                    margin-top: 0;
+                    margin-bottom: 20px;
+                    color: var(--text-color);
+                }
+
+                .taxi-confirmation-details {
+                    text-align: left;
+                    background-color: rgba(0, 0, 0, 0.2);
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                }
+
+                .taxi-confirmation-details p {
+                    margin: 8px 0;
+                    color: var(--text-color-dark);
+                }
+
+                .taxi-confirmation-info {
+                    margin-bottom: 20px;
+                    color: var(--text-color-dark);
+                }
+
+                .taxi-close-button {
+                    padding: 10px 25px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 25px;
+                    font-size: 1rem;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+                }
+
+                .taxi-close-button:hover {
+                    background-color: #388E3C;
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+                }
+            `;
+            style.textContent += confirmationStyle;
+
+            // Přidání event listenerů pro potvrzovací zprávu
+            const newCloseButton = modal.querySelector('.taxi-modal-close');
+            const closeConfirmationButton = modal.querySelector('.taxi-close-button');
+
+            const closeModal = () => {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            };
+
+            if (newCloseButton) {
+                newCloseButton.addEventListener('click', closeModal);
+            }
+
+            if (closeConfirmationButton) {
+                closeConfirmationButton.addEventListener('click', closeModal);
+            }
+
+            // Přidání XP za objednání taxi
+            if (typeof UserProgress !== 'undefined') {
+                UserProgress.addExperience(10, 'Objednání taxi', 'assistants');
+            }
+        });
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            }
+        });
+
+        // Přidání XP za otevření služby taxi
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(3, 'Zobrazení služby taxi', 'assistants');
+        }
+    },
+
+    // Vyhledání zubaře
+    showDentistSearch() {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('dentistModal')) {
+            return;
+        }
+
+        // Vytvoření modalu pro vyhledání zubaře
+        const modal = document.createElement('div');
+        modal.id = 'dentistModal';
+        modal.className = 'dentist-modal';
+        document.body.appendChild(modal);
+
+        // Definice zubařů v okolí
+        const dentists = [
+            {
+                name: 'MUDr. Jana Nováková',
+                address: 'Masarykovo náměstí 35, Hodonín',
+                phone: '+420 518 123 456',
+                rating: 4.8,
+                acceptingPatients: true,
+                nextAvailable: '2025-05-05T10:00:00'
+            },
+            {
+                name: 'MUDr. Petr Svoboda',
+                address: 'Dolní valy 15, Hodonín',
+                phone: '+420 518 234 567',
+                rating: 4.5,
+                acceptingPatients: true,
+                nextAvailable: '2025-05-03T14:30:00'
+            },
+            {
+                name: 'MUDr. Lucie Veselá',
+                address: 'Nádražní 8, Hodonín',
+                phone: '+420 518 345 678',
+                rating: 4.9,
+                acceptingPatients: false,
+                nextAvailable: null
+            },
+            {
+                name: 'MUDr. Martin Horák',
+                address: 'Brněnská 55, Hodonín',
+                phone: '+420 518 456 789',
+                rating: 4.3,
+                acceptingPatients: true,
+                nextAvailable: '2025-05-10T09:15:00'
+            }
+        ];
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="dentist-modal-content">
+                <div class="dentist-modal-header">
+                    <h2>Vyhledání zubaře</h2>
+                    <button class="dentist-modal-close">&times;</button>
+                </div>
+                <div class="dentist-modal-body">
+                    <div class="dentist-search">
+                        <input type="text" id="dentistSearch" placeholder="Hledat zubaře..." class="dentist-search-input">
+                    </div>
+
+                    <div class="dentist-list">
+                        ${dentists.map(dentist => `
+                            <div class="dentist-item">
+                                <div class="dentist-info">
+                                    <div class="dentist-name">${dentist.name}</div>
+                                    <div class="dentist-address">${dentist.address}</div>
+                                    <div class="dentist-phone">${dentist.phone}</div>
+                                    <div class="dentist-rating">
+                                        ${'⭐'.repeat(Math.floor(dentist.rating))}${dentist.rating % 1 >= 0.5 ? '⭐' : ''}
+                                        <span class="dentist-rating-value">${dentist.rating}/5</span>
+                                    </div>
+                                </div>
+                                <div class="dentist-availability">
+                                    ${dentist.acceptingPatients ?
+                                        `<div class="dentist-status accepting">Přijímá nové pacienty</div>
+                                         <button class="dentist-book-button">Objednat se</button>` :
+                                        `<div class="dentist-status not-accepting">Nepřijímá nové pacienty</div>`
+                                    }
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .dentist-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .dentist-modal.show {
+                opacity: 1;
+            }
+
+            .dentist-modal-content {
+                background-color: var(--card-bg);
+                border-radius: 10px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 90vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .dentist-modal.show .dentist-modal-content {
+                transform: scale(1);
+            }
+
+            .dentist-modal-header {
+                background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .dentist-modal-header h2 {
+                margin: 0;
+                color: white;
+                font-size: 1.5rem;
+            }
+
+            .dentist-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .dentist-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .dentist-search {
+                margin-bottom: 20px;
+            }
+
+            .dentist-search-input {
+                width: 100%;
+                padding: 10px 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 25px;
+                background-color: rgba(0, 0, 0, 0.2);
+                color: var(--text-color);
+                font-size: 1rem;
+            }
+
+            .dentist-search-input:focus {
+                outline: none;
+                border-color: #2196F3;
+                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+            }
+
+            .dentist-list {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .dentist-item {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
+                padding: 15px;
+                display: flex;
+                justify-content: space-between;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .dentist-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .dentist-info {
+                flex: 1;
+            }
+
+            .dentist-name {
+                font-weight: bold;
+                font-size: 1.1rem;
+                margin-bottom: 5px;
+                color: var(--text-color);
+            }
+
+            .dentist-address, .dentist-phone {
+                color: var(--text-color-dark);
+                margin-bottom: 3px;
+                font-size: 0.9rem;
+            }
+
+            .dentist-rating {
+                margin-top: 5px;
+                color: #FFC107;
+            }
+
+            .dentist-rating-value {
+                color: var(--text-color-dark);
+                margin-left: 5px;
+                font-size: 0.9rem;
+            }
+
+            .dentist-availability {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-end;
+                gap: 10px;
+                min-width: 150px;
+            }
+
+            .dentist-status {
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .dentist-status.accepting {
+                background-color: rgba(76, 175, 80, 0.2);
+                color: #4CAF50;
+            }
+
+            .dentist-status.not-accepting {
+                background-color: rgba(244, 67, 54, 0.2);
+                color: #F44336;
+            }
+
+            .dentist-book-button {
+                padding: 8px 15px;
+                background-color: #2196F3;
+                color: white;
+                border: none;
+                border-radius: 20px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.3s ease, transform 0.3s ease;
+            }
+
+            .dentist-book-button:hover {
+                background-color: #1976D2;
+                transform: translateY(-2px);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Zobrazení modalu s animací
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.dentist-modal-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+        });
+
+        // Vyhledávání zubařů
+        const searchInput = document.getElementById('dentistSearch');
+        searchInput.addEventListener('input', () => {
+            const searchText = searchInput.value.toLowerCase();
+            const dentistItems = document.querySelectorAll('.dentist-item');
+
+            dentistItems.forEach(item => {
+                const name = item.querySelector('.dentist-name').textContent.toLowerCase();
+                const address = item.querySelector('.dentist-address').textContent.toLowerCase();
+
+                if (name.includes(searchText) || address.includes(searchText)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Objednání k zubaři
+        const bookButtons = document.querySelectorAll('.dentist-book-button');
+        bookButtons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                const dentist = dentists[index];
+
+                // Zobrazení formuláře pro objednání
+                modal.querySelector('.dentist-modal-body').innerHTML = `
+                    <div class="dentist-booking">
+                        <h3>Objednání k zubaři</h3>
+                        <div class="dentist-booking-info">
+                            <p><strong>Zubař:</strong> ${dentist.name}</p>
+                            <p><strong>Adresa:</strong> ${dentist.address}</p>
+                            <p><strong>Nejbližší volný termín:</strong> ${new Date(dentist.nextAvailable).toLocaleString()}</p>
+                        </div>
+                        <div class="dentist-booking-form">
+                            <div class="dentist-form-group">
+                                <label for="dentistName">Vaše jméno:</label>
+                                <input type="text" id="dentistName" class="dentist-input" placeholder="Zadejte vaše jméno">
+                            </div>
+                            <div class="dentist-form-group">
+                                <label for="dentistPhone">Telefon:</label>
+                                <input type="text" id="dentistPhone" class="dentist-input" placeholder="Zadejte váš telefon">
+                            </div>
+                            <div class="dentist-form-group">
+                                <label for="dentistReason">Důvod návštěvy:</label>
+                                <select id="dentistReason" class="dentist-select">
+                                    <option value="checkup">Preventivní prohlídka</option>
+                                    <option value="pain">Bolest zubu</option>
+                                    <option value="filling">Výplň</option>
+                                    <option value="extraction">Vytrhnutí zubu</option>
+                                    <option value="other">Jiný důvod</option>
+                                </select>
+                            </div>
+                            <div class="dentist-form-group">
+                                <label for="dentistNote">Poznámka:</label>
+                                <textarea id="dentistNote" class="dentist-textarea" placeholder="Další informace pro zubaře"></textarea>
+                            </div>
+                        </div>
+                        <div class="dentist-booking-actions">
+                            <button id="dentistConfirmButton" class="dentist-confirm-button">Potvrdit objednání</button>
+                            <button id="dentistBackButton" class="dentist-back-button">Zpět</button>
+                        </div>
+                    </div>
+                `;
+
+                // Přidání CSS stylů pro formulář
+                const bookingStyle = `
+                    .dentist-booking {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 20px;
+                    }
+
+                    .dentist-booking h3 {
+                        margin: 0;
+                        color: var(--text-color);
+                        font-size: 1.3rem;
+                    }
+
+                    .dentist-booking-info {
+                        background-color: rgba(0, 0, 0, 0.2);
+                        border-radius: 8px;
+                        padding: 15px;
+                    }
+
+                    .dentist-booking-info p {
+                        margin: 8px 0;
+                        color: var(--text-color-dark);
+                    }
+
+                    .dentist-booking-form {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 15px;
+                    }
+
+                    .dentist-form-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 5px;
+                    }
+
+                    .dentist-form-group label {
+                        font-weight: bold;
+                        color: var(--text-color);
+                    }
+
+                    .dentist-input, .dentist-select, .dentist-textarea {
+                        padding: 10px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 5px;
+                        background-color: rgba(0, 0, 0, 0.2);
+                        color: var(--text-color);
+                    }
+
+                    .dentist-input:focus, .dentist-select:focus, .dentist-textarea:focus {
+                        outline: none;
+                        border-color: #2196F3;
+                        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+                    }
+
+                    .dentist-textarea {
+                        min-height: 80px;
+                        resize: vertical;
+                    }
+
+                    .dentist-booking-actions {
+                        display: flex;
+                        gap: 10px;
+                        justify-content: center;
+                        margin-top: 10px;
+                    }
+
+                    .dentist-confirm-button {
+                        padding: 10px 20px;
+                        background-color: #4CAF50;
+                        color: white;
+                        border: none;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        transition: background-color 0.3s ease, transform 0.3s ease;
+                    }
+
+                    .dentist-confirm-button:hover {
+                        background-color: #388E3C;
+                        transform: translateY(-2px);
+                    }
+
+                    .dentist-back-button {
+                        padding: 10px 20px;
+                        background-color: rgba(0, 0, 0, 0.3);
+                        color: var(--text-color);
+                        border: none;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        transition: background-color 0.3s ease;
+                    }
+
+                    .dentist-back-button:hover {
+                        background-color: rgba(0, 0, 0, 0.4);
+                    }
+                `;
+                style.textContent += bookingStyle;
+
+                // Přidání event listenerů pro formulář
+                const confirmButton = document.getElementById('dentistConfirmButton');
+                const backButton = document.getElementById('dentistBackButton');
+
+                confirmButton.addEventListener('click', () => {
+                    const name = document.getElementById('dentistName').value;
+                    const phone = document.getElementById('dentistPhone').value;
+
+                    if (!name || !phone) {
+                        alert('Vyplňte prosím všechny povinné údaje.');
+                        return;
+                    }
+
+                    // Zobrazení potvrzovací zprávy
+                    modal.querySelector('.dentist-modal-body').innerHTML = `
+                        <div class="dentist-confirmation">
+                            <div class="dentist-confirmation-icon">✅</div>
+                            <h3>Objednání bylo úspěšně vytvořeno!</h3>
+                            <div class="dentist-confirmation-details">
+                                <p><strong>Zubař:</strong> ${dentist.name}</p>
+                                <p><strong>Adresa:</strong> ${dentist.address}</p>
+                                <p><strong>Termín:</strong> ${new Date(dentist.nextAvailable).toLocaleString()}</p>
+                            </div>
+                            <p class="dentist-confirmation-message">Na vaše telefonní číslo vám byla odeslána SMS s potvrzením.</p>
+                            <button class="dentist-close-button">Zavřít</button>
+                        </div>
+                    `;
+
+                    // Přidání CSS stylů pro potvrzovací zprávu
+                    const confirmationStyle = `
+                        .dentist-confirmation {
+                            text-align: center;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: 15px;
+                        }
+
+                        .dentist-confirmation-icon {
+                            font-size: 48px;
+                            margin-bottom: 10px;
+                        }
+
+                        .dentist-confirmation h3 {
+                            margin: 0;
+                            color: var(--text-color);
+                        }
+
+                        .dentist-confirmation-details {
+                            background-color: rgba(0, 0, 0, 0.2);
+                            border-radius: 8px;
+                            padding: 15px;
+                            width: 100%;
+                            text-align: left;
+                        }
+
+                        .dentist-confirmation-details p {
+                            margin: 8px 0;
+                            color: var(--text-color-dark);
+                        }
+
+                        .dentist-confirmation-message {
+                            color: var(--text-color-dark);
+                            margin: 10px 0;
+                        }
+
+                        .dentist-close-button {
+                            padding: 10px 25px;
+                            background-color: #2196F3;
+                            color: white;
+                            border: none;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            transition: background-color 0.3s ease, transform 0.3s ease;
+                            margin-top: 10px;
+                        }
+
+                        .dentist-close-button:hover {
+                            background-color: #1976D2;
+                            transform: translateY(-2px);
+                        }
+                    `;
+                    style.textContent += confirmationStyle;
+
+                    // Přidání event listeneru pro tlačítko zavřít
+                    document.querySelector('.dentist-close-button').addEventListener('click', () => {
+                        modal.classList.remove('show');
+                        setTimeout(() => {
+                            modal.remove();
+                            style.remove();
+                        }, 300);
+                    });
+
+                    // Přidání XP za objednání k zubaři
+                    if (typeof UserProgress !== 'undefined') {
+                        UserProgress.addExperience(15, 'Objednání k zubaři', 'assistants');
+                    }
+                });
+
+                backButton.addEventListener('click', () => {
+                    // Návrat na seznam zubařů
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.remove();
+                        style.remove();
+                        // Znovu otevřít modal se seznamem zubařů
+                        this.showDentistSearch();
+                    }, 300);
+                });
+            });
+        });
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            }
+        });
+
+        // Přidání XP za zobrazení vyhledávání zubaře
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(3, 'Vyhledávání zubaře', 'assistants');
+        }
+    },
+
+    // Vyhledání lékaře
+    showDoctorSearch() {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('doctorModal')) {
+            return;
+        }
+
+        // Vytvoření modalu pro vyhledání lékaře
+        const modal = document.createElement('div');
+        modal.id = 'doctorModal';
+        modal.className = 'doctor-modal';
+        document.body.appendChild(modal);
+
+        // Definice lékařů v okolí
+        const doctors = [
+            {
+                name: 'MUDr. Tomáš Novotný',
+                specialization: 'Praktický lékař',
+                address: 'Masarykovo náměstí 38, Hodonín',
+                phone: '+420 518 321 654',
+                rating: 4.7,
+                acceptingPatients: true,
+                nextAvailable: '2025-05-02T09:30:00'
+            },
+            {
+                name: 'MUDr. Lenka Malá',
+                specialization: 'Internista',
+                address: 'Dolní valy 18, Hodonín',
+                phone: '+420 518 432 765',
+                rating: 4.9,
+                acceptingPatients: true,
+                nextAvailable: '2025-05-04T11:00:00'
+            },
+            {
+                name: 'MUDr. Jiří Svoboda',
+                specialization: 'Kardiolog',
+                address: 'Nádražní 12, Hodonín',
+                phone: '+420 518 543 876',
+                rating: 4.8,
+                acceptingPatients: false,
+                nextAvailable: null
+            },
+            {
+                name: 'MUDr. Hana Procházková',
+                specialization: 'Praktický lékař',
+                address: 'Brněnská 60, Hodonín',
+                phone: '+420 518 654 987',
+                rating: 4.5,
+                acceptingPatients: true,
+                nextAvailable: '2025-05-01T14:15:00'
+            }
+        ];
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="doctor-modal-content">
+                <div class="doctor-modal-header">
+                    <h2>Vyhledání lékaře</h2>
+                    <button class="doctor-modal-close">&times;</button>
+                </div>
+                <div class="doctor-modal-body">
+                    <div class="doctor-search">
+                        <input type="text" id="doctorSearch" placeholder="Hledat lékaře..." class="doctor-search-input">
+                        <select id="doctorSpecialization" class="doctor-specialization-select">
+                            <option value="all">Všechny specializace</option>
+                            <option value="Praktický lékař">Praktický lékař</option>
+                            <option value="Internista">Internista</option>
+                            <option value="Kardiolog">Kardiolog</option>
+                        </select>
+                    </div>
+
+                    <div class="doctor-list">
+                        ${doctors.map(doctor => `
+                            <div class="doctor-item" data-specialization="${doctor.specialization}">
+                                <div class="doctor-info">
+                                    <div class="doctor-name">${doctor.name}</div>
+                                    <div class="doctor-specialization">${doctor.specialization}</div>
+                                    <div class="doctor-address">${doctor.address}</div>
+                                    <div class="doctor-phone">${doctor.phone}</div>
+                                    <div class="doctor-rating">
+                                        ${'⭐'.repeat(Math.floor(doctor.rating))}${doctor.rating % 1 >= 0.5 ? '⭐' : ''}
+                                        <span class="doctor-rating-value">${doctor.rating}/5</span>
+                                    </div>
+                                </div>
+                                <div class="doctor-availability">
+                                    ${doctor.acceptingPatients ?
+                                        `<div class="doctor-status accepting">Přijímá nové pacienty</div>
+                                         <button class="doctor-book-button">Objednat se</button>` :
+                                        `<div class="doctor-status not-accepting">Nepřijímá nové pacienty</div>`
+                                    }
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .doctor-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .doctor-modal.show {
+                opacity: 1;
+            }
+
+            .doctor-modal-content {
+                background-color: var(--card-bg);
+                border-radius: 10px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 90vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .doctor-modal.show .doctor-modal-content {
+                transform: scale(1);
+            }
+
+            .doctor-modal-header {
+                background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .doctor-modal-header h2 {
+                margin: 0;
+                color: white;
+                font-size: 1.5rem;
+            }
+
+            .doctor-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .doctor-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .doctor-search {
+                margin-bottom: 20px;
+                display: flex;
+                gap: 10px;
+            }
+
+            .doctor-search-input {
+                flex: 1;
+                padding: 10px 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 25px;
+                background-color: rgba(0, 0, 0, 0.2);
+                color: var(--text-color);
+                font-size: 1rem;
+            }
+
+            .doctor-search-input:focus {
+                outline: none;
+                border-color: #4CAF50;
+                box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            }
+
+            .doctor-specialization-select {
+                padding: 10px 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 25px;
+                background-color: rgba(0, 0, 0, 0.2);
+                color: var(--text-color);
+                font-size: 1rem;
+                min-width: 180px;
+            }
+
+            .doctor-specialization-select:focus {
+                outline: none;
+                border-color: #4CAF50;
+                box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            }
+
+            .doctor-list {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .doctor-item {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
+                padding: 15px;
+                display: flex;
+                justify-content: space-between;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .doctor-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .doctor-info {
+                flex: 1;
+            }
+
+            .doctor-name {
+                font-weight: bold;
+                font-size: 1.1rem;
+                margin-bottom: 5px;
+                color: var(--text-color);
+            }
+
+            .doctor-specialization {
+                display: inline-block;
+                background-color: rgba(76, 175, 80, 0.2);
+                color: #4CAF50;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+
+            .doctor-address, .doctor-phone {
+                color: var(--text-color-dark);
+                margin-bottom: 3px;
+                font-size: 0.9rem;
+            }
+
+            .doctor-rating {
+                margin-top: 5px;
+                color: #FFC107;
+            }
+
+            .doctor-rating-value {
+                color: var(--text-color-dark);
+                margin-left: 5px;
+                font-size: 0.9rem;
+            }
+
+            .doctor-availability {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-end;
+                gap: 10px;
+                min-width: 150px;
+            }
+
+            .doctor-status {
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .doctor-status.accepting {
+                background-color: rgba(76, 175, 80, 0.2);
+                color: #4CAF50;
+            }
+
+            .doctor-status.not-accepting {
+                background-color: rgba(244, 67, 54, 0.2);
+                color: #F44336;
+            }
+
+            .doctor-book-button {
+                padding: 8px 15px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 20px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.3s ease, transform 0.3s ease;
+            }
+
+            .doctor-book-button:hover {
+                background-color: #388E3C;
+                transform: translateY(-2px);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Zobrazení modalu s animací
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.doctor-modal-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+        });
+
+        // Vyhledávání a filtrování lékařů
+        const searchInput = document.getElementById('doctorSearch');
+        const specializationSelect = document.getElementById('doctorSpecialization');
+
+        const filterDoctors = () => {
+            const searchText = searchInput.value.toLowerCase();
+            const specialization = specializationSelect.value;
+            const doctorItems = document.querySelectorAll('.doctor-item');
+
+            doctorItems.forEach(item => {
+                const name = item.querySelector('.doctor-name').textContent.toLowerCase();
+                const address = item.querySelector('.doctor-address').textContent.toLowerCase();
+                const doctorSpecialization = item.getAttribute('data-specialization');
+
+                const matchesSearch = name.includes(searchText) || address.includes(searchText);
+                const matchesSpecialization = specialization === 'all' || doctorSpecialization === specialization;
+
+                if (matchesSearch && matchesSpecialization) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        };
+
+        searchInput.addEventListener('input', filterDoctors);
+        specializationSelect.addEventListener('change', filterDoctors);
+
+        // Objednání k lékaři
+        const bookButtons = document.querySelectorAll('.doctor-book-button');
+        bookButtons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                const doctor = doctors[index];
+
+                // Zobrazení formuláře pro objednání
+                modal.querySelector('.doctor-modal-body').innerHTML = `
+                    <div class="doctor-booking">
+                        <h3>Objednání k lékaři</h3>
+                        <div class="doctor-booking-info">
+                            <p><strong>Lékař:</strong> ${doctor.name}</p>
+                            <p><strong>Specializace:</strong> ${doctor.specialization}</p>
+                            <p><strong>Adresa:</strong> ${doctor.address}</p>
+                            <p><strong>Nejbližší volný termín:</strong> ${new Date(doctor.nextAvailable).toLocaleString()}</p>
+                        </div>
+                        <div class="doctor-booking-form">
+                            <div class="doctor-form-group">
+                                <label for="doctorPatientName">Vaše jméno:</label>
+                                <input type="text" id="doctorPatientName" class="doctor-input" placeholder="Zadejte vaše jméno">
+                            </div>
+                            <div class="doctor-form-group">
+                                <label for="doctorPatientPhone">Telefon:</label>
+                                <input type="text" id="doctorPatientPhone" class="doctor-input" placeholder="Zadejte váš telefon">
+                            </div>
+                            <div class="doctor-form-group">
+                                <label for="doctorReason">Důvod návštěvy:</label>
+                                <select id="doctorReason" class="doctor-select">
+                                    <option value="checkup">Preventivní prohlídka</option>
+                                    <option value="illness">Nemoc</option>
+                                    <option value="prescription">Předpis léků</option>
+                                    <option value="results">Výsledky vyšetření</option>
+                                    <option value="other">Jiný důvod</option>
+                                </select>
+                            </div>
+                            <div class="doctor-form-group">
+                                <label for="doctorNote">Poznámka:</label>
+                                <textarea id="doctorNote" class="doctor-textarea" placeholder="Další informace pro lékaře"></textarea>
+                            </div>
+                        </div>
+                        <div class="doctor-booking-actions">
+                            <button id="doctorConfirmButton" class="doctor-confirm-button">Potvrdit objednání</button>
+                            <button id="doctorBackButton" class="doctor-back-button">Zpět</button>
+                        </div>
+                    </div>
+                `;
+
+                // Přidání CSS stylů pro formulář
+                const bookingStyle = `
+                    .doctor-booking {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 20px;
+                    }
+
+                    .doctor-booking h3 {
+                        margin: 0;
+                        color: var(--text-color);
+                        font-size: 1.3rem;
+                    }
+
+                    .doctor-booking-info {
+                        background-color: rgba(0, 0, 0, 0.2);
+                        border-radius: 8px;
+                        padding: 15px;
+                    }
+
+                    .doctor-booking-info p {
+                        margin: 8px 0;
+                        color: var(--text-color-dark);
+                    }
+
+                    .doctor-booking-form {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 15px;
+                    }
+
+                    .doctor-form-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 5px;
+                    }
+
+                    .doctor-form-group label {
+                        font-weight: bold;
+                        color: var(--text-color);
+                    }
+
+                    .doctor-input, .doctor-select, .doctor-textarea {
+                        padding: 10px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 5px;
+                        background-color: rgba(0, 0, 0, 0.2);
+                        color: var(--text-color);
+                    }
+
+                    .doctor-input:focus, .doctor-select:focus, .doctor-textarea:focus {
+                        outline: none;
+                        border-color: #4CAF50;
+                        box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+                    }
+
+                    .doctor-textarea {
+                        min-height: 80px;
+                        resize: vertical;
+                    }
+
+                    .doctor-booking-actions {
+                        display: flex;
+                        gap: 10px;
+                        justify-content: center;
+                        margin-top: 10px;
+                    }
+
+                    .doctor-confirm-button {
+                        padding: 10px 20px;
+                        background-color: #4CAF50;
+                        color: white;
+                        border: none;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        transition: background-color 0.3s ease, transform 0.3s ease;
+                    }
+
+                    .doctor-confirm-button:hover {
+                        background-color: #388E3C;
+                        transform: translateY(-2px);
+                    }
+
+                    .doctor-back-button {
+                        padding: 10px 20px;
+                        background-color: rgba(0, 0, 0, 0.3);
+                        color: var(--text-color);
+                        border: none;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        transition: background-color 0.3s ease;
+                    }
+
+                    .doctor-back-button:hover {
+                        background-color: rgba(0, 0, 0, 0.4);
+                    }
+                `;
+                style.textContent += bookingStyle;
+
+                // Přidání event listenerů pro formulář
+                const confirmButton = document.getElementById('doctorConfirmButton');
+                const backButton = document.getElementById('doctorBackButton');
+
+                confirmButton.addEventListener('click', () => {
+                    const name = document.getElementById('doctorPatientName').value;
+                    const phone = document.getElementById('doctorPatientPhone').value;
+
+                    if (!name || !phone) {
+                        alert('Vyplňte prosím všechny povinné údaje.');
+                        return;
+                    }
+
+                    // Zobrazení potvrzovací zprávy
+                    modal.querySelector('.doctor-modal-body').innerHTML = `
+                        <div class="doctor-confirmation">
+                            <div class="doctor-confirmation-icon">✅</div>
+                            <h3>Objednání bylo úspěšně vytvořeno!</h3>
+                            <div class="doctor-confirmation-details">
+                                <p><strong>Lékař:</strong> ${doctor.name}</p>
+                                <p><strong>Specializace:</strong> ${doctor.specialization}</p>
+                                <p><strong>Adresa:</strong> ${doctor.address}</p>
+                                <p><strong>Termín:</strong> ${new Date(doctor.nextAvailable).toLocaleString()}</p>
+                            </div>
+                            <p class="doctor-confirmation-message">Na vaše telefonní číslo vám byla odeslána SMS s potvrzením.</p>
+                            <button class="doctor-close-button">Zavřít</button>
+                        </div>
+                    `;
+
+                    // Přidání CSS stylů pro potvrzovací zprávu
+                    const confirmationStyle = `
+                        .doctor-confirmation {
+                            text-align: center;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: 15px;
+                        }
+
+                        .doctor-confirmation-icon {
+                            font-size: 48px;
+                            margin-bottom: 10px;
+                        }
+
+                        .doctor-confirmation h3 {
+                            margin: 0;
+                            color: var(--text-color);
+                        }
+
+                        .doctor-confirmation-details {
+                            background-color: rgba(0, 0, 0, 0.2);
+                            border-radius: 8px;
+                            padding: 15px;
+                            width: 100%;
+                            text-align: left;
+                        }
+
+                        .doctor-confirmation-details p {
+                            margin: 8px 0;
+                            color: var(--text-color-dark);
+                        }
+
+                        .doctor-confirmation-message {
+                            color: var(--text-color-dark);
+                            margin: 10px 0;
+                        }
+
+                        .doctor-close-button {
+                            padding: 10px 25px;
+                            background-color: #4CAF50;
+                            color: white;
+                            border: none;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            transition: background-color 0.3s ease, transform 0.3s ease;
+                            margin-top: 10px;
+                        }
+
+                        .doctor-close-button:hover {
+                            background-color: #388E3C;
+                            transform: translateY(-2px);
+                        }
+                    `;
+                    style.textContent += confirmationStyle;
+
+                    // Přidání event listeneru pro tlačítko zavřít
+                    document.querySelector('.doctor-close-button').addEventListener('click', () => {
+                        modal.classList.remove('show');
+                        setTimeout(() => {
+                            modal.remove();
+                            style.remove();
+                        }, 300);
+                    });
+
+                    // Přidání XP za objednání k lékaři
+                    if (typeof UserProgress !== 'undefined') {
+                        UserProgress.addExperience(15, 'Objednání k lékaři', 'assistants');
+                    }
+                });
+
+                backButton.addEventListener('click', () => {
+                    // Návrat na seznam lékařů
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.remove();
+                        style.remove();
+                        // Znovu otevřít modal se seznamem lékařů
+                        this.showDoctorSearch();
+                    }, 300);
+                });
+            });
+        });
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            }
+        });
+
+        // Přidání XP za zobrazení vyhledávání lékaře
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(3, 'Vyhledávání lékaře', 'assistants');
+        }
+    },
+
+    // Funkce "Chci jít do práce"
+    showGoToWork() {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('goToWorkModal')) {
+            return;
+        }
+
+        // Získání aktuální polohy (simulace)
+        const currentLocation = {
+            lat: 48.8492,
+            lng: 17.1247,
+            name: 'Aktuální poloha'
+        };
+
+        // Simulace údajů o práci
+        const workData = {
+            location: {
+                lat: 48.8592,
+                lng: 17.1347,
+                name: 'Firma XYZ'
+            },
+            tasks: [
+                { name: 'Kontrola e-mailů', completed: false, reward: 50 },
+                { name: 'Schůzka s klienty', completed: false, reward: 200 },
+                { name: 'Aktualizace databáze', completed: false, reward: 150 }
+            ],
+            balance: 12500
+        };
+
+        // Vytvoření modalu
+        const modal = document.createElement('div');
+        modal.id = 'goToWorkModal';
+        modal.className = 'go-to-work-modal';
+        document.body.appendChild(modal);
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="go-to-work-modal-content">
+                <div class="go-to-work-modal-header">
+                    <h2>Chci jít do práce</h2>
+                    <button class="go-to-work-modal-close">&times;</button>
+                </div>
+                <div class="go-to-work-modal-body">
+                    <div class="go-to-work-info">
+                        <div class="go-to-work-balance">
+                            <div class="go-to-work-balance-label">Zůstatek:</div>
+                            <div class="go-to-work-balance-value">${workData.balance} Kč</div>
+                        </div>
+                        <div class="go-to-work-location">
+                            <div class="go-to-work-current-location">
+                                <div class="go-to-work-location-icon">📍</div>
+                                <div class="go-to-work-location-name">${currentLocation.name}</div>
+                            </div>
+                            <div class="go-to-work-location-arrow">→</div>
+                            <div class="go-to-work-work-location">
+                                <div class="go-to-work-location-icon">🏢</div>
+                                <div class="go-to-work-location-name">${workData.location.name}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="go-to-work-tasks">
+                        <h3>Dnešní úkoly</h3>
+                        <div class="go-to-work-tasks-list">
+                            ${workData.tasks.map((task, index) => `
+                                <div class="go-to-work-task" data-task-id="${index}">
+                                    <div class="go-to-work-task-checkbox">
+                                        <input type="checkbox" id="task-${index}" ${task.completed ? 'checked' : ''}>
+                                        <label for="task-${index}"></label>
+                                    </div>
+                                    <div class="go-to-work-task-name">${task.name}</div>
+                                    <div class="go-to-work-task-reward">+${task.reward} Kč</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="go-to-work-actions">
+                        <button id="calculateRouteButton" class="go-to-work-route-button">Vypočítat trasu do práce</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .go-to-work-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .go-to-work-modal.show {
+                opacity: 1;
+            }
+
+            .go-to-work-modal-content {
+                background-color: var(--card-bg);
+                border-radius: 10px;
+                width: 90%;
+                max-width: 500px;
+                max-height: 90vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .go-to-work-modal.show .go-to-work-modal-content {
+                transform: scale(1);
+            }
+
+            .go-to-work-modal-header {
+                background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .go-to-work-modal-header h2 {
+                margin: 0;
+                color: white;
+                font-size: 1.5rem;
+            }
+
+            .go-to-work-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .go-to-work-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .go-to-work-info {
+                margin-bottom: 20px;
+            }
+
+            .go-to-work-balance {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: rgba(0, 0, 0, 0.2);
+                padding: 10px 15px;
+                border-radius: 8px;
+                margin-bottom: 15px;
+            }
+
+            .go-to-work-balance-label {
+                font-weight: bold;
+                color: var(--text-color);
+            }
+
+            .go-to-work-balance-value {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #4CAF50;
+            }
+
+            .go-to-work-location {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background-color: rgba(0, 0, 0, 0.2);
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            .go-to-work-current-location,
+            .go-to-work-work-location {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .go-to-work-location-icon {
+                font-size: 24px;
+            }
+
+            .go-to-work-location-name {
+                font-weight: bold;
+                color: var(--text-color);
+            }
+
+            .go-to-work-location-arrow {
+                font-size: 24px;
+                color: var(--text-color-dark);
+            }
+
+            .go-to-work-tasks {
+                margin-bottom: 20px;
+            }
+
+            .go-to-work-tasks h3 {
+                margin-top: 0;
+                margin-bottom: 15px;
+                color: var(--text-color);
+                font-size: 1.2rem;
+            }
+
+            .go-to-work-tasks-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .go-to-work-task {
+                display: flex;
+                align-items: center;
+                background-color: rgba(0, 0, 0, 0.2);
+                padding: 12px 15px;
+                border-radius: 8px;
+                transition: background-color 0.3s ease;
+            }
+
+            .go-to-work-task:hover {
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+
+            .go-to-work-task-checkbox {
+                margin-right: 15px;
+            }
+
+            .go-to-work-task-checkbox input[type="checkbox"] {
+                display: none;
+            }
+
+            .go-to-work-task-checkbox label {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                background-color: rgba(255, 255, 255, 0.1);
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
+                cursor: pointer;
+                position: relative;
+            }
+
+            .go-to-work-task-checkbox input[type="checkbox"]:checked + label::after {
+                content: '\2714';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #4CAF50;
+                font-size: 14px;
+            }
+
+            .go-to-work-task-name {
+                flex: 1;
+                color: var(--text-color);
+            }
+
+            .go-to-work-task-reward {
+                font-weight: bold;
+                color: #4CAF50;
+            }
+
+            .go-to-work-actions {
+                display: flex;
+                justify-content: center;
+            }
+
+            .go-to-work-route-button {
+                padding: 12px 25px;
+                background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+                color: white;
+                border: none;
+                border-radius: 25px;
+                font-size: 1rem;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+            }
+
+            .go-to-work-route-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(255, 152, 0, 0.4);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Zobrazení modalu s animací
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.go-to-work-modal-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+        });
+
+        // Event listener pro zaškrtávání úkolů
+        const taskCheckboxes = modal.querySelectorAll('.go-to-work-task-checkbox input[type="checkbox"]');
+        taskCheckboxes.forEach((checkbox, index) => {
+            checkbox.addEventListener('change', () => {
+                workData.tasks[index].completed = checkbox.checked;
+
+                // Přidání XP za splnění úkolu
+                if (checkbox.checked && typeof UserProgress !== 'undefined') {
+                    UserProgress.addExperience(10, `Splnění pracovního úkolu: ${workData.tasks[index].name}`, 'work');
+                }
+            });
+        });
+
+        // Event listener pro tlačítko vypočítat trasu
+        const routeButton = document.getElementById('calculateRouteButton');
+        routeButton.addEventListener('click', () => {
+            // Zavření modalu
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+
+            // Simulace vypočtení trasy (v reálné aplikaci by se volala funkce pro vypočtení trasy)
+            if (typeof calculateRoute === 'function') {
+                // Zde by se volala funkce pro vypočtení trasy mezi aktuální polohou a prací
+                console.log('Vypočítávám trasu do práce...');
+            }
+
+            // Přidání XP za vyhledání trasy do práce
+            if (typeof UserProgress !== 'undefined') {
+                UserProgress.addExperience(5, 'Vyhledání trasy do práce', 'work');
+            }
+        });
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            }
+        });
+
+        // Přidání XP za zobrazení funkce "Chci jít do práce"
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(3, 'Zobrazení funkce "Chci jít do práce"', 'work');
+        }
+    },
+
+    // Zobrazení rapových akcí
+    showRapActions() {
+        // Jednoduchá implementace - pouze základní modal
+        alert('Funkce Rapové akce bude implementována v další verzi.');
+
+        // Přidání XP za zobrazení rapových akcí
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(3, 'Zobrazení rapových akcí', 'entertainment');
         }
     },
 
@@ -866,6 +4066,513 @@ const CommandsMenu = {
                 }, 300);
             }
         });
+    },
+
+    // Aktivace hlasového asistenta Alexa
+    activateAlexa() {
+        // Kontrola, zda již modal neexistuje
+        if (document.getElementById('alexaModal')) {
+            return;
+        }
+
+        // Vytvoření modalu pro Alexu
+        const modal = document.createElement('div');
+        modal.id = 'alexaModal';
+        modal.className = 'alexa-modal';
+        document.body.appendChild(modal);
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="alexa-modal-content">
+                <div class="alexa-modal-header">
+                    <h2>Alexa - Hlasový asistent</h2>
+                    <button class="alexa-modal-close">&times;</button>
+                </div>
+                <div class="alexa-modal-body">
+                    <div class="alexa-icon-container">
+                        <div class="alexa-icon">
+                            <div class="alexa-ring"></div>
+                            <div class="alexa-circle"></div>
+                        </div>
+                    </div>
+                    <div class="alexa-status">Alexa je připravena...</div>
+                    <div class="alexa-instructions">
+                        <p>Klikněte na ikonu Alexy a začněte mluvit, nebo použijte následující příkazy:</p>
+                        <ul class="alexa-commands-list">
+                            <li><strong>"Alexa, najdi cestu do Brna"</strong> - vypočítá trasu do Brna</li>
+                            <li><strong>"Alexa, přidej bod na mapu"</strong> - přidá nový bod na mapu</li>
+                            <li><strong>"Alexa, zobraz počasí"</strong> - zobrazí aktuální počasí</li>
+                            <li><strong>"Alexa, zapni noční režim"</strong> - aktivuje noční režim mapy</li>
+                            <li><strong>"Alexa, najdi restaurace v okolí"</strong> - zobrazí restaurace v okolí</li>
+                        </ul>
+                    </div>
+                    <div class="alexa-controls">
+                        <button class="alexa-start-btn">Aktivovat Alexu</button>
+                        <button class="alexa-stop-btn" disabled>Zastavit poslech</button>
+                    </div>
+                    <div class="alexa-transcript">
+                        <h3>Historie příkazů</h3>
+                        <div class="alexa-transcript-content"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .alexa-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .alexa-modal.show {
+                opacity: 1;
+            }
+
+            .alexa-modal-content {
+                background-color: var(--card-bg);
+                border-radius: 10px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 90vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .alexa-modal.show .alexa-modal-content {
+                transform: scale(1);
+            }
+
+            .alexa-modal-header {
+                background: linear-gradient(135deg, #00CAFF 0%, #0091FF 100%);
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .alexa-modal-header h2 {
+                margin: 0;
+                color: white;
+                font-size: 1.5rem;
+            }
+
+            .alexa-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .alexa-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .alexa-icon-container {
+                margin: 20px 0;
+                cursor: pointer;
+            }
+
+            .alexa-icon {
+                position: relative;
+                width: 100px;
+                height: 100px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .alexa-ring {
+                position: absolute;
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #00CAFF 0%, #0091FF 100%);
+                opacity: 0.3;
+                transform: scale(0.8);
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+
+            .alexa-circle {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #00CAFF 0%, #0091FF 100%);
+                z-index: 1;
+                transition: transform 0.3s ease;
+            }
+
+            .alexa-icon-container:hover .alexa-ring {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            .alexa-icon-container:hover .alexa-circle {
+                transform: scale(1.1);
+            }
+
+            .alexa-icon-container.listening .alexa-ring {
+                animation: pulse 1.5s infinite;
+                opacity: 0.7;
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(0.8);
+                    opacity: 0.7;
+                }
+                50% {
+                    transform: scale(1.1);
+                    opacity: 0.5;
+                }
+                100% {
+                    transform: scale(0.8);
+                    opacity: 0.7;
+                }
+            }
+
+            .alexa-status {
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+                color: var(--text-color);
+                font-weight: bold;
+            }
+
+            .alexa-instructions {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .alexa-instructions p {
+                margin-top: 0;
+                margin-bottom: 10px;
+                color: var(--text-color);
+            }
+
+            .alexa-commands-list {
+                padding-left: 20px;
+                margin: 0;
+            }
+
+            .alexa-commands-list li {
+                margin-bottom: 8px;
+                color: var(--text-color-dark);
+            }
+
+            .alexa-controls {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .alexa-start-btn, .alexa-stop-btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 25px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+            }
+
+            .alexa-start-btn {
+                background: linear-gradient(135deg, #00CAFF 0%, #0091FF 100%);
+                color: white;
+            }
+
+            .alexa-start-btn:hover {
+                background: linear-gradient(135deg, #0091FF 0%, #0078D7 100%);
+            }
+
+            .alexa-stop-btn {
+                background-color: #f44336;
+                color: white;
+                opacity: 0.7;
+            }
+
+            .alexa-stop-btn:not([disabled]):hover {
+                background-color: #d32f2f;
+                opacity: 1;
+            }
+
+            .alexa-stop-btn[disabled] {
+                background-color: #ccc;
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+
+            .alexa-transcript {
+                width: 100%;
+                margin-top: 20px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                padding-top: 20px;
+            }
+
+            .alexa-transcript h3 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                color: var(--text-color);
+                font-size: 1.1rem;
+            }
+
+            .alexa-transcript-content {
+                max-height: 150px;
+                overflow-y: auto;
+                padding: 10px;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 5px;
+                color: var(--text-color-dark);
+            }
+
+            .alexa-transcript-item {
+                margin-bottom: 8px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .alexa-transcript-item:last-child {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+
+            .alexa-transcript-user {
+                color: #00CAFF;
+                font-weight: bold;
+            }
+
+            .alexa-transcript-response {
+                color: #4CAF50;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Zobrazení modalu s animací
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.alexa-modal-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+        });
+
+        // Simulace funkce hlasového asistenta
+        const alexaIcon = modal.querySelector('.alexa-icon-container');
+        const alexaStatus = modal.querySelector('.alexa-status');
+        const startButton = modal.querySelector('.alexa-start-btn');
+        const stopButton = modal.querySelector('.alexa-stop-btn');
+        const transcriptContent = modal.querySelector('.alexa-transcript-content');
+
+        // Funkce pro přidání záznamu do historie
+        const addTranscriptItem = (text, type) => {
+            const item = document.createElement('div');
+            item.className = 'alexa-transcript-item';
+
+            if (type === 'user') {
+                item.innerHTML = `<span class="alexa-transcript-user">Vy:</span> ${text}`;
+            } else if (type === 'response') {
+                item.innerHTML = `<span class="alexa-transcript-response">Alexa:</span> ${text}`;
+            } else {
+                item.textContent = text;
+            }
+
+            transcriptContent.appendChild(item);
+            transcriptContent.scrollTop = transcriptContent.scrollHeight;
+        };
+
+        // Funkce pro zpracování příkazu
+        const processCommand = (command) => {
+            // Přidání příkazu do historie
+            addTranscriptItem(command, 'user');
+
+            // Simulace zpracování příkazu
+            setTimeout(() => {
+                let response = '';
+                let action = null;
+
+                // Rozpoznání příkazu
+                if (command.toLowerCase().includes('najdi cestu') || command.toLowerCase().includes('trasa')) {
+                    const destination = command.toLowerCase().includes('do ') ?
+                        command.split('do ')[1].split(' ')[0] : 'cíle';
+                    response = `Vypočítávám trasu do ${destination}...`;
+                    action = () => {
+                        if (typeof calculateRoute === 'function') {
+                            calculateRoute();
+                        }
+                    };
+                } else if (command.toLowerCase().includes('přidej bod')) {
+                    response = 'Přidávám nový bod na mapu...';
+                    action = () => {
+                        if (typeof addActivity === 'function') {
+                            addActivity();
+                        }
+                    };
+                } else if (command.toLowerCase().includes('počasí')) {
+                    response = 'Zobrazuji aktuální počasí...';
+                    action = () => {
+                        if (typeof CommandsMenu.toggleWeatherOverlay === 'function') {
+                            CommandsMenu.toggleWeatherOverlay();
+                        }
+                    };
+                } else if (command.toLowerCase().includes('noční režim')) {
+                    response = 'Aktivuji noční režim mapy...';
+                    action = () => {
+                        if (typeof CommandsMenu.toggleNightMode === 'function') {
+                            CommandsMenu.toggleNightMode();
+                        }
+                    };
+                } else if (command.toLowerCase().includes('restaurace') || command.toLowerCase().includes('jídlo')) {
+                    response = 'Hledám restaurace v okolí...';
+                    action = () => {
+                        if (typeof CommandsMenu.showLocalFood === 'function') {
+                            CommandsMenu.showLocalFood();
+                        }
+                    };
+                } else {
+                    response = 'Omlouvám se, tomuto příkazu nerozumím. Zkuste některý z příkazů ze seznamu.';
+                }
+
+                // Přidání odpovědi do historie
+                addTranscriptItem(response, 'response');
+
+                // Provedení akce, pokud existuje
+                if (action) {
+                    setTimeout(action, 1000);
+                }
+
+                // Přidání XP za použití Alexy
+                if (typeof UserProgress !== 'undefined') {
+                    UserProgress.addExperience(5, 'Použití hlasového asistenta Alexa', 'assistants');
+                }
+            }, 1500);
+        };
+
+        // Simulace rozpoznávání řeči
+        let isListening = false;
+        let recognitionTimeout;
+
+        const startListening = () => {
+            isListening = true;
+            alexaIcon.classList.add('listening');
+            alexaStatus.textContent = 'Poslouchám...';
+            startButton.disabled = true;
+            stopButton.disabled = false;
+
+            // Simulace ukončení poslechu po 10 sekundách
+            recognitionTimeout = setTimeout(() => {
+                stopListening();
+                alexaStatus.textContent = 'Čas vypršel. Zkuste to znovu.';
+            }, 10000);
+        };
+
+        const stopListening = () => {
+            isListening = false;
+            alexaIcon.classList.remove('listening');
+            alexaStatus.textContent = 'Alexa je připravena...';
+            startButton.disabled = false;
+            stopButton.disabled = true;
+
+            clearTimeout(recognitionTimeout);
+        };
+
+        // Event listenery pro tlačítka
+        startButton.addEventListener('click', () => {
+            startListening();
+
+            // Simulace rozpoznání řeči po 3 sekundách
+            setTimeout(() => {
+                if (isListening) {
+                    stopListening();
+
+                    // Náhodný výběr příkazu pro simulaci
+                    const commands = [
+                        'Alexa, najdi cestu do Brna',
+                        'Alexa, přidej bod na mapu',
+                        'Alexa, zobraz počasí',
+                        'Alexa, zapni noční režim',
+                        'Alexa, najdi restaurace v okolí'
+                    ];
+                    const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+
+                    alexaStatus.textContent = `Rozpoznáno: "${randomCommand}"`;
+                    processCommand(randomCommand);
+                }
+            }, 3000);
+        });
+
+        stopButton.addEventListener('click', stopListening);
+
+        alexaIcon.addEventListener('click', () => {
+            if (!isListening) {
+                startListening();
+
+                // Simulace rozpoznání řeči po 3 sekundách
+                setTimeout(() => {
+                    if (isListening) {
+                        stopListening();
+
+                        // Náhodný výběr příkazu pro simulaci
+                        const commands = [
+                            'Alexa, najdi cestu do Brna',
+                            'Alexa, přidej bod na mapu',
+                            'Alexa, zobraz počasí',
+                            'Alexa, zapni noční režim',
+                            'Alexa, najdi restaurace v okolí'
+                        ];
+                        const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+
+                        alexaStatus.textContent = `Rozpoznáno: "${randomCommand}"`;
+                        processCommand(randomCommand);
+                    }
+                }, 3000);
+            } else {
+                stopListening();
+            }
+        });
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            }
+        });
+
+        // Přidání XP za otevření Alexy
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(3, 'Otevření hlasového asistenta Alexa', 'assistants');
+        }
     },
 
     // Zobrazení modalu s nápovědou
@@ -1723,6 +5430,532 @@ const CommandsMenu = {
         // Přidání XP za návštěvu obchodu
         if (typeof UserProgress !== 'undefined') {
             UserProgress.addExperience(5, 'Návštěva obchodu s krkovičkou');
+        }
+    },
+
+    // Zobrazení rozvážky pizzy
+    showPizzaDelivery() {
+        // Zobrazení informace o načítání pizzerií
+        addMessage('Načítám nabídku pizzerií v okolí...', false);
+
+        // Simulace načítání dat
+        const pizzerias = [
+            {
+                id: 'presto',
+                name: 'Pizza Presto',
+                rating: 4.8,
+                deliveryTime: '30-45 min',
+                minOrder: 199,
+                deliveryFee: 49,
+                image: 'https://via.placeholder.com/300x200?text=Pizza+Presto',
+                menu: [
+                    { name: 'Margherita', price: 159, ingredients: 'rajčatový základ, mozzarella, bazalka' },
+                    { name: 'Prosciutto', price: 189, ingredients: 'rajčatový základ, mozzarella, šunka' },
+                    { name: 'Salami', price: 199, ingredients: 'rajčatový základ, mozzarella, salám' },
+                    { name: 'Quattro Formaggi', price: 219, ingredients: 'smetanový základ, mozzarella, gorgonzola, parmesan, eidam' }
+                ]
+            },
+            {
+                id: 'mammamia',
+                name: 'Pizzerie Mamma Mia',
+                rating: 4.5,
+                deliveryTime: '40-55 min',
+                minOrder: 249,
+                deliveryFee: 0,
+                image: 'https://via.placeholder.com/300x200?text=Mamma+Mia',
+                menu: [
+                    { name: 'Margherita', price: 149, ingredients: 'rajčatový základ, mozzarella, bazalka' },
+                    { name: 'Capricciosa', price: 199, ingredients: 'rajčatový základ, mozzarella, šunka, žampiony, olivy' },
+                    { name: 'Diavola', price: 209, ingredients: 'rajčatový základ, mozzarella, pikantni salám, chilli' },
+                    { name: 'Hawai', price: 189, ingredients: 'rajčatový základ, mozzarella, šunka, ananas' }
+                ]
+            },
+            {
+                id: 'dongiovanni',
+                name: 'Don Giovanni Pizza',
+                rating: 4.9,
+                deliveryTime: '35-50 min',
+                minOrder: 299,
+                deliveryFee: 39,
+                image: 'https://via.placeholder.com/300x200?text=Don+Giovanni',
+                menu: [
+                    { name: 'Margherita', price: 169, ingredients: 'rajčatový základ, mozzarella, bazalka' },
+                    { name: 'Funghi', price: 189, ingredients: 'rajčatový základ, mozzarella, žampiony' },
+                    { name: 'Quattro Stagioni', price: 229, ingredients: 'rajčatový základ, mozzarella, šunka, žampiony, artyčoky, olivy' },
+                    { name: 'Tonno', price: 219, ingredients: 'rajčatový základ, mozzarella, tuňák, cibule' }
+                ]
+            }
+        ];
+
+        // Vytvoření modalu pro výběr pizzerie
+        const modal = document.createElement('div');
+        modal.id = 'pizzaDeliveryModal';
+        modal.className = 'pizza-delivery-modal';
+
+        // Vytvoření obsahu modalu
+        modal.innerHTML = `
+            <div class="pizza-delivery-modal-content">
+                <div class="pizza-delivery-modal-header">
+                    <h2>🍕 Rozvážka pizzy</h2>
+                    <button class="pizza-delivery-modal-close">&times;</button>
+                </div>
+                <div class="pizza-delivery-modal-body">
+                    <div class="pizza-delivery-description">
+                        <p>Vyberte si z nabídky nejlepších pizzerií v okolí s doručením až k vám domů.</p>
+                    </div>
+                    <div class="pizza-delivery-list">
+                        ${pizzerias.map(pizzeria => `
+                            <div class="pizza-delivery-item" data-pizzeria-id="${pizzeria.id}">
+                                <div class="pizza-delivery-item-image" style="background-image: url('${pizzeria.image}')"></div>
+                                <div class="pizza-delivery-item-info">
+                                    <h3>${pizzeria.name}</h3>
+                                    <div class="pizza-delivery-item-rating">
+                                        ${'⭐'.repeat(Math.floor(pizzeria.rating))}${pizzeria.rating % 1 >= 0.5 ? '⭐' : ''} ${pizzeria.rating.toFixed(1)}
+                                    </div>
+                                    <div class="pizza-delivery-item-details">
+                                        <span>Doručení: ${pizzeria.deliveryTime}</span>
+                                        <span>Min. objednávka: ${pizzeria.minOrder} Kč</span>
+                                        <span>Doprava: ${pizzeria.deliveryFee > 0 ? `${pizzeria.deliveryFee} Kč` : 'Zdarma'}</span>
+                                    </div>
+                                </div>
+                                <button class="pizza-delivery-item-button">Zobrazit menu</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Přidání CSS stylů pro modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .pizza-delivery-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .pizza-delivery-modal.show {
+                opacity: 1;
+            }
+
+            .pizza-delivery-modal-content {
+                background-color: var(--card-bg);
+                border-radius: 10px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 90vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .pizza-delivery-modal.show .pizza-delivery-modal-content {
+                transform: scale(1);
+            }
+
+            .pizza-delivery-modal-header {
+                background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%);
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .pizza-delivery-modal-header h2 {
+                margin: 0;
+                color: white;
+                font-size: 1.5rem;
+            }
+
+            .pizza-delivery-modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .pizza-delivery-modal-body {
+                padding: 20px;
+                overflow-y: auto;
+                max-height: calc(90vh - 60px);
+            }
+
+            .pizza-delivery-description {
+                margin-bottom: 20px;
+                color: var(--text-color);
+            }
+
+            .pizza-delivery-list {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .pizza-delivery-item {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .pizza-delivery-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .pizza-delivery-item-image {
+                height: 150px;
+                background-size: cover;
+                background-position: center;
+            }
+
+            .pizza-delivery-item-info {
+                padding: 15px;
+            }
+
+            .pizza-delivery-item-info h3 {
+                margin: 0 0 10px 0;
+                color: var(--text-color);
+                font-size: 1.2rem;
+            }
+
+            .pizza-delivery-item-rating {
+                color: #FFD700;
+                margin-bottom: 10px;
+            }
+
+            .pizza-delivery-item-details {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                color: var(--text-color-dark);
+                font-size: 0.9rem;
+            }
+
+            .pizza-delivery-item-details span {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 5px 10px;
+                border-radius: 15px;
+            }
+
+            .pizza-delivery-item-button {
+                margin: 0 15px 15px 15px;
+                padding: 10px;
+                background-color: #FF5722;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+            }
+
+            .pizza-delivery-item-button:hover {
+                background-color: #E64A19;
+            }
+
+            /* Styly pro menu pizzerie */
+            .pizza-menu {
+                margin-top: 20px;
+            }
+
+            .pizza-menu-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .pizza-menu-header h3 {
+                margin: 0;
+                color: var(--text-color);
+            }
+
+            .pizza-menu-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .pizza-menu-item {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 15px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .pizza-menu-item-info {
+                flex: 1;
+            }
+
+            .pizza-menu-item-name {
+                font-weight: bold;
+                color: var(--text-color);
+                margin-bottom: 5px;
+            }
+
+            .pizza-menu-item-ingredients {
+                color: var(--text-color-dark);
+                font-size: 0.9rem;
+            }
+
+            .pizza-menu-item-price {
+                font-weight: bold;
+                color: #FF5722;
+                margin-left: 15px;
+            }
+
+            .pizza-menu-item-add {
+                background-color: #FF5722;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 12px;
+                cursor: pointer;
+                margin-left: 15px;
+                transition: background-color 0.3s ease;
+            }
+
+            .pizza-menu-item-add:hover {
+                background-color: #E64A19;
+            }
+
+            .pizza-back-button {
+                background-color: rgba(0, 0, 0, 0.2);
+                color: var(--text-color);
+                border: none;
+                border-radius: 5px;
+                padding: 10px 15px;
+                cursor: pointer;
+                margin-top: 20px;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                transition: background-color 0.3s ease;
+            }
+
+            .pizza-back-button:hover {
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+
+            .pizza-order-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 12px 20px;
+                cursor: pointer;
+                margin-top: 20px;
+                font-weight: bold;
+                width: 100%;
+                transition: background-color 0.3s ease;
+            }
+
+            .pizza-order-button:hover {
+                background-color: #388E3C;
+            }
+        `;
+
+        document.head.appendChild(style);
+        document.body.appendChild(modal);
+
+        // Animace zobrazení
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        // Přidání event listenerů
+        const closeButton = modal.querySelector('.pizza-delivery-modal-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                style.remove();
+            }, 300);
+        });
+
+        // Event listenery pro tlačítka pizzerií
+        const pizzeriaButtons = modal.querySelectorAll('.pizza-delivery-item-button');
+        pizzeriaButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const pizzeriaItem = button.closest('.pizza-delivery-item');
+                const pizzeriaId = pizzeriaItem.getAttribute('data-pizzeria-id');
+                const pizzeria = pizzerias.find(p => p.id === pizzeriaId);
+
+                // Zobrazení menu vybrané pizzerie
+                const modalBody = modal.querySelector('.pizza-delivery-modal-body');
+                modalBody.innerHTML = `
+                    <div class="pizza-delivery-description">
+                        <button class="pizza-back-button">&#8592; Zpět na seznam pizzerií</button>
+                    </div>
+                    <div class="pizza-delivery-item">
+                        <div class="pizza-delivery-item-image" style="background-image: url('${pizzeria.image}')"></div>
+                        <div class="pizza-delivery-item-info">
+                            <h3>${pizzeria.name}</h3>
+                            <div class="pizza-delivery-item-rating">
+                                ${'⭐'.repeat(Math.floor(pizzeria.rating))}${pizzeria.rating % 1 >= 0.5 ? '⭐' : ''} ${pizzeria.rating.toFixed(1)}
+                            </div>
+                            <div class="pizza-delivery-item-details">
+                                <span>Doručení: ${pizzeria.deliveryTime}</span>
+                                <span>Min. objednávka: ${pizzeria.minOrder} Kč</span>
+                                <span>Doprava: ${pizzeria.deliveryFee > 0 ? `${pizzeria.deliveryFee} Kč` : 'Zdarma'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pizza-menu">
+                        <div class="pizza-menu-header">
+                            <h3>Menu</h3>
+                        </div>
+                        <div class="pizza-menu-list">
+                            ${pizzeria.menu.map(item => `
+                                <div class="pizza-menu-item">
+                                    <div class="pizza-menu-item-info">
+                                        <div class="pizza-menu-item-name">${item.name}</div>
+                                        <div class="pizza-menu-item-ingredients">${item.ingredients}</div>
+                                    </div>
+                                    <div class="pizza-menu-item-price">${item.price} Kč</div>
+                                    <button class="pizza-menu-item-add" data-pizza-name="${item.name}" data-pizza-price="${item.price}">Přidat</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <button class="pizza-order-button">Objednat</button>
+                `;
+
+                // Event listener pro tlačítko zpět
+                const backButton = modalBody.querySelector('.pizza-back-button');
+                backButton.addEventListener('click', () => {
+                    // Obnovení původního obsahu modalu
+                    this.showPizzaDelivery();
+                });
+
+                // Event listenery pro tlačítka přidání pizzy
+                const addButtons = modalBody.querySelectorAll('.pizza-menu-item-add');
+                addButtons.forEach(addButton => {
+                    addButton.addEventListener('click', () => {
+                        const pizzaName = addButton.getAttribute('data-pizza-name');
+                        const pizzaPrice = addButton.getAttribute('data-pizza-price');
+
+                        // Simulace přidání do košíku
+                        addButton.textContent = 'Přidáno';
+                        addButton.disabled = true;
+                        addButton.style.backgroundColor = '#4CAF50';
+
+                        // Zobrazení informace o přidání do košíku
+                        addMessage(`Pizza ${pizzaName} byla přidána do košíku.`, false);
+                    });
+                });
+
+                // Event listener pro tlačítko objednat
+                const orderButton = modalBody.querySelector('.pizza-order-button');
+                orderButton.addEventListener('click', () => {
+                    // Simulace objednávky
+                    modalBody.innerHTML = `
+                        <div class="pizza-order-confirmation">
+                            <div class="pizza-order-confirmation-icon">✅</div>
+                            <h3>Vaše objednávka byla přijata!</h3>
+                            <p>Objednávka z ${pizzeria.name} bude doručena za ${pizzeria.deliveryTime}.</p>
+                            <p>Děkujeme za vaši objednávku!</p>
+                            <button class="pizza-close-button">Zavřít</button>
+                        </div>
+                    `;
+
+                    // Přidání CSS stylů pro potvrzení objednávky
+                    style.textContent += `
+                        .pizza-order-confirmation {
+                            text-align: center;
+                            padding: 20px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: 15px;
+                        }
+
+                        .pizza-order-confirmation-icon {
+                            font-size: 48px;
+                            margin-bottom: 10px;
+                        }
+
+                        .pizza-order-confirmation h3 {
+                            margin: 0;
+                            color: var(--text-color);
+                            font-size: 1.5rem;
+                        }
+
+                        .pizza-order-confirmation p {
+                            margin: 5px 0;
+                            color: var(--text-color-dark);
+                        }
+
+                        .pizza-close-button {
+                            background-color: #4CAF50;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            padding: 12px 25px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            margin-top: 20px;
+                            transition: background-color 0.3s ease;
+                        }
+
+                        .pizza-close-button:hover {
+                            background-color: #388E3C;
+                        }
+                    `;
+
+                    // Event listener pro tlačítko zavřít
+                    const closeButton = modalBody.querySelector('.pizza-close-button');
+                    closeButton.addEventListener('click', () => {
+                        modal.classList.remove('show');
+                        setTimeout(() => {
+                            modal.remove();
+                            style.remove();
+                        }, 300);
+                    });
+
+                    // Přidání XP za objednání pizzy
+                    if (typeof UserProgress !== 'undefined') {
+                        UserProgress.addExperience(10, 'Objednání pizzy');
+                    }
+                });
+            });
+        });
+
+        // Zavření modalu při kliknutí mimo obsah
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    style.remove();
+                }, 300);
+            }
+        });
+
+        // Přidání XP za zobrazení rozvážky pizzy
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(3, 'Zobrazení rozvážky pizzy');
         }
     },
 

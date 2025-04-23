@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Map - Into the known</title>
+    <title>AI Map - Into the known v0.2.8.7.4</title>
     <link rel="icon" href="icons8-favicon.gif" type="image/gif">
     <link rel="stylesheet" href="styles.css">
     <!-- Leaflet CSS pro mapu -->
@@ -28,8 +28,14 @@
     <link rel="stylesheet" href="commands-menu-extensions.css">
     <link rel="stylesheet" href="user-progress.css">
     <link rel="stylesheet" href="route-utils.css">
+    <link rel="stylesheet" href="feedback-survey.css">
 </head>
 <body>
+    <!-- Ikona pro zobrazení novinek a aktualizací -->
+    <div id="updatesIcon" class="updates-icon">
+        <i class="icon">🔔</i>
+    </div>
+
     <div class="container">
         <header>
             <h1>AI Map - Into the known</h1>
@@ -331,10 +337,44 @@
     <script src="script.js"></script>
     <!-- Skripty pro novinky a menu příkazů -->
     <script src="updates-notification.js"></script>
+    <script>
+        // Přímá inicializace UpdatesNotification
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof UpdatesNotification !== 'undefined') {
+                console.log('Přímá inicializace UpdatesNotification...');
+                UpdatesNotification.init();
+            } else {
+                console.error('UpdatesNotification modul nebyl nalezen!');
+            }
+        });
+    </script>
     <script src="commands-menu.js"></script>
+    <script>
+        // Přímá inicializace CommandsMenu - optimalizovaná verze
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof CommandsMenu !== 'undefined') {
+                console.log('Přímá inicializace CommandsMenu...');
+                // Okamžitá inicializace pro rychlejší načtení
+                CommandsMenu.init();
+                console.log('CommandsMenu inicializováno');
+
+                // Kontrola, zda se menu správně inicializovalo
+                setTimeout(function() {
+                    if (!document.getElementById('commandsButton')) {
+                        console.log('Tlačítko menu příkazů nebylo nalezeno, zkusím znovu inicializovat');
+                        CommandsMenu.init();
+                    }
+                }, 500);
+            } else {
+                console.error('CommandsMenu modul nebyl nalezen!');
+            }
+        });
+    </script>
     <script src="user-progress.js"></script>
     <script src="user-progress-extensions.js"></script>
     <!-- Skript pro vyhledávání spojení veřejnou dopravou -->
     <script src="transport-connections.js"></script>
+    <!-- Skript pro dotazník zpětné vazby -->
+    <script src="feedback-survey.js"></script>
 </body>
 </html>

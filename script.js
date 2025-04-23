@@ -1,6 +1,6 @@
 /**
  * Hlavní skript aplikace
- * Verze 0.2.8.6.4
+ * Verze 0.2.8.7.4
  */
 
 // Inicializace mapy
@@ -934,6 +934,7 @@ function calculateRouteFunction() {
 
     // Použití přímého volání OSRM API pro rychlejší výpočet trasy
     // Toto je rychlejší než použití Leaflet Routing Machine
+    // Optimalizovaná verze pro lepší výkon
     const fetchDirectRoute = async () => {
         try {
             // Zobrazení indikátoru načítání
@@ -943,18 +944,36 @@ function calculateRouteFunction() {
             document.body.appendChild(loadingIndicator);
 
             // Vytvoření URL pro OSRM API s optimalizovanými parametry
-            const coordinates = points.map(p => `${p.lng},${p.lat}`).join(';');
+            // Omezení počtu bodů pro rychlejší výpočet
+            const maxPoints = 10; // Omezení počtu bodů pro rychlejší výpočet
+            let optimizedPoints = points;
+            if (points.length > maxPoints) {
+                // Pokud je bodů příliš mnoho, vybereme jen některé (první, poslední a několik mezi nimi)
+                const step = Math.floor(points.length / (maxPoints - 2));
+                optimizedPoints = [points[0]]; // První bod
+                for (let i = step; i < points.length - 1; i += step) {
+                    optimizedPoints.push(points[i]);
+                    if (optimizedPoints.length >= maxPoints - 1) break;
+                }
+                optimizedPoints.push(points[points.length - 1]); // Poslední bod
+            }
+
+            const coordinates = optimizedPoints.map(p => `${p.lng},${p.lat}`).join(';');
             const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=polyline&steps=false&alternatives=false&annotations=false&continue_straight=true`;
 
-            // Nastavení časového limitu pro fetch - snížený na 3 sekundy pro rychlejší odezvu
+            // Nastavení časového limitu pro fetch - snížený na 2 sekundy pro rychlejší odezvu
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-            // Provedení požadavku na API s prioritou
+            // Provedení požadavku na API s prioritou a optimalizací
             const response = await fetch(url, {
                 signal: controller.signal,
                 priority: 'high',
-                cache: 'no-store' // Zabrání cachování pro vždy aktuální data
+                cache: 'force-cache', // Použití cache pro rychlejší odezvu
+                headers: {
+                    'Accept': 'application/json',
+                    'Accept-Encoding': 'gzip' // Komprese dat pro rychlejší přenos
+                }
             });
             clearTimeout(timeoutId);
 
@@ -976,9 +995,9 @@ function calculateRouteFunction() {
 
             // Optimalizace počtu bodů pro dlouhé trasy (snížení počtu bodů pro lepší výkon)
             let optimizedRoute = decodedRoute;
-            if (decodedRoute.length > 1000) {
+            if (decodedRoute.length > 500) {
                 // Použití algoritmu pro redukci bodů při zachování tvaru trasy
-                optimizedRoute = L.LineUtil.simplify(decodedRoute, 0.0001);
+                optimizedRoute = L.LineUtil.simplify(decodedRoute, 0.0002);
             }
 
             // Vytvoření trasy na mapě s optimalizovanými nastaveními
@@ -990,8 +1009,9 @@ function calculateRouteFunction() {
                 color: 'blue',
                 weight: 5,
                 opacity: 0.9,
-                smoothFactor: 1,
-                renderer: L.canvas() // Použití canvas rendereru pro lepší výkon
+                smoothFactor: 1.5,
+                renderer: L.canvas({ tolerance: 5 }), // Použití canvas rendereru s vyšší tolerancí pro lepší výkon
+                interactive: false // Vypnutí interaktivity pro lepší výkon
             }).addTo(map);
 
             // Výpočet vzdálenosti a času
@@ -1113,7 +1133,7 @@ function calculateRouteFunction() {
 
             // Nastavení časového limitu pro získání trasy
             const routeTimeout = setTimeout(() => {
-                // Pokud se trasa nezobrazí do 2 sekund, vytvoříme přímou trasu
+                // Pokud se trasa nezobrazí do 1 sekundy, vytvoříme přímou trasu
                 if (routeControl && !route) {
                     addMessage('Výpočet přesné trasy trvá déle. Zobrazuji dočasnou přímou trasu.', false);
 
@@ -1158,7 +1178,7 @@ function calculateRouteFunction() {
                         console.log('Přímá trasa byla přidána na glóbus');
                     }
                 }
-            }, 2000);
+            }, 1000);
 
             // Poslech na událost 'routesfound' pro získání informací o trase
             routeControl.on('routesfound', function(e) {
@@ -1438,6 +1458,14 @@ function toggleFullscreen() {
         // Přidání plovoucího chatu do fullscreen režimu
         createFloatingChat();
 
+        // Aktualizace menu příkazů ve fullscreen režimu
+        if (typeof CommandsMenu !== 'undefined') {
+            console.log('Aktualizace CommandsMenu po přepnutí do fullscreen režimu');
+            setTimeout(() => {
+                CommandsMenu.updateFullscreenMenu();
+            }, 500);
+        }
+
         // Zobrazení informace o fullscreen režimu
         addMessage('Mapa je nyní v režimu celé obrazovky. Pro návrat stiskněte klávesu ESC nebo klikněte na tlačítko v pravém horním rohu.', false);
 
@@ -1547,6 +1575,14 @@ function createFloatingChat() {
     // Přidání kontejneru do mapy
     mapWrapper.appendChild(floatingChatContainer);
 
+    // Inicializace CommandsMenu pro fullscreen režim
+    if (typeof CommandsMenu !== 'undefined') {
+        console.log('Inicializace CommandsMenu pro fullscreen režim');
+        setTimeout(() => {
+            CommandsMenu.updateFullscreenMenu();
+        }, 300);
+    }
+
     // Přidání event listenerů pro ovládací prvky chatu
     document.getElementById('minimizeChat').addEventListener('click', toggleChatMinimize);
     document.getElementById('toggleChatPosition').addEventListener('click', toggleChatPosition);
@@ -1558,14 +1594,24 @@ function createFloatingChat() {
     });
 
     // Přidání event listeneru pro tlačítko menu příkazů
-    document.getElementById('floatingCommandsButton').addEventListener('click', () => {
-        if (typeof CommandsMenu !== 'undefined') {
-            CommandsMenu.toggleCommandsMenu();
-
-            // Aktualizace menu příkazů ve fullscreen režimu
-            CommandsMenu.updateFullscreenMenu();
-        }
-    });
+    const floatingCommandsButton = document.getElementById('floatingCommandsButton');
+    if (floatingCommandsButton) {
+        floatingCommandsButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log('Kliknuto na plovoucí tlačítko menu příkazů');
+            if (typeof CommandsMenu !== 'undefined') {
+                CommandsMenu.toggleCommandsMenu();
+                // Aktualizace menu příkazů ve fullscreen režimu
+                CommandsMenu.updateFullscreenMenu();
+            } else {
+                console.error('CommandsMenu modul nebyl nalezen!');
+            }
+        });
+        console.log('Event listener přidán k plovoucímu tlačítku menu příkazů');
+    } else {
+        console.error('Plovoucí tlačítko menu příkazů nebylo nalezeno!');
+    }
 
     // Přidání možnosti přesouvat chat
     makeChatDraggable(floatingChatContainer, chatHeader);
@@ -3236,6 +3282,21 @@ function updateAllMarkers() {
 
 // Inicializace chatu
 window.addEventListener('load', () => {
+    // Inicializace menu příkazů
+    try {
+        if (typeof CommandsMenu !== 'undefined') {
+            console.log('Inicializace CommandsMenu...');
+            setTimeout(() => {
+                CommandsMenu.init();
+                console.log('CommandsMenu inicializován');
+            }, 500); // Zpoždění pro jistotu, že DOM je plně načtený
+        } else {
+            console.error('CommandsMenu modul nebyl nalezen!');
+        }
+    } catch (error) {
+        console.error('Chyba při inicializaci CommandsMenu:', error);
+    }
+
     // Vyčištění předem definovaných zpráv
     chatMessages.innerHTML = '';
 
