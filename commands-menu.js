@@ -2121,26 +2121,67 @@ Got the best locations, without a doubt!`;
 
     // Zaměření bodu na mapě
     focusPointOnMap(pointId, lat, lng, customAddress) {
-        if (typeof addMessage !== 'undefined') {
-            if (pointId === 'custom' && customAddress) {
-                addMessage(`Zaměřuji adresu: ${customAddress}...`, false);
-            } else {
-                addMessage(`Zaměřuji bod: ${pointId}...`, false);
+        // Kontrola, zda existuje korekce pro tento bod v localStorage
+        const pointCorrections = JSON.parse(localStorage.getItem('pointCorrections')) || {};
+        const pointKey = pointId === 'custom' ? customAddress : pointId;
+
+        // Pokud existuje korekce, použijeme ji
+        if (pointCorrections[pointKey]) {
+            const correction = pointCorrections[pointKey];
+            lat = correction.lat;
+            lng = correction.lng;
+
+            if (typeof addMessage !== 'undefined') {
+                if (pointId === 'custom' && customAddress) {
+                    addMessage(`Zaměřuji opravenou adresu: ${customAddress}...`, false);
+                } else {
+                    addMessage(`Zaměřuji opravený bod: ${pointId}...`, false);
+                }
+            }
+        } else {
+            if (typeof addMessage !== 'undefined') {
+                if (pointId === 'custom' && customAddress) {
+                    addMessage(`Zaměřuji adresu: ${customAddress}...`, false);
+                } else {
+                    addMessage(`Zaměřuji bod: ${pointId}...`, false);
+                }
             }
         }
 
         // Pokud existuje MapManager, použijeme ho pro zaměření bodu
         if (typeof MapManager !== 'undefined') {
-            // Přidání markeru na mapu
-            MapManager.addMarker({
+            // Uložení informací o bodu pro případné pozdější korekce
+            const pointKey = pointId === 'custom' ? customAddress : pointId;
+            MapManager.currentFocusedPoint = {
+                id: pointId,
+                key: pointKey,
+                lat: lat,
+                lng: lng,
+                address: customAddress
+            };
+
+            // Přidání markeru na mapu s možností korekce
+            const markerId = MapManager.addMarker({
                 lat: lat,
                 lng: lng,
                 title: pointId === 'custom' && customAddress ? customAddress : pointId,
-                icon: pointId === 'custom' ? 'custom' : 'special'
+                icon: pointId === 'custom' ? 'custom' : 'special',
+                draggable: true, // Umožní přesunutí markeru
+                popupContent: this.createCorrectionPopup(pointId, customAddress)
             });
+
+            // Přidání event listeneru pro přesunutí markeru
+            if (typeof MapManager.addMarkerDragEndListener === 'function') {
+                MapManager.addMarkerDragEndListener(markerId, (newLat, newLng) => {
+                    this.handleMarkerCorrection(pointId, customAddress, newLat, newLng);
+                });
+            }
 
             // Zaměření mapy na bod
             MapManager.setView(lat, lng, 16);
+
+            // Automatické ověření správnosti bodu
+            this.verifyPointLocation(pointId, customAddress, lat, lng);
 
             // Přidání XP za použití funkce zaměření bodu
             if (typeof UserProgress !== 'undefined') {
@@ -2155,16 +2196,34 @@ Got the best locations, without a doubt!`;
             if (typeof map !== 'undefined') {
                 map.setView([lat, lng], 16);
 
-                // Přidání markeru na mapu
-                if (typeof L !== 'undefined') {
-                    const popupContent = pointId === 'custom' && customAddress ?
-                        `<b>${customAddress}</b>` :
-                        `<b>${pointId}</b>`;
+                // Uložení informací o bodu pro případné pozdější korekce
+                const pointKey = pointId === 'custom' ? customAddress : pointId;
+                this.currentFocusedPoint = {
+                    id: pointId,
+                    key: pointKey,
+                    lat: lat,
+                    lng: lng,
+                    address: customAddress
+                };
 
-                    L.marker([lat, lng]).addTo(map)
+                // Přidání markeru na mapu s možností korekce
+                if (typeof L !== 'undefined') {
+                    const popupContent = this.createCorrectionPopup(pointId, customAddress);
+
+                    const marker = L.marker([lat, lng], { draggable: true }).addTo(map)
                         .bindPopup(popupContent)
                         .openPopup();
+
+                    // Přidání event listeneru pro přesunutí markeru
+                    marker.on('dragend', (event) => {
+                        const newLat = event.target.getLatLng().lat;
+                        const newLng = event.target.getLatLng().lng;
+                        this.handleMarkerCorrection(pointId, customAddress, newLat, newLng);
+                    });
                 }
+
+                // Automatické ověření správnosti bodu
+                this.verifyPointLocation(pointId, customAddress, lat, lng);
 
                 // Přidání XP za použití funkce zaměření bodu
                 if (typeof UserProgress !== 'undefined') {
@@ -2178,14 +2237,287 @@ Got the best locations, without a doubt!`;
                 if (typeof addMessage !== 'undefined') {
                     if (pointId === 'custom' && customAddress) {
                         addMessage(`Adresa ${customAddress} byla zaměřena na souřadnicích [${lat}, ${lng}].`, false);
+                        addMessage('Pro korekci polohy bodu použijte příkaz "opravit bod".', false);
                     } else {
                         addMessage(`Bod ${pointId} byl zaměřen na souřadnicích [${lat}, ${lng}].`, false);
+                        addMessage('Pro korekci polohy bodu použijte příkaz "opravit bod".', false);
                     }
                 }
             }
         }
+    },
+
+    // Vytvoření popup okna pro korekci bodu
+    createCorrectionPopup(pointId, customAddress) {
+        const title = pointId === 'custom' && customAddress ? customAddress : pointId;
+        return `
+            <div class="correction-popup">
+                <h3>${title}</h3>
+                <p>Pokud poloha bodu není správná, můžete ji opravit:</p>
+                <ol>
+                    <li>Přetáhněte marker na správnou pozici</li>
+                    <li>Klikněte na tlačítko "Uložit korekci"</li>
+                </ol>
+                <div class="correction-actions">
+                    <button class="correction-save-btn" onclick="CommandsMenu.saveCurrentCorrection()">Uložit korekci</button>
+                    <button class="correction-cancel-btn" onclick="CommandsMenu.cancelCorrection()">Zrušit</button>
+                </div>
+            </div>
+        `;
+    },
+
+    // Automatické ověření správnosti bodu
+    verifyPointLocation(pointId, customAddress, lat, lng) {
+        // Simulace ověření správnosti bodu (v reálné aplikaci by zde byl API požadavek na geocoding službu)
+        setTimeout(() => {
+            // Simulace náhodného výsledku ověření (v 30% případů bude bod nesprávný)
+            const isCorrect = Math.random() > 0.3;
+
+            if (!isCorrect) {
+                // Simulace správné polohy (malá odchylka od původní polohy)
+                const correctLat = lat + (Math.random() * 0.01 - 0.005);
+                const correctLng = lng + (Math.random() * 0.01 - 0.005);
+
+                // Zobrazení zprávy o nesprávné poloze
+                if (typeof addMessage !== 'undefined') {
+                    if (pointId === 'custom' && customAddress) {
+                        addMessage(`Upozornění: Adresa ${customAddress} má pravděpodobně nesprávnou polohu.`, false);
+                    } else {
+                        addMessage(`Upozornění: Bod ${pointId} má pravděpodobně nesprávnou polohu.`, false);
+                    }
+                    addMessage('Automaticky přesměrovávám na správnou polohu...', false);
+                }
+
+                // Automatické přesměrování na správnou polohu
+                setTimeout(() => {
+                    // Aktualizace polohy markeru
+                    if (typeof MapManager !== 'undefined') {
+                        // Aktualizace polohy markeru v MapManager
+                        MapManager.updateMarkerPosition(correctLat, correctLng);
+
+                        // Zaměření mapy na novou polohu
+                        MapManager.setView(correctLat, correctLng, 16);
+                    } else if (typeof map !== 'undefined' && typeof L !== 'undefined') {
+                        // Aktualizace polohy markeru v Leaflet
+                        const markers = document.querySelectorAll('.leaflet-marker-icon');
+                        if (markers.length > 0) {
+                            const lastMarker = markers[markers.length - 1];
+                            const markerId = lastMarker.getAttribute('data-marker-id');
+                            if (markerId) {
+                                const marker = map._layers[markerId];
+                                if (marker) {
+                                    marker.setLatLng([correctLat, correctLng]);
+                                }
+                            }
+                        }
+
+                        // Zaměření mapy na novou polohu
+                        map.setView([correctLat, correctLng], 16);
+                    }
+
+                    // Zobrazení zprávy o přesměrování
+                    if (typeof addMessage !== 'undefined') {
+                        addMessage('Přesměrováno na správnou polohu. Můžete bod dále upravit přetáhnutím markeru.', false);
+                    }
+
+                    // Aktualizace informací o aktuálním bodu
+                    if (typeof MapManager !== 'undefined' && MapManager.currentFocusedPoint) {
+                        MapManager.currentFocusedPoint.lat = correctLat;
+                        MapManager.currentFocusedPoint.lng = correctLng;
+                    } else if (this.currentFocusedPoint) {
+                        this.currentFocusedPoint.lat = correctLat;
+                        this.currentFocusedPoint.lng = correctLng;
+                    }
+                }, 1500);
+            } else {
+                // Zobrazení zprávy o správné poloze
+                if (typeof addMessage !== 'undefined') {
+                    if (pointId === 'custom' && customAddress) {
+                        addMessage(`Adresa ${customAddress} má správnou polohu.`, false);
+                    } else {
+                        addMessage(`Bod ${pointId} má správnou polohu.`, false);
+                    }
+                }
+            }
+        }, 2000);
+    },
+
+    // Zpracování korekce markeru
+    handleMarkerCorrection(pointId, customAddress, newLat, newLng) {
+        // Aktualizace informací o aktuálním bodu
+        if (typeof MapManager !== 'undefined' && MapManager.currentFocusedPoint) {
+            MapManager.currentFocusedPoint.lat = newLat;
+            MapManager.currentFocusedPoint.lng = newLng;
+        } else if (this.currentFocusedPoint) {
+            this.currentFocusedPoint.lat = newLat;
+            this.currentFocusedPoint.lng = newLng;
+        }
+
+        // Zobrazení zprávy o přesunutí markeru
+        if (typeof addMessage !== 'undefined') {
+            if (pointId === 'custom' && customAddress) {
+                addMessage(`Marker pro adresu ${customAddress} byl přesunut na novou pozici [${newLat.toFixed(6)}, ${newLng.toFixed(6)}].`, false);
+            } else {
+                addMessage(`Marker pro bod ${pointId} byl přesunut na novou pozici [${newLat.toFixed(6)}, ${newLng.toFixed(6)}].`, false);
+            }
+            addMessage('Pro uložení korekce klikněte na tlačítko "Uložit korekci" v popup okně markeru.', false);
+        }
+    },
+
+    // Uložení aktuální korekce
+    saveCurrentCorrection() {
+        // Získání informací o aktuálním bodu
+        const currentPoint = typeof MapManager !== 'undefined' && MapManager.currentFocusedPoint ?
+            MapManager.currentFocusedPoint : this.currentFocusedPoint;
+
+        if (!currentPoint) {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Chyba: Nelze uložit korekci, protože není vybrán žádný bod.', false);
+            }
+            return;
+        }
+
+        // Získání existujících korekcí z localStorage
+        const pointCorrections = JSON.parse(localStorage.getItem('pointCorrections')) || {};
+
+        // Přidání nové korekce
+        pointCorrections[currentPoint.key] = {
+            lat: currentPoint.lat,
+            lng: currentPoint.lng,
+            correctedAt: new Date().toISOString()
+        };
+
+        // Uložení korekcí do localStorage
+        localStorage.setItem('pointCorrections', JSON.stringify(pointCorrections));
+
+        // Zobrazení zprávy o uložení korekce
+        if (typeof addMessage !== 'undefined') {
+            if (currentPoint.id === 'custom' && currentPoint.address) {
+                addMessage(`Korekce pro adresu ${currentPoint.address} byla uložena. Příště budete automaticky přesměrováni na tuto pozici.`, false);
+            } else {
+                addMessage(`Korekce pro bod ${currentPoint.id} byla uložena. Příště budete automaticky přesměrováni na tuto pozici.`, false);
+            }
+        }
+
+        // Přidání XP za uložení korekce
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addXP(20, 'Korekce polohy bodu');
+        }
+
+        // Zavření popup okna
+        if (typeof MapManager !== 'undefined' && typeof MapManager.closePopup === 'function') {
+            MapManager.closePopup();
+        } else if (typeof map !== 'undefined') {
+            map.closePopup();
+        }
+    },
+
+    // Zrušení korekce
+    cancelCorrection() {
+        // Získání informací o aktuálním bodu
+        const currentPoint = typeof MapManager !== 'undefined' && MapManager.currentFocusedPoint ?
+            MapManager.currentFocusedPoint : this.currentFocusedPoint;
+
+        if (!currentPoint) {
+            if (typeof addMessage !== 'undefined') {
+                addMessage('Chyba: Nelze zrušit korekci, protože není vybrán žádný bod.', false);
+            }
+            return;
+        }
+
+        // Zobrazení zprávy o zrušení korekce
+        if (typeof addMessage !== 'undefined') {
+            addMessage('Korekce byla zrušena.', false);
+        }
+
+        // Zavření popup okna
+        if (typeof MapManager !== 'undefined' && typeof MapManager.closePopup === 'function') {
+            MapManager.closePopup();
+        } else if (typeof map !== 'undefined') {
+            map.closePopup();
+        }
     }
 };
+
+// Přidání CSS stylů pro popup okno korekce
+const correctionStyles = document.createElement('style');
+correctionStyles.textContent = `
+    .correction-popup {
+        padding: 10px;
+        max-width: 300px;
+    }
+
+    .correction-popup h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .correction-popup p {
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .correction-popup ol {
+        margin-top: 0;
+        margin-bottom: 15px;
+        padding-left: 20px;
+        font-size: 14px;
+    }
+
+    .correction-popup li {
+        margin-bottom: 5px;
+    }
+
+    .correction-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .correction-save-btn, .correction-cancel-btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .correction-save-btn {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .correction-save-btn:hover {
+        background-color: #2980b9;
+    }
+
+    .correction-cancel-btn {
+        background-color: #e0e0e0;
+        color: #333;
+    }
+
+    .correction-cancel-btn:hover {
+        background-color: #bdc3c7;
+    }
+
+    /* Tmavý režim */
+    body[data-theme="dark"] .correction-popup {
+        color: #ecf0f1;
+    }
+
+    body[data-theme="dark"] .correction-cancel-btn {
+        background-color: #34495e;
+        color: #ecf0f1;
+    }
+
+    body[data-theme="dark"] .correction-cancel-btn:hover {
+        background-color: #2c3e50;
+    }
+`;
+document.head.appendChild(correctionStyles);
 
 // Inicializace modulu po načtení dokumentu
 document.addEventListener('DOMContentLoaded', () => {

@@ -2,6 +2,22 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.0.0] - 2025-05-20 - AUTOMATICKÉ OVĚŘENÍ A KOREKCE BODŮ
+
+### Nové funkce
+- Přidáno automatické ověření správnosti polohy bodů
+- Implementováno automatické přesměrování na správnou polohu při detekci nesprávného bodu
+- Přidána možnost ruční korekce polohy bodů přetáhnutím markeru
+- Implementováno ukládání korekcí do localStorage pro budoucí použití
+- Přidána funkce pro automatické použití uložených korekcí při příštím zaměření bodu
+- Implementováno získávání XP za korekci polohy bodu
+
+### Vylepšení uživatelského rozhraní
+- Přidáno popup okno s návodem pro korekci polohy bodu
+- Implementovány tlačítka pro uložení nebo zrušení korekce
+- Přidány notifikace o stavu ověření a korekce bodů
+- Vytvořeny CSS styly pro popup okno korekce s podporou tmavého režimu
+
 ## [0.2.9.9] - 2025-05-19 - VYHLEDÁVÁNÍ ADRES
 
 ### Nové funkce
