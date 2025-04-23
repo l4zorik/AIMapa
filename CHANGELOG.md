@@ -2,6 +2,21 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.0.5] - 2025-05-25 - ZJEDNODUŠENÉ OVĚŘENÍ BODŮ
+
+### Nové funkce
+- Přepracováno zobrazení bodů po ověření - nyní se zobrazuje pouze fotka s pojmenováním
+- Přidáno ukládání informací o ověřených bodech do localStorage
+- Implementována kontrola, zda je bod již ověřený při jeho zaměření
+- Přidána možnost úpravy polohy ověřeného bodu přes tlačítko nastavení
+- Implementována možnost odstranění ověření bodu pro jeho opětovné ověření
+
+### Vylepšení uživatelského rozhraní
+- Vytvořeno jednodušší rozhraní pro ověřené body - pouze fotka s pojmenováním
+- Přidáno malé tlačítko nastavení pro případné úpravy ověřeného bodu
+- Implementován dialog nastavení s možnostmi úpravy polohy a odstranění ověření
+- Přidána podpora tmavého režimu pro všechny nové prvky
+
 ## [0.3.0.4] - 2025-05-24 - PŘESNÉ A MODIFIKOVATELNÉ VYHLEDÁVÁNÍ PRÁCE
 
 ### Nové funkce

@@ -2769,7 +2769,11 @@ Got the best locations, without a doubt!`;
     focusPointOnMap(pointId, lat, lng, customAddress) {
         // Kontrola, zda existuje korekce pro tento bod v localStorage
         const pointCorrections = JSON.parse(localStorage.getItem('pointCorrections')) || {};
+        const verifiedPoints = JSON.parse(localStorage.getItem('verifiedPoints')) || {};
         const pointKey = pointId === 'custom' ? customAddress : pointId;
+
+        // Kontrola, zda je bod již ověřený
+        const isVerified = verifiedPoints[pointKey] !== undefined;
 
         // Pokud existuje korekce, použijeme ji
         if (pointCorrections[pointKey]) {
@@ -2806,28 +2810,49 @@ Got the best locations, without a doubt!`;
                 address: customAddress
             };
 
-            // Přidání markeru na mapu s možností korekce
-            const markerId = MapManager.addMarker({
-                lat: lat,
-                lng: lng,
-                title: pointId === 'custom' && customAddress ? customAddress : pointId,
-                icon: pointId === 'custom' ? 'custom' : 'special',
-                draggable: true, // Umožní přesunutí markeru
-                popupContent: this.createCorrectionPopup(pointId, customAddress)
-            });
+            // Přidání markeru na mapu
+            let markerId;
 
-            // Přidání event listeneru pro přesunutí markeru
-            if (typeof MapManager.addMarkerDragEndListener === 'function') {
-                MapManager.addMarkerDragEndListener(markerId, (newLat, newLng) => {
-                    this.handleMarkerCorrection(pointId, customAddress, newLat, newLng);
+            if (isVerified) {
+                // Pro ověřené body zobrazujeme pouze fotku
+                markerId = MapManager.addMarker({
+                    lat: lat,
+                    lng: lng,
+                    title: pointId === 'custom' && customAddress ? customAddress : pointId,
+                    icon: pointId === 'custom' ? 'custom' : 'special',
+                    draggable: false, // Ověřené body nelze přesouvat
+                    popupContent: null // Žádný popup obsah
                 });
+
+                // Zaměření mapy na bod
+                MapManager.setView(lat, lng, 16);
+
+                // Zobrazení fotky bodu
+                this.showPointImage(pointId, customAddress, lat, lng);
+            } else {
+                // Pro neověřené body zobrazujeme možnost korekce
+                markerId = MapManager.addMarker({
+                    lat: lat,
+                    lng: lng,
+                    title: pointId === 'custom' && customAddress ? customAddress : pointId,
+                    icon: pointId === 'custom' ? 'custom' : 'special',
+                    draggable: true, // Umožní přesunutí markeru
+                    popupContent: this.createCorrectionPopup(pointId, customAddress)
+                });
+
+                // Přidání event listeneru pro přesunutí markeru
+                if (typeof MapManager.addMarkerDragEndListener === 'function') {
+                    MapManager.addMarkerDragEndListener(markerId, (newLat, newLng) => {
+                        this.handleMarkerCorrection(pointId, customAddress, newLat, newLng);
+                    });
+                }
+
+                // Zaměření mapy na bod
+                MapManager.setView(lat, lng, 16);
+
+                // Automatické ověření správnosti bodu
+                this.verifyPointLocation(pointId, customAddress, lat, lng);
             }
-
-            // Zaměření mapy na bod
-            MapManager.setView(lat, lng, 16);
-
-            // Automatické ověření správnosti bodu
-            this.verifyPointLocation(pointId, customAddress, lat, lng);
 
             // Přidání XP za použití funkce zaměření bodu
             if (typeof UserProgress !== 'undefined') {
@@ -2852,24 +2877,32 @@ Got the best locations, without a doubt!`;
                     address: customAddress
                 };
 
-                // Přidání markeru na mapu s možností korekce
                 if (typeof L !== 'undefined') {
-                    const popupContent = this.createCorrectionPopup(pointId, customAddress);
+                    if (isVerified) {
+                        // Pro ověřené body zobrazujeme pouze fotku
+                        L.marker([lat, lng], { draggable: false }).addTo(map);
 
-                    const marker = L.marker([lat, lng], { draggable: true }).addTo(map)
-                        .bindPopup(popupContent)
-                        .openPopup();
+                        // Zobrazení fotky bodu
+                        this.showPointImage(pointId, customAddress, lat, lng);
+                    } else {
+                        // Pro neověřené body zobrazujeme možnost korekce
+                        const popupContent = this.createCorrectionPopup(pointId, customAddress);
 
-                    // Přidání event listeneru pro přesunutí markeru
-                    marker.on('dragend', (event) => {
-                        const newLat = event.target.getLatLng().lat;
-                        const newLng = event.target.getLatLng().lng;
-                        this.handleMarkerCorrection(pointId, customAddress, newLat, newLng);
-                    });
+                        const marker = L.marker([lat, lng], { draggable: true }).addTo(map)
+                            .bindPopup(popupContent)
+                            .openPopup();
+
+                        // Přidání event listeneru pro přesunutí markeru
+                        marker.on('dragend', (event) => {
+                            const newLat = event.target.getLatLng().lat;
+                            const newLng = event.target.getLatLng().lng;
+                            this.handleMarkerCorrection(pointId, customAddress, newLat, newLng);
+                        });
+
+                        // Automatické ověření správnosti bodu
+                        this.verifyPointLocation(pointId, customAddress, lat, lng);
+                    }
                 }
-
-                // Automatické ověření správnosti bodu
-                this.verifyPointLocation(pointId, customAddress, lat, lng);
 
                 // Přidání XP za použití funkce zaměření bodu
                 if (typeof UserProgress !== 'undefined') {
@@ -3257,17 +3290,242 @@ Got the best locations, without a doubt!`;
                 dialog.remove();
                 pointImageStyles.remove();
 
-                // Simulace otevření nastavení bodu (v reálné aplikaci by zde bylo otevření nastavení)
-                if (typeof addMessage !== 'undefined') {
-                    addMessage(`Otevírám nastavení bodu: ${pointName}...`, false);
+                // Vytvoření dialogu pro nastavení bodu
+                const settingsDialog = document.createElement('div');
+                settingsDialog.className = 'point-settings-dialog';
+                settingsDialog.innerHTML = `
+                    <div class="point-settings-header">
+                        <h3>Nastavení bodu: ${pointName}</h3>
+                        <button class="point-settings-close">&times;</button>
+                    </div>
+                    <div class="point-settings-content">
+                        <div class="point-settings-option">
+                            <h4>Upravit polohu</h4>
+                            <p>Umožní ruční úpravu polohy bodu.</p>
+                            <button class="point-settings-edit-btn">Upravit polohu</button>
+                        </div>
+                        <div class="point-settings-option">
+                            <h4>Odstranit ověření</h4>
+                            <p>Odstraní ověření bodu a umožní jeho opětovné ověření.</p>
+                            <button class="point-settings-reset-btn">Odstranit ověření</button>
+                        </div>
+                    </div>
+                    <div class="point-settings-actions">
+                        <button class="point-settings-cancel-btn">Zavřít</button>
+                    </div>
+                `;
 
-                    // Simulace zobrazení nastavení po krátké prodlevě
+                // Přidání CSS stylů
+                const pointSettingsStyles = document.createElement('style');
+                pointSettingsStyles.textContent = `
+                    .point-settings-dialog {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: white;
+                        border-radius: 15px;
+                        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                        z-index: 1200;
+                        width: 90%;
+                        max-width: 500px;
+                        overflow: hidden;
+                        animation: fadeIn 0.3s ease-in-out;
+                    }
+
+                    .point-settings-header {
+                        background-color: #3498db;
+                        color: white;
+                        padding: 15px 20px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .point-settings-header h3 {
+                        margin: 0;
+                        font-size: 20px;
+                        font-weight: bold;
+                    }
+
+                    .point-settings-close {
+                        background: none;
+                        border: none;
+                        color: white;
+                        font-size: 24px;
+                        cursor: pointer;
+                    }
+
+                    .point-settings-content {
+                        padding: 20px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 15px;
+                    }
+
+                    .point-settings-option {
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        padding: 15px;
+                    }
+
+                    .point-settings-option h4 {
+                        margin-top: 0;
+                        margin-bottom: 8px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        color: #2c3e50;
+                    }
+
+                    .point-settings-option p {
+                        margin-bottom: 12px;
+                        font-size: 14px;
+                        color: #7f8c8d;
+                    }
+
+                    .point-settings-edit-btn, .point-settings-reset-btn {
+                        padding: 8px 12px;
+                        border: none;
+                        border-radius: 4px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                        width: 100%;
+                    }
+
+                    .point-settings-edit-btn {
+                        background-color: #3498db;
+                        color: white;
+                    }
+
+                    .point-settings-edit-btn:hover {
+                        background-color: #2980b9;
+                    }
+
+                    .point-settings-reset-btn {
+                        background-color: #e74c3c;
+                        color: white;
+                    }
+
+                    .point-settings-reset-btn:hover {
+                        background-color: #c0392b;
+                    }
+
+                    .point-settings-actions {
+                        padding: 15px 20px;
+                        background-color: #f8f9fa;
+                        display: flex;
+                        justify-content: flex-end;
+                    }
+
+                    .point-settings-cancel-btn {
+                        padding: 10px 15px;
+                        background-color: #e0e0e0;
+                        color: #333;
+                        border: none;
+                        border-radius: 4px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                    }
+
+                    .point-settings-cancel-btn:hover {
+                        background-color: #bdc3c7;
+                    }
+
+                    /* Tmavý režim */
+                    body[data-theme="dark"] .point-settings-dialog {
+                        background-color: #2c3e50;
+                        color: #ecf0f1;
+                    }
+
+                    body[data-theme="dark"] .point-settings-header {
+                        background-color: #2980b9;
+                    }
+
+                    body[data-theme="dark"] .point-settings-option {
+                        background-color: #34495e;
+                    }
+
+                    body[data-theme="dark"] .point-settings-option h4 {
+                        color: #ecf0f1;
+                    }
+
+                    body[data-theme="dark"] .point-settings-option p {
+                        color: #bdc3c7;
+                    }
+
+                    body[data-theme="dark"] .point-settings-actions {
+                        background-color: #34495e;
+                    }
+
+                    body[data-theme="dark"] .point-settings-cancel-btn {
+                        background-color: #34495e;
+                        color: #ecf0f1;
+                    }
+
+                    body[data-theme="dark"] .point-settings-cancel-btn:hover {
+                        background-color: #2c3e50;
+                    }
+                `;
+
+                document.head.appendChild(pointSettingsStyles);
+                document.body.appendChild(settingsDialog);
+
+                // Přidání event listenerů
+                const closeButton = settingsDialog.querySelector('.point-settings-close');
+                const cancelButton = settingsDialog.querySelector('.point-settings-cancel-btn');
+                const editButton = settingsDialog.querySelector('.point-settings-edit-btn');
+                const resetButton = settingsDialog.querySelector('.point-settings-reset-btn');
+
+                // Zavření dialogu
+                const closeSettingsDialog = () => {
+                    settingsDialog.remove();
+                    pointSettingsStyles.remove();
+                };
+
+                closeButton.addEventListener('click', closeSettingsDialog);
+                cancelButton.addEventListener('click', closeSettingsDialog);
+
+                // Upravení polohy bodu
+                editButton.addEventListener('click', () => {
+                    closeSettingsDialog();
+
+                    // Zobrazení dialogu pro korekci bodu
+                    if (typeof addMessage !== 'undefined') {
+                        addMessage(`Otevírám dialog pro úpravu polohy bodu: ${pointName}...`, false);
+                    }
+
+                    // Odstranění ověření bodu
+                    const verifiedPoints = JSON.parse(localStorage.getItem('verifiedPoints')) || {};
+                    delete verifiedPoints[pointKey];
+                    localStorage.setItem('verifiedPoints', JSON.stringify(verifiedPoints));
+
+                    // Zobrazení dialogu pro korekci bodu
                     setTimeout(() => {
-                        // Zde by bylo zobrazení dialogu pro nastavení bodu
-                        // Pro účely demonstrace použijeme původní dialog pro korekci bodu
                         this.showFocusPointDialog();
                     }, 500);
-                }
+                });
+
+                // Odstranění ověření bodu
+                resetButton.addEventListener('click', () => {
+                    closeSettingsDialog();
+
+                    // Odstranění ověření bodu
+                    const verifiedPoints = JSON.parse(localStorage.getItem('verifiedPoints')) || {};
+                    delete verifiedPoints[pointKey];
+                    localStorage.setItem('verifiedPoints', JSON.stringify(verifiedPoints));
+
+                    // Zobrazení zprávy o odstranění ověření
+                    if (typeof addMessage !== 'undefined') {
+                        addMessage(`Ověření bodu ${pointName} bylo odstraněno. Nyní můžete bod znovu ověřit.`, false);
+                    }
+
+                    // Znovu zaměření bodu
+                    setTimeout(() => {
+                        this.focusPointOnMap(pointId, lat, lng, customAddress);
+                    }, 1000);
+                });
             });
         }
 
@@ -3375,11 +3633,24 @@ Got the best locations, without a doubt!`;
                 lat: correctLat,
                 lng: correctLng,
                 correctedAt: new Date().toISOString(),
-                autoVerified: true
+                autoVerified: true,
+                verified: true // Označení bodu jako ověřeného
+            };
+
+            // Uložení informace o ověřených bodech
+            const verifiedPoints = JSON.parse(localStorage.getItem('verifiedPoints')) || {};
+            verifiedPoints[currentPoint.key] = {
+                lat: correctLat,
+                lng: correctLng,
+                verifiedAt: new Date().toISOString(),
+                name: currentPoint.id === 'custom' ? currentPoint.address : currentPoint.id
             };
 
             // Uložení korekcí do localStorage
             localStorage.setItem('pointCorrections', JSON.stringify(pointCorrections));
+
+            // Uložení informace o ověřených bodech
+            localStorage.setItem('verifiedPoints', JSON.stringify(verifiedPoints));
 
             // Zobrazení zprávy o uložení korekce
             if (typeof addMessage !== 'undefined') {
