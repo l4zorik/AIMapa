@@ -2,6 +2,21 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.2.9.9] - 2025-05-19 - VYHLEDÁVÁNÍ ADRES
+
+### Nové funkce
+- Rozšířena funkce "zaměřit bod" o možnost vyhledávání a přesměrování na vlastní adresu
+- Přidána záložka "Vlastní adresa" do dialogu pro zaměření bodů
+- Implementováno vyhledávání adres s návrhem výsledků
+- Přidána možnost vybrat konkrétní výsledek vyhledávání a přejít na něj
+- Implementováno získávání většího množství XP za vyhledávání vlastních adres
+
+### Vylepšení designu
+- Vytvořeno záložkové rozhraní pro přepínání mezi předdefinovanými body a vlastní adresou
+- Přidán formulář pro zadání vlastní adresy s tlačítkem pro vyhledávání
+- Implementováno zobrazení výsledků vyhledávání s možností výběru
+- Přidána podpora tmavého režimu pro nové prvky
+
 ## [0.2.9.8] - 2025-05-18 - ZAMĚŘENÍ SPECIÁLNÍCH BODŮ
 
 ### Nové funkce

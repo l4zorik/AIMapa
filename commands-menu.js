@@ -1648,16 +1648,37 @@ Got the best locations, without a doubt!`;
                 <div class="focus-point-search">
                     <input type="text" class="focus-point-search-input" placeholder="Hledat bod...">
                 </div>
-                <div class="focus-point-list">
-                    ${specialPoints.map(point => `
-                        <div class="focus-point-item" data-point-id="${point.id}" data-lat="${point.lat}" data-lng="${point.lng}">
-                            <div class="focus-point-icon">${point.icon}</div>
-                            <div class="focus-point-info">
-                                <div class="focus-point-name">${point.name}</div>
-                                <div class="focus-point-description">${point.description}</div>
+                <div class="focus-point-tabs">
+                    <div class="focus-point-tab active" data-tab="predefined">Předdefinované body</div>
+                    <div class="focus-point-tab" data-tab="custom">Vlastní adresa</div>
+                </div>
+                <div class="focus-point-tab-content" id="predefined-tab" style="display: block;">
+                    <div class="focus-point-list">
+                        ${specialPoints.map(point => `
+                            <div class="focus-point-item" data-point-id="${point.id}" data-lat="${point.lat}" data-lng="${point.lng}">
+                                <div class="focus-point-icon">${point.icon}</div>
+                                <div class="focus-point-info">
+                                    <div class="focus-point-name">${point.name}</div>
+                                    <div class="focus-point-description">${point.description}</div>
+                                </div>
                             </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="focus-point-tab-content" id="custom-tab" style="display: none;">
+                    <div class="custom-address-form">
+                        <div class="form-group">
+                            <label for="address-input">Zadejte adresu:</label>
+                            <input type="text" id="address-input" class="address-input" placeholder="např. Masarykovo náměstí 1, Hodonín">
                         </div>
-                    `).join('')}
+                        <div class="form-group">
+                            <button class="search-address-btn">Vyhledat adresu</button>
+                        </div>
+                        <div class="address-results" style="display: none;">
+                            <h4>Výsledky vyhledávání:</h4>
+                            <div class="address-results-list"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -1724,10 +1745,118 @@ Got the best locations, without a doubt!`;
                 font-size: 16px;
             }
 
+            .focus-point-tabs {
+                display: flex;
+                margin-bottom: 15px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .focus-point-tab {
+                padding: 10px 15px;
+                cursor: pointer;
+                border-bottom: 2px solid transparent;
+                transition: all 0.2s ease;
+            }
+
+            .focus-point-tab.active {
+                border-bottom-color: #3498db;
+                font-weight: bold;
+            }
+
+            .focus-point-tab:hover {
+                background-color: #f8f9fa;
+            }
+
+            .focus-point-tab-content {
+                margin-bottom: 15px;
+            }
+
             .focus-point-list {
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+            }
+
+            .custom-address-form {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .form-group label {
+                font-weight: bold;
+                color: #555;
+            }
+
+            .address-input {
+                width: 100%;
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+            }
+
+            .search-address-btn {
+                padding: 10px 15px;
+                background-color: #3498db;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .search-address-btn:hover {
+                background-color: #2980b9;
+            }
+
+            .address-results {
+                margin-top: 15px;
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 10px;
+            }
+
+            .address-results h4 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                font-size: 16px;
+            }
+
+            .address-results-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .address-result-item {
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                background-color: white;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .address-result-item:hover {
+                background-color: #e9ecef;
+            }
+
+            .address-result-icon {
+                font-size: 20px;
+                margin-right: 10px;
+            }
+
+            .address-result-info {
+                flex: 1;
             }
 
             .focus-point-item {
@@ -1807,6 +1936,36 @@ Got the best locations, without a doubt!`;
                 color: #bdc3c7;
             }
 
+            body[data-theme="dark"] .focus-point-tabs {
+                border-bottom-color: #34495e;
+            }
+
+            body[data-theme="dark"] .focus-point-tab:hover {
+                background-color: #34495e;
+            }
+
+            body[data-theme="dark"] .form-group label {
+                color: #bdc3c7;
+            }
+
+            body[data-theme="dark"] .address-input {
+                background-color: #34495e;
+                border-color: #2c3e50;
+                color: #ecf0f1;
+            }
+
+            body[data-theme="dark"] .address-results {
+                background-color: #34495e;
+            }
+
+            body[data-theme="dark"] .address-result-item {
+                background-color: #2c3e50;
+            }
+
+            body[data-theme="dark"] .address-result-item:hover {
+                background-color: #233140;
+            }
+
             @keyframes fadeIn {
                 from { opacity: 0; transform: translate(-50%, -60%); }
                 to { opacity: 1; transform: translate(-50%, -50%); }
@@ -1825,6 +1984,32 @@ Got the best locations, without a doubt!`;
             });
         }
 
+        // Přidání event listenerů pro přepínání záložek
+        const tabs = dialog.querySelectorAll('.focus-point-tab');
+        const tabContents = dialog.querySelectorAll('.focus-point-tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Odstranění aktivní třídy ze všech záložek
+                tabs.forEach(t => t.classList.remove('active'));
+
+                // Přidání aktivní třídy na kliknutou záložku
+                tab.classList.add('active');
+
+                // Skrytí všech obsahů záložek
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+
+                // Zobrazení obsahu vybrané záložky
+                const tabId = tab.dataset.tab;
+                const tabContent = dialog.querySelector(`#${tabId}-tab`);
+                if (tabContent) {
+                    tabContent.style.display = 'block';
+                }
+            });
+        });
+
         // Přidání event listenerů pro vyhledávání
         const searchInput = dialog.querySelector('.focus-point-search-input');
         if (searchInput) {
@@ -1842,6 +2027,77 @@ Got the best locations, without a doubt!`;
                         item.style.display = 'none';
                     }
                 });
+            });
+        }
+
+        // Přidání event listenerů pro vyhledávání adres
+        const addressInput = dialog.querySelector('.address-input');
+        const searchAddressBtn = dialog.querySelector('.search-address-btn');
+        const addressResults = dialog.querySelector('.address-results');
+        const addressResultsList = dialog.querySelector('.address-results-list');
+
+        if (searchAddressBtn && addressInput) {
+            searchAddressBtn.addEventListener('click', () => {
+                const address = addressInput.value.trim();
+
+                if (!address) {
+                    if (typeof addMessage !== 'undefined') {
+                        addMessage('Zadejte adresu pro vyhledání.', false);
+                    }
+                    return;
+                }
+
+                // Zobrazení zprávy o vyhledávání
+                if (typeof addMessage !== 'undefined') {
+                    addMessage(`Vyhledávám adresu: ${address}...`, false);
+                }
+
+                // Simulace vyhledávání adres (v reálné aplikaci by zde byl API požadavek na geocoding službu)
+                setTimeout(() => {
+                    // Simulace výsledků vyhledávání
+                    const results = [
+                        { address: `${address}, Hodonín`, lat: 48.8484 + Math.random() * 0.01, lng: 17.1259 + Math.random() * 0.01 },
+                        { address: `${address}, Brno`, lat: 49.1951 + Math.random() * 0.01, lng: 16.6068 + Math.random() * 0.01 },
+                        { address: `${address}, Praha`, lat: 50.0755 + Math.random() * 0.01, lng: 14.4378 + Math.random() * 0.01 }
+                    ];
+
+                    // Zobrazení výsledků
+                    addressResults.style.display = 'block';
+                    addressResultsList.innerHTML = '';
+
+                    results.forEach(result => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'address-result-item';
+                        resultItem.innerHTML = `
+                            <div class="address-result-icon">📍</div>
+                            <div class="address-result-info">${result.address}</div>
+                        `;
+
+                        // Přidání event listeneru pro kliknutí na výsledek
+                        resultItem.addEventListener('click', () => {
+                            // Zavření dialogu
+                            dialog.remove();
+                            focusPointStyles.remove();
+
+                            // Zaměření bodu na mapě
+                            this.focusPointOnMap('custom', result.lat, result.lng, result.address);
+                        });
+
+                        addressResultsList.appendChild(resultItem);
+                    });
+
+                    // Zobrazení zprávy o dokončení vyhledávání
+                    if (typeof addMessage !== 'undefined') {
+                        addMessage(`Nalezeno ${results.length} výsledků pro adresu: ${address}`, false);
+                    }
+                }, 1000);
+            });
+
+            // Přidání event listeneru pro stisknutí klávesy Enter v poli pro adresu
+            addressInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    searchAddressBtn.click();
+                }
             });
         }
 
@@ -1864,9 +2120,13 @@ Got the best locations, without a doubt!`;
     },
 
     // Zaměření bodu na mapě
-    focusPointOnMap(pointId, lat, lng) {
+    focusPointOnMap(pointId, lat, lng, customAddress) {
         if (typeof addMessage !== 'undefined') {
-            addMessage(`Zaměřuji bod: ${pointId}...`, false);
+            if (pointId === 'custom' && customAddress) {
+                addMessage(`Zaměřuji adresu: ${customAddress}...`, false);
+            } else {
+                addMessage(`Zaměřuji bod: ${pointId}...`, false);
+            }
         }
 
         // Pokud existuje MapManager, použijeme ho pro zaměření bodu
@@ -1875,8 +2135,8 @@ Got the best locations, without a doubt!`;
             MapManager.addMarker({
                 lat: lat,
                 lng: lng,
-                title: pointId,
-                icon: 'special'
+                title: pointId === 'custom' && customAddress ? customAddress : pointId,
+                icon: pointId === 'custom' ? 'custom' : 'special'
             });
 
             // Zaměření mapy na bod
@@ -1884,7 +2144,11 @@ Got the best locations, without a doubt!`;
 
             // Přidání XP za použití funkce zaměření bodu
             if (typeof UserProgress !== 'undefined') {
-                UserProgress.addXP(10, `Zaměření bodu: ${pointId}`);
+                if (pointId === 'custom' && customAddress) {
+                    UserProgress.addXP(15, `Zaměření adresy: ${customAddress}`);
+                } else {
+                    UserProgress.addXP(10, `Zaměření bodu: ${pointId}`);
+                }
             }
         } else {
             // Pokud MapManager neexistuje, použijeme základní funkce pro zaměření bodu
@@ -1893,18 +2157,30 @@ Got the best locations, without a doubt!`;
 
                 // Přidání markeru na mapu
                 if (typeof L !== 'undefined') {
+                    const popupContent = pointId === 'custom' && customAddress ?
+                        `<b>${customAddress}</b>` :
+                        `<b>${pointId}</b>`;
+
                     L.marker([lat, lng]).addTo(map)
-                        .bindPopup(`<b>${pointId}</b>`)
+                        .bindPopup(popupContent)
                         .openPopup();
                 }
 
                 // Přidání XP za použití funkce zaměření bodu
                 if (typeof UserProgress !== 'undefined') {
-                    UserProgress.addXP(10, `Zaměření bodu: ${pointId}`);
+                    if (pointId === 'custom' && customAddress) {
+                        UserProgress.addXP(15, `Zaměření adresy: ${customAddress}`);
+                    } else {
+                        UserProgress.addXP(10, `Zaměření bodu: ${pointId}`);
+                    }
                 }
             } else {
                 if (typeof addMessage !== 'undefined') {
-                    addMessage(`Bod ${pointId} byl zaměřen na souřadnicích [${lat}, ${lng}].`, false);
+                    if (pointId === 'custom' && customAddress) {
+                        addMessage(`Adresa ${customAddress} byla zaměřena na souřadnicích [${lat}, ${lng}].`, false);
+                    } else {
+                        addMessage(`Bod ${pointId} byl zaměřen na souřadnicích [${lat}, ${lng}].`, false);
+                    }
                 }
             }
         }
