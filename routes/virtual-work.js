@@ -83,7 +83,6 @@ router.get('/workplaces', (req, res) => {
 
 // Uložení záznamu o práci
 router.post('/work-history', (req, res) => {
-    // Zde bude v budoucnu ukládání do databáze
     const workRecord = req.body;
 
     // Kontrola povinných polí
@@ -95,17 +94,89 @@ router.post('/work-history', (req, res) => {
     workRecord.id = workRecord.id || Date.now();
     workRecord.date = workRecord.date || new Date().toISOString();
 
-    // V budoucnu zde bude ukládání do databáze
+    // Načtení existující historie
+    let workHistory = [];
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        const historyPath = path.join(__dirname, '../data/work-history.json');
+
+        // Kontrola, zda existuje adresář data
+        if (!fs.existsSync(path.join(__dirname, '../data'))) {
+            fs.mkdirSync(path.join(__dirname, '../data'));
+        }
+
+        // Kontrola, zda existuje soubor s historií
+        if (fs.existsSync(historyPath)) {
+            const historyData = fs.readFileSync(historyPath, 'utf8');
+            workHistory = JSON.parse(historyData);
+        }
+
+        // Přidání nového záznamu
+        workHistory.push(workRecord);
+
+        // Uložení aktualizované historie
+        fs.writeFileSync(historyPath, JSON.stringify(workHistory, null, 2));
+
+        console.log(`Uložen nový záznam práce: ${workRecord.name}`);
+    } catch (error) {
+        console.error('Chyba při ukládání záznamu práce:', error);
+        return res.status(500).json({ error: 'Chyba při ukládání záznamu práce' });
+    }
 
     res.status(201).json(workRecord);
 });
 
 // Získání historie práce
 router.get('/work-history', (req, res) => {
-    // Zde bude v budoucnu načítání z databáze
-    const workHistory = [];
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        const historyPath = path.join(__dirname, '../data/work-history.json');
 
-    res.json(workHistory);
+        // Kontrola, zda existuje soubor s historií
+        if (fs.existsSync(historyPath)) {
+            const historyData = fs.readFileSync(historyPath, 'utf8');
+            const workHistory = JSON.parse(historyData);
+            return res.json(workHistory);
+        }
+
+        // Pokud soubor neexistuje, vrátíme prázdné pole
+        return res.json([]);
+    } catch (error) {
+        console.error('Chyba při načítání historie práce:', error);
+        return res.status(500).json({ error: 'Chyba při načítání historie práce' });
+    }
+});
+
+// Získání detailu záznamu práce podle ID
+router.get('/work-history/:id', (req, res) => {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        const historyPath = path.join(__dirname, '../data/work-history.json');
+
+        // Kontrola, zda existuje soubor s historií
+        if (fs.existsSync(historyPath)) {
+            const historyData = fs.readFileSync(historyPath, 'utf8');
+            const workHistory = JSON.parse(historyData);
+
+            // Hledání záznamu podle ID
+            const workRecord = workHistory.find(record => record.id === parseInt(req.params.id));
+
+            if (workRecord) {
+                return res.json(workRecord);
+            } else {
+                return res.status(404).json({ error: 'Záznam nebyl nalezen' });
+            }
+        }
+
+        // Pokud soubor neexistuje, vrátíme chybu
+        return res.status(404).json({ error: 'Historie práce neexistuje' });
+    } catch (error) {
+        console.error('Chyba při načítání detailu záznamu práce:', error);
+        return res.status(500).json({ error: 'Chyba při načítání detailu záznamu práce' });
+    }
 });
 
 // Export routeru

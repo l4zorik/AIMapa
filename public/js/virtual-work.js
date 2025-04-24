@@ -1,6 +1,6 @@
 /**
  * Jednoduchý modul pro virtuální práci
- * Verze 0.3.0.15
+ * Verze 0.3.1.0
  */
 
 class VirtualWorkClass {
@@ -145,30 +145,109 @@ class VirtualWorkClass {
     }
 
     /**
-     * Načtení historie práce z localStorage
+     * Načtení historie práce z API
      */
-    loadWorkHistory() {
+    async loadWorkHistory() {
         try {
-            const workHistory = localStorage.getItem('workHistory');
-            if (workHistory) {
-                this.workHistory = JSON.parse(workHistory);
-                console.log(`Načteno ${this.workHistory.length} záznamů historie práce`);
+            const response = await fetch('/api/virtual-work/work-history');
+            if (response.ok) {
+                const data = await response.json();
+                this.workHistory = data;
+                console.log(`Načteno ${this.workHistory.length} záznamů historie práce z API`);
+            } else {
+                console.error('Chyba při načítání historie práce z API:', response.statusText);
+                this.workHistory = [];
             }
         } catch (error) {
-            console.error('Chyba při načítání historie práce:', error);
+            console.error('Chyba při načítání historie práce z API:', error);
             this.workHistory = [];
+
+            // Záložní načtení z localStorage
+            try {
+                const workHistory = localStorage.getItem('workHistory');
+                if (workHistory) {
+                    this.workHistory = JSON.parse(workHistory);
+                    console.log(`Načteno ${this.workHistory.length} záznamů historie práce z localStorage (záloha)`);
+                }
+            } catch (localError) {
+                console.error('Chyba při načítání historie práce z localStorage:', localError);
+            }
         }
     }
 
     /**
-     * Uložení historie práce do localStorage
+     * Uložení záznamu práce do API
      */
-    saveWorkHistory() {
+    async saveWorkRecord(workRecord) {
         try {
-            localStorage.setItem('workHistory', JSON.stringify(this.workHistory));
-            console.log(`Uloženo ${this.workHistory.length} záznamů historie práce`);
+            const response = await fetch('/api/virtual-work/work-history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(workRecord)
+            });
+
+            if (response.ok) {
+                const savedRecord = await response.json();
+                console.log('Záznam práce byl úspěšně uložen do API:', savedRecord);
+
+                // Přidání záznamu do lokální historie
+                this.workHistory.push(savedRecord);
+
+                // Záložní uložení do localStorage
+                try {
+                    localStorage.setItem('workHistory', JSON.stringify(this.workHistory));
+                } catch (localError) {
+                    console.error('Chyba při ukládání historie práce do localStorage:', localError);
+                }
+
+                return savedRecord;
+            } else {
+                console.error('Chyba při ukládání záznamu práce do API:', response.statusText);
+                return null;
+            }
         } catch (error) {
-            console.error('Chyba při ukládání historie práce:', error);
+            console.error('Chyba při ukládání záznamu práce do API:', error);
+
+            // Záložní uložení do localStorage
+            try {
+                // Přidání záznamu do lokální historie
+                this.workHistory.push(workRecord);
+                localStorage.setItem('workHistory', JSON.stringify(this.workHistory));
+                console.log('Záznam práce byl uložen do localStorage (záloha)');
+                return workRecord;
+            } catch (localError) {
+                console.error('Chyba při ukládání záznamu práce do localStorage:', localError);
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Získání detailu záznamu práce podle ID
+     */
+    async getWorkRecordById(id) {
+        try {
+            const response = await fetch(`/api/virtual-work/work-history/${id}`);
+            if (response.ok) {
+                const workRecord = await response.json();
+                return workRecord;
+            } else {
+                console.error('Chyba při načítání detailu záznamu práce:', response.statusText);
+                return null;
+            }
+        } catch (error) {
+            console.error('Chyba při načítání detailu záznamu práce:', error);
+
+            // Záložní hledání v lokální historii
+            const localRecord = this.workHistory.find(record => record.id === id);
+            if (localRecord) {
+                console.log('Záznam práce byl nalezen v lokální historii (záloha)');
+                return localRecord;
+            }
+
+            return null;
         }
     }
 
@@ -315,6 +394,12 @@ class VirtualWorkClass {
                     }
                 });
             });
+        });
+
+        // Přidání event listeneru pro tlačítko historie
+        const historyBtn = dialog.querySelector('#virtual-work-history');
+        historyBtn.addEventListener('click', () => {
+            this.showWorkHistory(dialog);
         });
     }
 
@@ -478,6 +563,126 @@ class VirtualWorkClass {
      */
     closeDialog(dialog) {
         dialog.remove();
+    }
+
+    /**
+     * Zobrazení historie práce
+     */
+    async showWorkHistory(dialog) {
+        // Načtení aktuální historie práce z API
+        await this.loadWorkHistory();
+
+        // Změna obsahu dialogu na historii práce
+        dialog.querySelector('.virtual-work-content').innerHTML = `
+            <div class="work-history-container">
+                <h3>Historie práce</h3>
+                ${this.workHistory.length === 0 ?
+                    '<p class="no-history">Zatím nemáte žádnou historii práce.</p>' :
+                    `<div class="work-history-list">
+                        ${this.workHistory.map(record => {
+                            // Formátování data
+                            const date = new Date(record.date);
+                            const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+                            // Určení ikony podle typu práce
+                            const icon = record.icon || '💼';
+
+                            return `
+                                <div class="work-history-item" data-id="${record.id}">
+                                    <div class="work-history-icon">${icon}</div>
+                                    <div class="work-history-info">
+                                        <div class="work-history-name">${record.name}</div>
+                                        <div class="work-history-date">${formattedDate}</div>
+                                        <div class="work-history-details">
+                                            <span class="work-history-pay">${record.pay} Kč</span>
+                                            <span class="work-history-xp">+${record.xp} XP</span>
+                                            ${record.tasks && record.tasks.length > 0 ?
+                                                `<span class="work-history-tasks">${record.tasks.filter(task => task.completed).length}/${record.tasks.length} úkolů</span>` :
+                                                ''}
+                                        </div>
+                                    </div>
+                                    <div class="work-history-actions">
+                                        <button class="work-history-repeat-btn" data-id="${record.id}">Opakovat</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>`
+                }
+            </div>
+        `;
+
+        // Změna tlačítek v dialogu
+        dialog.querySelector('.virtual-work-actions').innerHTML = `
+            <button class="virtual-work-btn secondary" id="virtual-work-back">Zpět</button>
+            <button class="virtual-work-btn primary" id="virtual-work-close">Zavřít</button>
+        `;
+
+        // Přidání event listenerů pro tlačítka
+        dialog.querySelector('#virtual-work-back').addEventListener('click', () => {
+            this.openWorkDialog();
+        });
+
+        dialog.querySelector('#virtual-work-close').addEventListener('click', () => {
+            this.closeDialog(dialog);
+        });
+
+        // Přidání event listenerů pro tlačítka opakování
+        const repeatButtons = dialog.querySelectorAll('.work-history-repeat-btn');
+        repeatButtons.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const recordId = parseInt(btn.dataset.id);
+                await this.repeatWorkRecord(dialog, recordId);
+            });
+        });
+    }
+
+    /**
+     * Opakování záznamu práce
+     */
+    async repeatWorkRecord(dialog, recordId) {
+        // Načtení detailu záznamu
+        const workRecord = await this.getWorkRecordById(recordId);
+
+        if (!workRecord) {
+            console.error('Nepodařilo se načíst záznam práce pro opakování');
+            return;
+        }
+
+        // Najdeme odpovídající pracoviště
+        let workplace = this.workplaces.find(wp => wp.id === workRecord.workplace);
+
+        // Pokud nenajdeme přesnou shodu, vytvoříme nové pracoviště z dat záznamu
+        if (!workplace) {
+            workplace = {
+                id: workRecord.workplace || 'custom',
+                name: workRecord.name,
+                type: workRecord.type || 'custom',
+                icon: workRecord.icon || '💼',
+                pay: workRecord.pay,
+                description: workRecord.description || 'Vlastní práce',
+                difficulty: workRecord.difficulty || 'medium',
+                xp: workRecord.xp,
+                duration: workRecord.duration || 3
+            };
+        }
+
+        // Nastavíme vybrané pracoviště
+        this.selectedWorkplace = workplace;
+
+        // Pokud záznam obsahuje úkoly, použijeme je
+        if (workRecord.tasks && workRecord.tasks.length > 0) {
+            this.customTasks = workRecord.tasks.map(task => ({
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                text: task.text,
+                completed: false
+            }));
+        } else {
+            this.customTasks = [];
+        }
+
+        // Spustíme práci s úkoly
+        this.startWorkWithTasks(dialog, workplace);
     }
 
     /**
@@ -699,20 +904,26 @@ class VirtualWorkClass {
                     xp += xpBonus;
                 }
 
-                // Přidání záznamu do historie práce
-                this.workHistory.push({
+                // Vytvoření záznamu práce
+                const workRecord = {
                     id: Date.now(),
                     workplace: workplace.id,
                     name: workplace.name,
+                    icon: workplace.icon,
+                    type: workplace.type,
                     pay: earnings,
                     xp: xp,
+                    duration: workplace.duration,
                     date: new Date().toISOString(),
                     completedManually: false,
                     customTasks: this.customTasks.length > 0 ? this.customTasks.map(task => ({
                         text: task.text,
                         completed: task.completed
                     })) : []
-                });
+                };
+
+                // Uložení záznamu do API
+                this.saveWorkRecord(workRecord);
 
                 // Přidání peněz a XP
                 this.addMoney(earnings, xp);
@@ -824,9 +1035,6 @@ class VirtualWorkClass {
         } else {
             console.warn('UserProgress není k dispozici, XP nebylo přidáno');
         }
-
-        // Uložení historie práce
-        this.saveWorkHistory();
     }
 
     /**
@@ -1535,20 +1743,26 @@ class VirtualWorkClass {
             xp += xpBonus;
         }
 
-        // Přidání záznamu do historie práce
-        this.workHistory.push({
+        // Vytvoření záznamu práce
+        const workRecord = {
             id: Date.now(),
             workplace: workplace.id,
             name: workplace.name,
+            icon: workplace.icon,
+            type: workplace.type,
             pay: earnings,
             xp: xp,
+            duration: workplace.duration,
             date: new Date().toISOString(),
             completedManually: true,
             customTasks: this.customTasks.map(task => ({
                 text: task.text,
                 completed: task.completed
             }))
-        });
+        };
+
+        // Uložení záznamu do API
+        this.saveWorkRecord(workRecord);
 
         // Přidání peněz a XP
         this.addMoney(earnings, xp);
