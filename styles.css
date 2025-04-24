@@ -25,9 +25,12 @@ body {
 }
 
 .container {
-    max-width: 1400px;
+    max-width: 1800px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 header {
@@ -35,11 +38,38 @@ header {
 }
 
 header h1 {
-    background-color: var(--primary-color);
-    padding: 15px;
-    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), #6d3fcf);
+    padding: 18px;
+    border-radius: 12px;
     text-align: center;
-    margin: 0 0 20px 0;
+    margin: 0 0 25px 0;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    font-size: 2rem;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+header h1::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0) 100%);
+    transform: translateX(-100%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .settings-button {
@@ -57,29 +87,57 @@ header h1 {
 main {
     display: grid;
     grid-template-columns: 4fr 1fr;
-    gap: 30px;
+    gap: 25px;
     margin-bottom: 30px;
 }
 
 .map-container {
     background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 10px;
+    padding: 25px;
+    border-radius: 15px;
+    width: 100%;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.map-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), #6d3fcf);
 }
 
 .status-bar {
-    background-color: #064e3b;
+    background: linear-gradient(135deg, #064e3b, #065f46);
     color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #34d399;
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
 .status-icon {
     color: #34d399;
-    margin-right: 10px;
+    margin-right: 15px;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    animation: pulse-status 2s infinite;
+}
+
+@keyframes pulse-status {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 .map-wrapper {
@@ -88,10 +146,16 @@ main {
 }
 
 #map {
-    height: 850px;
-    border-radius: 8px;
+    height: 900px;
+    border-radius: 12px;
     width: 100%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+#map:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
 .map-control-btn {
@@ -251,64 +315,131 @@ body[data-theme="dark"] .route-info {
 .controls {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 15px;
+    margin-top: 10px;
 }
 
 .btn {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
     color: white;
     border: none;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 15px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s, opacity 0.2s;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    opacity: 0;
 }
 
 .btn:hover {
-    opacity: 0.9;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover::before {
+    opacity: 1;
 }
 
 .btn.active {
-    background-color: var(--primary-color-dark);
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, var(--primary-color-dark), #5d35b5);
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.3);
     transform: translateY(1px);
 }
 
+.btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] .btn {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
 body[data-theme="dark"] .btn:hover {
-    background-color: var(--primary-color-dark);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .icon {
-    margin-right: 5px;
+    margin-right: 10px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn:hover .icon {
+    transform: scale(1.2);
 }
 
 .ai-assistant {
     background-color: var(--card-bg);
-    border-radius: 12px;
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
-    width: 320px; /* Omezená šířka */
-    height: auto; /* Automatická výška */
-    max-height: 500px; /* Maximální výška */
+    width: 350px; /* Zvětšená šířka */
+    height: auto;
+    max-height: 600px; /* Zvětšená maximální výška */
     overflow: hidden;
-    position: fixed; /* Fixní pozicování na stránce */
-    top: 20px; /* Výchozí pozice od horního okraje */
-    right: 20px; /* Výchozí pozice od pravého okraje */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000; /* Zajištění, že bude nad mapou */
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.ai-assistant:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
 }
 
 .chat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
-    background-color: var(--primary-color);
+    padding: 15px 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
     color: white;
-    cursor: default; /* Normální kurzor v normálním režimu */
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%);
+    transform: translateX(-100%);
+    animation: shimmer 3s infinite;
 }
 
 /* Kurzor pro přesunutelný chat ve fullscreen režimu */
@@ -363,42 +494,95 @@ body[data-theme="dark"] .btn:hover {
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    margin-bottom: 10px;
-    padding: 8px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    max-height: 300px; /* Snížená maximální výška */
-    transition: background-color 0.3s;
+    gap: 12px;
+    max-height: 350px; /* Zvětšená maximální výška */
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
 }
 
 body[data-theme="dark"] .chat-messages {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.03);
 }
 
 .message {
-    padding: 8px;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border-radius: 12px;
     max-width: 85%;
     white-space: pre-line;
-    font-size: 0.9rem; /* Menší velikost písma */
+    font-size: 0.95rem;
+    line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.message:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .message.ai {
-    background-color: #374151;
+    background: linear-gradient(135deg, #374151, #2d3748);
     align-self: flex-start;
-    transition: background-color 0.3s;
+    border-bottom-left-radius: 2px;
+    border-left: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.message.ai::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -5px;
+    width: 10px;
+    height: 10px;
+    background-color: #374151;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
 body[data-theme="dark"] .message.ai {
-    background-color: #2d3748;
+    background: linear-gradient(135deg, #2d3748, #1e2533);
+    border-left: 3px solid rgba(255, 255, 255, 0.1);
 }
 
 .message.user {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
     align-self: flex-end;
+    border-bottom-right-radius: 2px;
+    border-right: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.message.user::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: -5px;
+    width: 10px;
+    height: 10px;
+    background-color: var(--primary-color-dark);
+    clip-path: polygon(0 0, 0 100%, 100% 0);
 }
 
 /* Styly pro návrhy dalších akcí */
@@ -450,40 +634,61 @@ body[data-theme="dark"] .message.ai {
 
 .chat-input {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
     position: relative;
+    padding: 0 15px 15px 15px;
 }
 
 .chat-input input {
     flex: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 5px;
-    background-color: rgba(0, 0, 0, 0.2);
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.15);
     color: white;
-    transition: background-color 0.3s, color 0.3s;
-    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chat-input input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 body[data-theme="dark"] .chat-input input {
     background-color: var(--input-bg-dark);
     color: var(--text-color-dark);
+    border-color: rgba(255, 255, 255, 0.05);
 }
 
 .send-btn {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
     color: white;
     border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
+    padding: 12px 18px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s;
-    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .send-btn:hover {
-    background-color: var(--primary-color-dark);
+    background: linear-gradient(135deg, var(--primary-color-dark), #5d35b5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.send-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Command Menu Styles */
@@ -491,26 +696,50 @@ body[data-theme="dark"] .chat-input input {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
     color: white;
     border: none;
     cursor: pointer;
-    margin-right: 10px;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-right: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.commands-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .commands-button:hover {
-    background-color: var(--primary-color-dark);
-    transform: scale(1.05);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.commands-button:hover::before {
+    opacity: 1;
+}
+
+.commands-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .commands-button .icon {
     margin: 0;
-    font-size: 18px;
+    font-size: 20px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .commands-overlay {
