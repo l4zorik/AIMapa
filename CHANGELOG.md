@@ -2,6 +2,60 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.0.8] - 2025-05-28 - VYLEPŠENÝ SYSTÉM FIREM NA MAPĚ A FINANČNÍHO INDIKÁTORU
+
+### Nové funkce
+- Přidán systém zobrazení firem a podniků na mapě s detailními informacemi
+- Implementováno 8 typů firem (obchody, restaurace, banky, kanceláře, továrny, čerpací stanice, hotely, nemocnice)
+- Přidán filtr pro zobrazení/skrytí různých typů firem na mapě
+- Vylepšen finanční indikátor s animovanou ikonou dolaru a detailními informacemi
+- Přidán rozšířený finanční panel s přehledem všech financí a kryptoměn
+- Implementována správa příkazů s možností přidávání, úpravy a deaktivace příkazů
+- Přidána možnost vylepšení příkazů pomocí AI
+
+### Vylepšení uživatelského rozhraní
+- Vytvořeny moderní a interaktivní markery firem na mapě s barevným rozlišením podle typu
+- Přidány detailní popup okna s informacemi o firmách, službách a hodnocení
+- Implementován responzivní design pro všechny nové prvky s podporou mobilních zařízení
+- Vylepšen design finančního indikátoru s animacemi při přidání/odebrání peněz
+- Přidána podpora tmavého režimu pro všechny nové prvky
+- Vytvořeno intuitivní rozhraní pro správu příkazů s možností vyhledávání
+
+## [0.3.0.7] - 2025-05-27 - VYLEPŠENÍ ÚKOLŮ S DETAILNÍMI POPISY A SOUŘADNICEMI
+
+### Nové funkce
+- Přidána možnost zobrazení všech kroků úkolu na mapě najednou s vyznačenou cestou
+- Implementováno zobrazení přesných souřadnic pro každý bod úkolu
+- Přidána funkce pro kopírování souřadnic do schránky
+- Implementováno číslování bodů podle pořadí na mapě pro lepší orientaci
+- Přidána možnost přepínání mezi zobrazením všech kroků a pouze aktivního kroku
+
+### Vylepšení uživatelského rozhraní
+- Vylepšeno zobrazení markerů úkolů s čísly kroků a bodů
+- Přidány detailní informace o bodech úkolů včetně souřadnic
+- Implementováno barevné rozlišení dokončených, aktivních a čekajících kroků
+- Přidána animovaná cesta mezi body úkolu s šipkami pro směr postupu
+- Vylepšen design popup oken s detailními informacemi o krocích
+- Přidána podpora tmavého režimu pro všechny nové prvky
+
+## [0.3.0.6] - 2025-05-26 - ROZŠÍŘENÝ SYSTÉM ÚKOLŮ A KROKŮ
+
+### Nové funkce
+- Přidán systém kroků pro úkoly s postupným plněním
+- Implementováno zobrazení kroků úkolů na mapě s trasami mezi body
+- Přidána podpora pro různé typy kroků (navštívení lokace, vydělání peněz)
+- Implementováno automatické postupování mezi kroky úkolů
+- Přidány odměny za dokončení jednotlivých kroků úkolů
+- Rozšířen úkol "sehnat peníze na nájem" o detailní kroky s postupem
+
+### Vylepšení uživatelského rozhraní
+- Vytvořeno přehledné zobrazení kroků úkolů v dialogu úkolů
+- Přidány vizuální indikátory pro aktivní, čekající a dokončené kroky
+- Implementováno zobrazení odměn za jednotlivé kroky
+- Přidány ikony pro různé typy lokací v krocích úkolů
+- Vylepšeno zobrazení markerů kroků na mapě s vlastními ikonami
+- Přidána podpora tmavého režimu pro všechny nové prvky
+
 ## [0.3.0.5] - 2025-05-25 - ZJEDNODUŠENÉ OVĚŘENÍ BODŮ
 
 ### Nové funkce

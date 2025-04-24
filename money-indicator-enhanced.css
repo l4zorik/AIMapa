@@ -1,0 +1,316 @@
+/**
+ * Vylepšené styly pro finanční indikátor
+ * Verze 0.3.0.4
+ */
+
+/* Základní styly pro finanční indikátor */
+.money-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #2c3e50, #1a252f);
+    border-radius: 12px;
+    padding: 10px 15px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.money-indicator:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Ikona dolaru */
+.money-icon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.5);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+    }
+}
+
+/* Hodnota peněz */
+.money-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Animace pro přidání peněz */
+@keyframes moneyAdded {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+        color: #2ecc71;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.money-added {
+    animation: moneyAdded 0.5s ease;
+}
+
+/* Animace pro odebrání peněz */
+@keyframes moneyRemoved {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+        color: #e74c3c;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.money-removed {
+    animation: moneyRemoved 0.5s ease;
+}
+
+/* Styly pro kryptoměny */
+.crypto-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.crypto-indicator:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.crypto-icon {
+    font-size: 16px;
+}
+
+.crypto-value {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Styly pro různé kryptoměny */
+.crypto-indicator[data-crypto="BTC"] .crypto-icon {
+    color: #f7931a;
+}
+
+.crypto-indicator[data-crypto="ETH"] .crypto-icon {
+    color: #627eea;
+}
+
+.crypto-indicator[data-crypto="DOGE"] .crypto-icon {
+    color: #c3a634;
+}
+
+.crypto-indicator[data-crypto="XRP"] .crypto-icon {
+    color: #23292f;
+}
+
+/* Styly pro cenu kryptoměny */
+.crypto-price {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-left: 5px;
+}
+
+/* Styly pro fullscreen režim */
+.fullscreen-money-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #2c3e50, #1a252f);
+    border-radius: 12px;
+    padding: 10px 15px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    cursor: move;
+}
+
+/* Rozšířený finanční panel */
+.finance-panel {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    background: linear-gradient(135deg, #2c3e50, #1a252f);
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    z-index: 1000;
+    width: 300px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: none;
+}
+
+.finance-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.finance-panel-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.finance-panel-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.finance-panel-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.finance-panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.finance-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.finance-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.finance-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.finance-details {
+    flex-grow: 1;
+}
+
+.finance-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.finance-value {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.finance-secondary {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Styly pro tmavý režim */
+body[data-theme="dark"] .money-indicator,
+body[data-theme="dark"] .fullscreen-money-indicator,
+body[data-theme="dark"] .finance-panel {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+body[data-theme="dark"] .finance-item {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+body[data-theme="dark"] .finance-item:hover {
+    background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* Responzivní styly */
+@media (max-width: 768px) {
+    .money-indicator {
+        top: 5px;
+        right: 5px;
+        padding: 8px 12px;
+    }
+    
+    .money-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+    
+    .money-value {
+        font-size: 14px;
+    }
+    
+    .finance-panel {
+        width: calc(100% - 20px);
+        top: 50px;
+        right: 10px;
+        left: 10px;
+    }
+}
