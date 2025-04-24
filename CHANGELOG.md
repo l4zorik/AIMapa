@@ -12,7 +12,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidána historie virtuální práce s možností opakování misí
 - Implementováno ukládání historie práce na serveru
 - Přidáno rozhraní pro zobrazení a výběr předchozích misí
-- Upravena virtuální práce - progress bar se zastaví na 99% a práce se dokončí pouze manuálně
+- Upravena virtuální práce - progress bar se aktualizuje podle dokončených úkolů
+- Práce se dokončí pouze po manuálním stisknutí tlačítka
 - Přidáno zvýraznění tlačítka pro manuální dokončení práce s pulzující animací
 
 ### Vylepšení
@@ -23,6 +24,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vylepšen design historie virtuální práce s podporou tmavého režimu
 - Přidána možnost opakovat předchozí mise s jejich úkoly
 - Vylepšen design tlačítka pro manuální dokončení práce
+- Progress bar nyní zobrazuje procento dokončených úkolů místo automatického postupu v čase
 
 ## [0.3.0.16] - 2025-06-05 - KOMPLETNÍ PŘEPRACOVÁNÍ MODULU VIRTUÁLNÍ PRÁCE
 

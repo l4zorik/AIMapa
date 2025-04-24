@@ -778,6 +778,9 @@ class VirtualWorkClass {
 
                         // Kontrola, zda jsou všechny úkoly dokončeny
                         this.checkAllTasksCompleted(dialog);
+
+                        // Aktualizace progress baru podle dokončených úkolů
+                        this.updateProgressBarByTasks(dialog, progressBar, percentElement);
                     }
                 });
             });
@@ -846,16 +849,35 @@ class VirtualWorkClass {
             this.completeWorkManually(dialog, workplace, progressBar, percentElement, timeRemaining, activityLog, progressInterval);
         });
 
-        // Interval pro aktualizaci progress baru
+        // Inicializace progress baru na 0%
+        progressBar.style.width = '0%';
+        percentElement.textContent = '0%';
+
+        // Aktualizace zbývajícího času - zobrazíme celkový čas
+        const minutes = Math.floor(workDuration / 60000);
+        const seconds = Math.floor((workDuration % 60000) / 1000);
+        timeRemaining.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        // Přidání první aktivity
+        const randomActivity = workActivities[0];
+        activityLog.innerHTML = `<div class="work-activity-item new-activity">${randomActivity}</div>` + activityLog.innerHTML;
+
+        // Odstranění třídy new-activity po animaci
+        setTimeout(() => {
+            const newActivity = activityLog.querySelector('.new-activity');
+            if (newActivity) {
+                newActivity.classList.remove('new-activity');
+            }
+        }, 1000);
+
+        // Pokud máme úkoly, aktualizujeme progress bar podle nich
+        if (this.customTasks.length > 0) {
+            this.updateProgressBarByTasks(dialog, progressBar, percentElement);
+        }
+
+        // Interval pro aktualizaci času (ale ne progress baru)
         const progressInterval = setInterval(() => {
             currentStep++;
-
-            // Výpočet procenta dokončení - maximálně 99% pro automatický progress
-            const percent = Math.min(Math.floor((currentStep / totalSteps) * 100), 99);
-
-            // Aktualizace progress baru
-            progressBar.style.width = `${percent}%`;
-            percentElement.textContent = `${percent}%`;
 
             // Aktualizace zbývajícího času
             const remainingSeconds = Math.max(0, Math.floor((workDuration - (currentStep * 100)) / 1000));
@@ -863,9 +885,10 @@ class VirtualWorkClass {
             const seconds = remainingSeconds % 60;
             timeRemaining.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-            // Přidání nové aktivity každých 20%
-            if (percent % 20 === 0 && percent > 0 && percent < 100) {
-                const randomActivity = workActivities[Math.floor(percent / 20) - 1];
+            // Přidání nové aktivity každých 20 sekund
+            if (currentStep % 200 === 0) {
+                const activityIndex = Math.min(Math.floor(currentStep / 200), workActivities.length - 1);
+                const randomActivity = workActivities[activityIndex];
                 activityLog.innerHTML = `<div class="work-activity-item new-activity">${randomActivity}</div>` + activityLog.innerHTML;
 
                 // Odstranění třídy new-activity po animaci
@@ -877,26 +900,12 @@ class VirtualWorkClass {
                 }, 1000);
             }
 
-            // Kontrola, zda jsme dosáhli 99% (ale nedokončíme automaticky)
+            // Kontrola, zda jsme dosáhli konce času
             if (currentStep >= totalSteps) {
                 clearInterval(progressInterval);
 
                 // Přidání poslední aktivity
-                activityLog.innerHTML = `<div class="work-activity-item new-activity">Práce je téměř dokončena! Klikněte na tlačítko "Dokončit práci manuálně" pro získání odměny.</div>` + activityLog.innerHTML;
-
-                // Zvýraznění tlačítka pro manuální dokončení
-                const completeManuallyBtn = dialog.querySelector('#complete-work-manually');
-                if (completeManuallyBtn) {
-                    completeManuallyBtn.classList.add('pulse-animation');
-                    completeManuallyBtn.style.backgroundColor = '#e74c3c';
-                    completeManuallyBtn.style.color = 'white';
-                    completeManuallyBtn.style.fontWeight = 'bold';
-                    completeManuallyBtn.style.fontSize = '16px';
-                    completeManuallyBtn.style.padding = '12px 20px';
-                }
-
-                // Kontrola dokončení úkolů
-                this.checkAllTasksCompleted(dialog);
+                activityLog.innerHTML = `<div class="work-activity-item new-activity">Čas vypršel! Dokončete úkoly a klikněte na tlačítko "Dokončit práci manuálně" pro získání odměny.</div>` + activityLog.innerHTML;
             }
         }, 100);
     }
@@ -924,6 +933,48 @@ class VirtualWorkClass {
         }
 
         return allCompleted;
+    }
+
+    /**
+     * Aktualizace progress baru podle dokončených úkolů
+     */
+    updateProgressBarByTasks(dialog, progressBar, percentElement) {
+        if (this.customTasks.length === 0) return;
+
+        // Výpočet procenta dokončených úkolů
+        const completedTasks = this.customTasks.filter(task => task.completed);
+        const completionPercent = Math.floor((completedTasks.length / this.customTasks.length) * 100);
+
+        // Aktualizace progress baru
+        progressBar.style.width = `${completionPercent}%`;
+        percentElement.textContent = `${completionPercent}%`;
+
+        // Pokud jsou všechny úkoly dokončeny, zvýrazníme tlačítko pro manuální dokončení
+        if (completionPercent === 100) {
+            const completeManuallyBtn = dialog.querySelector('#complete-work-manually');
+            if (completeManuallyBtn) {
+                completeManuallyBtn.classList.add('pulse-animation');
+                completeManuallyBtn.style.backgroundColor = '#e74c3c';
+                completeManuallyBtn.style.color = 'white';
+                completeManuallyBtn.style.fontWeight = 'bold';
+                completeManuallyBtn.style.fontSize = '16px';
+                completeManuallyBtn.style.padding = '12px 20px';
+
+                // Přidání poslední aktivity
+                const activityLog = dialog.querySelector('.work-activity-log');
+                if (activityLog) {
+                    activityLog.innerHTML = `<div class="work-activity-item new-activity">Všechny úkoly dokončeny! Klikněte na tlačítko "Dokončit práci manuálně" pro získání odměny.</div>` + activityLog.innerHTML;
+
+                    // Odstranění třídy new-activity po animaci
+                    setTimeout(() => {
+                        const newActivity = activityLog.querySelector('.new-activity');
+                        if (newActivity) {
+                            newActivity.classList.remove('new-activity');
+                        }
+                    }, 1000);
+                }
+            }
+        }
     }
 
     /**
