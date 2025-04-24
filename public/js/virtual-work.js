@@ -596,8 +596,8 @@ class VirtualWorkClass {
                                         <div class="work-history-details">
                                             <span class="work-history-pay">${record.pay} Kč</span>
                                             <span class="work-history-xp">+${record.xp} XP</span>
-                                            ${record.tasks && record.tasks.length > 0 ?
-                                                `<span class="work-history-tasks">${record.tasks.filter(task => task.completed).length}/${record.tasks.length} úkolů</span>` :
+                                            ${record.customTasks && record.customTasks.length > 0 ?
+                                                `<span class="work-history-tasks">${record.customTasks.filter(task => task.completed).length}/${record.customTasks.length} úkolů</span>` :
                                                 ''}
                                         </div>
                                     </div>
@@ -671,8 +671,8 @@ class VirtualWorkClass {
         this.selectedWorkplace = workplace;
 
         // Pokud záznam obsahuje úkoly, použijeme je
-        if (workRecord.tasks && workRecord.tasks.length > 0) {
-            this.customTasks = workRecord.tasks.map(task => ({
+        if (workRecord.customTasks && workRecord.customTasks.length > 0) {
+            this.customTasks = workRecord.customTasks.map(task => ({
                 id: Date.now() + Math.floor(Math.random() * 1000),
                 text: task.text,
                 completed: false
