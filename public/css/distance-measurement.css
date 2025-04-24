@@ -1,0 +1,85 @@
+/**
+ * Styly pro modul měření vzdálenosti
+ * Verze 0.2.8.6.2
+ */
+
+/* Tlačítko pro měření vzdálenosti */
+.measure-button {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.measure-button:hover {
+    background-color: #f4f4f4;
+}
+
+.measure-button.active {
+    background-color: #FF4500;
+    color: white;
+}
+
+.measure-button .icon {
+    font-size: 16px;
+}
+
+/* Body měření */
+.measure-point {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.measure-point-inner {
+    width: 10px;
+    height: 10px;
+    background-color: #FF4500;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Marker vzdálenosti */
+.distance-marker {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.distance-marker-inner {
+    padding: 5px 10px;
+    background-color: #FF4500;
+    color: white;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .measure-button {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .measure-button:hover {
+    background-color: #444;
+}
+
+body[data-theme="dark"] .measure-button.active {
+    background-color: #FF4500;
+}
+
+body[data-theme="dark"] .measure-point-inner {
+    border-color: #333;
+}
+
+body[data-theme="dark"] .distance-marker-inner {
+    border: 1px solid #333;
+}

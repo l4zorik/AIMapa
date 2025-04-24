@@ -1,155 +1,184 @@
-/* Styly pro modul virtuální práce */
+/**
+ * Jednoduchý styl pro virtuální práci
+ * Verze 0.3.0.4
+ */
 
-/* Dialog */
+/* Hlavní dialog */
 .virtual-work-dialog {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 600px;
-    max-width: 90%;
-    max-height: 90vh;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+    z-index: 1100;
+    width: 90%;
+    max-width: 550px;
     overflow: hidden;
+    resize: both;
+    min-width: 320px;
+    min-height: 250px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Dialog header */
+.virtual-work-dialog:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25), 0 1px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Hlavička dialogu */
 .virtual-work-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 12px 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background-color: #3498db;
-    color: #fff;
+    cursor: move;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .virtual-work-header h2 {
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+.virtual-work-header h2::before {
+    content: '💼';
+    margin-right: 8px;
+    font-size: 20px;
 }
 
 .virtual-work-close {
     background: none;
     border: none;
-    color: #fff;
-    font-size: 1.5rem;
+    color: white;
+    font-size: 22px;
     cursor: pointer;
-    padding: 0;
-    line-height: 1;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
 }
 
-/* Dialog content */
+.virtual-work-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+/* Obsah dialogu */
 .virtual-work-content {
     padding: 20px;
     overflow-y: auto;
-    flex: 1;
+    max-height: 450px;
+    background-color: #f9f9f9;
 }
 
-/* Dialog actions */
-.virtual-work-actions {
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 20px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #e0e0e0;
-}
-
-/* Buttons */
-.virtual-work-btn {
-    padding: 8px 16px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    margin-left: 10px;
-    transition: background-color 0.2s;
-}
-
-.virtual-work-btn.primary {
-    background-color: #3498db;
-    color: #fff;
-}
-
-.virtual-work-btn.primary:hover {
-    background-color: #2980b9;
-}
-
-.virtual-work-btn.secondary {
-    background-color: #e0e0e0;
-    color: #333;
-}
-
-.virtual-work-btn.secondary:hover {
-    background-color: #d0d0d0;
-}
-
-.virtual-work-btn:disabled {
-    background-color: #ccc;
-    color: #888;
-    cursor: not-allowed;
-}
-
-/* Workplace categories */
+/* Kategorie pracovišť */
 .workplace-categories {
     display: flex;
+    gap: 10px;
     margin-bottom: 15px;
-    overflow-x: auto;
-    padding-bottom: 5px;
+    flex-wrap: wrap;
 }
 
 .category-btn {
-    padding: 6px 12px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-    margin-right: 8px;
+    padding: 8px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    background-color: white;
+    color: #555;
     cursor: pointer;
-    white-space: nowrap;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.category-btn:hover {
+    background-color: #f5f5f5;
+    transform: translateY(-2px);
 }
 
 .category-btn.active {
     background-color: #3498db;
-    color: #fff;
+    color: white;
     border-color: #3498db;
 }
 
-/* Workplace list */
+/* Pracoviště */
 .workplace-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     margin-bottom: 20px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 .workplace-item {
     display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
     border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 12px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.2s ease;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.workplace-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background-color: #e0e0e0;
+    transition: all 0.2s ease;
 }
 
 .workplace-item:hover {
+    background-color: #f5f5f5;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .workplace-item.selected {
     border-color: #3498db;
-    background-color: #ebf5fb;
+    background-color: #ebf7ff;
+}
+
+.workplace-item.selected::after {
+    background-color: #3498db;
 }
 
 .workplace-icon {
-    font-size: 2rem;
-    margin-right: 12px;
+    font-size: 28px;
+    background-color: #f0f0f0;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.workplace-item:hover .workplace-icon {
+    transform: scale(1.1);
 }
 
 .workplace-info {
@@ -158,191 +187,410 @@
 
 .workplace-name {
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: #333;
 }
 
 .workplace-pay {
     color: #27ae60;
-    font-weight: 500;
-    margin-bottom: 4px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.workplace-pay::before {
+    content: '💰';
+    margin-right: 5px;
+    font-size: 14px;
 }
 
 .workplace-description {
-    font-size: 0.9rem;
-    color: #666;
+    margin-top: 5px;
+    color: #777;
+    font-size: 13px;
     margin-bottom: 8px;
+    line-height: 1.4;
 }
 
 .workplace-details {
     display: flex;
-    font-size: 0.8rem;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 12px;
 }
 
 .workplace-difficulty,
 .workplace-xp,
 .workplace-duration {
-    margin-right: 8px;
-    padding: 2px 6px;
+    display: flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 12px;
     background-color: #f5f5f5;
-    border-radius: 3px;
 }
 
-.workplace-xp {
-    color: #8e44ad;
+.workplace-xp::before {
+    content: '⭐';
+    margin-right: 4px;
 }
 
-.workplace-duration {
-    color: #2c3e50;
+.workplace-duration::before {
+    content: '⏱️';
+    margin-right: 4px;
 }
 
-/* Work stats */
+/* Statistiky práce */
 .work-stats {
-    background-color: #f9f9f9;
-    border-radius: 6px;
+    margin-top: 20px;
     padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .work-stats h3 {
     margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
 }
 
 .work-stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 15px;
 }
 
 .work-stat {
     text-align: center;
     padding: 10px;
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    border-radius: 8px;
 }
 
 .work-stat-value {
-    font-size: 1.2rem;
+    font-size: 18px;
     font-weight: bold;
     color: #3498db;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
 }
 
 .work-stat-label {
-    font-size: 0.8rem;
+    font-size: 12px;
+    color: #777;
+}
+
+/* Tlačítka */
+.virtual-work-actions {
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+}
+
+.virtual-work-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.virtual-work-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.virtual-work-btn.primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.virtual-work-btn.primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2980b9, #1f6aa6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.virtual-work-btn.primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.virtual-work-btn.secondary {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #e0e0e0;
+}
+
+.virtual-work-btn.secondary:hover:not(:disabled) {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.virtual-work-btn.secondary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Výsledek práce */
+.work-result {
+    text-align: center;
+    padding: 25px 0;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+}
+
+.work-result-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+}
+
+.work-result-amount {
+    font-size: 28px;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 15px 0 5px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: slideUp 0.5s ease-out;
+}
+
+.work-result-xp {
+    font-size: 22px;
+    font-weight: bold;
+    color: #f39c12;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: slideUp 0.5s ease-out 0.2s;
+    animation-fill-mode: both;
+}
+
+@keyframes slideUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.work-result h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.work-result p {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+/* Progress bar */
+.work-progress-container {
+    width: 100%;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin: 15px 0;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.work-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    border-radius: 10px;
+    transition: width 0.1s linear;
+}
+
+.work-progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 14px;
     color: #666;
 }
 
-/* Custom tasks */
+/* Activity log */
+.work-activity-log {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: #f9f9f9;
+}
+
+.work-activity-item {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    color: #555;
+    transition: all 0.3s ease;
+}
+
+.work-activity-item:last-child {
+    border-bottom: none;
+}
+
+.work-activity-item.new-activity {
+    background-color: #ebf7ff;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; background-color: #d6eeff; }
+    100% { opacity: 1; background-color: #ebf7ff; }
+}
+
+/* Vlastní úkoly */
 .custom-tasks-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    padding: 15px;
+}
+
+.custom-tasks-header {
+    margin-bottom: 20px;
 }
 
 .custom-tasks-header h3 {
     margin-top: 0;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 18px;
 }
 
 .custom-tasks-header p {
     color: #666;
-    font-size: 0.9rem;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .custom-tasks-list {
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    min-height: 150px;
-    max-height: 250px;
+    max-height: 200px;
     overflow-y: auto;
-    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
 }
 
 .no-tasks {
-    color: #888;
+    padding: 15px;
     text-align: center;
-    padding: 20px;
+    color: #777;
+    font-style: italic;
 }
 
 .custom-task-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 10px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-    margin-bottom: 8px;
+    padding: 10px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+.custom-task-item:last-child {
+    border-bottom: none;
+}
+
+.custom-task-item:hover {
+    background-color: #f5f5f5;
 }
 
 .custom-task-text {
     flex: 1;
+    font-size: 14px;
+    color: #333;
 }
 
 .custom-task-delete {
     background: none;
     border: none;
     color: #e74c3c;
-    font-size: 1.2rem;
+    font-size: 18px;
     cursor: pointer;
-    padding: 0 5px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.custom-task-delete:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+    transform: scale(1.1);
 }
 
 .custom-tasks-form {
     display: flex;
     gap: 10px;
+    margin-bottom: 20px;
 }
 
 .custom-task-input {
     flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.custom-task-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    outline: none;
 }
 
 .custom-tasks-actions {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    gap: 10px;
 }
 
-/* Work progress */
-.work-progress-container {
-    height: 20px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    margin: 15px 0;
-    overflow: hidden;
+.custom-tasks-actions button {
+    flex: 1;
 }
 
-.work-progress-bar {
-    height: 100%;
-    background-color: #3498db;
-    width: 0%;
-    transition: width 0.3s ease;
-}
-
-.work-progress-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 15px;
-}
-
-/* Custom tasks progress */
+/* Checklist úkolů */
 .custom-tasks-progress {
-    margin: 20px 0;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    margin: 15px 0;
     padding: 15px;
-    background-color: #f9f9f9;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .custom-tasks-progress h4 {
     margin-top: 0;
     margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
 }
 
 .custom-tasks-checklist {
@@ -354,23 +602,30 @@
 .custom-task-check-item {
     display: flex;
     align-items: center;
-    padding: 8px;
-    background-color: #fff;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    padding: 8px 10px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    background-color: #f9f9f9;
 }
 
 .custom-task-check-item.completed {
-    background-color: #e8f8f5;
+    background-color: #e8f7f0;
+}
+
+.custom-task-check-item.completed .custom-task-check-text {
+    text-decoration: line-through;
+    color: #27ae60;
 }
 
 .custom-task-checkbox {
+    position: relative;
     display: flex;
     align-items: center;
-    position: relative;
-    padding-left: 30px;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
     cursor: pointer;
-    user-select: none;
 }
 
 .custom-task-checkbox input {
@@ -383,16 +638,23 @@
 
 .checkmark {
     position: absolute;
+    top: 0;
     left: 0;
     height: 20px;
     width: 20px;
     background-color: #fff;
-    border: 2px solid #3498db;
+    border: 2px solid #e0e0e0;
     border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.custom-task-checkbox:hover .checkmark {
+    border-color: #3498db;
 }
 
 .custom-task-checkbox input:checked ~ .checkmark {
-    background-color: #3498db;
+    background-color: #27ae60;
+    border-color: #27ae60;
 }
 
 .checkmark:after {
@@ -416,263 +678,570 @@
 }
 
 .custom-task-check-text {
-    margin-left: 10px;
-    flex: 1;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s ease;
 }
 
-/* Work activity log */
-.work-activity-log {
-    margin-top: 20px;
-    max-height: 150px;
-    overflow-y: auto;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+/* Notifikace o dokončení úkolů */
+.tasks-completed-notification {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
     padding: 10px;
+    background-color: #e8f7f0;
+    border-radius: 6px;
+    animation: fadeIn 0.5s ease-out;
 }
 
-.work-activity-item {
-    padding: 8px;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 0.9rem;
-    color: #666;
+.tasks-completed-icon {
+    font-size: 20px;
+    margin-right: 10px;
 }
 
-.work-activity-item:last-child {
-    border-bottom: none;
-}
-
-.work-activity-item.new-activity {
-    animation: fadeIn 0.5s;
-    background-color: #ebf5fb;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* Skip button */
-.skip-button-container {
-    margin-top: 20px;
-    text-align: center;
-}
-
-/* Work result */
-.work-result {
-    text-align: center;
-    padding: 20px 0;
-}
-
-.work-result-icon {
-    font-size: 3rem;
-    margin-bottom: 15px;
-}
-
-.work-result h3 {
-    margin-bottom: 15px;
-}
-
-.work-result-amount {
-    font-size: 1.8rem;
+.tasks-completed-text {
     font-weight: bold;
     color: #27ae60;
-    margin-bottom: 5px;
 }
 
-.work-result-xp {
-    font-size: 1.2rem;
-    color: #8e44ad;
-    margin-bottom: 20px;
-}
-
-.work-result p {
-    color: #666;
-    margin-bottom: 20px;
-}
-
-.work-result-stats {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.work-result-stat {
-    text-align: center;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 6px;
-    min-width: 120px;
-}
-
-.work-result-stat-label {
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 5px;
-}
-
-.work-result-stat-value {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #3498db;
-}
-
-/* Tasks summary */
+/* Souhrn úkolů */
 .tasks-summary {
-    background-color: #f9f9f9;
-    border-radius: 6px;
-    padding: 15px;
     margin: 15px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
 }
 
 .all-tasks-completed {
     color: #27ae60;
     font-weight: bold;
     margin-top: 5px;
+    animation: pulse 1.5s infinite alternate;
 }
 
 .tasks-bonus {
     color: #f39c12;
+    font-weight: bold;
     margin-top: 5px;
 }
 
-/* Tasks completed notification */
-.tasks-completed-notification {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #e8f8f5;
-    border-radius: 4px;
-    padding: 10px;
-    margin-top: 10px;
-    animation: fadeIn 0.5s;
+/* Tlačítko pro manuální dokončení */
+.skip-button-container {
+    margin-top: 20px;
+    text-align: center;
 }
 
-.tasks-completed-icon {
-    font-size: 1.2rem;
-    color: #27ae60;
-    margin-right: 10px;
-}
-
-.tasks-completed-text {
-    color: #27ae60;
+#complete-work-manually {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    padding: 12px 20px;
+    font-size: 16px;
     font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    animation: pulse-attention 2s infinite;
 }
 
-/* Track points */
+#complete-work-manually:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(135deg, #c0392b, #a93226);
+}
+
+#complete-work-manually:active {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse-attention {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Statistiky výsledku */
+.work-result-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.work-result-stat {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.work-result-stat-label {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.work-result-stat-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3498db;
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .virtual-work-dialog {
+    background-color: #1a2530;
+    color: #ecf0f1;
+    border-color: #2c3e50;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .virtual-work-dialog:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .virtual-work-header {
+    background: linear-gradient(135deg, #2980b9, #1f6aa6);
+    border-bottom-color: #2c3e50;
+}
+
+body[data-theme="dark"] .virtual-work-content {
+    background-color: #2c3e50;
+}
+
+body[data-theme="dark"] .workplace-item {
+    border-color: #34495e;
+    background-color: #1a2530;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .workplace-item::after {
+    background-color: #34495e;
+}
+
+body[data-theme="dark"] .workplace-item:hover {
+    background-color: #243342;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .workplace-item.selected {
+    border-color: #3498db;
+    background-color: #1f6aa6;
+}
+
+body[data-theme="dark"] .workplace-item.selected::after {
+    background-color: #3498db;
+}
+
+body[data-theme="dark"] .workplace-icon {
+    background-color: #34495e;
+}
+
+body[data-theme="dark"] .workplace-name {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .workplace-description {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .category-btn {
+    background-color: #1a2530;
+    border-color: #34495e;
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .category-btn:hover {
+    background-color: #243342;
+}
+
+body[data-theme="dark"] .category-btn.active {
+    background-color: #3498db;
+    border-color: #2980b9;
+}
+
+body[data-theme="dark"] .workplace-details span {
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .work-stats {
+    background-color: #1a2530;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .work-stats h3 {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .work-stat {
+    background-color: #2c3e50;
+}
+
+body[data-theme="dark"] .work-stat-label {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .virtual-work-actions {
+    border-top-color: #34495e;
+    background-color: #1a2530;
+}
+
+body[data-theme="dark"] .virtual-work-btn.secondary {
+    background-color: #34495e;
+    color: #ecf0f1;
+    border-color: #2c3e50;
+}
+
+body[data-theme="dark"] .virtual-work-btn.secondary:hover:not(:disabled) {
+    background-color: #2c3e50;
+}
+
+body[data-theme="dark"] .work-result {
+    background-color: #1a2530;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .work-result h3 {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .work-result p {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .work-progress-container {
+    background-color: #34495e;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .work-progress-bar {
+    background: linear-gradient(90deg, #3498db, #2980b9);
+}
+
+body[data-theme="dark"] .work-progress-info {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .work-activity-log {
+    background-color: #2c3e50;
+    border-color: #34495e;
+}
+
+body[data-theme="dark"] .work-activity-item {
+    color: #ecf0f1;
+    border-bottom-color: #34495e;
+}
+
+body[data-theme="dark"] .work-activity-item.new-activity {
+    background-color: #2980b9;
+}
+
+@keyframes fadeInDark {
+    0% { opacity: 0; background-color: #3498db; }
+    100% { opacity: 1; background-color: #2980b9; }
+}
+
+body[data-theme="dark"] .work-activity-item.new-activity {
+    animation: fadeInDark 0.5s ease-out;
+}
+
+body[data-theme="dark"] .work-result-stats {
+    border-top-color: #34495e;
+}
+
+body[data-theme="dark"] .work-result-stat {
+    background-color: #34495e;
+}
+
+body[data-theme="dark"] .work-result-stat-label {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .work-result-stat-value {
+    color: #3498db;
+}
+
+body[data-theme="dark"] .work-result-xp {
+    color: #f39c12;
+}
+
+body[data-theme="dark"] #complete-work-manually {
+    background: linear-gradient(135deg, #c0392b, #922b21);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+body[data-theme="dark"] #complete-work-manually:hover {
+    background: linear-gradient(135deg, #922b21, #7b241c);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Tmavý režim pro vlastní úkoly */
+body[data-theme="dark"] .custom-tasks-header h3 {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .custom-tasks-header p {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .custom-tasks-list {
+    background-color: #2c3e50;
+    border-color: #34495e;
+}
+
+body[data-theme="dark"] .no-tasks {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .custom-task-item {
+    background-color: #1a2530;
+    border-color: #34495e;
+}
+
+body[data-theme="dark"] .custom-task-item:hover {
+    background-color: #243342;
+}
+
+body[data-theme="dark"] .custom-task-text {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .custom-task-input {
+    background-color: #1a2530;
+    border-color: #34495e;
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .custom-task-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
+
+body[data-theme="dark"] .custom-tasks-progress {
+    background-color: #1a2530;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .custom-tasks-progress h4 {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .custom-task-check-item {
+    background-color: #2c3e50;
+}
+
+body[data-theme="dark"] .custom-task-check-item.completed {
+    background-color: #27ae60;
+}
+
+body[data-theme="dark"] .custom-task-check-item.completed .custom-task-check-text {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .checkmark {
+    background-color: #34495e;
+    border-color: #2c3e50;
+}
+
+body[data-theme="dark"] .custom-task-check-text {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .tasks-completed-notification {
+    background-color: #27ae60;
+}
+
+body[data-theme="dark"] .tasks-completed-text {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .tasks-summary {
+    background-color: #2c3e50;
+}
+
+body[data-theme="dark"] .tasks-summary p {
+    color: #ecf0f1;
+}
+
+/* Styly pro sledování bodů */
 .track-points-controls {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
 }
 
-.track-points-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 15px;
+.track-points-list {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
 .track-points-header {
-    display: flex;
-    background-color: #f5f5f5;
-    font-weight: bold;
-    border-bottom: 2px solid #ddd;
-}
-
-.track-point-row {
-    display: flex;
-    border-bottom: 1px solid #eee;
-}
-
-.track-point-cell {
-    padding: 8px 12px;
-    flex: 1;
-}
-
-.track-point-cell:first-child {
-    flex: 0 0 40px;
-}
-
-.track-point-cell:last-child {
-    flex: 0 0 60px;
-    text-align: right;
-}
-
-.track-point-action {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 2px 5px;
-}
-
-.track-point-action.delete {
-    color: #e74c3c;
-}
-
-.track-path-controls {
-    display: flex;
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr;
     gap: 10px;
-    margin-bottom: 15px;
-}
-
-/* Path preview */
-.path-preview-info {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.path-preview-stat {
-    flex: 1;
-    text-align: center;
+    background-color: #f5f5f5;
     padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-}
-
-.path-preview-stat-label {
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 5px;
-}
-
-.path-preview-stat-value {
-    font-size: 1.1rem;
     font-weight: bold;
-    color: #3498db;
 }
 
-/* Existing paths */
-.existing-paths-section {
-    margin-top: 20px;
-    padding-top: 15px;
+.track-point-item {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
     border-top: 1px solid #e0e0e0;
 }
 
-.existing-path-info {
+.track-point-item:hover {
     background-color: #f9f9f9;
-    border-radius: 4px;
+}
+
+.track-point-number {
+    font-weight: bold;
+    text-align: center;
+}
+
+.track-points-summary {
     padding: 10px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    font-weight: bold;
+}
+
+.no-points {
+    padding: 20px;
+    text-align: center;
+    color: #777;
+}
+
+/* Marker na mapě */
+.track-point-marker {
+    background-color: #3498db;
+    border: 2px solid white;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    width: 24px !important;
+    height: 24px !important;
+    margin-left: -12px !important;
+    margin-top: -12px !important;
+}
+
+.track-point-number {
+    font-size: 12px;
+    line-height: 1;
+}
+
+.track-point-popup h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+
+.track-point-popup p {
+    margin: 0 0 3px 0;
+    font-size: 14px;
+}
+
+/* Tmavý režim pro sledování bodů */
+body[data-theme="dark"] .track-points-list {
+    border-color: #34495e;
+}
+
+body[data-theme="dark"] .track-points-header {
+    background-color: #34495e;
+}
+
+body[data-theme="dark"] .track-point-item {
+    border-top-color: #34495e;
+}
+
+body[data-theme="dark"] .track-point-item:hover {
+    background-color: #2c3e50;
+}
+
+body[data-theme="dark"] .track-points-summary {
+    background-color: #34495e;
+    border-top-color: #2c3e50;
+}
+
+body[data-theme="dark"] .no-points {
+    color: #bdc3c7;
+}
+
+/* Styly pro ukládání cest */
+.track-path-controls {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.track-path-preview {
+    margin-top: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.track-path-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
     margin-bottom: 10px;
 }
 
-/* Saved paths */
+.track-path-stat {
+    background-color: #f0f0f0;
+    padding: 8px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.track-path-stat-label {
+    font-size: 12px;
+    color: #777;
+}
+
+.track-path-stat-value {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.track-path-name-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
 .saved-paths-list {
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 .saved-path-item {
     display: flex;
     align-items: center;
+    gap: 10px;
     padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
     margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.saved-path-item:hover {
+    background-color: #f5f5f5;
 }
 
 .saved-path-icon {
-    font-size: 1.5rem;
-    margin-right: 10px;
+    font-size: 20px;
+    color: #3498db;
 }
 
 .saved-path-info {
@@ -685,8 +1254,8 @@
 }
 
 .saved-path-details {
-    font-size: 0.8rem;
-    color: #666;
+    font-size: 12px;
+    color: #777;
 }
 
 .saved-path-actions {
@@ -695,37 +1264,127 @@
 }
 
 .saved-path-action {
-    background: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
     border: none;
+    background-color: #f0f0f0;
+    color: #555;
     cursor: pointer;
-    padding: 2px 5px;
-    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
 }
 
-.saved-path-action.show {
-    color: #3498db;
+.saved-path-action:hover {
+    background-color: #e0e0e0;
 }
 
 .saved-path-action.delete {
     color: #e74c3c;
 }
 
-/* Track point marker */
-.track-point-marker {
-    background: none;
-    border: none;
+.saved-path-action.show {
+    color: #3498db;
 }
 
-.track-point-marker-inner {
-    width: 24px;
-    height: 24px;
-    background-color: #3498db;
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
+/* Styly pro existující cestu */
+.existing-paths-section {
+    margin-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 15px;
+}
+
+.existing-paths-section h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+#existing-path-preview {
+    margin-bottom: 15px;
+}
+
+/* Zvýraznění tlačítka pro import existující cesty */
+#import-existing-path {
+    background-color: #27ae60;
+    color: white;
     font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#import-existing-path:hover {
+    background-color: #2ecc71;
+    transform: scale(1.05);
+}
+
+/* Tlačítko pro výpočet trasy */
+#calculate-route-btn {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+#calculate-route-btn:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+/* Animace pro upozornění na existující cestu */
+@keyframes highlight-path {
+    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+
+.track-path-preview {
+    animation: highlight-path 2s ease-in-out;
+}
+
+/* Tmavý režim pro ukládání cest */
+body[data-theme="dark"] .track-path-preview {
+    background-color: #2c3e50;
+    border-color: #34495e;
+}
+
+body[data-theme="dark"] .track-path-stat {
+    background-color: #34495e;
+}
+
+body[data-theme="dark"] .track-path-stat-label {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .track-path-name-input {
+    background-color: #34495e;
+    border-color: #2c3e50;
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .saved-path-item {
+    border-color: #34495e;
+}
+
+body[data-theme="dark"] .saved-path-item:hover {
+    background-color: #34495e;
+}
+
+body[data-theme="dark"] .saved-path-details {
+    color: #bdc3c7;
+}
+
+body[data-theme="dark"] .saved-path-action {
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .existing-paths-section h3 {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .existing-paths-section {
+    border-top-color: #34495e;
 }

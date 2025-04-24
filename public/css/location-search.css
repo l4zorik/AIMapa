@@ -1,0 +1,245 @@
+/**
+ * Styly pro modul vyhledávání míst
+ * Verze 0.2.8.6.2
+ */
+
+/* Kontejner pro vyhledávací pole */
+.search-container {
+    position: relative;
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+/* Vyhledávací pole */
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* Input pro vyhledávání */
+.search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+/* Tlačítko pro vyhledávání */
+.search-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.search-button .icon {
+    font-size: 16px;
+}
+
+/* Výsledky vyhledávání */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+/* Seznam výsledků */
+.search-results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Položka výsledku */
+.search-result-item {
+    display: flex;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* Ikona výsledku */
+.search-result-icon {
+    margin-right: 10px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Informace o výsledku */
+.search-result-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Název výsledku */
+.search-result-name {
+    font-weight: bold;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Adresa výsledku */
+.search-result-address {
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Načítání */
+.search-loading {
+    padding: 15px;
+    text-align: center;
+    color: #666;
+}
+
+/* Žádné výsledky */
+.search-no-results {
+    padding: 15px;
+    text-align: center;
+    color: #666;
+}
+
+/* Chyba */
+.search-error {
+    padding: 15px;
+    text-align: center;
+    color: #f44336;
+}
+
+/* Marker vyhledávání */
+.search-marker {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.search-marker-inner {
+    font-size: 30px;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Popup okno vyhledávání */
+.search-popup {
+    padding: 5px;
+}
+
+.search-popup h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+
+.search-popup p {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Akce v popup okně */
+.search-popup-actions {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.search-popup-add-point,
+.search-popup-directions {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+.search-popup-add-point {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.search-popup-add-point:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.search-popup-directions {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.search-popup-directions:hover {
+    background-color: #388E3C;
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .search-box {
+    background-color: #333;
+}
+
+body[data-theme="dark"] .search-input {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .search-results {
+    background-color: #333;
+}
+
+body[data-theme="dark"] .search-result-item {
+    border-bottom-color: #444;
+}
+
+body[data-theme="dark"] .search-result-item:hover {
+    background-color: #444;
+}
+
+body[data-theme="dark"] .search-result-address {
+    color: #aaa;
+}
+
+body[data-theme="dark"] .search-loading,
+body[data-theme="dark"] .search-no-results {
+    color: #aaa;
+}
+
+body[data-theme="dark"] .search-popup {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .search-popup p {
+    color: #aaa;
+}

@@ -18,15 +18,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Statické soubory - servírujeme přímo z kořenového adresáře
-app.use(express.static(path.join(__dirname)));
+// Statické soubory
+app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.use('/api', require('./routes/api'));
 
 // Hlavní route pro aplikaci
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Nastavení portu
