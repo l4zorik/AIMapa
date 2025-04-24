@@ -2,6 +2,20 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.1.0] - 2025-06-06 - PŘEVOD APLIKACE NA NODE.JS
+
+### Nové funkce
+- Vytvořena základní struktura Node.js aplikace
+- Implementován Express.js server
+- Vytvořeny API endpointy pro virtuální práci
+- Přesun front-end kódu do adresáře public
+
+### Vylepšení
+- Oddělení klientské a serverové části aplikace
+- Příprava na implementaci databáze
+- Vylepšená struktura projektu
+- Přidána podpora pro environment proměnné
+
 ## [0.3.0.16] - 2025-06-05 - KOMPLETNÍ PŘEPRACOVÁNÍ MODULU VIRTUÁLNÍ PRÁCE
 
 ### Opravy

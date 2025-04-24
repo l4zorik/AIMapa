@@ -1,0 +1,731 @@
+/* Styly pro modul virtuální práce */
+
+/* Dialog */
+.virtual-work-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-width: 90%;
+    max-height: 90vh;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Dialog header */
+.virtual-work-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #3498db;
+    color: #fff;
+}
+
+.virtual-work-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.virtual-work-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+/* Dialog content */
+.virtual-work-content {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Dialog actions */
+.virtual-work-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 20px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Buttons */
+.virtual-work-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    margin-left: 10px;
+    transition: background-color 0.2s;
+}
+
+.virtual-work-btn.primary {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.virtual-work-btn.primary:hover {
+    background-color: #2980b9;
+}
+
+.virtual-work-btn.secondary {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.virtual-work-btn.secondary:hover {
+    background-color: #d0d0d0;
+}
+
+.virtual-work-btn:disabled {
+    background-color: #ccc;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* Workplace categories */
+.workplace-categories {
+    display: flex;
+    margin-bottom: 15px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.category-btn {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    margin-right: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.category-btn.active {
+    background-color: #3498db;
+    color: #fff;
+    border-color: #3498db;
+}
+
+/* Workplace list */
+.workplace-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.workplace-item {
+    display: flex;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.workplace-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.workplace-item.selected {
+    border-color: #3498db;
+    background-color: #ebf5fb;
+}
+
+.workplace-icon {
+    font-size: 2rem;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.workplace-info {
+    flex: 1;
+}
+
+.workplace-name {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.workplace-pay {
+    color: #27ae60;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.workplace-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.workplace-details {
+    display: flex;
+    font-size: 0.8rem;
+}
+
+.workplace-difficulty,
+.workplace-xp,
+.workplace-duration {
+    margin-right: 8px;
+    padding: 2px 6px;
+    background-color: #f5f5f5;
+    border-radius: 3px;
+}
+
+.workplace-xp {
+    color: #8e44ad;
+}
+
+.workplace-duration {
+    color: #2c3e50;
+}
+
+/* Work stats */
+.work-stats {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.work-stats h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.work-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.work-stat {
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.work-stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #3498db;
+    margin-bottom: 4px;
+}
+
+.work-stat-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Custom tasks */
+.custom-tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.custom-tasks-header h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.custom-tasks-header p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.custom-tasks-list {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    min-height: 150px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.no-tasks {
+    color: #888;
+    text-align: center;
+    padding: 20px;
+}
+
+.custom-task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.custom-task-text {
+    flex: 1;
+}
+
+.custom-task-delete {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.custom-tasks-form {
+    display: flex;
+    gap: 10px;
+}
+
+.custom-task-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.custom-tasks-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+/* Work progress */
+.work-progress-container {
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin: 15px 0;
+    overflow: hidden;
+}
+
+.work-progress-bar {
+    height: 100%;
+    background-color: #3498db;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.work-progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+/* Custom tasks progress */
+.custom-tasks-progress {
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    background-color: #f9f9f9;
+}
+
+.custom-tasks-progress h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.custom-tasks-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.custom-task-check-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background-color: #fff;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.custom-task-check-item.completed {
+    background-color: #e8f8f5;
+}
+
+.custom-task-checkbox {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-task-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #3498db;
+    border-radius: 4px;
+}
+
+.custom-task-checkbox input:checked ~ .checkmark {
+    background-color: #3498db;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.custom-task-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.custom-task-checkbox .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-task-check-text {
+    margin-left: 10px;
+    flex: 1;
+}
+
+/* Work activity log */
+.work-activity-log {
+    margin-top: 20px;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.work-activity-item {
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.work-activity-item:last-child {
+    border-bottom: none;
+}
+
+.work-activity-item.new-activity {
+    animation: fadeIn 0.5s;
+    background-color: #ebf5fb;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Skip button */
+.skip-button-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Work result */
+.work-result {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.work-result-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.work-result h3 {
+    margin-bottom: 15px;
+}
+
+.work-result-amount {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #27ae60;
+    margin-bottom: 5px;
+}
+
+.work-result-xp {
+    font-size: 1.2rem;
+    color: #8e44ad;
+    margin-bottom: 20px;
+}
+
+.work-result p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.work-result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.work-result-stat {
+    text-align: center;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    min-width: 120px;
+}
+
+.work-result-stat-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.work-result-stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #3498db;
+}
+
+/* Tasks summary */
+.tasks-summary {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.all-tasks-completed {
+    color: #27ae60;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.tasks-bonus {
+    color: #f39c12;
+    margin-top: 5px;
+}
+
+/* Tasks completed notification */
+.tasks-completed-notification {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e8f8f5;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    animation: fadeIn 0.5s;
+}
+
+.tasks-completed-icon {
+    font-size: 1.2rem;
+    color: #27ae60;
+    margin-right: 10px;
+}
+
+.tasks-completed-text {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+/* Track points */
+.track-points-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.track-points-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.track-points-header {
+    display: flex;
+    background-color: #f5f5f5;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+}
+
+.track-point-row {
+    display: flex;
+    border-bottom: 1px solid #eee;
+}
+
+.track-point-cell {
+    padding: 8px 12px;
+    flex: 1;
+}
+
+.track-point-cell:first-child {
+    flex: 0 0 40px;
+}
+
+.track-point-cell:last-child {
+    flex: 0 0 60px;
+    text-align: right;
+}
+
+.track-point-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 5px;
+}
+
+.track-point-action.delete {
+    color: #e74c3c;
+}
+
+.track-path-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Path preview */
+.path-preview-info {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.path-preview-stat {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+.path-preview-stat-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.path-preview-stat-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #3498db;
+}
+
+/* Existing paths */
+.existing-paths-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.existing-path-info {
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* Saved paths */
+.saved-paths-list {
+    margin-top: 10px;
+}
+
+.saved-path-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.saved-path-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.saved-path-info {
+    flex: 1;
+}
+
+.saved-path-name {
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.saved-path-details {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.saved-path-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.saved-path-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 5px;
+    font-size: 1.1rem;
+}
+
+.saved-path-action.show {
+    color: #3498db;
+}
+
+.saved-path-action.delete {
+    color: #e74c3c;
+}
+
+/* Track point marker */
+.track-point-marker {
+    background: none;
+    border: none;
+}
+
+.track-point-marker-inner {
+    width: 24px;
+    height: 24px;
+    background-color: #3498db;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}

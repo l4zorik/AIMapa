@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMapa - Interaktivní mapa s AI funkcemi</title>
+    
+    <!-- Základní styly -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Virtuální práce CSS -->
+    <link rel="stylesheet" href="css/virtual-work.css">
+</head>
+<body>
+    <header>
+        <h1>AIMapa</h1>
+        <nav>
+            <ul>
+                <li><a href="#" id="open-map">Mapa</a></li>
+                <li><a href="#" id="open-virtual-work">Virtuální práce</a></li>
+                <li><a href="#" id="open-settings">Nastavení</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
+        
+        <div id="sidebar">
+            <div id="money-indicator">
+                <span id="money-amount">500</span> Kč
+            </div>
+            
+            <div id="commands-menu">
+                <button id="toggle-commands">Příkazy</button>
+                <div id="commands-list" style="display: none;">
+                    <ul>
+                        <li data-command="virtual-work">Virtuální práce</li>
+                        <li data-command="track-points">Sledování bodů</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>AIMapa v0.3.0.16 &copy; 2025 Jan Lazorik</p>
+    </footer>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Základní skripty -->
+    <script src="js/app.js"></script>
+    <script src="js/map.js"></script>
+    
+    <!-- Modul pro virtuální práci -->
+    <script src="js/virtual-work.js"></script>
+</body>
+</html>
