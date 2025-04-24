@@ -2,6 +2,129 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.0.16] - 2025-06-05 - KOMPLETNÍ PŘEPRACOVÁNÍ MODULU VIRTUÁLNÍ PRÁCE
+
+### Opravy
+- Kompletně přepracován modul virtuální práce pro zajištění správného načítání
+- Opravena struktura třídy VirtualWorkClass
+- Odstraněny syntaktické chyby v kódu
+- Přidáno správné exportování modulu
+
+### Vylepšení
+- Přidána lepší detekce chyb při inicializaci
+- Vylepšeno logování pro snadnější diagnostiku problémů
+- Přidána podpora pro Node.js (první krok k přechodu na Node.js)
+
+## [0.3.0.15] - 2025-06-04 - OPRAVA CHYBY NAČÍTÁNÍ MODULU VIRTUÁLNÍ PRÁCE
+
+### Opravy
+- Opravena syntaktická chyba v souboru virtual-work.js, která způsobovala, že se modul virtuální práce nenačítal
+- Odstraněn duplicitní kód pro interval aktualizace progress baru
+- Opravena struktura metod v modulu virtuální práce
+- Přidán testovací skript pro ověření načítání modulu
+
+## [0.3.0.14] - 2025-06-03 - PŘIDÁNÍ VLASTNÍCH ÚKOLŮ DO VIRTUÁLNÍ PRÁCE
+
+### Nové funkce
+- Přidána možnost definovat vlastní úkoly před začátkem práce
+- Implementován systém pro manuální označení úkolů jako dokončené během práce
+- Přidán bonus za dokončené úkoly (až 20% navíc k výdělku a XP)
+- Implementována notifikace o dokončení všech úkolů
+- Přidáno zobrazení souhrnu dokončených úkolů po skončení práce
+
+### Vylepšení uživatelského rozhraní
+- Přidán formulář pro zadávání vlastních úkolů s možností přidání a odstranění
+- Implementován checklist úkolů s vizuálním označením dokončených úkolů
+- Přidány animace a vizuální efekty pro lepší uživatelský zážitek
+- Implementována podpora tmavého režimu pro všechny nové prvky
+- Vylepšeno zobrazení výsledku práce s informacemi o dokončených úkolech
+
+## [0.3.0.13] - 2025-06-02 - PŘIDÁNÍ TLAČÍTKA PRO MANUÁLNÍ DOKONČENÍ ÚKOLU
+
+### Nové funkce
+- Přidáno tlačítko "Dokončit úkol manuálně" pro okamžité dokončení práce
+- Implementováno okamžité získání odměny a XP po manuálním dokončení
+- Přidáno rozlišení mezi automaticky a manuálně dokončenými úkoly v historii
+- Implementována animace pro zvýraznění tlačítka manuálního dokončení
+
+### Vylepšení uživatelského rozhraní
+- Přidáno výrazné červené tlačítko pro manuální dokončení s pulzujícím efektem
+- Upraveno zobrazení výsledku po manuálním dokončení s odpovídající zprávou
+- Implementována podpora tmavého režimu pro nové tlačítko
+- Vylepšeny animace a přechody pro plynulejší uživatelský zážitek
+
+## [0.3.0.12] - 2025-06-01 - KOMPLETNÍ REDESIGN OKNA VIRTUÁLNÍ PRÁCE
+
+### Nový design
+- Kompletně přepracován design okna virtuální práce s moderním vzhledem
+- Přidány animace, přechody a vizuální efekty pro lepší uživatelský zážitek
+- Implementován responzivní design s lepším využitím prostoru
+- Přidána podpora tmavého režimu pro všechny nové prvky
+
+### Nové funkce
+- Přidáno více typů pracovišť (6 různých kategorií) s různými odměnami a obtížností
+- Implementováno filtrování pracovišť podle kategorií
+- Přidána historie práce s ukládáním do localStorage
+- Implementovány statistiky práce (celkový výdělek, počet směn, získané XP)
+- Přidán interaktivní progress bar s animací průběhu práce
+- Implementován log aktivit během práce podle typu zaměstnání
+- Přidáno získávání XP za práci s různými hodnotami podle obtížnosti
+
+### Vylepšení uživatelského rozhraní
+- Přidány detailní informace o pracovištích včetně popisu, obtížnosti a doby trvání
+- Implementovány kategorie pracovišť s možností filtrování
+- Přidány statistiky práce s přehledným zobrazením
+- Vylepšeno zobrazení výsledku práce s animacemi a detailními informacemi
+- Implementován systém pro zobrazení aktivit během práce
+
+## [0.3.0.11] - 2025-05-31 - VYLEPŠENÍ DETEKCE EXISTUJÍCÍCH CEST A PŘIDÁNÍ TLAČÍTKA PRO VÝPOČET TRASY
+
+### Nové funkce
+- Přidáno tlačítko pro výpočet trasy přímo v dialogu sledování bodů
+- Implementována automatická aktualizace detekce cest po výpočtu trasy
+- Přidán event listener pro zachycení události výpočtu trasy
+- Implementována podpora pro vytvoření cesty z existujících markerů
+
+### Vylepšení detekce cest
+- Kompletně přepracována detekce existujících cest na mapě
+- Přidána podpora pro detekci jakékoliv cesty na mapě (nejen červené přerušované)
+- Vylepšena detekce markerů a vytvoření cesty z nich
+- Implementována robustnější kontrola existence cesty
+
+### Vylepšení uživatelského rozhraní
+- Přidány nové CSS styly pro tlačítko výpočtu trasy
+- Vylepšeno zobrazení informací o detekované cestě
+- Přidány informativní zprávy o výpočtu trasy a importu cesty
+- Implementována lepší vizuální hierarchie prvků v dialogu
+
+## [0.3.0.10] - 2025-05-30 - OPRAVA DETEKCE EXISTUJÍCÍCH CEST V DIALOGU SLEDOVÁNÍ BODŮ
+
+### Opravy
+- Opravena detekce existujících cest na mapě v dialogu sledování bodů
+- Vylepšena detekce červené přerušované čáry na mapě
+- Přidána podpora pro detekci globální proměnné route
+- Implementováno lepší zobrazení detekované cesty s informacemi o typu a barvě
+
+### Vylepšení uživatelského rozhraní
+- Přidány nové CSS styly pro lepší zobrazení existující cesty
+- Vylepšeno zobrazení tlačítka pro import existující cesty
+- Přidána animace pro zvýraznění detekované cesty
+- Implementována podpora tmavého režimu pro nové prvky
+
+## [0.3.0.9] - 2025-05-29 - ZOBRAZENÍ EXISTUJÍCÍCH CEST V DIALOGU SLEDOVÁNÍ BODŮ
+
+### Nové funkce
+- Přidána detekce existujících cest na mapě a jejich zobrazení v dialogu sledování bodů
+- Implementována možnost importu existující cesty do systému sledování bodů
+- Přidáno zobrazení statistik existující cesty (počet bodů, vzdálenost)
+- Implementována funkce pro výpočet vzdálenosti mezi body cesty
+
+### Vylepšení uživatelského rozhraní
+- Přidána nová sekce "Aktuální cesta na mapě" v dialogu sledování bodů
+- Vylepšeno zobrazení existujících cest s detailními informacemi
+- Přidáno tlačítko pro import existující cesty do systému sledování bodů
+- Implementována podpora tmavého režimu pro nové prvky
+
 ## [0.3.0.8] - 2025-05-28 - VYLEPŠENÝ SYSTÉM FIREM NA MAPĚ A FINANČNÍHO INDIKÁTORU
 
 ### Nové funkce
