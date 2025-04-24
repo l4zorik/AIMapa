@@ -850,8 +850,8 @@ class VirtualWorkClass {
         const progressInterval = setInterval(() => {
             currentStep++;
 
-            // Výpočet procenta dokončení
-            const percent = Math.min(Math.floor((currentStep / totalSteps) * 100), 100);
+            // Výpočet procenta dokončení - maximálně 99% pro automatický progress
+            const percent = Math.min(Math.floor((currentStep / totalSteps) * 100), 99);
 
             // Aktualizace progress baru
             progressBar.style.width = `${percent}%`;
@@ -877,116 +877,26 @@ class VirtualWorkClass {
                 }, 1000);
             }
 
-            // Kontrola, zda jsme dokončili práci
+            // Kontrola, zda jsme dosáhli 99% (ale nedokončíme automaticky)
             if (currentStep >= totalSteps) {
                 clearInterval(progressInterval);
 
                 // Přidání poslední aktivity
-                activityLog.innerHTML = `<div class="work-activity-item new-activity">Práce dokončena!</div>` + activityLog.innerHTML;
+                activityLog.innerHTML = `<div class="work-activity-item new-activity">Práce je téměř dokončena! Klikněte na tlačítko "Dokončit práci manuálně" pro získání odměny.</div>` + activityLog.innerHTML;
 
-                // Kontrola dokončení úkolů
-                const allTasksCompleted = this.checkAllTasksCompleted(dialog);
-
-                // Výpočet výdělku a XP s bonusem za dokončené úkoly
-                let earnings = workplace.pay;
-                let xp = workplace.xp;
-
-                // Bonus za dokončené úkoly
-                if (this.customTasks.length > 0) {
-                    const completedTasks = this.customTasks.filter(task => task.completed);
-                    const completionRate = completedTasks.length / this.customTasks.length;
-
-                    // Bonus za dokončené úkoly (až 20% navíc)
-                    const taskBonus = Math.round(earnings * 0.2 * completionRate);
-                    const xpBonus = Math.round(xp * 0.2 * completionRate);
-
-                    earnings += taskBonus;
-                    xp += xpBonus;
+                // Zvýraznění tlačítka pro manuální dokončení
+                const completeManuallyBtn = dialog.querySelector('#complete-work-manually');
+                if (completeManuallyBtn) {
+                    completeManuallyBtn.classList.add('pulse-animation');
+                    completeManuallyBtn.style.backgroundColor = '#e74c3c';
+                    completeManuallyBtn.style.color = 'white';
+                    completeManuallyBtn.style.fontWeight = 'bold';
+                    completeManuallyBtn.style.fontSize = '16px';
+                    completeManuallyBtn.style.padding = '12px 20px';
                 }
 
-                // Vytvoření záznamu práce
-                const workRecord = {
-                    id: Date.now(),
-                    workplace: workplace.id,
-                    name: workplace.name,
-                    icon: workplace.icon,
-                    type: workplace.type,
-                    pay: earnings,
-                    xp: xp,
-                    duration: workplace.duration,
-                    date: new Date().toISOString(),
-                    completedManually: false,
-                    customTasks: this.customTasks.length > 0 ? this.customTasks.map(task => ({
-                        text: task.text,
-                        completed: task.completed
-                    })) : []
-                };
-
-                // Uložení záznamu do API
-                this.saveWorkRecord(workRecord);
-
-                // Přidání peněz a XP
-                this.addMoney(earnings, xp);
-
-                // Krátká pauza před zobrazením výsledku
-                setTimeout(() => {
-                    // Zobrazení výsledku
-                    let resultHTML = `
-                        <div class="work-result">
-                            <div class="work-result-icon">✅</div>
-                            <h3>Práce dokončena!</h3>
-                            <div class="work-result-amount">+ ${earnings} Kč</div>
-                            <div class="work-result-xp">+ ${xp} XP</div>
-                    `;
-
-                    // Přidání informací o úkolech
-                    if (this.customTasks.length > 0) {
-                        const completedTasks = this.customTasks.filter(task => task.completed);
-
-                        resultHTML += `
-                            <div class="tasks-summary">
-                                <p>Dokončeno ${completedTasks.length} z ${this.customTasks.length} úkolů</p>
-                                ${allTasksCompleted ?
-                                    '<div class="all-tasks-completed">Všechny úkoly dokončeny! Získáváte bonus +20%</div>' :
-                                    `<div class="tasks-bonus">Bonus za dokončené úkoly: +${Math.round((completedTasks.length / this.customTasks.length) * 20)}%</div>`
-                                }
-                            </div>
-                        `;
-                    }
-
-                    resultHTML += `
-                            <p>Peníze a zkušenosti byly přidány na váš účet.</p>
-
-                            <div class="work-result-stats">
-                                <div class="work-result-stat">
-                                    <div class="work-result-stat-label">Celkový výdělek</div>
-                                    <div class="work-result-stat-value">${this.getTotalEarnings()} Kč</div>
-                                </div>
-                                <div class="work-result-stat">
-                                    <div class="work-result-stat-label">Celkem směn</div>
-                                    <div class="work-result-stat-value">${this.workHistory.length}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    dialog.querySelector('.virtual-work-content').innerHTML = resultHTML;
-
-                    // Změna tlačítek
-                    dialog.querySelector('.virtual-work-actions').innerHTML = `
-                        <button class="virtual-work-btn secondary" id="virtual-work-close">Zavřít</button>
-                        <button class="virtual-work-btn secondary" id="track-points">Sledovat body</button>
-                        <button class="virtual-work-btn primary" id="virtual-work-again">Pracovat znovu</button>
-                    `;
-
-                    // Přidání event listenerů pro nová tlačítka
-                    dialog.querySelector('#virtual-work-close').addEventListener('click', () => this.closeDialog(dialog));
-                    dialog.querySelector('#virtual-work-again').addEventListener('click', () => this.openWorkDialog());
-                    dialog.querySelector('#track-points').addEventListener('click', () => {
-                        this.closeDialog(dialog);
-                        this.openTrackPointsDialog();
-                    });
-                }, 1000);
+                // Kontrola dokončení úkolů
+                this.checkAllTasksCompleted(dialog);
             }
         }, 100);
     }

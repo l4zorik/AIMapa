@@ -1571,3 +1571,40 @@ body[data-theme="dark"] .work-history-name {
 body[data-theme="dark"] .work-history-date {
     color: #bdc3c7;
 }
+
+/* Animace pulzování pro tlačítko dokončení práce */
+@keyframes pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+        transform: scale(1.05);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+        transform: scale(1);
+    }
+}
+
+.pulse-animation {
+    animation: pulse-animation 1.5s infinite;
+}
+
+/* Vylepšení tlačítka pro manuální dokončení */
+.skip-button-container {
+    margin-top: 15px;
+    text-align: center;
+}
+
+#complete-work-manually {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+#complete-work-manually:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
