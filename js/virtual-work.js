@@ -1,6 +1,6 @@
 /**
  * Jednoduchý modul pro virtuální práci
- * Verze 0.3.1.0
+ * Verze 0.3.5.0
  */
 
 class VirtualWorkClass {

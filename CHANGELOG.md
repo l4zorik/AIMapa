@@ -2,6 +2,25 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.5.0] - 2025-06-20 - FUNKČNÍ SYSTÉM VIRTUÁLNÍ PRÁCE A ODMĚŇOVACÍ SYSTÉM
+
+### Nové funkce
+- Plně funkční systém virtuální práce s možností definování vlastních úkolů
+- Implementován odměňovací systém s možností výběru typu odměny (peníze, XP, úspora času)
+- Přidána položka "Systém odměn" do menu příkazů v kategorii Zábava
+- Přidány vizuální efekty pro výběr odměny a zobrazení výsledku
+
+### Vylepšení
+- Optimalizován proces dokončení práce a získání odměny
+- Vylepšen design odměňovacího systému s animacemi a vizuálními efekty
+- Přidána podpora tmavého režimu pro odměňovací systém
+- Vylepšeno zobrazení položky "Systém odměn" v menu příkazů
+
+### Opravy
+- Opraveno zobrazování položky "Systém odměn" v menu příkazů
+- Opraveno tlačítko "Zpět na výběr práce" v dialogu nedokončené práce
+- Opraveno tlačítko "Zpět na výběr práce" v pracovním dialogu
+
 ## [0.3.4.2] - 2025-06-18 - PŘÍMÁ OPRAVA MENU PŘÍKAZŮ
 
 ### Nové funkce
