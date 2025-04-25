@@ -1,6 +1,6 @@
 /**
  * Samostatný odměňovací systém
- * Verze 0.3.5.6
+ * Verze 0.3.5.7
  */
 
 class RewardSystemClass {

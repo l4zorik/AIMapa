@@ -1,6 +1,6 @@
 /**
  * Jednoduchý modul pro virtuální práci
- * Verze 0.3.5.6
+ * Verze 0.3.5.7
  */
 
 class VirtualWorkClass {
@@ -1795,20 +1795,126 @@ class VirtualWorkClass {
 
             const rewardType = selectedOption.dataset.type;
 
-            // Zpracování vybrané odměny
+            // Výpočet odměny podle vybraného typu
+            let finalPay = workplace.pay + taskBonus;
+            let finalXp = workplace.xp + taskBonusXp;
+            let timeBonus = 0;
+
             switch (rewardType) {
                 case 'money':
-                    // Standardní finanční odměna
-                    this.completeWorkWithReward(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp, 'money');
+                    // Standardní odměna, nic se nemění
                     break;
                 case 'xp':
                     // Více XP, méně peněz
-                    this.completeWorkWithReward(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp, 'xp');
+                    finalXp = Math.floor(finalXp * 1.5); // +50% XP
+                    finalPay = Math.floor(finalPay * 0.7); // -30% peněz
                     break;
                 case 'time':
                     // Úspora času pro příští práci
-                    this.completeWorkWithReward(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp, 'time');
+                    timeBonus = Math.floor(workplace.duration * 0.3); // 30% úspora času
                     break;
+            }
+
+            // Přidání peněz a XP
+            if (window.addMoney) {
+                window.addMoney(finalPay);
+            }
+
+            if (window.addXP) {
+                window.addXP(finalXp, 'Práce');
+            }
+
+            // Uložení časového bonusu, pokud byl vybrán
+            if (rewardType === 'time' && timeBonus > 0) {
+                localStorage.setItem('aiMapaTimeBonus', JSON.stringify({
+                    workplaceId: workplace.id,
+                    minutes: timeBonus
+                }));
+            }
+
+            // Uložení záznamu práce
+            const workRecord = {
+                id: Date.now().toString(),
+                workplaceId: workplace.id,
+                name: workplace.name,
+                icon: workplace.icon,
+                pay: finalPay,
+                xp: finalXp,
+                duration: totalTimeFormatted,
+                date: new Date().toISOString(),
+                tasks: this.customTasks,
+                rewardType: rewardType
+            };
+
+            // Uložení záznamu do API
+            this.saveWorkRecord(workRecord);
+
+            // Zavření dialogu virtuální práce
+            this.closeDialog(dialog);
+
+            // Vytvoření objektu s odměnou pro odměňovací systém
+            const workReward = {
+                icon: workplace.icon,
+                name: workplace.name,
+                money: finalPay,
+                moneyBonus: taskBonus > 0 ? taskBonus : null,
+                xp: finalXp,
+                xpBonus: taskBonusXp > 0 ? taskBonusXp : null,
+                timeBonus: rewardType === 'time' ? 30 : null,
+                tasks: this.customTasks,
+                rewardType: rewardType,
+                duration: totalTimeFormatted
+            };
+
+            // Otevření odměňovacího systému s odměnou z práce
+            if (typeof RewardSystem !== 'undefined') {
+                // Inicializace modulu odměňovacího systému, pokud ještě nebyl inicializován
+                if (!RewardSystem.isInitialized) {
+                    RewardSystem.init();
+                }
+
+                // Otevření dialogu odměňovacího systému s odměnou z práce
+                RewardSystem.openRewardSystemDialog(workReward);
+
+                // Zobrazení informace o systému odměn
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Práce dokončena! Otevírám systém odměn...', false);
+                    setTimeout(() => {
+                        addMessage('Nyní si můžete vybrat další odměnu z našeho systému odměn! 🐱', false);
+                    }, 1000);
+                }
+            } else {
+                // Pokud není odměňovací systém k dispozici, načteme ho
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Práce dokončena! Načítám modul systému odměn...', false);
+
+                    // Načtení skriptu odměňovacího systému
+                    const script = document.createElement('script');
+                    script.src = 'js/reward-system.js';
+                    script.onload = () => {
+                        // Inicializace modulu po načtení
+                        if (typeof RewardSystem !== 'undefined') {
+                            RewardSystem.init();
+                            RewardSystem.openRewardSystemDialog(workReward);
+                            addMessage('Nyní si můžete vybrat další odměnu z našeho systému odměn! 🐱', false);
+                        } else {
+                            addMessage('Nepodařilo se načíst modul systému odměn. Zkuste obnovit stránku.', false);
+
+                            // Zobrazíme alespoň standardní výsledek práce
+                            this.showStandardWorkResult(workplace, finalPay, finalXp, taskBonus, taskBonusXp, totalTimeFormatted, rewardType);
+                        }
+                    };
+                    script.onerror = () => {
+                        addMessage('Nepodařilo se načíst modul systému odměn. Zkuste obnovit stránku.', false);
+
+                        // Zobrazíme alespoň standardní výsledek práce
+                        this.showStandardWorkResult(workplace, finalPay, finalXp, taskBonus, taskBonusXp, totalTimeFormatted, rewardType);
+                    };
+                    document.head.appendChild(script);
+                } else {
+                    // Zobrazíme alespoň standardní výsledek práce
+                    this.showStandardWorkResult(workplace, finalPay, finalXp, taskBonus, taskBonusXp, totalTimeFormatted, rewardType);
+                }
             }
         });
     }
