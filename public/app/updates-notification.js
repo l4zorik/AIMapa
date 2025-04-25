@@ -1,14 +1,30 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.3.0
+ * Verze 0.3.6.0
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.3.0',
+    currentVersion: '0.3.6.0',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.6.0',
+            date: '2025-06-25',
+            title: 'Načítání reálných dat podniků z internetu a epická reorganizace souborů',
+            description: 'Přidán modul pro načítání reálných dat podniků z internetu a kompletně přepracována struktura souborů',
+            changes: [
+                'Přidán nový modul pro načítání reálných dat podniků z internetu',
+                'Implementováno rozhraní pro výběr oblasti a parametrů načítání',
+                'Přidána podpora pro OpenStreetMap API pro získání aktuálních dat',
+                'Implementováno mapování typů podniků z OSM na vlastní kategorie',
+                'Kompletně přepracována struktura souborů pro maximální přehlednost',
+                'Všechny soubory aplikace přesunuty do jediného adresáře public/app',
+                'Přidána možnost otevřít menu příkazů trojitým kliknutím mimo mapu',
+                'Přidána možnost přesouvat menu příkazů pomocí drag and drop'
+            ]
+        },
         {
             version: '0.3.3.0',
             date: '2025-06-08',

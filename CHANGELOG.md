@@ -31,6 +31,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementován handler pro detekci trojitého kliknutí s časovým limitem 1 sekundy
 - Přidána možnost přesouvat menu příkazů pomocí drag and drop
 - Implementováno ukládání pozice menu příkazů mezi relacemi
+- Přidáno tlačítko pro reportování bugů v pravém dolním rohu
+- Implementován systém pro ukládání seznamu bugů do localStorage
 
 ## [0.3.5.7] - 2025-06-21 - VYLEPŠENÍ PROPOJENÍ VIRTUÁLNÍ PRÁCE S ODMĚŇOVACÍM SYSTÉMEM
 
