@@ -2,6 +2,18 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.4.2] - 2025-06-18 - PŘÍMÁ OPRAVA MENU PŘÍKAZŮ
+
+### Nové funkce
+- Přidán nový soubor fix-menu.js pro přímou opravu menu příkazů
+- Implementováno přímé odstranění položky "Rap" z DOM struktury menu
+- Přidáno tlačítko pro ruční opravu menu v pravém dolním rohu obrazovky
+
+### Opravy
+- Vyřešen problém s nezobrazováním položky "Systém odměn" v menu příkazů
+- Implementováno spolehlivější řešení pro odstranění položky "Rap" z menu
+- Přidána automatická oprava menu při kliknutí na tlačítko menu příkazů
+
 ## [0.3.4.1] - 2025-06-17 - ÚPRAVA MENU PŘÍKAZŮ
 
 ### Změny

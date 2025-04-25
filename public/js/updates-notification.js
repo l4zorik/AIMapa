@@ -1,14 +1,28 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.4.1
+ * Verze 0.3.4.2
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.4.1',
+    currentVersion: '0.3.4.2',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.4.2',
+            date: '2025-06-18',
+            title: 'Přímá oprava menu příkazů',
+            description: 'Vyřešen problém s nezobrazováním položky "Systém odměn" v menu příkazů',
+            changes: [
+                'Přidán nový soubor fix-menu.js pro přímou opravu menu příkazů',
+                'Implementováno přímé odstranění položky "Rap" z DOM struktury menu',
+                'Přidáno tlačítko pro ruční opravu menu v pravém dolním rohu obrazovky',
+                'Vyřešen problém s nezobrazováním položky "Systém odměn" v menu příkazů',
+                'Implementováno spolehlivější řešení pro odstranění položky "Rap" z menu',
+                'Přidána automatická oprava menu při kliknutí na tlačítko menu příkazů'
+            ]
+        },
         {
             version: '0.3.4.1',
             date: '2025-06-17',
