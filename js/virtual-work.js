@@ -431,15 +431,12 @@ class VirtualWorkClass {
 
                     <div class="custom-tasks-form">
                         <input type="text" id="new-task-input" placeholder="Zadejte nový úkol..." class="custom-task-input">
-                        <button id="add-task-btn" class="virtual-work-btn primary">Přidat úkol</button>
+                        <button id="add-task-btn">Přidat úkol</button>
                     </div>
 
                     <div class="custom-tasks-actions">
-                        <button id="back-to-workplaces-btn" class="virtual-work-btn secondary">Zpět na výběr práce</button>
-                        <div class="tasks-action-buttons">
-                            <button id="start-with-tasks-btn" class="virtual-work-btn primary" disabled>Začít práci s úkoly</button>
-                            <button id="skip-tasks-btn" class="virtual-work-btn secondary">Přeskočit a začít bez úkolů</button>
-                        </div>
+                        <button id="back-to-workplaces-btn">Zpět na výběr práce</button>
+                        <button id="skip-tasks-btn">Začít pracovat</button>
                     </div>
                 </div>
             `;
@@ -451,7 +448,6 @@ class VirtualWorkClass {
             const addTaskBtn = dialog.querySelector('#add-task-btn');
             const newTaskInput = dialog.querySelector('#new-task-input');
             const tasksList = dialog.querySelector('#custom-tasks-list');
-            const startWithTasksBtn = dialog.querySelector('#start-with-tasks-btn');
             const skipTasksBtn = dialog.querySelector('#skip-tasks-btn');
             const backBtn = dialog.querySelector('#back-to-workplaces-btn');
 
@@ -480,15 +476,16 @@ class VirtualWorkClass {
             const updateTasksList = () => {
                 if (this.customTasks.length === 0) {
                     tasksList.innerHTML = '<div class="no-tasks">Zatím nejsou definovány žádné úkoly. Přidejte nový úkol pomocí formuláře níže.</div>';
-                    startWithTasksBtn.disabled = true;
+
+                    // Aktualizace stavu tlačítka pro začátek práce
+                    skipTasksBtn.textContent = 'Začít pracovat bez úkolů';
                 } else {
-                    tasksList.innerHTML = this.customTasks.map(task => `
+                    tasksList.innerHTML = this.customTasks.map((task, index) => `
                         <div class="custom-task-item" data-id="${task.id}">
-                            <div class="custom-task-text">${task.text}</div>
+                            <div class="custom-task-text">${index + 1}. ${task.text}</div>
                             <button class="custom-task-delete" title="Odstranit úkol">×</button>
                         </div>
                     `).join('');
-                    startWithTasksBtn.disabled = false;
 
                     // Přidání event listenerů pro tlačítka odstranění
                     const deleteButtons = tasksList.querySelectorAll('.custom-task-delete');
@@ -504,6 +501,9 @@ class VirtualWorkClass {
                             updateTasksList();
                         });
                     });
+
+                    // Aktualizace stavu tlačítka pro začátek práce
+                    skipTasksBtn.textContent = 'Začít pracovat';
                 }
             };
 
@@ -517,11 +517,6 @@ class VirtualWorkClass {
                 }
             });
 
-            // Event listener pro začátek práce s úkoly
-            startWithTasksBtn.addEventListener('click', () => {
-                this.startWorkWithTasks(dialog, workplace);
-            });
-
             // Event listener pro přeskočení definice úkolů
             skipTasksBtn.addEventListener('click', () => {
                 this.customTasks = [];
@@ -532,6 +527,19 @@ class VirtualWorkClass {
             backBtn.addEventListener('click', () => {
                 // Vrátíme se zpět na výběr pracoviště
                 this.openWorkDialog();
+
+                // Vybereme znovu stejné pracoviště, pokud existuje
+                setTimeout(() => {
+                    const dialog = document.querySelector('.virtual-work-dialog');
+                    if (dialog && this.selectedWorkplace) {
+                        const workplaceItems = dialog.querySelectorAll('.workplace-item');
+                        workplaceItems.forEach(item => {
+                            if (item.dataset.id === this.selectedWorkplace.id) {
+                                item.click();
+                            }
+                        });
+                    }
+                }, 100);
             });
 
             // Inicializace seznamu úkolů
@@ -680,7 +688,6 @@ class VirtualWorkClass {
         // Přidání tlačítek pro ovládání práce
         const actionsContainer = dialog.querySelector('.virtual-work-actions');
         actionsContainer.innerHTML = `
-            <button class="virtual-work-btn secondary" id="cancel-work-btn">Zrušit práci</button>
             <div class="complete-manually-container">
                 <button class="virtual-work-btn primary" id="complete-work-btn">Dokončit práci a získat odměnu</button>
             </div>
@@ -693,7 +700,6 @@ class VirtualWorkClass {
         const activityLog = dialog.querySelector('.work-activity-log');
         const completeManuallyContainer = dialog.querySelector('.complete-manually-container');
         const completeBtn = completeManuallyContainer.querySelector('#complete-work-btn');
-        const cancelBtn = dialog.querySelector('#cancel-work-btn');
 
         // Přidání event listenerů pro checkboxy úkolů
         const checkboxes = dialog.querySelectorAll('.custom-task-checkbox');
@@ -739,15 +745,6 @@ class VirtualWorkClass {
                     this.updateTaskMarkersOnMap();
                 }
             });
-        });
-
-        // Přidání event listeneru pro tlačítko zrušení
-        cancelBtn.addEventListener('click', () => {
-            // Zastavení časovače
-            clearInterval(progressInterval);
-
-            // Zavření dialogu
-            this.closeDialog(dialog);
         });
 
         // Přidání event listeneru pro tlačítko dokončení
@@ -993,7 +990,7 @@ class VirtualWorkClass {
         this.removeTaskMarkersFromMap();
 
         // Výpočet celkového času, který práce trvala
-        const startTime = new Date(dialog.getAttribute('data-start-time'));
+        const startTime = new Date(dialog.getAttribute('data-start-time') || new Date());
         const endTime = new Date();
         const totalTimeMs = endTime - startTime;
         const totalMinutes = Math.floor(totalTimeMs / 60000);
@@ -1004,7 +1001,9 @@ class VirtualWorkClass {
         dialog.setAttribute('data-total-time', totalTimeFormatted);
 
         // Zastavení intervalu
-        clearInterval(progressInterval);
+        if (progressInterval) {
+            clearInterval(progressInterval);
+        }
 
         // Nastavení progress baru na 100%
         progressBar.style.width = '100%';

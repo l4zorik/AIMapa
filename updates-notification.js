@@ -1,14 +1,29 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.0.4
+ * Verze 0.3.2.0
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.0.4',
+    currentVersion: '0.3.2.0',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.2.0',
+            date: '2025-06-07',
+            title: 'Vylepšení designu definování úkolů',
+            description: 'Kompletně přepracovaný design okna pro definování úkolů s moderním vzhledem a animacemi',
+            changes: [
+                'Přidán nový CSS soubor pro definování úkolů s moderním designem',
+                'Implementovány animace pro přidávání nových úkolů',
+                'Přidáno číslování úkolů pro lepší přehlednost',
+                'Implementována změna textu tlačítka "Začít pracovat" podle počtu úkolů',
+                'Vylepšeny styly pro seznam úkolů s animacemi a stíny',
+                'Přidány barevné přechody pro tlačítka a interaktivní prvky',
+                'Implementovány vlastní scrollbary pro lepší uživatelský zážitek'
+            ]
+        },
         {
             version: '0.3.0.4',
             date: '2025-05-20',

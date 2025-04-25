@@ -1,6 +1,6 @@
 /**
  * Jednoduchý styl pro virtuální práci
- * Verze 0.3.1.0
+ * Verze 0.3.0.4
  */
 
 /* Hlavní dialog */
@@ -13,12 +13,12 @@
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
     z-index: 1100;
-    width: 90%;
-    max-width: 550px;
+    width: 95%;
+    max-width: 900px;
     overflow: hidden;
     resize: both;
-    min-width: 320px;
-    min-height: 250px;
+    min-width: 700px;
+    min-height: 500px;
     transition: all 0.3s ease;
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
@@ -78,8 +78,10 @@
 .virtual-work-content {
     padding: 20px;
     overflow-y: auto;
-    max-height: 450px;
+    max-height: 550px;
     background-color: #f9f9f9;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Kategorie pracovišť */
@@ -116,26 +118,34 @@
 .workplace-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
     margin-bottom: 20px;
-    max-height: 350px;
+    max-height: 450px;
     overflow-y: auto;
-    padding-right: 5px;
+    padding-right: 15px;
+    padding-left: 15px;
+    width: 100%;
+    min-width: 650px;
 }
 
 .workplace-item {
     display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 15px;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
     border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     background-color: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     position: relative;
     overflow: hidden;
+    margin-bottom: 10px;
+    width: 100%;
+    min-width: 600px;
+    box-sizing: border-box;
+    height: 100px;
 }
 
 .workplace-item::after {
@@ -150,36 +160,40 @@
 }
 
 .workplace-item:hover {
-    background-color: #f5f5f5;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+    border-color: #d0d7de;
 }
 
 .workplace-item.selected {
     border-color: #3498db;
     background-color: #ebf7ff;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+    transform: translateY(-2px);
 }
 
 .workplace-item.selected::after {
     background-color: #3498db;
+    width: 8px;
 }
 
 .workplace-icon {
     font-size: 28px;
     background-color: #f0f0f0;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     transition: all 0.2s ease;
     flex-shrink: 0;
-    overflow: visible;
-    line-height: 1;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid white;
     position: relative;
-    padding: 0;
-    margin: 0;
+    overflow: visible;
+    margin-left: 10px;
 }
 
 .workplace-icon::before {
@@ -188,36 +202,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 28px;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Speciální styl pro ikonky v dialogu výsledku práce */
-.work-result-icon {
-    font-size: 40px;
-    margin-bottom: 15px;
-    position: relative;
-    width: 80px;
-    height: 80px;
-    background-color: #f0f0f0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 15px auto;
-}
-
-.work-result-icon::before {
-    content: attr(data-icon);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 40px;
+    font-size: 32px;
     width: 100%;
     height: 100%;
     display: flex;
@@ -235,9 +220,14 @@
 
 .workplace-name {
     font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 16px;
+    margin-bottom: 8px;
+    font-size: 20px;
     color: #333;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .workplace-pay {
@@ -245,28 +235,33 @@
     font-weight: 600;
     display: flex;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    font-size: 15px;
 }
 
 .workplace-pay::before {
     content: '💰';
-    margin-right: 5px;
-    font-size: 14px;
+    margin-right: 6px;
+    font-size: 15px;
 }
 
 .workplace-description {
-    margin-top: 5px;
-    color: #777;
-    font-size: 13px;
-    margin-bottom: 8px;
-    line-height: 1.4;
+    margin-top: 6px;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+    border-left: 3px solid #f0f0f0;
+    padding-left: 8px;
+    font-style: italic;
 }
 
 .workplace-details {
     display: flex;
     gap: 12px;
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 12px;
+    flex-wrap: wrap;
 }
 
 .workplace-difficulty,
@@ -274,9 +269,18 @@
 .workplace-duration {
     display: flex;
     align-items: center;
-    padding: 3px 8px;
-    border-radius: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
     background-color: #f5f5f5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.workplace-item:hover .workplace-difficulty,
+.workplace-item:hover .workplace-xp,
+.workplace-item:hover .workplace-duration {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .workplace-xp::before {
@@ -890,6 +894,7 @@ body[data-theme="dark"] .workplace-name {
 
 body[data-theme="dark"] .workplace-description {
     color: #bdc3c7;
+    border-left-color: #34495e;
 }
 
 body[data-theme="dark"] .category-btn {
@@ -1435,246 +1440,4 @@ body[data-theme="dark"] .existing-paths-section h3 {
 
 body[data-theme="dark"] .existing-paths-section {
     border-top-color: #34495e;
-}
-
-/* Historie práce */
-.work-history-container {
-    padding: 10px 0;
-}
-
-.work-history-container h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 18px;
-    color: #333;
-}
-
-.no-history {
-    text-align: center;
-    padding: 20px;
-    color: #777;
-    font-style: italic;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px dashed #ddd;
-}
-
-.work-history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-height: 350px;
-    overflow-y: auto;
-    padding-right: 5px;
-}
-
-.work-history-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-.work-history-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
-}
-
-.work-history-icon {
-    font-size: 24px;
-    background-color: #f0f0f0;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.work-history-info {
-    flex: 1;
-}
-
-.work-history-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 16px;
-    color: #333;
-}
-
-.work-history-date {
-    color: #777;
-    font-size: 12px;
-    margin-bottom: 8px;
-}
-
-.work-history-details {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.work-history-pay {
-    color: #27ae60;
-    font-weight: 600;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-}
-
-.work-history-pay::before {
-    content: '💰';
-    margin-right: 4px;
-    font-size: 14px;
-}
-
-.work-history-xp {
-    color: #f39c12;
-    font-weight: 600;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-}
-
-.work-history-xp::before {
-    content: '⭐';
-    margin-right: 4px;
-    font-size: 14px;
-}
-
-.work-history-tasks {
-    color: #3498db;
-    font-weight: 600;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-}
-
-.work-history-tasks::before {
-    content: '✓';
-    margin-right: 4px;
-    font-size: 14px;
-}
-
-.work-history-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-left: auto;
-}
-
-.work-history-repeat-btn {
-    padding: 8px 12px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.work-history-repeat-btn:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-}
-
-/* Tmavý režim pro historii práce */
-body[data-theme="dark"] .work-history-container h3 {
-    color: #ecf0f1;
-}
-
-body[data-theme="dark"] .no-history {
-    color: #bdc3c7;
-    background-color: #2c3e50;
-    border-color: #34495e;
-}
-
-body[data-theme="dark"] .work-history-item {
-    background-color: #2c3e50;
-    border-color: #34495e;
-}
-
-body[data-theme="dark"] .work-history-item:hover {
-    background-color: #34495e;
-}
-
-body[data-theme="dark"] .work-history-icon {
-    background-color: #34495e;
-}
-
-body[data-theme="dark"] .work-history-name {
-    color: #ecf0f1;
-}
-
-body[data-theme="dark"] .work-history-date {
-    color: #bdc3c7;
-}
-
-/* Animace pulzování pro tlačítko dokončení práce */
-@keyframes pulse-animation {
-    0% {
-        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
-        transform: scale(1);
-    }
-    50% {
-        box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
-        transform: scale(1.05);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
-        transform: scale(1);
-    }
-}
-
-.pulse-animation {
-    animation: pulse-animation 1.5s infinite;
-}
-
-/* Vylepšení tlačítka pro manuální dokončení */
-.skip-button-container {
-    margin-top: 15px;
-    text-align: center;
-}
-
-#complete-work-manually {
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-}
-
-#complete-work-manually:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Animace pro tlačítko manuálního dokončení */
-@keyframes pulse-animation {
-    0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-}
-
-.pulse-animation {
-    animation: pulse-animation 1.5s infinite;
-}
-
-/* Animace pro upozornění na tlačítko */
-@keyframes attention-animation {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.attention-animation {
-    animation: attention-animation 1.5s infinite;
 }

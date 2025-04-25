@@ -2,6 +2,23 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.2.0] - 2025-06-07 - VYLEPŠENÍ DESIGNU DEFINOVÁNÍ ÚKOLŮ
+
+### Nové funkce
+- Přidán nový CSS soubor pro definování úkolů s moderním designem
+- Implementovány animace pro přidávání nových úkolů
+- Přidáno číslování úkolů pro lepší přehlednost
+- Implementována změna textu tlačítka "Začít pracovat" podle počtu úkolů
+
+### Vylepšení
+- Kompletně přepracován design okna pro definování úkolů
+- Vylepšeny styly pro seznam úkolů s animacemi a stíny
+- Přidány barevné přechody pro tlačítka a interaktivní prvky
+- Implementovány vlastní scrollbary pro lepší uživatelský zážitek
+- Vylepšena podpora tmavého režimu pro všechny prvky
+- Přidány vizuální efekty pro tlačítka při najetí myší
+- Zvětšena velikost písma a tlačítek pro lepší čitelnost
+
 ## [0.3.1.0] - 2025-06-06 - PŘEVOD APLIKACE NA NODE.JS A VYLEPŠENÍ VIRTUÁLNÍ PRÁCE
 
 ### Nové funkce
@@ -12,9 +29,20 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidána historie virtuální práce s možností opakování misí
 - Implementováno ukládání historie práce na serveru
 - Přidáno rozhraní pro zobrazení a výběr předchozích misí
-- Upravena virtuální práce - progress bar se aktualizuje podle dokončených úkolů
-- Práce se dokončí pouze po manuálním stisknutí tlačítka
-- Přidáno zvýraznění tlačítka pro manuální dokončení práce s pulzující animací
+- Kompletně přepracován modul virtuální práce s novým designem a funkcionalitou
+- Progress bar se nyní pohybuje POUZE podle dokončených úkolů, nikdy automaticky v čase
+- Práce se dokončí pouze po manuálním stisknutí tlačítka "Dokončit práci a získat odměnu"
+- Přidáno zvýraznění tlačítka pro dokončení práce s pulzující animací po dokončení všech úkolů
+- Přidáno zobrazení úkolů na mapě s možností sledování jejich stavu
+- Přidáno výrazné upozornění pro uživatele po dokončení všech úkolů
+- Opravena funkce tlačítka "Pracovat znovu" - nyní správně přechází na obrazovku plánování úkolů
+- Odstraněno tlačítko "Zrušit práci" pro zjednodušení rozhraní
+- Opraveno zobrazení ikonek pracovišť - nyní se zobrazují správně bez přeseknutí
+- Prodloužena doba trvání prací pro lepší uživatelský zážitek a více času na dokončení úkolů
+- Přidáno sledování celkového času práce - nyní se zobrazuje, jak dlouho práce trvala
+- Přidán bonus za dokončené úkoly (až 20% navíc k výdělku a XP)
+- Přidáno zobrazení souhrnu dokončených úkolů po skončení práce
+- Přidáno tlačítko "Zpět" na obrazovku plánování práce pro návrat k výběru pracoviště
 
 ### Vylepšení
 - Oddělení klientské a serverové části aplikace
@@ -25,6 +53,9 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidána možnost opakovat předchozí mise s jejich úkoly
 - Vylepšen design tlačítka pro manuální dokončení práce
 - Progress bar nyní zobrazuje procento dokončených úkolů místo automatického postupu v čase
+- Vylepšena inicializace progress baru při spuštění práce
+- Přidány markery úkolů na mapě s barevným rozlišením dokončených a nedokončených úkolů
+- Přidány popup okna s detailními informacemi o úkolech na mapě
 
 ## [0.3.0.16] - 2025-06-05 - KOMPLETNÍ PŘEPRACOVÁNÍ MODULU VIRTUÁLNÍ PRÁCE
 
@@ -33,6 +64,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Opravena struktura třídy VirtualWorkClass
 - Odstraněny syntaktické chyby v kódu
 - Přidáno správné exportování modulu
+- Opravena funkčnost tlačítka "Dokončit práci a získat odměnu"
 
 ### Vylepšení
 - Přidána lepší detekce chyb při inicializaci
