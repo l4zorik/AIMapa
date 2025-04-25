@@ -1,6 +1,6 @@
 /**
  * Jednoduchý modul pro virtuální práci
- * Verze 0.3.5.0
+ * Verze 0.3.5.5
  */
 
 class VirtualWorkClass {
@@ -1301,6 +1301,18 @@ class VirtualWorkClass {
 
         // Přidání event listeneru pro tlačítko dokončení
         completeBtn.addEventListener('click', () => {
+            // Kontrola, zda jsou všechny úkoly dokončeny
+            if (this.customTasks.length > 0) {
+                const allCompleted = this.customTasks.every(task => task.completed);
+                if (!allCompleted) {
+                    // Pokud nejsou všechny úkoly dokončeny, zobrazíme upozornění
+                    const confirmComplete = confirm('Nemáte dokončeny všechny úkoly. Opravdu chcete ukončit práci?');
+                    if (!confirmComplete) {
+                        return;
+                    }
+                }
+            }
+
             // Dokončení práce
             this.completeWorkManually(dialog, workplace, progressBar, percentElement, timeRemaining, activityLog, progressInterval);
         });

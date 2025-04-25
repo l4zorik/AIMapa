@@ -2,6 +2,13 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.5.5] - 2025-06-21 - OPRAVA TLAČÍTKA "DOKONČIT PRÁCI A ZÍSKAT ODMĚNU"
+
+### Opravy
+- Opravena funkčnost tlačítka "Dokončit práci a získat odměnu" ve virtuální práci
+- Přidáno potvrzení při dokončení práce s nedokončenými úkoly
+- Vylepšena kontrola dokončení úkolů před ukončením práce
+
 ## [0.3.5.4] - 2025-06-21 - PŘIDÁNÍ KATEGORIE SPÁNEK DO ODMĚŇOVACÍHO SYSTÉMU
 
 ### Nové funkce
