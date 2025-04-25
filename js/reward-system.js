@@ -1,6 +1,6 @@
 /**
  * Samostatný odměňovací systém
- * Verze 0.3.5.1
+ * Verze 0.3.5.2
  */
 
 class RewardSystemClass {
@@ -9,9 +9,10 @@ class RewardSystemClass {
         this.isInitialized = false;
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
-        
+
         // Dostupné odměny
         this.availableRewards = [
+            // Finanční odměny
             {
                 id: 'money-small',
                 name: 'Malá finanční odměna',
@@ -39,6 +40,8 @@ class RewardSystemClass {
                 description: 'Získáte 2000 Kč na větší výdaje.',
                 cost: 'Vysoká'
             },
+
+            // XP odměny
             {
                 id: 'xp-small',
                 name: 'Malá XP odměna',
@@ -66,6 +69,8 @@ class RewardSystemClass {
                 description: 'Získáte 200 XP pro rychlejší postup na další úroveň.',
                 cost: 'Vysoká'
             },
+
+            // Ostatní odměny
             {
                 id: 'time-save',
                 name: 'Úspora času',
@@ -82,6 +87,62 @@ class RewardSystemClass {
                 icon: '₿',
                 value: 0.001,
                 description: 'Získáte 0.001 BTC do své digitální peněženky.',
+                cost: 'Vysoká'
+            },
+
+            // Jídlo a pití
+            {
+                id: 'coffee',
+                name: 'Káva',
+                type: 'food',
+                icon: '☕',
+                value: 'Káva',
+                description: 'Dopřejte si šálek kvalitní kávy jako odměnu za svou práci.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'cake',
+                name: 'Dort',
+                type: 'food',
+                icon: '🍰',
+                value: 'Dort',
+                description: 'Odměňte se kouskem lahodného dortu.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'pizza',
+                name: 'Pizza',
+                type: 'food',
+                icon: '🍕',
+                value: 'Pizza',
+                description: 'Dopřejte si pizzu jako odměnu za dobře odvedenou práci.',
+                cost: 'Střední'
+            },
+            {
+                id: 'beer',
+                name: 'Pivo',
+                type: 'food',
+                icon: '🍺',
+                value: 'Pivo',
+                description: 'Zajděte si na jedno pivo jako odměnu za svou práci.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'wine',
+                name: 'Víno',
+                type: 'food',
+                icon: '🍷',
+                value: 'Víno',
+                description: 'Dopřejte si sklenku dobrého vína jako odměnu.',
+                cost: 'Střední'
+            },
+            {
+                id: 'dinner',
+                name: 'Večeře v restauraci',
+                type: 'food',
+                icon: '🍽️',
+                value: 'Večeře',
+                description: 'Zajděte si na večeři do oblíbené restaurace jako odměnu za svou práci.',
                 cost: 'Vysoká'
             }
         ];
@@ -621,6 +682,7 @@ class RewardSystemClass {
                     <button class="category-btn active" data-category="all">Všechny</button>
                     <button class="category-btn" data-category="money">Peníze</button>
                     <button class="category-btn" data-category="xp">Zkušenosti</button>
+                    <button class="category-btn" data-category="food">Jídlo a pití</button>
                     <button class="category-btn" data-category="other">Ostatní</button>
                 </div>
 
@@ -651,16 +713,16 @@ class RewardSystemClass {
             button.addEventListener('click', () => {
                 // Odstranění aktivní třídy ze všech tlačítek
                 categoryButtons.forEach(btn => btn.classList.remove('active'));
-                
+
                 // Přidání aktivní třídy na kliknuté tlačítko
                 button.classList.add('active');
-                
+
                 // Filtrování odměn podle kategorie
                 const category = button.dataset.category;
                 const rewardItems = dialog.querySelectorAll('.reward-item');
-                
+
                 rewardItems.forEach(item => {
-                    if (category === 'all' || item.dataset.type === category || 
+                    if (category === 'all' || item.dataset.type === category ||
                         (category === 'other' && item.dataset.type !== 'money' && item.dataset.type !== 'xp')) {
                         item.style.display = 'flex';
                     } else {
@@ -673,15 +735,15 @@ class RewardSystemClass {
         // Přidání event listenerů pro výběr odměny
         const rewardItems = dialog.querySelectorAll('.reward-item');
         const claimBtn = dialog.querySelector('#claim-reward-btn');
-        
+
         rewardItems.forEach(item => {
             item.addEventListener('click', () => {
                 // Odstranění výběru ze všech odměn
                 rewardItems.forEach(reward => reward.classList.remove('selected'));
-                
+
                 // Přidání výběru na kliknutou odměnu
                 item.classList.add('selected');
-                
+
                 // Povolení tlačítka pro získání odměny
                 claimBtn.disabled = false;
             });
@@ -698,10 +760,10 @@ class RewardSystemClass {
             // Získání vybrané odměny
             const selectedItem = dialog.querySelector('.reward-item.selected');
             if (!selectedItem) return;
-            
+
             const rewardId = selectedItem.dataset.id;
             const reward = this.availableRewards.find(r => r.id === rewardId);
-            
+
             if (reward) {
                 this.claimReward(dialog, reward);
             }
@@ -721,6 +783,8 @@ class RewardSystemClass {
                 return `-${reward.value}% času`;
             case 'bitcoin':
                 return `${reward.value} BTC`;
+            case 'food':
+                return `${reward.value} (+25 XP)`;
             default:
                 return reward.value;
         }
@@ -736,11 +800,11 @@ class RewardSystemClass {
                 <div class="reward-result-icon">${reward.icon}</div>
                 <h3>Odměna získána!</h3>
                 <p>Úspěšně jste získali odměnu: ${reward.name}</p>
-                
+
                 <div class="reward-result-amount">
                     ${this.formatRewardValue(reward)}
                 </div>
-                
+
                 <p>${reward.description}</p>
             </div>
         `;
@@ -784,6 +848,22 @@ class RewardSystemClass {
                 if (window.BitcoinIndicator && window.BitcoinIndicator.addBitcoin) {
                     window.BitcoinIndicator.addBitcoin(reward.value, 'Odměňovací systém');
                 }
+                break;
+            case 'food':
+                // Pro jídlo a pití pouze zobrazíme zprávu a přidáme XP
+                if (window.addXP) {
+                    window.addXP(25, `Odměna: ${reward.value}`);
+                }
+
+                // Uložíme do localStorage informaci o získané odměně
+                const foodRewards = JSON.parse(localStorage.getItem('aiMapaFoodRewards') || '[]');
+                foodRewards.push({
+                    name: reward.name,
+                    value: reward.value,
+                    icon: reward.icon,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('aiMapaFoodRewards', JSON.stringify(foodRewards));
                 break;
         }
 

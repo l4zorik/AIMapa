@@ -1,6 +1,6 @@
 /**
  * AIMapa - Virtuální práce API Routes
- * Verze 0.3.5.1
+ * Verze 0.3.5.2
  */
 
 const express = require('express');

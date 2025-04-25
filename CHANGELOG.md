@@ -2,6 +2,19 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.5.2] - 2025-06-21 - ROZŠÍŘENÍ ODMĚŇOVACÍHO SYSTÉMU O JÍDLO A PITÍ
+
+### Nové funkce
+- Přidána nová kategorie "Jídlo a pití" do odměňovacího systému
+- Přidáno 6 nových typů odměn v kategorii jídlo a pití (káva, dort, pizza, pivo, víno, večeře)
+- Implementováno ukládání historie získaných odměn jídla a pití do localStorage
+- Za odměny typu jídlo a pití uživatel získává 25 XP
+
+### Vylepšení
+- Vylepšeno filtrování odměn podle kategorií, přidána kategorie "Jídlo a pití"
+- Vylepšeno formátování hodnot odměn pro kategorii jídlo a pití
+- Přidáno zobrazení získaných XP u odměn typu jídlo a pití
+
 ## [0.3.5.1] - 2025-06-21 - SAMOSTATNÝ ODMĚŇOVACÍ SYSTÉM
 
 ### Nové funkce
