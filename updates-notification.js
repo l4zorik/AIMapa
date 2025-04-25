@@ -1,14 +1,29 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.2.0
+ * Verze 0.3.3.0
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.2.0',
+    currentVersion: '0.3.3.0',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.3.0',
+            date: '2025-06-08',
+            title: 'Drag and drop úkolů a ukládání nedokončené práce',
+            description: 'Přidána možnost přesouvat úkoly pomocí drag and drop a ukládat nedokončenou práci',
+            changes: [
+                'Přidána možnost přesouvat úkoly pomocí drag and drop',
+                'Implementováno přidávání nových úkolů během práce',
+                'Přidána možnost uložit nedokončenou práci a vrátit se k ní později',
+                'Přidán banner s informací o nedokončené práci v hlavním menu',
+                'Implementována notifikace o uložené práci',
+                'Vylepšen progress bar, který se nyní aktualizuje podle dokončených úkolů',
+                'Přidány vizuální efekty pro přetahování úkolů'
+            ]
+        },
         {
             version: '0.3.2.0',
             date: '2025-06-07',

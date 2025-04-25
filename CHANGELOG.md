@@ -2,6 +2,21 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.3.0] - 2025-06-08 - DRAG AND DROP ÚKOLŮ A UKLÁDÁNÍ NEDOKONČENÉ PRÁCE
+
+### Nové funkce
+- Přidána možnost přesouvat úkoly pomocí drag and drop
+- Implementováno přidávání nových úkolů během práce
+- Přidána možnost uložit nedokončenou práci a vrátit se k ní později
+- Přidán banner s informací o nedokončené práci v hlavním menu
+- Implementována notifikace o uložené práci
+
+### Vylepšení
+- Vylepšen progress bar, který se nyní aktualizuje podle dokončených úkolů
+- Přidány vizuální efekty pro přetahování úkolů
+- Implementovány vlastní scrollbary pro seznam nedokončených prací
+- Vylepšena podpora tmavého režimu pro všechny nové prvky
+
 ## [0.3.2.0] - 2025-06-07 - VYLEPŠENÍ DESIGNU DEFINOVÁNÍ ÚKOLŮ
 
 ### Nové funkce

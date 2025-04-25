@@ -113,12 +113,26 @@ class VirtualWorkClass {
         // Kontrola, zda již styly existují
         if (document.getElementById('virtual-work-styles')) return;
 
-        // Načtení externího CSS souboru
-        const link = document.createElement('link');
-        link.id = 'virtual-work-styles';
-        link.rel = 'stylesheet';
-        link.href = 'css/virtual-work.css';
-        document.head.appendChild(link);
+        // Načtení externích CSS souborů
+        const virtualWorkStyles = document.createElement('link');
+        virtualWorkStyles.id = 'virtual-work-styles';
+        virtualWorkStyles.rel = 'stylesheet';
+        virtualWorkStyles.href = 'css/virtual-work.css';
+        document.head.appendChild(virtualWorkStyles);
+
+        // Načtení CSS pro task-definition
+        const taskDefinitionStyles = document.createElement('link');
+        taskDefinitionStyles.id = 'task-definition-styles';
+        taskDefinitionStyles.rel = 'stylesheet';
+        taskDefinitionStyles.href = 'css/task-definition.css';
+        document.head.appendChild(taskDefinitionStyles);
+
+        // Načtení CSS pro saved-work
+        const savedWorkStyles = document.createElement('link');
+        savedWorkStyles.id = 'saved-work-styles';
+        savedWorkStyles.rel = 'stylesheet';
+        savedWorkStyles.href = 'css/saved-work.css';
+        document.head.appendChild(savedWorkStyles);
     }
 
     /**
@@ -229,6 +243,218 @@ class VirtualWorkClass {
     }
 
     /**
+     * Uložení aktuálního stavu práce
+     */
+    saveWorkProgress(dialog, workplace, startTime) {
+        // Výpočet uplynulého času
+        const currentTime = new Date();
+        const elapsedTimeMs = currentTime - startTime;
+        const elapsedMinutes = Math.floor(elapsedTimeMs / 60000);
+        const elapsedSeconds = Math.floor((elapsedTimeMs % 60000) / 1000);
+        const elapsedTimeFormatted = `${elapsedMinutes}:${elapsedSeconds.toString().padStart(2, '0')}`;
+
+        // Vytvoření záznamu nedokončené práce
+        const workProgress = {
+            id: `progress_${Date.now()}`,
+            workplaceId: workplace.id,
+            name: workplace.name,
+            icon: workplace.icon,
+            startTime: startTime.toISOString(),
+            elapsedTime: elapsedTimeFormatted,
+            tasks: this.customTasks,
+            date: new Date().toISOString(),
+            isCompleted: false
+        };
+
+        // Uložení záznamu do localStorage
+        const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
+        savedWork.push(workProgress);
+        localStorage.setItem('aiMapaSavedWork', JSON.stringify(savedWork));
+
+        // Odstranění markerů úkolů z mapy
+        this.removeTaskMarkersFromMap();
+
+        console.log('Práce byla uložena:', workProgress);
+        return workProgress;
+    }
+
+    /**
+     * Zobrazení notifikace o uložené práci
+     */
+    showSavedWorkNotification(workplace) {
+        // Vytvoření notifikace
+        const notification = document.createElement('div');
+        notification.className = 'saved-work-notification';
+        notification.innerHTML = `
+            <div class="saved-work-notification-content">
+                <div class="saved-work-notification-icon">${workplace.icon}</div>
+                <div class="saved-work-notification-text">
+                    <div class="saved-work-notification-title">Práce uložena</div>
+                    <div class="saved-work-notification-desc">Vaše práce jako ${workplace.name} byla uložena. Můžete se k ní vrátit později.</div>
+                </div>
+                <button class="saved-work-notification-close">&times;</button>
+            </div>
+            <div class="saved-work-notification-actions">
+                <button class="saved-work-notification-resume">Pokračovat v práci</button>
+            </div>
+        `;
+
+        // Přidání notifikace do dokumentu
+        document.body.appendChild(notification);
+
+        // Animace zobrazení
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+
+        // Event listener pro zavření notifikace
+        const closeBtn = notification.querySelector('.saved-work-notification-close');
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+
+        // Event listener pro pokračování v práci
+        const resumeBtn = notification.querySelector('.saved-work-notification-resume');
+        resumeBtn.addEventListener('click', () => {
+            // Zavření notifikace
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+
+            // Otevření dialogu s nedokončenou prací
+            this.showSavedWorkDialog();
+        });
+
+        // Automatické zavření notifikace po 10 sekundách
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 10000);
+    }
+
+    /**
+     * Zobrazení dialogu s nedokončenou prací
+     */
+    showSavedWorkDialog() {
+        // Načtení uložených prací z localStorage
+        const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
+
+        // Kontrola, zda existují nějaké uložené práce
+        if (savedWork.length === 0) {
+            alert('Nemáte žádnou uloženou nedokončenou práci.');
+            return;
+        }
+
+        // Vytvoření dialogu
+        const dialog = this.createDialog('Nedokončená práce');
+
+        // Zobrazení seznamu nedokončených prací
+        dialog.querySelector('.virtual-work-content').innerHTML = `
+            <div class="saved-work-container">
+                <h3>Vaše nedokončené práce</h3>
+                <div class="saved-work-list">
+                    ${savedWork.map((work, index) => {
+                        const date = new Date(work.date);
+                        const formattedDate = date.toLocaleDateString('cs-CZ') + ' ' + date.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+
+                        return `
+                            <div class="saved-work-item" data-id="${work.id}">
+                                <div class="saved-work-icon">${work.icon}</div>
+                                <div class="saved-work-info">
+                                    <div class="saved-work-name">${work.name}</div>
+                                    <div class="saved-work-date">Uloženo: ${formattedDate}</div>
+                                    <div class="saved-work-details">
+                                        <span class="saved-work-time">⏱️ Odpracováno: ${work.elapsedTime}</span>
+                                        <span class="saved-work-tasks">📋 Úkolů: ${work.tasks.length}</span>
+                                    </div>
+                                </div>
+                                <button class="saved-work-resume" title="Pokračovat v práci">▶️</button>
+                                <button class="saved-work-delete" title="Odstranit">🗑️</button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+
+        // Přidání tlačítka zpět
+        const actionsContainer = dialog.querySelector('.virtual-work-actions');
+        actionsContainer.innerHTML = `
+            <button class="virtual-work-btn secondary" id="back-to-workplaces-btn">Zpět na výběr práce</button>
+        `;
+
+        // Event listener pro tlačítko zpět
+        const backBtn = dialog.querySelector('#back-to-workplaces-btn');
+        backBtn.addEventListener('click', () => {
+            this.openWorkDialog();
+        });
+
+        // Event listenery pro tlačítka pokračování
+        const resumeButtons = dialog.querySelectorAll('.saved-work-resume');
+        resumeButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const workItem = e.target.closest('.saved-work-item');
+                const workId = workItem.dataset.id;
+
+                // Načtení detailu uložené práce
+                const workDetail = savedWork.find(work => work.id === workId);
+                if (workDetail) {
+                    // Najdeme odpovídající pracoviště
+                    const workplace = this.workplaces.find(wp => wp.id === workDetail.workplaceId);
+                    if (workplace) {
+                        // Nastavení vybraného pracoviště
+                        this.selectedWorkplace = workplace;
+
+                        // Nastavení úkolů z uložené práce
+                        this.customTasks = workDetail.tasks ? [...workDetail.tasks] : [];
+
+                        // Odstranění uložené práce ze seznamu
+                        const updatedSavedWork = savedWork.filter(work => work.id !== workId);
+                        localStorage.setItem('aiMapaSavedWork', JSON.stringify(updatedSavedWork));
+
+                        // Spuštění práce s úkoly
+                        this.startWorkWithTasks(dialog, workplace);
+                    }
+                }
+            });
+        });
+
+        // Event listenery pro tlačítka odstranění
+        const deleteButtons = dialog.querySelectorAll('.saved-work-delete');
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const workItem = e.target.closest('.saved-work-item');
+                const workId = workItem.dataset.id;
+
+                // Potvrzení odstranění
+                if (confirm('Opravdu chcete odstranit tuto nedokončenou práci?')) {
+                    // Odstranění uložené práce ze seznamu
+                    const updatedSavedWork = savedWork.filter(work => work.id !== workId);
+                    localStorage.setItem('aiMapaSavedWork', JSON.stringify(updatedSavedWork));
+
+                    // Odstranění položky ze seznamu
+                    workItem.remove();
+
+                    // Pokud byl seznam vyprázdněn, zobrazíme zprávu
+                    if (updatedSavedWork.length === 0) {
+                        dialog.querySelector('.saved-work-list').innerHTML = '<p class="no-saved-work">Nemáte žádnou uloženou nedokončenou práci.</p>';
+                    }
+                }
+            });
+        });
+    }
+
+    /**
      * Získání celkového výdělku
      */
     getTotalEarnings() {
@@ -262,6 +488,10 @@ class VirtualWorkClass {
         // Kontrola, zda je dialog již otevřený
         if (document.querySelector('.virtual-work-dialog')) return;
 
+        // Kontrola, zda existují uložené nedokončené práce
+        const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
+        const hasSavedWork = savedWork.length > 0;
+
         // Vytvoření dialogu
         const dialog = document.createElement('div');
         dialog.className = 'virtual-work-dialog';
@@ -271,6 +501,16 @@ class VirtualWorkClass {
                 <button class="virtual-work-close">&times;</button>
             </div>
             <div class="virtual-work-content">
+                ${hasSavedWork ? `
+                    <div class="saved-work-banner">
+                        <div class="saved-work-banner-icon">💾</div>
+                        <div class="saved-work-banner-text">
+                            Máte ${savedWork.length} nedokončen${savedWork.length === 1 ? 'ou práci' : 'é práce'}
+                        </div>
+                        <button class="saved-work-banner-btn" id="show-saved-work-btn">Zobrazit</button>
+                    </div>
+                ` : ''}
+
                 <h3>Vyberte typ práce:</h3>
 
                 <div class="workplace-categories">
@@ -376,6 +616,14 @@ class VirtualWorkClass {
         historyBtn.addEventListener('click', () => {
             this.showWorkHistory(dialog);
         });
+
+        // Přidání event listeneru pro tlačítko zobrazení nedokončené práce
+        const showSavedWorkBtn = dialog.querySelector('#show-saved-work-btn');
+        if (showSavedWorkBtn) {
+            showSavedWorkBtn.addEventListener('click', () => {
+                this.showSavedWorkDialog();
+            });
+        }
     }
 
     /**
@@ -481,7 +729,7 @@ class VirtualWorkClass {
                     skipTasksBtn.textContent = 'Začít pracovat bez úkolů';
                 } else {
                     tasksList.innerHTML = this.customTasks.map((task, index) => `
-                        <div class="custom-task-item" data-id="${task.id}">
+                        <div class="custom-task-item" data-id="${task.id}" draggable="true">
                             <div class="custom-task-text">${index + 1}. ${task.text}</div>
                             <button class="custom-task-delete" title="Odstranit úkol">×</button>
                         </div>
@@ -503,7 +751,88 @@ class VirtualWorkClass {
                     });
 
                     // Aktualizace stavu tlačítka pro začátek práce
-                    skipTasksBtn.textContent = 'Začít pracovat';
+                    skipTasksBtn.textContent = this.customTasks.length > 0 ? 'Začít pracovat bez úkolů' : 'Začít pracovat';
+
+                    // Implementace drag and drop funkcionality
+                    const taskItems = tasksList.querySelectorAll('.custom-task-item');
+
+                    taskItems.forEach(item => {
+                        // Drag start
+                        item.addEventListener('dragstart', (e) => {
+                            e.dataTransfer.setData('text/plain', item.dataset.id);
+                            item.classList.add('dragging');
+
+                            // Nastavení průhledného obrázku jako drag image
+                            const img = new Image();
+                            img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                            e.dataTransfer.setDragImage(img, 0, 0);
+                        });
+
+                        // Drag end
+                        item.addEventListener('dragend', () => {
+                            item.classList.remove('dragging');
+                            taskItems.forEach(i => i.classList.remove('drag-over-top', 'drag-over-bottom'));
+                        });
+
+                        // Drag over
+                        item.addEventListener('dragover', (e) => {
+                            e.preventDefault();
+                            const draggingItem = tasksList.querySelector('.dragging');
+                            if (draggingItem !== item) {
+                                const rect = item.getBoundingClientRect();
+                                const midY = rect.top + rect.height / 2;
+
+                                if (e.clientY < midY) {
+                                    item.classList.add('drag-over-top');
+                                    item.classList.remove('drag-over-bottom');
+                                } else {
+                                    item.classList.add('drag-over-bottom');
+                                    item.classList.remove('drag-over-top');
+                                }
+                            }
+                        });
+
+                        // Drag leave
+                        item.addEventListener('dragleave', () => {
+                            item.classList.remove('drag-over-top', 'drag-over-bottom');
+                        });
+
+                        // Drop
+                        item.addEventListener('drop', (e) => {
+                            e.preventDefault();
+                            const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                            const targetId = parseInt(item.dataset.id);
+
+                            if (draggedId !== targetId) {
+                                // Najít indexy obou úkolů
+                                const draggedIndex = this.customTasks.findIndex(task => task.id === draggedId);
+                                const targetIndex = this.customTasks.findIndex(task => task.id === targetId);
+
+                                if (draggedIndex !== -1 && targetIndex !== -1) {
+                                    // Vyjmout přetahovaný úkol
+                                    const [draggedTask] = this.customTasks.splice(draggedIndex, 1);
+
+                                    // Určit novou pozici
+                                    let newIndex = targetIndex;
+                                    if (draggedIndex < targetIndex && item.classList.contains('drag-over-bottom')) {
+                                        newIndex = targetIndex;
+                                    } else if (draggedIndex > targetIndex && item.classList.contains('drag-over-top')) {
+                                        newIndex = targetIndex;
+                                    } else if (draggedIndex < targetIndex) {
+                                        newIndex = targetIndex - 1;
+                                    }
+
+                                    // Vložit úkol na novou pozici
+                                    this.customTasks.splice(newIndex, 0, draggedTask);
+
+                                    // Aktualizovat seznam
+                                    updateTasksList();
+                                }
+                            }
+
+                            item.classList.remove('drag-over-top', 'drag-over-bottom');
+                        });
+                    });
                 }
             };
 
@@ -682,6 +1011,22 @@ class VirtualWorkClass {
                         <div class="work-activity-item">Začali jste pracovat jako ${workplace.name}.</div>
                     </div>
                 </div>
+
+                <div class="add-task-during-work">
+                    <button class="add-task-toggle" id="add-task-toggle">
+                        <i>+</i> Přidat nový úkol
+                    </button>
+                    <div class="add-task-form" id="add-task-form">
+                        <div class="custom-tasks-form">
+                            <input type="text" id="new-task-input-during-work" placeholder="Zadejte nový úkol..." class="custom-task-input">
+                            <button id="add-task-btn-during-work">Přidat úkol</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="save-work-btn" id="save-work-btn">
+                    <i>💾</i> Uložit práci a vrátit se později
+                </button>
             </div>
         `;
 
@@ -751,6 +1096,166 @@ class VirtualWorkClass {
         completeBtn.addEventListener('click', () => {
             // Dokončení práce
             this.completeWorkManually(dialog, workplace, progressBar, percentElement, timeRemaining, activityLog, progressInterval);
+        });
+
+        // Event listenery pro přidávání úkolů během práce
+        const addTaskToggle = dialog.querySelector('#add-task-toggle');
+        const addTaskForm = dialog.querySelector('#add-task-form');
+        const newTaskInputDuringWork = dialog.querySelector('#new-task-input-during-work');
+        const addTaskBtnDuringWork = dialog.querySelector('#add-task-btn-during-work');
+        const tasksChecklist = dialog.querySelector('.custom-tasks-checklist');
+
+        // Toggle formuláře pro přidání úkolu
+        addTaskToggle.addEventListener('click', () => {
+            const isExpanded = addTaskForm.classList.contains('expanded');
+
+            if (isExpanded) {
+                addTaskForm.classList.remove('expanded');
+                addTaskToggle.classList.remove('expanded');
+                addTaskToggle.innerHTML = '<i>+</i> Přidat nový úkol';
+            } else {
+                addTaskForm.classList.add('expanded');
+                addTaskToggle.classList.add('expanded');
+                addTaskToggle.innerHTML = '<i>+</i> Zavřít formulář';
+                newTaskInputDuringWork.focus();
+            }
+        });
+
+        // Funkce pro přidání nového úkolu během práce
+        const addNewTaskDuringWork = () => {
+            const taskText = newTaskInputDuringWork.value.trim();
+            if (taskText) {
+                // Přidání úkolu do pole
+                const taskId = Date.now();
+                this.customTasks.push({
+                    id: taskId,
+                    text: taskText,
+                    completed: false
+                });
+
+                // Aktualizace seznamu úkolů v checklistu
+                if (this.customTasks.length === 1) {
+                    // Pokud to byl první úkol, nahradíme zprávu o žádných úkolech
+                    dialog.querySelector('.custom-tasks-progress').innerHTML = `
+                        <h3>Vaše úkoly:</h3>
+                        <div class="custom-tasks-checklist">
+                            <div class="custom-task-check-item" data-id="${taskId}">
+                                <label class="custom-task-check-label">
+                                    <input type="checkbox" class="custom-task-checkbox">
+                                    <span class="custom-task-check-text">${taskText}</span>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Přidání nového úkolu do existujícího seznamu
+                    const newTaskItem = document.createElement('div');
+                    newTaskItem.className = 'custom-task-check-item';
+                    newTaskItem.dataset.id = taskId;
+                    newTaskItem.innerHTML = `
+                        <label class="custom-task-check-label">
+                            <input type="checkbox" class="custom-task-checkbox">
+                            <span class="custom-task-check-text">${taskText}</span>
+                        </label>
+                    `;
+
+                    // Přidání event listeneru pro checkbox
+                    const checkbox = newTaskItem.querySelector('.custom-task-checkbox');
+                    checkbox.addEventListener('change', (e) => {
+                        const taskItem = e.target.closest('.custom-task-check-item');
+                        const taskId = parseInt(taskItem.dataset.id);
+
+                        // Aktualizace stavu úkolu v poli
+                        const taskIndex = this.customTasks.findIndex(task => task.id === taskId);
+                        if (taskIndex !== -1) {
+                            this.customTasks[taskIndex].completed = e.target.checked;
+
+                            // Přidání aktivity do logu
+                            if (e.target.checked) {
+                                activityLog.innerHTML = `<div class="work-activity-item new-activity">Úkol dokončen: ${this.customTasks[taskIndex].text}</div>` + activityLog.innerHTML;
+                            } else {
+                                activityLog.innerHTML = `<div class="work-activity-item new-activity">Úkol označen jako nedokončený: ${this.customTasks[taskIndex].text}</div>` + activityLog.innerHTML;
+                            }
+
+                            // Odstranění třídy new-activity po animaci
+                            setTimeout(() => {
+                                const newActivity = activityLog.querySelector('.new-activity');
+                                if (newActivity) {
+                                    newActivity.classList.remove('new-activity');
+                                }
+                            }, 1000);
+
+                            // Vizuální efekt pro dokončený úkol
+                            if (e.target.checked) {
+                                taskItem.classList.add('completed');
+                            } else {
+                                taskItem.classList.remove('completed');
+                            }
+
+                            // Kontrola, zda jsou všechny úkoly dokončeny
+                            this.checkAllTasksCompleted(dialog);
+
+                            // Aktualizace progress baru podle dokončených úkolů
+                            this.updateProgressBarByTasks(dialog, progressBar, percentElement);
+
+                            // Aktualizace markerů úkolů na mapě
+                            this.updateTaskMarkersOnMap();
+                        }
+                    });
+
+                    // Přidání nového úkolu do seznamu
+                    dialog.querySelector('.custom-tasks-checklist').appendChild(newTaskItem);
+                }
+
+                // Přidání aktivity do logu
+                activityLog.innerHTML = `<div class="work-activity-item new-activity">Přidán nový úkol: ${taskText}</div>` + activityLog.innerHTML;
+
+                // Odstranění třídy new-activity po animaci
+                setTimeout(() => {
+                    const newActivity = activityLog.querySelector('.new-activity');
+                    if (newActivity) {
+                        newActivity.classList.remove('new-activity');
+                    }
+                }, 1000);
+
+                // Vyčištění inputu
+                newTaskInputDuringWork.value = '';
+                newTaskInputDuringWork.focus();
+
+                // Aktualizace progress baru podle dokončených úkolů
+                this.updateProgressBarByTasks(dialog, progressBar, percentElement);
+
+                // Aktualizace markerů úkolů na mapě
+                this.addTaskMarkersToMap();
+            }
+        };
+
+        // Event listener pro přidání úkolu během práce
+        addTaskBtnDuringWork.addEventListener('click', addNewTaskDuringWork);
+
+        // Event listener pro přidání úkolu po stisknutí Enter
+        newTaskInputDuringWork.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addNewTaskDuringWork();
+            }
+        });
+
+        // Event listener pro tlačítko uložení práce
+        const saveWorkBtn = dialog.querySelector('#save-work-btn');
+        saveWorkBtn.addEventListener('click', () => {
+            // Uložení aktuálního stavu práce
+            this.saveWorkProgress(dialog, workplace, startTime);
+
+            // Přidání aktivity do logu
+            activityLog.innerHTML = `<div class="work-activity-item new-activity">Práce uložena. Můžete se k ní vrátit později.</div>` + activityLog.innerHTML;
+
+            // Zavření dialogu po krátké prodlevě
+            setTimeout(() => {
+                this.closeDialog(dialog);
+
+                // Zobrazení notifikace o uložení
+                this.showSavedWorkNotification(workplace);
+            }, 1500);
         });
 
         // Přidání markerů úkolů na mapu
