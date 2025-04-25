@@ -2,6 +2,21 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.5.3] - 2025-06-21 - DALŠÍ ROZŠÍŘENÍ ODMĚŇOVACÍHO SYSTÉMU
+
+### Nové funkce
+- Přidány dvě nové kategorie do odměňovacího systému: "Sladkosti" a "Posilovna"
+- Přidáno 5 nových typů odměn v kategorii sladkosti (čokoláda, zmrzlina, sušenky, bonbóny, donut)
+- Přidáno 5 nových typů odměn v kategorii posilovna (návštěva posilovny, běh, plavání, cyklistika, jóga)
+- Implementováno ukládání historie získaných odměn sladkostí a posilovny do localStorage
+- Za odměny typu sladkosti uživatel získává 15 XP
+- Za odměny typu posilovna uživatel získává 50 XP (více než ostatní kategorie, protože je to zdravé)
+
+### Vylepšení
+- Vylepšeno filtrování odměn podle kategorií, přidány kategorie "Sladkosti" a "Posilovna"
+- Vylepšeno formátování hodnot odměn pro kategorie sladkosti a posilovna
+- Přidáno zobrazení získaných XP u odměn typu sladkosti a posilovna
+
 ## [0.3.5.2] - 2025-06-21 - ROZŠÍŘENÍ ODMĚŇOVACÍHO SYSTÉMU O JÍDLO A PITÍ
 
 ### Nové funkce

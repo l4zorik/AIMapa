@@ -1,6 +1,6 @@
 /**
  * Samostatný odměňovací systém
- * Verze 0.3.5.2
+ * Verze 0.3.5.3
  */
 
 class RewardSystemClass {
@@ -144,6 +144,100 @@ class RewardSystemClass {
                 value: 'Večeře',
                 description: 'Zajděte si na večeři do oblíbené restaurace jako odměnu za svou práci.',
                 cost: 'Vysoká'
+            },
+
+            // Sladkosti
+            {
+                id: 'chocolate',
+                name: 'Čokoláda',
+                type: 'sweets',
+                icon: '🍫',
+                value: 'Čokoláda',
+                description: 'Dopřejte si tabulku kvalitní čokolády jako odměnu.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'ice-cream',
+                name: 'Zmrzlina',
+                type: 'sweets',
+                icon: '🍦',
+                value: 'Zmrzlina',
+                description: 'Odměňte se lahodnou zmrzlinou.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'cookies',
+                name: 'Sušenky',
+                type: 'sweets',
+                icon: '🍪',
+                value: 'Sušenky',
+                description: 'Dopřejte si balíček oblíbených sušenek jako odměnu.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'candy',
+                name: 'Bonbóny',
+                type: 'sweets',
+                icon: '🍬',
+                value: 'Bonbóny',
+                description: 'Odměňte se sáčkem bonbónů.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'donut',
+                name: 'Donut',
+                type: 'sweets',
+                icon: '🍩',
+                value: 'Donut',
+                description: 'Dopřejte si lahodný donut jako odměnu.',
+                cost: 'Nízká'
+            },
+
+            // Posilovna
+            {
+                id: 'gym-visit',
+                name: 'Návštěva posilovny',
+                type: 'gym',
+                icon: '🏋️',
+                value: 'Posilovna',
+                description: 'Odměňte se návštěvou posilovny a udělejte něco pro své zdraví.',
+                cost: 'Střední'
+            },
+            {
+                id: 'running',
+                name: 'Běh v přírodě',
+                type: 'gym',
+                icon: '🏃',
+                value: 'Běh',
+                description: 'Dopřejte si osvěžující běh v přírodě jako odměnu.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'swimming',
+                name: 'Plavání',
+                type: 'gym',
+                icon: '🏊',
+                value: 'Plavání',
+                description: 'Odměňte se návštěvou bazénu a zaplavejte si.',
+                cost: 'Střední'
+            },
+            {
+                id: 'cycling',
+                name: 'Cyklistika',
+                type: 'gym',
+                icon: '🚴',
+                value: 'Cyklistika',
+                description: 'Dopřejte si projížďku na kole jako odměnu.',
+                cost: 'Střední'
+            },
+            {
+                id: 'yoga',
+                name: 'Jóga',
+                type: 'gym',
+                icon: '🧘',
+                value: 'Jóga',
+                description: 'Odměňte se relaxační lekcí jógy.',
+                cost: 'Střední'
             }
         ];
     }
@@ -683,6 +777,8 @@ class RewardSystemClass {
                     <button class="category-btn" data-category="money">Peníze</button>
                     <button class="category-btn" data-category="xp">Zkušenosti</button>
                     <button class="category-btn" data-category="food">Jídlo a pití</button>
+                    <button class="category-btn" data-category="sweets">Sladkosti</button>
+                    <button class="category-btn" data-category="gym">Posilovna</button>
                     <button class="category-btn" data-category="other">Ostatní</button>
                 </div>
 
@@ -785,6 +881,10 @@ class RewardSystemClass {
                 return `${reward.value} BTC`;
             case 'food':
                 return `${reward.value} (+25 XP)`;
+            case 'sweets':
+                return `${reward.value} (+15 XP)`;
+            case 'gym':
+                return `${reward.value} (+50 XP)`;
             default:
                 return reward.value;
         }
@@ -864,6 +964,40 @@ class RewardSystemClass {
                     date: new Date().toISOString()
                 });
                 localStorage.setItem('aiMapaFoodRewards', JSON.stringify(foodRewards));
+                break;
+
+            case 'sweets':
+                // Pro sladkosti pouze zobrazíme zprávu a přidáme XP
+                if (window.addXP) {
+                    window.addXP(15, `Odměna: ${reward.value}`);
+                }
+
+                // Uložíme do localStorage informaci o získané odměně
+                const sweetsRewards = JSON.parse(localStorage.getItem('aiMapaSweetsRewards') || '[]');
+                sweetsRewards.push({
+                    name: reward.name,
+                    value: reward.value,
+                    icon: reward.icon,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('aiMapaSweetsRewards', JSON.stringify(sweetsRewards));
+                break;
+
+            case 'gym':
+                // Pro posilovnu přidáme více XP, protože je to zdravé
+                if (window.addXP) {
+                    window.addXP(50, `Odměna: ${reward.value}`);
+                }
+
+                // Uložíme do localStorage informaci o získané odměně
+                const gymRewards = JSON.parse(localStorage.getItem('aiMapaGymRewards') || '[]');
+                gymRewards.push({
+                    name: reward.name,
+                    value: reward.value,
+                    icon: reward.icon,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('aiMapaGymRewards', JSON.stringify(gymRewards));
                 break;
         }
 
