@@ -1,6 +1,6 @@
 /**
  * Doplňkové styly pro definování úkolů
- * Verze 0.3.6.1
+ * Verze 0.3.6.2
  */
 
 /* Hlavička s akcemi */
@@ -15,6 +15,14 @@
     margin: 0;
     font-size: 18px;
     color: #2c3e50;
+}
+
+/* Kontejner pro tlačítka akcí */
+.task-action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 /* Tlačítko pro analýzu problému v pracovním okně */
@@ -40,6 +48,60 @@
 .analyze-task-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 3px rgba(155, 89, 182, 0.3);
+}
+
+/* Tlačítko pro pojmenování projektu */
+.name-project-btn {
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(46, 204, 113, 0.3);
+}
+
+.name-project-btn:hover {
+    background: linear-gradient(135deg, #27ae60, #219653);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 204, 113, 0.4);
+}
+
+.name-project-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(46, 204, 113, 0.3);
+}
+
+/* Tlačítko pro informace o projektu */
+.project-info-btn {
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.project-info-btn:hover {
+    background: linear-gradient(135deg, #2980b9, #2471a3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
+}
+
+.project-info-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(52, 152, 219, 0.3);
 }
 
 /* Úchyt pro přetahování úkolů */

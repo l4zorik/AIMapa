@@ -9,6 +9,9 @@ class VirtualWorkClass {
         this.isInitialized = false;
         // Šablony úkolů
         this.taskTemplates = {};
+        // Informace o projektu
+        this.projectName = null;
+        this.projectInfo = {};
         this.workplaces = [
             {
                 id: 'office1',
@@ -106,9 +109,42 @@ class VirtualWorkClass {
         // Načtení šablon úkolů
         this.loadTaskTemplates();
 
+        // Načtení informací o projektu
+        this.loadProjectInfo();
+
         // Označení jako inicializovaný
         this.isInitialized = true;
         console.log('VirtualWork: Modul byl inicializován');
+    }
+
+    /**
+     * Načtení informací o projektu z localStorage
+     */
+    loadProjectInfo() {
+        try {
+            const projectInfo = localStorage.getItem('aiMapaProjectInfo');
+            if (projectInfo) {
+                this.projectInfo = JSON.parse(projectInfo);
+                this.projectName = this.projectInfo.name || null;
+                console.log(`Načteny informace o projektu: ${this.projectName}`);
+            }
+        } catch (error) {
+            console.error('Chyba při načítání informací o projektu:', error);
+            this.projectInfo = {};
+            this.projectName = null;
+        }
+    }
+
+    /**
+     * Uložení informací o projektu do localStorage
+     */
+    saveProjectInfo() {
+        try {
+            localStorage.setItem('aiMapaProjectInfo', JSON.stringify(this.projectInfo));
+            console.log(`Uloženy informace o projektu: ${this.projectName}`);
+        } catch (error) {
+            console.error('Chyba při ukládání informací o projektu:', error);
+        }
     }
 
     /**
@@ -166,6 +202,13 @@ class VirtualWorkClass {
         taskDefinitionCustomStyles.rel = 'stylesheet';
         taskDefinitionCustomStyles.href = 'app/task-definition-custom.css';
         document.head.appendChild(taskDefinitionCustomStyles);
+
+        // Načtení stylů pro informace o projektu
+        const projectInfoStyles = document.createElement('link');
+        projectInfoStyles.id = 'project-info-styles';
+        projectInfoStyles.rel = 'stylesheet';
+        projectInfoStyles.href = 'app/project-info.css';
+        document.head.appendChild(projectInfoStyles);
 
         // Načtení CSS pro saved-work
         const savedWorkStyles = document.createElement('link');
@@ -1306,7 +1349,11 @@ class VirtualWorkClass {
                 <div class="custom-tasks-progress">
                     <div class="custom-tasks-header-with-actions">
                         <h3>Vaše úkoly:</h3>
-                        <button id="analyze-task-btn" class="analyze-task-btn" title="Analyzovat problém a uložit jako šablonu">Analyzovat problém</button>
+                        <div class="task-action-buttons">
+                            <button id="analyze-task-btn" class="analyze-task-btn" title="Analyzovat problém a uložit jako šablonu">Analyzovat problém</button>
+                            <button id="name-project-btn" class="name-project-btn" title="Pojmenovat projekt">Pojmenovat projekt</button>
+                            ${this.projectName ? `<button id="project-info-btn" class="project-info-btn" title="Informace o projektu">${this.projectName}</button>` : ''}
+                        </div>
                     </div>
                     ${this.customTasks.length === 0 ?
                         '<p class="no-tasks">Nemáte definované žádné úkoly.</p>' :
@@ -1798,7 +1845,11 @@ class VirtualWorkClass {
         tasksContainer.innerHTML = `
             <div class="custom-tasks-header-with-actions">
                 <h3>Vaše úkoly:</h3>
-                <button id="analyze-task-btn" class="analyze-task-btn" title="Analyzovat problém a uložit jako šablonu">Analyzovat problém</button>
+                <div class="task-action-buttons">
+                    <button id="analyze-task-btn" class="analyze-task-btn" title="Analyzovat problém a uložit jako šablonu">Analyzovat problém</button>
+                    <button id="name-project-btn" class="name-project-btn" title="Pojmenovat projekt">Pojmenovat projekt</button>
+                    ${this.projectName ? `<button id="project-info-btn" class="project-info-btn" title="Informace o projektu">${this.projectName}</button>` : ''}
+                </div>
             </div>
             <div class="custom-tasks-checklist">
                 ${this.customTasks.map(task => `
@@ -1873,6 +1924,18 @@ class VirtualWorkClass {
             analyzeTaskBtn.addEventListener('click', () => this.handleAnalyzeTask(dialog));
         }
 
+        // Přidání event listeneru pro tlačítko pojmenovat projekt
+        const nameProjectBtn = tasksContainer.querySelector('#name-project-btn');
+        if (nameProjectBtn) {
+            nameProjectBtn.addEventListener('click', () => this.handleNameProject(dialog));
+        }
+
+        // Přidání event listeneru pro tlačítko informace o projektu
+        const projectInfoBtn = tasksContainer.querySelector('#project-info-btn');
+        if (projectInfoBtn) {
+            projectInfoBtn.addEventListener('click', () => this.showProjectInfo(dialog));
+        }
+
         // Nastavení drag and drop pro úkoly
         this.setupDragAndDropForTasksChecklist(dialog);
     }
@@ -1931,6 +1994,139 @@ class VirtualWorkClass {
                 alert('Úkol byl analyzován a uložen jako šablona. Při příštím spuštění práce bude automaticky k dispozici.');
             }
         }
+    }
+
+    /**
+     * Obsluha tlačítka pojmenovat projekt
+     */
+    handleNameProject(dialog) {
+        // Zobrazení dialogu pro zadání názvu projektu
+        const projectName = prompt('Zadejte název projektu:', this.projectName || '');
+
+        if (projectName !== null) {
+            // Uložení názvu projektu
+            this.projectName = projectName.trim();
+
+            // Uložení informací o projektu
+            this.projectInfo.name = this.projectName;
+            this.projectInfo.createdAt = this.projectInfo.createdAt || new Date().toISOString();
+            this.projectInfo.updatedAt = new Date().toISOString();
+
+            // Přidání informací o úkolech
+            this.projectInfo.tasks = [...this.customTasks];
+
+            // Uložení do localStorage
+            this.saveProjectInfo();
+
+            // Aktualizace UI
+            this.updateTasksChecklistUI(dialog);
+
+            // Přidání aktivity do logu
+            const activityLog = dialog.querySelector('.work-activity-log');
+            if (activityLog) {
+                activityLog.innerHTML = `<div class="work-activity-item new-activity">Projekt byl pojmenován: ${this.projectName}</div>` + activityLog.innerHTML;
+
+                // Odstranění třídy new-activity po animaci
+                setTimeout(() => {
+                    const newActivity = activityLog.querySelector('.new-activity');
+                    if (newActivity) {
+                        newActivity.classList.remove('new-activity');
+                    }
+                }, 1000);
+            }
+        }
+    }
+
+    /**
+     * Zobrazení informací o projektu
+     */
+    showProjectInfo(dialog) {
+        if (!this.projectName || !this.projectInfo) {
+            alert('Nejsou k dispozici žádné informace o projektu.');
+            return;
+        }
+
+        // Vytvoření dialogu pro zobrazení informací o projektu
+        const projectInfoDialog = document.createElement('div');
+        projectInfoDialog.className = 'virtual-work-dialog project-info-dialog';
+
+        // Formátování data vytvoření a aktualizace
+        const createdDate = this.projectInfo.createdAt ? new Date(this.projectInfo.createdAt).toLocaleString() : 'Neznámé';
+        const updatedDate = this.projectInfo.updatedAt ? new Date(this.projectInfo.updatedAt).toLocaleString() : 'Neznámé';
+
+        // Výpočet statistik projektu
+        const totalTasks = this.customTasks.length;
+        const completedTasks = this.customTasks.filter(task => task.completed).length;
+        const completionPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+        // Obsah dialogu
+        projectInfoDialog.innerHTML = `
+            <div class="virtual-work-header">
+                <h2>Informace o projektu</h2>
+                <button class="virtual-work-close">&times;</button>
+            </div>
+            <div class="virtual-work-content project-info-content">
+                <div class="project-info-header">
+                    <h3>${this.projectName}</h3>
+                    <div class="project-dates">
+                        <div class="project-date-item">
+                            <span class="project-date-label">Vytvořeno:</span>
+                            <span class="project-date-value">${createdDate}</span>
+                        </div>
+                        <div class="project-date-item">
+                            <span class="project-date-label">Aktualizováno:</span>
+                            <span class="project-date-value">${updatedDate}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-stats">
+                    <div class="project-stat-item">
+                        <span class="project-stat-label">Celkem úkolů:</span>
+                        <span class="project-stat-value">${totalTasks}</span>
+                    </div>
+                    <div class="project-stat-item">
+                        <span class="project-stat-label">Dokončeno úkolů:</span>
+                        <span class="project-stat-value">${completedTasks}</span>
+                    </div>
+                    <div class="project-stat-item">
+                        <span class="project-stat-label">Dokončeno:</span>
+                        <span class="project-stat-value">${completionPercent}%</span>
+                    </div>
+                </div>
+
+                <div class="project-tasks-list">
+                    <h4>Seznam úkolů:</h4>
+                    <ul>
+                        ${this.customTasks.map(task => `
+                            <li class="${task.completed ? 'completed' : ''}">
+                                <span class="task-status-icon">${task.completed ? '✅' : '⬜'}</span>
+                                <span class="task-text">${task.text}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+
+                <div class="project-info-actions">
+                    <button id="close-project-info-btn">Zavřít</button>
+                </div>
+            </div>
+        `;
+
+        // Přidání dialogu do stránky
+        document.body.appendChild(projectInfoDialog);
+
+        // Přidání event listeneru pro zavření dialogu
+        const closeBtn = projectInfoDialog.querySelector('.virtual-work-close');
+        closeBtn.addEventListener('click', () => {
+            projectInfoDialog.remove();
+        });
+
+        // Přidání event listeneru pro tlačítko "Zavřít"
+        const closeBtnAction = projectInfoDialog.querySelector('#close-project-info-btn');
+        closeBtnAction.addEventListener('click', () => {
+            projectInfoDialog.remove();
+        });
     }
 
     /**

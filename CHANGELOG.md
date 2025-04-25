@@ -2,6 +2,16 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.6.2] - 2025-06-27 - SPRÁVA PROJEKTŮ VE VIRTUÁLNÍ PRÁCI
+
+### Nové funkce
+- Přidáno tlačítko "Pojmenovat projekt" vedle tlačítka "Analyzovat problém"
+- Implementována možnost pojmenovat projekt a ukládat informace o něm
+- Přidáno tlačítko s názvem projektu, které zobrazí detailní informace
+- Implementováno zobrazení statistik projektu (celkem úkolů, dokončeno, procenta)
+- Přidán přehledný seznam úkolů v informacích o projektu
+- Implementováno ukládání a načítání informací o projektu z localStorage
+
 ## [0.3.6.1] - 2025-06-26 - VYLEPŠENÍ VIRTUÁLNÍ PRÁCE A ANALÝZA PROBLÉMŮ
 
 ### Nové funkce
