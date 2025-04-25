@@ -1,14 +1,29 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.0.4
+ * Verze 0.3.4.0
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.0.4',
+    currentVersion: '0.3.4.0',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.4.0',
+            date: '2025-06-16',
+            title: 'Odměňovací systém',
+            description: 'Implementován odměňovací systém s možností výběru typu odměny',
+            changes: [
+                'Implementován odměňovací systém s možností výběru typu odměny (peníze, XP, úspora času)',
+                'Přidána položka "Systém odměn" do menu příkazů v kategorii Zábava',
+                'Přidány vizuální efekty pro výběr odměny a zobrazení výsledku',
+                'Vylepšen design odměňovacího systému s animacemi a vizuálními efekty',
+                'Přidána podpora tmavého režimu pro odměňovací systém',
+                'Opraveno tlačítko "Zpět na výběr práce" v dialogu nedokončené práce',
+                'Opraveno tlačítko "Zpět na výběr práce" v pracovním dialogu'
+            ]
+        },
         {
             version: '0.3.0.4',
             date: '2025-05-20',

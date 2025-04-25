@@ -343,9 +343,52 @@ class VirtualWorkClass {
     }
 
     /**
-     * Zobrazení dialogu s nedokončenou prací
+     * Zobrazení notifikace o uložení práce
+     * @param {Object} workplace - Pracoviště, na kterém byla práce uložena
      */
-    showSavedWorkDialog() {
+    showSavedWorkNotification(workplace) {
+        // Vytvoření notifikace
+        const notification = document.createElement('div');
+        notification.className = 'saved-work-notification';
+        notification.innerHTML = `
+            <div class="saved-work-notification-icon">${workplace.icon}</div>
+            <div class="saved-work-notification-content">
+                <div class="saved-work-notification-title">Práce uložena</div>
+                <div class="saved-work-notification-text">Vaše práce jako ${workplace.name} byla uložena. Můžete se k ní vrátit později.</div>
+            </div>
+            <button class="saved-work-notification-close">&times;</button>
+        `;
+
+        // Přidání notifikace do stránky
+        document.body.appendChild(notification);
+
+        // Přidání event listeneru pro zavření notifikace
+        const closeBtn = notification.querySelector('.saved-work-notification-close');
+        closeBtn.addEventListener('click', () => {
+            notification.classList.add('closing');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        });
+
+        // Automatické zavření notifikace po 5 sekundách
+        setTimeout(() => {
+            notification.classList.add('closing');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 5000);
+    }
+
+    /**
+     * Zobrazení dialogu s nedokončenou prací
+     * @param {HTMLElement} existingDialog - Existující dialog, pokud je k dispozici
+     */
+    showSavedWorkDialog(existingDialog = null) {
         // Načtení uložených prací z localStorage
         const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
 
@@ -355,8 +398,14 @@ class VirtualWorkClass {
             return;
         }
 
-        // Vytvoření dialogu
-        const dialog = this.createDialog('Nedokončená práce');
+        // Použití existujícího dialogu nebo vytvoření nového
+        let dialog = existingDialog || document.querySelector('.virtual-work-dialog');
+        if (!dialog) {
+            dialog = this.createDialog('Nedokončená práce');
+        } else {
+            // Aktualizace titulku existujícího dialogu
+            dialog.querySelector('.virtual-work-header h2').textContent = 'Nedokončená práce';
+        }
 
         // Zobrazení seznamu nedokončených prací
         dialog.querySelector('.virtual-work-content').innerHTML = `
@@ -396,7 +445,11 @@ class VirtualWorkClass {
         // Event listener pro tlačítko zpět
         const backBtn = dialog.querySelector('#back-to-workplaces-btn');
         backBtn.addEventListener('click', () => {
-            this.openWorkDialog();
+            // Aktualizace titulku dialogu
+            dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+
+            // Místo vytváření nového dialogu aktualizujeme stávající
+            this.updateWorkDialog(dialog);
         });
 
         // Event listenery pro tlačítka pokračování
@@ -445,9 +498,13 @@ class VirtualWorkClass {
                     // Odstranění položky ze seznamu
                     workItem.remove();
 
-                    // Pokud byl seznam vyprázdněn, zobrazíme zprávu
+                    // Pokud byl seznam vyprázdněn, přesměrujeme na hlavní dialog
                     if (updatedSavedWork.length === 0) {
-                        dialog.querySelector('.saved-work-list').innerHTML = '<p class="no-saved-work">Nemáte žádnou uloženou nedokončenou práci.</p>';
+                        // Aktualizace titulku dialogu
+                        dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+
+                        // Přesměrování na hlavní dialog
+                        this.updateWorkDialog(dialog);
                     }
                 }
             });
@@ -482,6 +539,139 @@ class VirtualWorkClass {
     }
 
     /**
+     * Vytvoření nového dialogu
+     * @param {string} title - Titulek dialogu
+     * @returns {HTMLElement} - Vytvořený dialog
+     */
+    createDialog(title) {
+        // Vytvoření dialogu
+        const dialog = document.createElement('div');
+        dialog.className = 'virtual-work-dialog';
+        dialog.innerHTML = `
+            <div class="virtual-work-header">
+                <h2>${title}</h2>
+                <button class="virtual-work-close">&times;</button>
+            </div>
+            <div class="virtual-work-content">
+                <!-- Obsah bude doplněn později -->
+            </div>
+            <div class="virtual-work-actions">
+                <!-- Tlačítka budou doplněna později -->
+            </div>
+        `;
+
+        // Přidání dialogu do stránky
+        document.body.appendChild(dialog);
+
+        // Přidání základních event listenerů
+        const closeBtn = dialog.querySelector('.virtual-work-close');
+        closeBtn.addEventListener('click', () => this.closeDialog(dialog));
+
+        return dialog;
+    }
+
+    /**
+     * Aktualizace obsahu dialogu virtuální práce
+     * @param {HTMLElement} dialog - Existující dialog, který chceme aktualizovat
+     */
+    updateWorkDialog(dialog) {
+        // Kontrola, zda existují uložené nedokončené práce
+        const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
+        const hasSavedWork = savedWork.length > 0;
+
+        // Pokud existuje nedokončená práce, rovnou ji zobrazíme
+        if (hasSavedWork) {
+            this.showSavedWorkDialog(dialog);
+            return;
+        }
+
+        // Aktualizace obsahu dialogu
+        dialog.querySelector('.virtual-work-content').innerHTML = `
+            ${hasSavedWork ? `
+                <div class="saved-work-banner">
+                    <div class="saved-work-banner-icon">💾</div>
+                    <div class="saved-work-banner-text">
+                        Máte ${savedWork.length} nedokončen${savedWork.length === 1 ? 'ou práci' : 'é práce'}
+                    </div>
+                    <button class="saved-work-banner-btn" id="show-saved-work-btn">Zobrazit</button>
+                </div>
+            ` : ''}
+
+            <div class="workplaces-container">
+                <div class="workplaces-categories">
+                    <button class="workplace-category-btn active" data-category="all">Všechny</button>
+                    <button class="workplace-category-btn" data-category="office">Kancelář</button>
+                    <button class="workplace-category-btn" data-category="manual">Manuální</button>
+                    <button class="workplace-category-btn" data-category="creative">Kreativní</button>
+                </div>
+                <div class="workplaces-list">
+                    ${this.workplaces.map(workplace => `
+                        <div class="workplace-item" data-id="${workplace.id}" data-category="${workplace.category}">
+                            <div class="workplace-icon">${workplace.icon}</div>
+                            <div class="workplace-info">
+                                <div class="workplace-name">${workplace.name}</div>
+                                <div class="workplace-details">
+                                    <span class="workplace-pay">💰 ${workplace.pay} Kč</span>
+                                    <span class="workplace-xp">⭐ ${workplace.xp} XP</span>
+                                    <span class="workplace-duration">⏱️ ${workplace.duration} min</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // Aktualizace tlačítek v patičce
+        dialog.querySelector('.virtual-work-actions').innerHTML = `
+            <button class="virtual-work-btn secondary" id="virtual-work-history">Historie práce</button>
+            <button class="virtual-work-btn secondary" id="virtual-work-cancel">Zrušit</button>
+            <button class="virtual-work-btn primary" id="virtual-work-start" disabled>Začít pracovat</button>
+        `;
+
+        // Přidání event listenerů pro tlačítka a položky
+        this.setupDialogEvents(dialog);
+
+        // Přidání event listeneru pro tlačítko historie
+        const historyBtn = dialog.querySelector('#virtual-work-history');
+        historyBtn.addEventListener('click', () => {
+            this.showWorkHistory(dialog);
+        });
+
+        // Přidání event listeneru pro tlačítko zobrazení nedokončené práce
+        const showSavedWorkBtn = dialog.querySelector('#show-saved-work-btn');
+        if (showSavedWorkBtn) {
+            showSavedWorkBtn.addEventListener('click', () => {
+                this.showSavedWorkDialog(dialog);
+            });
+        }
+
+        // Přidání event listenerů pro kategorie
+        const categoryButtons = dialog.querySelectorAll('.workplace-category-btn');
+        categoryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Odstranění aktivní třídy ze všech tlačítek
+                categoryButtons.forEach(b => b.classList.remove('active'));
+
+                // Přidání aktivní třídy na kliknuté tlačítko
+                btn.classList.add('active');
+
+                // Filtrování pracovišť podle kategorie
+                const category = btn.dataset.category;
+                const workplaceItems = dialog.querySelectorAll('.workplace-item');
+
+                workplaceItems.forEach(item => {
+                    if (category === 'all' || item.dataset.category === category) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    }
+
+    /**
      * Otevření dialogu virtuální práce
      */
     openWorkDialog() {
@@ -491,6 +681,12 @@ class VirtualWorkClass {
         // Kontrola, zda existují uložené nedokončené práce
         const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
         const hasSavedWork = savedWork.length > 0;
+
+        // Pokud existuje nedokončená práce, rovnou ji zobrazíme
+        if (hasSavedWork) {
+            this.showSavedWorkDialog();
+            return;
+        }
 
         // Vytvoření dialogu
         const dialog = document.createElement('div');
@@ -621,7 +817,7 @@ class VirtualWorkClass {
         const showSavedWorkBtn = dialog.querySelector('#show-saved-work-btn');
         if (showSavedWorkBtn) {
             showSavedWorkBtn.addEventListener('click', () => {
-                this.showSavedWorkDialog();
+                this.showSavedWorkDialog(dialog);
             });
         }
     }
@@ -854,13 +1050,12 @@ class VirtualWorkClass {
 
             // Event listener pro tlačítko zpět
             backBtn.addEventListener('click', () => {
-                // Vrátíme se zpět na výběr pracoviště
-                this.openWorkDialog();
+                // Místo vytváření nového dialogu aktualizujeme stávající
+                this.updateWorkDialog(dialog);
 
                 // Vybereme znovu stejné pracoviště, pokud existuje
                 setTimeout(() => {
-                    const dialog = document.querySelector('.virtual-work-dialog');
-                    if (dialog && this.selectedWorkplace) {
+                    if (this.selectedWorkplace) {
                         const workplaceItems = dialog.querySelectorAll('.workplace-item');
                         workplaceItems.forEach(item => {
                             if (item.dataset.id === this.selectedWorkplace.id) {
@@ -953,7 +1148,8 @@ class VirtualWorkClass {
         // Event listener pro tlačítko zpět
         const backBtn = dialog.querySelector('#back-to-workplaces-btn');
         backBtn.addEventListener('click', () => {
-            this.openWorkDialog();
+            // Místo vytváření nového dialogu aktualizujeme stávající
+            this.updateWorkDialog(dialog);
         });
     }
 
@@ -1033,10 +1229,21 @@ class VirtualWorkClass {
         // Přidání tlačítek pro ovládání práce
         const actionsContainer = dialog.querySelector('.virtual-work-actions');
         actionsContainer.innerHTML = `
+            <button class="virtual-work-btn secondary" id="back-to-workplaces-btn">Zpět na výběr práce</button>
             <div class="complete-manually-container">
                 <button class="virtual-work-btn primary" id="complete-work-btn">Dokončit práci a získat odměnu</button>
             </div>
         `;
+
+        // Event listener pro tlačítko zpět
+        const backBtn = dialog.querySelector('#back-to-workplaces-btn');
+        backBtn.addEventListener('click', () => {
+            // Aktualizace titulku dialogu
+            dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+
+            // Místo vytváření nového dialogu aktualizujeme stávající
+            this.updateWorkDialog(dialog);
+        });
 
         // Získání referencí na elementy
         const progressBar = dialog.querySelector('.work-progress-bar');
@@ -1488,44 +1695,134 @@ class VirtualWorkClass {
     }
 
     /**
-     * Manuální dokončení práce
+     * Zobrazení dialogu pro výběr odměny
+     * @param {HTMLElement} dialog - Dialog s prací
+     * @param {Object} workplace - Vybrané pracoviště
+     * @param {string} totalTimeFormatted - Formátovaný celkový čas práce
+     * @param {number} taskBonus - Bonus za dokončené úkoly
+     * @param {number} taskBonusXp - XP bonus za dokončené úkoly
      */
-    completeWorkManually(dialog, workplace, progressBar, percentElement, timeRemaining, activityLog, progressInterval) {
-        // Odstranění markerů úkolů z mapy
-        this.removeTaskMarkersFromMap();
+    showRewardSelectionDialog(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp) {
+        // Zobrazení dialogu pro výběr odměny
+        dialog.querySelector('.virtual-work-content').innerHTML = `
+            <div class="reward-selection-container">
+                <h3>Vyberte si svoji odměnu</h3>
+                <p>Gratulujeme k dokončení práce! Nyní si můžete vybrat, jakou odměnu za svoji práci dostanete.</p>
 
-        // Výpočet celkového času, který práce trvala
-        const startTime = new Date(dialog.getAttribute('data-start-time') || new Date());
-        const endTime = new Date();
-        const totalTimeMs = endTime - startTime;
-        const totalMinutes = Math.floor(totalTimeMs / 60000);
-        const totalSeconds = Math.floor((totalTimeMs % 60000) / 1000);
-        const totalTimeFormatted = `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
+                <div class="reward-options">
+                    <div class="reward-option" data-type="money">
+                        <div class="reward-option-icon">💰</div>
+                        <div class="reward-option-info">
+                            <div class="reward-option-name">Peníze</div>
+                            <div class="reward-option-value">${workplace.pay + taskBonus} Kč</div>
+                            <div class="reward-option-description">Standardní finanční odměna za vaši práci.</div>
+                        </div>
+                    </div>
 
-        // Uložení celkového času do dialogu pro pozdější použití
-        dialog.setAttribute('data-total-time', totalTimeFormatted);
+                    <div class="reward-option" data-type="xp">
+                        <div class="reward-option-icon">⭐</div>
+                        <div class="reward-option-info">
+                            <div class="reward-option-name">Zkušenosti</div>
+                            <div class="reward-option-value">${workplace.xp + taskBonusXp} XP</div>
+                            <div class="reward-option-description">Získáte více zkušeností, ale méně peněz.</div>
+                        </div>
+                    </div>
 
-        // Zastavení intervalu
-        if (progressInterval) {
-            clearInterval(progressInterval);
-        }
+                    <div class="reward-option" data-type="time">
+                        <div class="reward-option-icon">⏱️</div>
+                        <div class="reward-option-info">
+                            <div class="reward-option-name">Úspora času</div>
+                            <div class="reward-option-value">-${Math.floor(workplace.duration * 0.3)} min</div>
+                            <div class="reward-option-description">Příští práce bude trvat o 30% kratší dobu.</div>
+                        </div>
+                    </div>
+                </div>
 
-        // Nastavení progress baru na 100%
-        progressBar.style.width = '100%';
-        percentElement.textContent = '100%';
-        timeRemaining.textContent = '0:00';
+                <div class="reward-selection-info">
+                    <p>Vyberte jednu z možností kliknutím na příslušnou kartu.</p>
+                </div>
+            </div>
+        `;
 
-        // Výpočet bonusu za dokončené úkoly
-        let taskBonus = 0;
-        let taskBonusXp = 0;
+        // Přidání tlačítek pro ovládání výběru
+        const actionsContainer = dialog.querySelector('.virtual-work-actions');
+        actionsContainer.innerHTML = `
+            <button class="virtual-work-btn secondary" id="reward-back-btn">Zpět</button>
+            <button class="virtual-work-btn primary" id="reward-confirm-btn" disabled>Potvrdit výběr</button>
+        `;
 
-        if (this.customTasks.length > 0) {
-            const completedTasks = this.customTasks.filter(task => task.completed);
-            const completionPercent = Math.floor((completedTasks.length / this.customTasks.length) * 100);
+        // Přidání event listenerů pro výběr odměny
+        const rewardOptions = dialog.querySelectorAll('.reward-option');
+        const confirmBtn = dialog.querySelector('#reward-confirm-btn');
 
-            // Bonus až 20% za dokončené úkoly
-            taskBonus = Math.floor((workplace.pay * completionPercent * 0.2) / 100);
-            taskBonusXp = Math.floor((workplace.xp * completionPercent * 0.2) / 100);
+        rewardOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Odstranění výběru ze všech možností
+                rewardOptions.forEach(opt => opt.classList.remove('selected'));
+
+                // Přidání výběru na kliknutou možnost
+                option.classList.add('selected');
+
+                // Povolení tlačítka pro potvrzení
+                confirmBtn.disabled = false;
+            });
+        });
+
+        // Event listener pro tlačítko zpět
+        const backBtn = dialog.querySelector('#reward-back-btn');
+        backBtn.addEventListener('click', () => {
+            // Návrat k pracovnímu dialogu
+            this.startWorkWithTasks(dialog, workplace);
+        });
+
+        // Event listener pro tlačítko potvrzení
+        confirmBtn.addEventListener('click', () => {
+            // Získání vybrané odměny
+            const selectedOption = dialog.querySelector('.reward-option.selected');
+            if (!selectedOption) return;
+
+            const rewardType = selectedOption.dataset.type;
+
+            // Zpracování vybrané odměny
+            switch (rewardType) {
+                case 'money':
+                    // Standardní finanční odměna
+                    this.completeWorkWithReward(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp, 'money');
+                    break;
+                case 'xp':
+                    // Více XP, méně peněz
+                    this.completeWorkWithReward(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp, 'xp');
+                    break;
+                case 'time':
+                    // Úspora času pro příští práci
+                    this.completeWorkWithReward(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp, 'time');
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Dokončení práce s vybranou odměnou
+     */
+    completeWorkWithReward(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp, rewardType) {
+        // Výpočet odměny podle vybraného typu
+        let finalPay = workplace.pay + taskBonus;
+        let finalXp = workplace.xp + taskBonusXp;
+        let timeBonus = 0;
+
+        switch (rewardType) {
+            case 'money':
+                // Standardní odměna, nic se nemění
+                break;
+            case 'xp':
+                // Více XP, méně peněz
+                finalXp = Math.floor(finalXp * 1.5); // +50% XP
+                finalPay = Math.floor(finalPay * 0.7); // -30% peněz
+                break;
+            case 'time':
+                // Úspora času pro příští práci
+                timeBonus = Math.floor(workplace.duration * 0.3); // 30% úspora času
+                break;
         }
 
         // Zobrazení výsledku práce
@@ -1537,19 +1834,22 @@ class VirtualWorkClass {
 
                 <div class="work-result-amount">
                     <span class="work-result-amount-icon">💰</span>
-                    <span class="work-result-amount-value">${workplace.pay + taskBonus} Kč</span>
+                    <span class="work-result-amount-value">${finalPay} Kč</span>
                     ${taskBonus > 0 ? `<span class="work-result-bonus">(+${taskBonus} bonus za úkoly)</span>` : ''}
+                    ${rewardType === 'xp' ? `<span class="work-result-bonus reward-bonus">(-30% kvůli volbě XP)</span>` : ''}
                 </div>
 
                 <div class="work-result-xp">
                     <span class="work-result-xp-icon">⭐</span>
-                    <span class="work-result-xp-value">${workplace.xp + taskBonusXp} XP</span>
+                    <span class="work-result-xp-value">${finalXp} XP</span>
                     ${taskBonusXp > 0 ? `<span class="work-result-bonus">(+${taskBonusXp} bonus za úkoly)</span>` : ''}
+                    ${rewardType === 'xp' ? `<span class="work-result-bonus reward-bonus">(+50% díky volbě XP)</span>` : ''}
                 </div>
 
                 <div class="work-result-time">
                     <span class="work-result-time-icon">⏱️</span>
                     <span class="work-result-time-value">Celkový čas: ${totalTimeFormatted}</span>
+                    ${rewardType === 'time' ? `<span class="work-result-bonus reward-bonus">(-30% času pro příští práci)</span>` : ''}
                 </div>
 
                 ${this.customTasks.length > 0 ? `
@@ -1565,6 +1865,15 @@ class VirtualWorkClass {
                         </div>
                     </div>
                 ` : ''}
+
+                <div class="work-result-reward">
+                    <h4>Vybraná odměna:</h4>
+                    <div class="work-result-reward-type">
+                        ${rewardType === 'money' ? '💰 Peníze - Standardní finanční odměna' : ''}
+                        ${rewardType === 'xp' ? '⭐ Zkušenosti - Více XP, méně peněz' : ''}
+                        ${rewardType === 'time' ? '⏱️ Úspora času - Příští práce bude trvat o 30% kratší dobu' : ''}
+                    </div>
+                </div>
             </div>
         `;
 
@@ -1629,11 +1938,19 @@ class VirtualWorkClass {
 
         // Přidání peněz a XP
         if (window.addMoney) {
-            window.addMoney(workplace.pay + taskBonus);
+            window.addMoney(finalPay);
         }
 
         if (window.addXP) {
-            window.addXP(workplace.xp + taskBonusXp, 'Práce');
+            window.addXP(finalXp, 'Práce');
+        }
+
+        // Uložení časového bonusu, pokud byl vybrán
+        if (rewardType === 'time' && timeBonus > 0) {
+            localStorage.setItem('aiMapaTimeBonus', JSON.stringify({
+                workplaceId: workplace.id,
+                minutes: timeBonus
+            }));
         }
 
         // Uložení záznamu práce
@@ -1642,15 +1959,61 @@ class VirtualWorkClass {
             workplaceId: workplace.id,
             name: workplace.name,
             icon: workplace.icon,
-            pay: workplace.pay + taskBonus,
-            xp: workplace.xp + taskBonusXp,
+            pay: finalPay,
+            xp: finalXp,
             duration: totalTimeFormatted,
             date: new Date().toISOString(),
-            tasks: this.customTasks
+            tasks: this.customTasks,
+            rewardType: rewardType
         };
 
         // Uložení záznamu do API
         this.saveWorkRecord(workRecord);
+    }
+
+    /**
+     * Manuální dokončení práce
+     */
+    completeWorkManually(dialog, workplace, progressBar, percentElement, timeRemaining, activityLog, progressInterval) {
+        // Odstranění markerů úkolů z mapy
+        this.removeTaskMarkersFromMap();
+
+        // Výpočet celkového času, který práce trvala
+        const startTime = new Date(dialog.getAttribute('data-start-time') || new Date());
+        const endTime = new Date();
+        const totalTimeMs = endTime - startTime;
+        const totalMinutes = Math.floor(totalTimeMs / 60000);
+        const totalSeconds = Math.floor((totalTimeMs % 60000) / 1000);
+        const totalTimeFormatted = `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
+
+        // Uložení celkového času do dialogu pro pozdější použití
+        dialog.setAttribute('data-total-time', totalTimeFormatted);
+
+        // Zastavení intervalu
+        if (progressInterval) {
+            clearInterval(progressInterval);
+        }
+
+        // Nastavení progress baru na 100%
+        progressBar.style.width = '100%';
+        percentElement.textContent = '100%';
+        timeRemaining.textContent = '0:00';
+
+        // Výpočet bonusu za dokončené úkoly
+        let taskBonus = 0;
+        let taskBonusXp = 0;
+
+        if (this.customTasks.length > 0) {
+            const completedTasks = this.customTasks.filter(task => task.completed);
+            const completionPercent = Math.floor((completedTasks.length / this.customTasks.length) * 100);
+
+            // Bonus až 20% za dokončené úkoly
+            taskBonus = Math.floor((workplace.pay * completionPercent * 0.2) / 100);
+            taskBonusXp = Math.floor((workplace.xp * completionPercent * 0.2) / 100);
+        }
+
+        // Zobrazení dialogu pro výběr odměny
+        this.showRewardSelectionDialog(dialog, workplace, totalTimeFormatted, taskBonus, taskBonusXp);
     }
 }
 

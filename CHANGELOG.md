@@ -2,6 +2,96 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.4.0] - 2025-06-16 - ODMĚŇOVACÍ SYSTÉM
+
+### Nové funkce
+- Implementován odměňovací systém s možností výběru typu odměny (peníze, XP, úspora času)
+- Přidána položka "Systém odměn" do menu příkazů v kategorii Zábava
+- Přidány vizuální efekty pro výběr odměny a zobrazení výsledku
+
+### Vylepšení
+- Vyčištěn kód od zbytečných souborů pro opravu menu
+- Optimalizován proces dokončení práce a získání odměny
+- Vylepšen design odměňovacího systému s animacemi a vizuálními efekty
+- Přidána podpora tmavého režimu pro odměňovací systém
+
+### Opravy
+- Opraveno zobrazování položky "Systém odměn" v menu příkazů
+- Opraveno tlačítko "Zpět na výběr práce" v dialogu nedokončené práce
+- Opraveno tlačítko "Zpět na výběr práce" v pracovním dialogu
+
+## [0.3.3.6] - 2025-06-14 - PŘIDÁNÍ SAMOSTATNÉHO MODULU PRO OPRAVU MENU
+
+### Nové funkce
+- Přidán nový soubor menu-fix.js pro opravu menu příkazů
+- Implementována automatická oprava menu po načtení stránky
+- Přidán příkaz "opravit menu" pro ruční opravu menu
+
+### Opravy
+- Vyřešen problém s nezobrazováním položky "Systém odměn" v menu příkazů
+- Implementováno spolehlivější řešení pro přidání položky do kategorie Zábava
+- Přidáno automatické otevření kategorie Zábava při opravě menu
+
+## [0.3.3.5] - 2025-06-13 - PŘIDÁNÍ FUNKCE OBNOVENÍ MENU
+
+### Nové funkce
+- Přidána funkce pro obnovení menu příkazů
+- Přidán příkaz "Obnovit menu" do kategorie Nastavení
+- Implementováno automatické otevření kategorie Zábava při obnovení menu
+
+### Opravy
+- Opraveno zobrazování položky "Systém odměn" v menu příkazů
+- Přidáno automatické obnovení menu při použití příkazu "odměňovací systém"
+
+## [0.3.3.4] - 2025-06-12 - ÚPRAVA SYSTÉMU ODMĚN V MENU PŘÍKAZŮ
+
+### Vylepšení
+- Změněn název položky v menu příkazů z "Odměňovací systém" na "Systém odměn"
+- Změněna ikona položky z trofeje na kočku (🐱)
+- Aktualizovány informativní zprávy při otevření systému odměn
+- Přidán symbol kočky do zpráv systému odměn
+
+## [0.3.3.3] - 2025-06-11 - ODMĚŇOVACÍ SYSTÉM V MENU PŘÍKAZŮ
+
+### Nové funkce
+- Přidán odměňovací systém do menu příkazů v kategorii zábava
+- Implementován příkaz "odměňovací systém" pro rychlý přístup k funkci
+
+### Vylepšení
+- Vylepšena integrace odměňovacího systému s ostatními moduly
+- Přidány informativní zprávy při otevření odměňovacího systému
+- Optimalizováno načítání modulu virtuální práce při použití příkazu
+
+## [0.3.3.2] - 2025-06-10 - ODMĚŇOVACÍ SYSTÉM A OPRAVY
+
+### Nové funkce
+- Implementován odměňovací systém s možností výběru typu odměny (peníze, XP, úspora času)
+- Přidány vizuální efekty pro výběr odměny a zobrazení výsledku
+- Přidána možnost získat různé bonusy podle typu vybrané odměny
+
+### Opravy
+- Opraveno tlačítko "Zpět na výběr práce" v dialogu nedokončené práce
+- Opraveno tlačítko "Zpět na výběr práce" v pracovním dialogu
+- Vylepšeno zobrazení výsledku práce s informací o vybrané odměně
+
+### Vylepšení
+- Vylepšen design odměňovacího systému s animacemi a vizuálními efekty
+- Přidána podpora tmavého režimu pro odměňovací systém
+- Optimalizován proces dokončení práce a získání odměny
+
+## [0.3.3.1] - 2025-06-09 - OPRAVA ZOBRAZENÍ NEDOKONČENÉ PRÁCE
+
+### Opravy
+- Opraveno tlačítko "Zobrazit" pro nedokončenou práci, které nyní správně funguje
+- Implementováno automatické zobrazení nedokončené práce při otevření dialogu virtuální práce
+- Opraveno zobrazení nedokončené práce po návratu z jiných obrazovek
+- Vylepšeno ukládání a načítání nedokončené práce
+
+### Vylepšení
+- Přidána notifikace o uložení práce s možností rychlého návratu
+- Vylepšena podpora tmavého režimu pro notifikace
+- Optimalizováno zobrazení seznamu nedokončených prací
+
 ## [0.3.3.0] - 2025-06-08 - DRAG AND DROP ÚKOLŮ A UKLÁDÁNÍ NEDOKONČENÉ PRÁCE
 
 ### Nové funkce
