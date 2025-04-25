@@ -7,6 +7,8 @@ class VirtualWorkClass {
     constructor() {
         // Základní nastavení
         this.isInitialized = false;
+        // Šablony úkolů
+        this.taskTemplates = {};
         this.workplaces = [
             {
                 id: 'office1',
@@ -101,9 +103,40 @@ class VirtualWorkClass {
         // Načtení historie práce
         this.loadWorkHistory();
 
+        // Načtení šablon úkolů
+        this.loadTaskTemplates();
+
         // Označení jako inicializovaný
         this.isInitialized = true;
         console.log('VirtualWork: Modul byl inicializován');
+    }
+
+    /**
+     * Načtení šablon úkolů z localStorage
+     */
+    loadTaskTemplates() {
+        try {
+            const templates = localStorage.getItem('aiMapaTaskTemplates');
+            if (templates) {
+                this.taskTemplates = JSON.parse(templates);
+                console.log(`Načteno ${Object.keys(this.taskTemplates).length} šablon úkolů`);
+            }
+        } catch (error) {
+            console.error('Chyba při načítání šablon úkolů:', error);
+            this.taskTemplates = {};
+        }
+    }
+
+    /**
+     * Uložení šablon úkolů do localStorage
+     */
+    saveTaskTemplates() {
+        try {
+            localStorage.setItem('aiMapaTaskTemplates', JSON.stringify(this.taskTemplates));
+            console.log(`Uloženo ${Object.keys(this.taskTemplates).length} šablon úkolů`);
+        } catch (error) {
+            console.error('Chyba při ukládání šablon úkolů:', error);
+        }
     }
 
     /**
@@ -861,6 +894,9 @@ class VirtualWorkClass {
             // Uložení reference na vybrané pracoviště
             const workplace = this.selectedWorkplace;
 
+            // Kontrola, zda existuje šablona úkolů pro toto pracoviště
+            const hasTemplate = this.taskTemplates[workplace.id] && this.taskTemplates[workplace.id].length > 0;
+
             // Zobrazení dialogu pro definování vlastních úkolů
             dialog.querySelector('.virtual-work-content').innerHTML = `
                 <div class="custom-tasks-container">
@@ -876,6 +912,11 @@ class VirtualWorkClass {
                     <div class="custom-tasks-form">
                         <input type="text" id="new-task-input" placeholder="Zadejte nový úkol..." class="custom-task-input">
                         <button id="add-task-btn">Přidat úkol</button>
+                    </div>
+
+                    <div class="custom-tasks-template-actions">
+                        <button id="analyze-problem-btn" class="analyze-problem-btn">Analyzovat problém</button>
+                        ${hasTemplate ? `<button id="load-template-btn" class="load-template-btn">Načíst uložené úkoly</button>` : ''}
                     </div>
 
                     <div class="custom-tasks-actions">
@@ -894,6 +935,8 @@ class VirtualWorkClass {
             const tasksList = dialog.querySelector('#custom-tasks-list');
             const skipTasksBtn = dialog.querySelector('#skip-tasks-btn');
             const backBtn = dialog.querySelector('#back-to-workplaces-btn');
+            const analyzeBtn = dialog.querySelector('#analyze-problem-btn');
+            const loadTemplateBtn = dialog.querySelector('#load-template-btn');
 
             // Funkce pro přidání nového úkolu
             const addNewTask = () => {
@@ -1066,12 +1109,81 @@ class VirtualWorkClass {
                 }, 100);
             });
 
+            // Event listener pro tlačítko analyzovat problém
+            if (analyzeBtn) {
+                analyzeBtn.addEventListener('click', () => {
+                    // Kontrola, zda je zadán alespoň jeden úkol
+                    if (this.customTasks.length === 0) {
+                        alert('Nejprve přidejte alespoň jeden úkol, který chcete analyzovat.');
+                        return;
+                    }
+
+                    // Uložení úkolů jako šablonu pro toto pracoviště
+                    this.taskTemplates[workplace.id] = [...this.customTasks];
+                    this.saveTaskTemplates();
+
+                    // Přidání tlačítka pro načtení šablony, pokud ještě neexistuje
+                    if (!dialog.querySelector('#load-template-btn')) {
+                        const templateActions = dialog.querySelector('.custom-tasks-template-actions');
+                        const loadTemplateBtn = document.createElement('button');
+                        loadTemplateBtn.id = 'load-template-btn';
+                        loadTemplateBtn.className = 'load-template-btn';
+                        loadTemplateBtn.textContent = 'Načíst uložené úkoly';
+                        templateActions.appendChild(loadTemplateBtn);
+
+                        // Přidání event listeneru pro nově vytvořené tlačítko
+                        loadTemplateBtn.addEventListener('click', () => {
+                            this.loadTaskTemplateForWorkplace(workplace.id, updateTasksList);
+                        });
+                    }
+
+                    alert('Úkoly byly analyzovány a uloženy jako šablona. Při příštím spuštění práce budou automaticky k dispozici.');
+                });
+            }
+
+            // Event listener pro tlačítko načíst šablonu
+            if (loadTemplateBtn) {
+                loadTemplateBtn.addEventListener('click', () => {
+                    this.loadTaskTemplateForWorkplace(workplace.id, updateTasksList);
+                });
+            }
+
+            // Automatické načtení šablony úkolů, pokud existuje
+            if (hasTemplate) {
+                this.loadTaskTemplateForWorkplace(workplace.id, updateTasksList);
+            }
+
             // Inicializace seznamu úkolů
             updateTasksList();
 
             // Zaměření na input pro rychlé zadávání
             newTaskInput.focus();
         });
+    }
+
+    /**
+     * Načtení šablony úkolů pro konkrétní pracoviště
+     * @param {string} workplaceId - ID pracoviště
+     * @param {Function} updateCallback - Callback funkce pro aktualizaci seznamu úkolů
+     */
+    loadTaskTemplateForWorkplace(workplaceId, updateCallback) {
+        // Kontrola, zda existuje šablona pro toto pracoviště
+        if (this.taskTemplates[workplaceId] && this.taskTemplates[workplaceId].length > 0) {
+            // Načtení úkolů ze šablony
+            this.customTasks = [...this.taskTemplates[workplaceId]];
+
+            // Resetování stavu dokončení úkolů
+            this.customTasks.forEach(task => task.completed = false);
+
+            // Aktualizace seznamu úkolů
+            if (typeof updateCallback === 'function') {
+                updateCallback();
+            }
+
+            console.log(`Načteno ${this.customTasks.length} úkolů ze šablony pro pracoviště ${workplaceId}`);
+        } else {
+            console.log(`Pro pracoviště ${workplaceId} neexistuje žádná šablona úkolů`);
+        }
     }
 
     /**

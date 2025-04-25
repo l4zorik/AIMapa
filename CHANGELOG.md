@@ -11,6 +11,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementováno mapování typů podniků z OSM na vlastní kategorie
 - Přidáno zobrazení správných ikon podle typu podniku
 - Implementováno získávání XP za načtení dat podniků
+- Přidána možnost analyzovat problém ve virtuální práci a uložit úkoly jako šablonu
+- Implementováno automatické načítání uložených úkolů při spuštění virtuální práce
 
 ### Vylepšení
 - Vylepšen systém zobrazování podniků na mapě s přesnějšími ikonami

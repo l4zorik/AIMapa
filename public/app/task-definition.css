@@ -1,6 +1,6 @@
 /**
  * Vylepšené styly pro definování úkolů
- * Verze 0.3.2.0
+ * Verze 0.3.6.0
  */
 
 /* Hlavní kontejner pro definování úkolů */
@@ -210,6 +210,62 @@
     box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
 }
 
+/* Akce pro šablony úkolů */
+.custom-tasks-template-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+/* Tlačítko pro analýzu problému */
+#analyze-problem-btn {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(155, 89, 182, 0.3);
+}
+
+#analyze-problem-btn:hover {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(155, 89, 182, 0.4);
+}
+
+#analyze-problem-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(155, 89, 182, 0.3);
+}
+
+/* Tlačítko pro načtení šablony */
+#load-template-btn {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(243, 156, 18, 0.3);
+}
+
+#load-template-btn:hover {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(243, 156, 18, 0.4);
+}
+
+#load-template-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(243, 156, 18, 0.3);
+}
+
 /* Akce pro úkoly */
 .custom-tasks-actions {
     display: flex;
@@ -325,6 +381,23 @@ body[data-theme="dark"] #back-to-workplaces-btn {
 
 body[data-theme="dark"] #back-to-workplaces-btn:hover {
     background-color: #2c3e50;
+}
+
+/* Tmavý režim pro tlačítka šablon */
+body[data-theme="dark"] #analyze-problem-btn {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+}
+
+body[data-theme="dark"] #analyze-problem-btn:hover {
+    background: linear-gradient(135deg, #7d3c98, #6c3483);
+}
+
+body[data-theme="dark"] #load-template-btn {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+body[data-theme="dark"] #load-template-btn:hover {
+    background: linear-gradient(135deg, #d35400, #a04000);
 }
 
 /* Animace pro přidání nového úkolu */
