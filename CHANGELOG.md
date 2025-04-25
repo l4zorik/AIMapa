@@ -2,6 +2,13 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.4.1] - 2025-06-17 - ÚPRAVA MENU PŘÍKAZŮ
+
+### Změny
+- Odstraněna položka "Rap" z menu příkazů v kategorii Zábava
+- Ponechána pouze položka "Systém odměn" v kategorii Zábava
+- Odstraněno zpracování příkazu "rap" z kódu
+
 ## [0.3.4.0] - 2025-06-16 - ODMĚŇOVACÍ SYSTÉM
 
 ### Nové funkce

@@ -105,7 +105,6 @@ const CommandsMenu = {
             icon: '🎮',
             isOpen: false,
             commands: [
-                { id: 'rap', name: 'Rap', description: 'Spustí rapové akce', icon: '🎤', command: 'rap' },
                 { id: 'reward-system', name: 'Systém odměn', description: 'Otevře dialog odměňovacího systému', icon: '🐱', command: 'odměňovací systém' }
             ]
         }
@@ -930,24 +929,7 @@ Email: podatelna@ho.mpsv.cz`;
             return true;
         }
 
-        if (command === 'rap') {
-            if (typeof addMessage !== 'undefined') {
-                addMessage('Yo, let me drop some beats for you!', false);
-                setTimeout(() => {
-                    const message = `AI Map on the mic, I'm mapping your way,
-Navigating streets, making your day,
-From Hodonín to Hrušky, I know the route,
-Got the best locations, without a doubt!`;
-                    addMessage(message, false);
-
-                    // Přidání XP za použití rapu
-                    if (typeof UserProgress !== 'undefined') {
-                        UserProgress.addXP(10, 'Rapová akce');
-                    }
-                }, 1500);
-            }
-            return true;
-        }
+        // Příkaz 'rap' byl odstraněn a nahrazen příkazem 'odměňovací systém'
 
         // Příkaz pro obnovení menu
         if (command === 'obnovit menu') {

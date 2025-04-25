@@ -1,14 +1,26 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.4.0
+ * Verze 0.3.4.1
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.4.0',
+    currentVersion: '0.3.4.1',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.4.1',
+            date: '2025-06-17',
+            title: 'Úprava menu příkazů',
+            description: 'Odstraněna položka "Rap" z menu příkazů v kategorii Zábava',
+            changes: [
+                'Odstraněna položka "Rap" z menu příkazů v kategorii Zábava',
+                'Ponechána pouze položka "Systém odměn" v kategorii Zábava',
+                'Odstraněno zpracování příkazu "rap" z kódu',
+                'Vyčištěn kód od zbytečných funkcí'
+            ]
+        },
         {
             version: '0.3.4.0',
             date: '2025-06-16',
