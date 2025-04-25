@@ -1,6 +1,6 @@
 /**
  * AIMapa - API Routes
- * Verze 0.3.5.5
+ * Verze 0.3.5.6
  */
 
 const express = require('express');

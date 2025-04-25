@@ -1,6 +1,6 @@
 /**
  * Samostatný odměňovací systém
- * Verze 0.3.5.4
+ * Verze 0.3.5.6
  */
 
 class RewardSystemClass {
@@ -708,8 +708,9 @@ class RewardSystemClass {
 
     /**
      * Otevření dialogu odměňovacího systému
+     * @param {Object} workReward - Volitelný objekt s informacemi o odměně z virtuální práce
      */
-    openRewardSystemDialog() {
+    openRewardSystemDialog(workReward = null) {
         // Kontrola, zda je modul inicializován
         if (!this.isInitialized) {
             this.init();
@@ -720,14 +721,96 @@ class RewardSystemClass {
         if (dialog) {
             // Dialog již existuje, pouze ho zobrazíme
             dialog.style.display = 'block';
-            return;
+
+            // Pokud máme odměnu z práce, zobrazíme ji
+            if (workReward) {
+                this.showWorkReward(dialog, workReward);
+            }
+
+            return dialog;
         }
 
         // Vytvoření dialogu
         dialog = this.createDialog();
 
-        // Zobrazení seznamu odměn
-        this.showRewardsList(dialog);
+        // Pokud máme odměnu z práce, zobrazíme ji
+        if (workReward) {
+            this.showWorkReward(dialog, workReward);
+        } else {
+            // Jinak zobrazíme standardní seznam odměn
+            this.showRewardsList(dialog);
+        }
+
+        return dialog;
+    }
+
+    /**
+     * Zobrazení odměny z virtuální práce
+     * @param {HTMLElement} dialog - Dialog odměňovacího systému
+     * @param {Object} workReward - Objekt s informacemi o odměně z virtuální práce
+     */
+    showWorkReward(dialog, workReward) {
+        // Zobrazení výsledku získání odměny z práce
+        dialog.querySelector('.reward-system-content').innerHTML = `
+            <div class="reward-result">
+                <div class="reward-result-icon">${workReward.icon || '💼'}</div>
+                <h3>Odměna za práci!</h3>
+                <p>Úspěšně jste dokončili práci a získali jste následující odměnu:</p>
+
+                <div class="reward-result-amount">
+                    <span class="work-result-amount-icon">💰</span>
+                    <span class="work-result-amount-value">${workReward.money} Kč</span>
+                    ${workReward.moneyBonus ? `<span class="work-result-bonus">(+${workReward.moneyBonus} bonus za úkoly)</span>` : ''}
+                </div>
+
+                <div class="reward-result-xp">
+                    <span class="work-result-xp-icon">⭐</span>
+                    <span class="work-result-xp-value">${workReward.xp} XP</span>
+                    ${workReward.xpBonus ? `<span class="work-result-bonus">(+${workReward.xpBonus} bonus za úkoly)</span>` : ''}
+                </div>
+
+                ${workReward.timeBonus ? `
+                <div class="work-result-time">
+                    <span class="work-result-time-icon">⏱️</span>
+                    <span class="work-result-time-value">Úspora času: -${workReward.timeBonus}% pro příští práci</span>
+                </div>
+                ` : ''}
+
+                ${workReward.tasks && workReward.tasks.length > 0 ? `
+                <div class="work-result-tasks">
+                    <h4>Dokončené úkoly:</h4>
+                    <div class="work-result-tasks-list">
+                        ${workReward.tasks.map(task => `
+                            <div class="work-result-task-item ${task.completed ? 'completed' : 'incomplete'}">
+                                <span class="work-result-task-status">${task.completed ? '✅' : '❌'}</span>
+                                <span class="work-result-task-text">${task.text}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                <p>Nyní si můžete vybrat další odměnu z našeho systému odměn!</p>
+            </div>
+        `;
+
+        // Přidání tlačítek pro ovládání výsledku
+        const actionsContainer = dialog.querySelector('.reward-system-actions');
+        actionsContainer.innerHTML = `
+            <button class="reward-system-btn secondary" id="close-result-btn">Zavřít</button>
+            <button class="reward-system-btn primary" id="choose-reward-btn">Vybrat další odměnu</button>
+        `;
+
+        // Přidání event listenerů pro tlačítka
+        const closeBtn = dialog.querySelector('#close-result-btn');
+        closeBtn.addEventListener('click', () => {
+            this.closeDialog(dialog);
+        });
+
+        // Přidání event listeneru pro tlačítko "Vybrat další odměnu"
+        dialog.querySelector('#choose-reward-btn').addEventListener('click', () => {
+            this.showRewardsList(dialog);
+        });
     }
 
     /**

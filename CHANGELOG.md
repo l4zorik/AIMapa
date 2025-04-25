@@ -2,6 +2,20 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.5.6] - 2025-06-21 - PROPOJENÍ VIRTUÁLNÍ PRÁCE S ODMĚŇOVACÍM SYSTÉMEM
+
+### Nové funkce
+- Propojení virtuální práce s odměňovacím systémem
+- Po dokončení práce se automaticky otevře odměňovací systém
+- Zobrazení získané odměny z práce v odměňovacím systému
+- Možnost vybrat si další odměnu po dokončení práce
+
+### Vylepšení
+- Vylepšeno uživatelské rozhraní odměňovacího systému pro zobrazení odměn z práce
+- Přidány informace o bonusech za dokončené úkoly
+- Přidány informace o úspoře času pro příští práci
+- Vylepšeny zprávy při dokončení práce
+
 ## [0.3.5.5] - 2025-06-21 - OPRAVA TLAČÍTKA "DOKONČIT PRÁCI A ZÍSKAT ODMĚNU"
 
 ### Opravy

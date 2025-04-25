@@ -1,6 +1,6 @@
 /**
  * AIMapa - Server
- * Verze 0.3.5.5
+ * Verze 0.3.5.6
  */
 
 // Načtení modulů
