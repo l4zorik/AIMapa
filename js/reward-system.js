@@ -1,6 +1,6 @@
 /**
  * Samostatný odměňovací systém
- * Verze 0.3.5.3
+ * Verze 0.3.5.4
  */
 
 class RewardSystemClass {
@@ -238,6 +238,53 @@ class RewardSystemClass {
                 value: 'Jóga',
                 description: 'Odměňte se relaxační lekcí jógy.',
                 cost: 'Střední'
+            },
+
+            // Spánek
+            {
+                id: 'nap',
+                name: 'Krátký spánek',
+                type: 'sleep',
+                icon: '😴',
+                value: 'Krátký spánek',
+                description: 'Dopřejte si 20-30 minut krátkého osvěžujícího spánku.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'early-sleep',
+                name: 'Dřívější spánek',
+                type: 'sleep',
+                icon: '🛌',
+                value: 'Dřívější spánek',
+                description: 'Jděte dnes spát o hodinu dříve než obvykle.',
+                cost: 'Střední'
+            },
+            {
+                id: 'sleep-in',
+                name: 'Přispání',
+                type: 'sleep',
+                icon: '💤',
+                value: 'Přispání',
+                description: 'Dopřejte si ráno o hodinu delší spánek než obvykle.',
+                cost: 'Střední'
+            },
+            {
+                id: 'weekend-sleep',
+                name: 'Víkendový spánek',
+                type: 'sleep',
+                icon: '🌙',
+                value: 'Víkendový spánek',
+                description: 'Naplánujte si celý víkendový den bez budíku a spěte, dokud se přirozeně neprobudíte.',
+                cost: 'Vysoká'
+            },
+            {
+                id: 'meditation',
+                name: 'Meditace před spaním',
+                type: 'sleep',
+                icon: '🧠',
+                value: 'Meditace',
+                description: 'Dopřejte si 15 minut meditace před spaním pro lepší kvalitu spánku.',
+                cost: 'Nízká'
             }
         ];
     }
@@ -779,6 +826,7 @@ class RewardSystemClass {
                     <button class="category-btn" data-category="food">Jídlo a pití</button>
                     <button class="category-btn" data-category="sweets">Sladkosti</button>
                     <button class="category-btn" data-category="gym">Posilovna</button>
+                    <button class="category-btn" data-category="sleep">Spánek</button>
                     <button class="category-btn" data-category="other">Ostatní</button>
                 </div>
 
@@ -885,6 +933,8 @@ class RewardSystemClass {
                 return `${reward.value} (+15 XP)`;
             case 'gym':
                 return `${reward.value} (+50 XP)`;
+            case 'sleep':
+                return `${reward.value} (+40 XP)`;
             default:
                 return reward.value;
         }
@@ -998,6 +1048,23 @@ class RewardSystemClass {
                     date: new Date().toISOString()
                 });
                 localStorage.setItem('aiMapaGymRewards', JSON.stringify(gymRewards));
+                break;
+
+            case 'sleep':
+                // Pro spánek přidáme také více XP, protože je to zdravé
+                if (window.addXP) {
+                    window.addXP(40, `Odměna: ${reward.value}`);
+                }
+
+                // Uložíme do localStorage informaci o získané odměně
+                const sleepRewards = JSON.parse(localStorage.getItem('aiMapaSleepRewards') || '[]');
+                sleepRewards.push({
+                    name: reward.name,
+                    value: reward.value,
+                    icon: reward.icon,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('aiMapaSleepRewards', JSON.stringify(sleepRewards));
                 break;
         }
 

@@ -2,6 +2,19 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.5.4] - 2025-06-21 - PŘIDÁNÍ KATEGORIE SPÁNEK DO ODMĚŇOVACÍHO SYSTÉMU
+
+### Nové funkce
+- Přidána nová kategorie "Spánek" do odměňovacího systému
+- Přidáno 5 nových typů odměn v kategorii spánek (krátký spánek, dřívější spánek, přispání, víkendový spánek, meditace před spaním)
+- Implementováno ukládání historie získaných odměn spánku do localStorage
+- Za odměny typu spánek uživatel získává 40 XP (více než běžné odměny, protože je to zdravé)
+
+### Vylepšení
+- Vylepšeno filtrování odměn podle kategorií, přidána kategorie "Spánek"
+- Vylepšeno formátování hodnot odměn pro kategorii spánek
+- Přidáno zobrazení získaných XP u odměn typu spánek
+
 ## [0.3.5.3] - 2025-06-21 - DALŠÍ ROZŠÍŘENÍ ODMĚŇOVACÍHO SYSTÉMU
 
 ### Nové funkce
