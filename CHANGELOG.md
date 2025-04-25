@@ -2,6 +2,16 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.6.1] - 2025-06-26 - VYLEPŠENÍ VIRTUÁLNÍ PRÁCE A ANALÝZA PROBLÉMŮ
+
+### Nové funkce
+- Přidána možnost analyzovat problém ve virtuální práci a uložit úkoly jako šablonu
+- Implementováno automatické načítání uložených úkolů při spuštění virtuální práce
+- Přidáno tlačítko "Analyzovat problém" přímo do pracovního okna
+- Implementován drag and drop pro přesouvání úkolů v pracovním okně
+- Přidána funkce pro kontrolu, zda na úkolu "AI Mapa" již nepracujeme
+- Přidána možnost specifikovat, co je to za konkrétní úkol a proč je důležitý
+
 ## [0.3.6.0] - 2025-06-25 - NAČÍTÁNÍ REÁLNÝCH DAT PODNIKŮ Z INTERNETU A EPICKÁ REORGANIZACE SOUBORŮ
 
 ### Nové funkce
@@ -11,8 +21,6 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Implementováno mapování typů podniků z OSM na vlastní kategorie
 - Přidáno zobrazení správných ikon podle typu podniku
 - Implementováno získávání XP za načtení dat podniků
-- Přidána možnost analyzovat problém ve virtuální práci a uložit úkoly jako šablonu
-- Implementováno automatické načítání uložených úkolů při spuštění virtuální práce
 
 ### Vylepšení
 - Vylepšen systém zobrazování podniků na mapě s přesnějšími ikonami

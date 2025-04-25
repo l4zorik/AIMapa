@@ -160,6 +160,13 @@ class VirtualWorkClass {
         taskDefinitionStyles.href = 'css/task-definition.css';
         document.head.appendChild(taskDefinitionStyles);
 
+        // Načtení doplňkových stylů pro task-definition
+        const taskDefinitionCustomStyles = document.createElement('link');
+        taskDefinitionCustomStyles.id = 'task-definition-custom-styles';
+        taskDefinitionCustomStyles.rel = 'stylesheet';
+        taskDefinitionCustomStyles.href = 'app/task-definition-custom.css';
+        document.head.appendChild(taskDefinitionCustomStyles);
+
         // Načtení CSS pro saved-work
         const savedWorkStyles = document.createElement('link');
         savedWorkStyles.id = 'saved-work-styles';
@@ -1297,12 +1304,16 @@ class VirtualWorkClass {
                 </div>
 
                 <div class="custom-tasks-progress">
-                    <h3>Vaše úkoly:</h3>
+                    <div class="custom-tasks-header-with-actions">
+                        <h3>Vaše úkoly:</h3>
+                        <button id="analyze-task-btn" class="analyze-task-btn" title="Analyzovat problém a uložit jako šablonu">Analyzovat problém</button>
+                    </div>
                     ${this.customTasks.length === 0 ?
                         '<p class="no-tasks">Nemáte definované žádné úkoly.</p>' :
                         `<div class="custom-tasks-checklist">
                             ${this.customTasks.map(task => `
-                                <div class="custom-task-check-item" data-id="${task.id}">
+                                <div class="custom-task-check-item" data-id="${task.id}" draggable="true">
+                                    <div class="task-drag-handle">⋮⋮</div>
                                     <label class="custom-task-check-label">
                                         <input type="checkbox" class="custom-task-checkbox" ${task.completed ? 'checked' : ''}>
                                         <span class="custom-task-check-text">${task.text}</span>
@@ -1411,6 +1422,61 @@ class VirtualWorkClass {
             });
         });
 
+        // Přidání event listeneru pro tlačítko analyzovat problém
+        const analyzeTaskBtn = dialog.querySelector('#analyze-task-btn');
+        if (analyzeTaskBtn) {
+            analyzeTaskBtn.addEventListener('click', () => {
+                // Kontrola, zda je zadán alespoň jeden úkol
+                if (this.customTasks.length === 0) {
+                    alert('Nemáte definované žádné úkoly k analýze.');
+                    return;
+                }
+
+                // Kontrola, zda existuje úkol "AI Mapa"
+                const aiMapaTask = this.customTasks.find(task => task.text.toLowerCase().includes('ai mapa'));
+
+                if (aiMapaTask) {
+                    // Kontrola, zda již na úkolu pracujeme
+                    if (aiMapaTask.completed) {
+                        alert('Na úkolu AI Mapa již pracujete a je označen jako dokončený.');
+                    } else {
+                        alert('Na úkolu AI Mapa již pracujete. Pokračujte v jeho plnění.');
+                    }
+                } else {
+                    // Zobrazení dialogu pro specifikaci úkolu
+                    const taskDescription = prompt('Specifikujte, co je to za konkrétní úkol a proč je důležitý:');
+
+                    if (taskDescription) {
+                        // Přidání nového úkolu s popisem
+                        const taskId = Date.now();
+                        const taskText = 'AI Mapa: ' + taskDescription;
+
+                        this.customTasks.push({
+                            id: taskId,
+                            text: taskText,
+                            completed: false,
+                            important: true
+                        });
+
+                        // Uložení úkolů jako šablonu pro toto pracoviště
+                        this.taskTemplates[this.selectedWorkplace.id] = [...this.customTasks];
+                        this.saveTaskTemplates();
+
+                        // Aktualizace seznamu úkolů v UI
+                        this.updateTasksChecklistUI(dialog);
+
+                        // Přidání aktivity do logu
+                        activityLog.innerHTML = `<div class="work-activity-item new-activity">Důležitý úkol přidán a analyzován: ${taskText}</div>` + activityLog.innerHTML;
+
+                        alert('Úkol byl analyzován a uložen jako šablona. Při příštím spuštění práce bude automaticky k dispozici.');
+                    }
+                }
+            });
+        }
+
+        // Implementace drag and drop pro úkoly v checklistu
+        this.setupDragAndDropForTasksChecklist(dialog);
+
         // Přidání event listeneru pro tlačítko dokončení
         completeBtn.addEventListener('click', () => {
             // Kontrola, zda jsou všechny úkoly dokončeny
@@ -1468,9 +1534,13 @@ class VirtualWorkClass {
                 if (this.customTasks.length === 1) {
                     // Pokud to byl první úkol, nahradíme zprávu o žádných úkolech
                     dialog.querySelector('.custom-tasks-progress').innerHTML = `
-                        <h3>Vaše úkoly:</h3>
+                        <div class="custom-tasks-header-with-actions">
+                            <h3>Vaše úkoly:</h3>
+                            <button id="analyze-task-btn" class="analyze-task-btn" title="Analyzovat problém a uložit jako šablonu">Analyzovat problém</button>
+                        </div>
                         <div class="custom-tasks-checklist">
-                            <div class="custom-task-check-item" data-id="${taskId}">
+                            <div class="custom-task-check-item" data-id="${taskId}" draggable="true">
+                                <div class="task-drag-handle">⋮⋮</div>
                                 <label class="custom-task-check-label">
                                     <input type="checkbox" class="custom-task-checkbox">
                                     <span class="custom-task-check-text">${taskText}</span>
@@ -1478,12 +1548,23 @@ class VirtualWorkClass {
                             </div>
                         </div>
                     `;
+
+                    // Přidání event listeneru pro tlačítko analyzovat problém
+                    const analyzeTaskBtn = dialog.querySelector('#analyze-task-btn');
+                    if (analyzeTaskBtn) {
+                        analyzeTaskBtn.addEventListener('click', this.handleAnalyzeTask.bind(this, dialog));
+                    }
+
+                    // Nastavení drag and drop pro nový seznam
+                    this.setupDragAndDropForTasksChecklist(dialog);
                 } else {
                     // Přidání nového úkolu do existujícího seznamu
                     const newTaskItem = document.createElement('div');
                     newTaskItem.className = 'custom-task-check-item';
                     newTaskItem.dataset.id = taskId;
+                    newTaskItem.draggable = true;
                     newTaskItem.innerHTML = `
+                        <div class="task-drag-handle">⋮⋮</div>
                         <label class="custom-task-check-label">
                             <input type="checkbox" class="custom-task-checkbox">
                             <span class="custom-task-check-text">${taskText}</span>
@@ -1704,6 +1785,240 @@ class VirtualWorkClass {
                 completeBtn.classList.add('pulse-animation');
             }
         }
+    }
+
+    /**
+     * Aktualizace seznamu úkolů v UI
+     */
+    updateTasksChecklistUI(dialog) {
+        const tasksContainer = dialog.querySelector('.custom-tasks-progress');
+        if (!tasksContainer) return;
+
+        // Aktualizace seznamu úkolů
+        tasksContainer.innerHTML = `
+            <div class="custom-tasks-header-with-actions">
+                <h3>Vaše úkoly:</h3>
+                <button id="analyze-task-btn" class="analyze-task-btn" title="Analyzovat problém a uložit jako šablonu">Analyzovat problém</button>
+            </div>
+            <div class="custom-tasks-checklist">
+                ${this.customTasks.map(task => `
+                    <div class="custom-task-check-item ${task.completed ? 'completed' : ''}" data-id="${task.id}" draggable="true">
+                        <div class="task-drag-handle">⋮⋮</div>
+                        <label class="custom-task-check-label">
+                            <input type="checkbox" class="custom-task-checkbox" ${task.completed ? 'checked' : ''}>
+                            <span class="custom-task-check-text">${task.text}</span>
+                        </label>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        // Přidání event listenerů pro checkboxy
+        const checkboxes = tasksContainer.querySelectorAll('.custom-task-checkbox');
+        const activityLog = dialog.querySelector('.work-activity-log');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const taskItem = e.target.closest('.custom-task-check-item');
+                const taskId = parseInt(taskItem.dataset.id);
+
+                // Aktualizace stavu úkolu v poli
+                const taskIndex = this.customTasks.findIndex(task => task.id === taskId);
+                if (taskIndex !== -1) {
+                    this.customTasks[taskIndex].completed = e.target.checked;
+
+                    // Přidání aktivity do logu
+                    if (activityLog) {
+                        if (e.target.checked) {
+                            activityLog.innerHTML = `<div class="work-activity-item new-activity">Úkol dokončen: ${this.customTasks[taskIndex].text}</div>` + activityLog.innerHTML;
+                        } else {
+                            activityLog.innerHTML = `<div class="work-activity-item new-activity">Úkol označen jako nedokončený: ${this.customTasks[taskIndex].text}</div>` + activityLog.innerHTML;
+                        }
+
+                        // Odstranění třídy new-activity po animaci
+                        setTimeout(() => {
+                            const newActivity = activityLog.querySelector('.new-activity');
+                            if (newActivity) {
+                                newActivity.classList.remove('new-activity');
+                            }
+                        }, 1000);
+                    }
+
+                    // Vizuální efekt pro dokončený úkol
+                    if (e.target.checked) {
+                        taskItem.classList.add('completed');
+                    } else {
+                        taskItem.classList.remove('completed');
+                    }
+
+                    // Kontrola, zda jsou všechny úkoly dokončeny
+                    this.checkAllTasksCompleted(dialog);
+
+                    // Aktualizace progress baru podle dokončených úkolů
+                    const progressBar = dialog.querySelector('.work-progress-bar');
+                    const percentElement = dialog.querySelector('.work-progress-percent');
+                    if (progressBar && percentElement) {
+                        this.updateProgressBarByTasks(dialog, progressBar, percentElement);
+                    }
+
+                    // Aktualizace markerů úkolů na mapě
+                    this.updateTaskMarkersOnMap();
+                }
+            });
+        });
+
+        // Přidání event listeneru pro tlačítko analyzovat problém
+        const analyzeTaskBtn = tasksContainer.querySelector('#analyze-task-btn');
+        if (analyzeTaskBtn) {
+            analyzeTaskBtn.addEventListener('click', () => this.handleAnalyzeTask(dialog));
+        }
+
+        // Nastavení drag and drop pro úkoly
+        this.setupDragAndDropForTasksChecklist(dialog);
+    }
+
+    /**
+     * Obsluha tlačítka analyzovat problém
+     */
+    handleAnalyzeTask(dialog) {
+        // Kontrola, zda je zadán alespoň jeden úkol
+        if (this.customTasks.length === 0) {
+            alert('Nemáte definované žádné úkoly k analýze.');
+            return;
+        }
+
+        // Kontrola, zda existuje úkol "AI Mapa"
+        const aiMapaTask = this.customTasks.find(task => task.text.toLowerCase().includes('ai mapa'));
+        const activityLog = dialog.querySelector('.work-activity-log');
+
+        if (aiMapaTask) {
+            // Kontrola, zda již na úkolu pracujeme
+            if (aiMapaTask.completed) {
+                alert('Na úkolu AI Mapa již pracujete a je označen jako dokončený.');
+            } else {
+                alert('Na úkolu AI Mapa již pracujete. Pokračujte v jeho plnění.');
+            }
+        } else {
+            // Zobrazení dialogu pro specifikaci úkolu
+            const taskDescription = prompt('Specifikujte, co je to za konkrétní úkol a proč je důležitý:');
+
+            if (taskDescription) {
+                // Přidání nového úkolu s popisem
+                const taskId = Date.now();
+                const taskText = 'AI Mapa: ' + taskDescription;
+
+                this.customTasks.push({
+                    id: taskId,
+                    text: taskText,
+                    completed: false,
+                    important: true
+                });
+
+                // Uložení úkolů jako šablonu pro toto pracoviště
+                if (this.selectedWorkplace) {
+                    this.taskTemplates[this.selectedWorkplace.id] = [...this.customTasks];
+                    this.saveTaskTemplates();
+                }
+
+                // Aktualizace seznamu úkolů v UI
+                this.updateTasksChecklistUI(dialog);
+
+                // Přidání aktivity do logu
+                if (activityLog) {
+                    activityLog.innerHTML = `<div class="work-activity-item new-activity">Důležitý úkol přidán a analyzován: ${taskText}</div>` + activityLog.innerHTML;
+                }
+
+                alert('Úkol byl analyzován a uložen jako šablona. Při příštím spuštění práce bude automaticky k dispozici.');
+            }
+        }
+    }
+
+    /**
+     * Nastavení drag and drop pro úkoly v checklistu
+     */
+    setupDragAndDropForTasksChecklist(dialog) {
+        const taskItems = dialog.querySelectorAll('.custom-task-check-item');
+        const tasksList = dialog.querySelector('.custom-tasks-checklist');
+
+        if (!tasksList || taskItems.length === 0) return;
+
+        taskItems.forEach(item => {
+            // Drag start
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', item.dataset.id);
+                item.classList.add('dragging');
+
+                // Nastavení průhledného obrázku jako drag image
+                const img = new Image();
+                img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                e.dataTransfer.setDragImage(img, 0, 0);
+            });
+
+            // Drag end
+            item.addEventListener('dragend', () => {
+                item.classList.remove('dragging');
+                taskItems.forEach(i => i.classList.remove('drag-over-top', 'drag-over-bottom'));
+            });
+
+            // Drag over
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const draggingItem = dialog.querySelector('.dragging');
+                if (draggingItem !== item) {
+                    const rect = item.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+
+                    if (e.clientY < midY) {
+                        item.classList.add('drag-over-top');
+                        item.classList.remove('drag-over-bottom');
+                    } else {
+                        item.classList.add('drag-over-bottom');
+                        item.classList.remove('drag-over-top');
+                    }
+                }
+            });
+
+            // Drag leave
+            item.addEventListener('dragleave', () => {
+                item.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+
+            // Drop
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                const targetId = parseInt(item.dataset.id);
+
+                if (draggedId !== targetId) {
+                    // Najít indexy obou úkolů
+                    const draggedIndex = this.customTasks.findIndex(task => task.id === draggedId);
+                    const targetIndex = this.customTasks.findIndex(task => task.id === targetId);
+
+                    if (draggedIndex !== -1 && targetIndex !== -1) {
+                        // Vyjmout přetahovaný úkol
+                        const [draggedTask] = this.customTasks.splice(draggedIndex, 1);
+
+                        // Určit novou pozici
+                        let newIndex = targetIndex;
+                        if (draggedIndex < targetIndex && item.classList.contains('drag-over-bottom')) {
+                            newIndex = targetIndex;
+                        } else if (draggedIndex > targetIndex && item.classList.contains('drag-over-top')) {
+                            newIndex = targetIndex;
+                        } else if (draggedIndex < targetIndex) {
+                            newIndex = targetIndex - 1;
+                        }
+
+                        // Vložit úkol na novou pozici
+                        this.customTasks.splice(newIndex, 0, draggedTask);
+
+                        // Aktualizovat seznam
+                        this.updateTasksChecklistUI(dialog);
+                    }
+                }
+
+                item.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+        });
     }
 
     /**

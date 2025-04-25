@@ -1,6 +1,6 @@
 /**
  * Vylepšené styly pro definování úkolů
- * Verze 0.3.6.0
+ * Verze 0.3.6.1
  */
 
 /* Hlavní kontejner pro definování úkolů */
@@ -400,6 +400,60 @@ body[data-theme="dark"] #load-template-btn:hover {
     background: linear-gradient(135deg, #d35400, #a04000);
 }
 
+/* Hlavička s akcemi */
+.custom-tasks-header-with-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.custom-tasks-header-with-actions h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+/* Tlačítko pro analýzu problému v pracovním okně */
+.analyze-task-btn {
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(155, 89, 182, 0.3);
+}
+
+.analyze-task-btn:hover {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(155, 89, 182, 0.4);
+}
+
+.analyze-task-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(155, 89, 182, 0.3);
+}
+
+/* Úchyt pro přetahování úkolů */
+.task-drag-handle {
+    color: #bdc3c7;
+    font-size: 14px;
+    cursor: grab;
+    margin-right: 8px;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+}
+
+.custom-task-check-item:hover .task-drag-handle {
+    opacity: 1;
+    color: #7f8c8d;
+}
+
 /* Animace pro přidání nového úkolu */
 @keyframes fadeInUp {
     from {
@@ -557,4 +611,25 @@ body[data-theme="dark"] .custom-tasks-list::-webkit-scrollbar-thumb {
 
 body[data-theme="dark"] .custom-tasks-list::-webkit-scrollbar-thumb:hover {
     background: #95a5a6;
+}
+
+/* Tmavý režim pro hlavičku s akcemi */
+body[data-theme="dark"] .custom-tasks-header-with-actions h3 {
+    color: #ecf0f1;
+}
+
+body[data-theme="dark"] .analyze-task-btn {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+}
+
+body[data-theme="dark"] .analyze-task-btn:hover {
+    background: linear-gradient(135deg, #7d3c98, #6c3483);
+}
+
+body[data-theme="dark"] .task-drag-handle {
+    color: #7f8c8d;
+}
+
+body[data-theme="dark"] .custom-task-check-item:hover .task-drag-handle {
+    color: #95a5a6;
 }
