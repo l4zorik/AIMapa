@@ -95,7 +95,8 @@ const CommandsMenu = {
                 { id: 'dark-mode', name: 'Tmavý režim', description: 'Přepne tmavý režim aplikace', icon: '🌙', command: 'tmavý režim' },
                 { id: 'updates', name: 'Novinky a aktualizace', description: 'Zobrazí informace o novinkách a aktualizacích', icon: '🔔', command: 'novinky' },
                 { id: 'help', name: 'Nápověda', description: 'Zobrazí nápovědu k používání aplikace', icon: '❓', command: 'nápověda' },
-                { id: 'premium', name: 'Premium verze', description: 'Zobrazí informace o premium verzi', icon: '⭐', command: 'premium' }
+                { id: 'premium', name: 'Premium verze', description: 'Zobrazí informace o premium verzi', icon: '⭐', command: 'premium' },
+                { id: 'refresh-menu', name: 'Obnovit menu', description: 'Obnoví menu příkazů', icon: '🔄', command: 'obnovit menu' }
             ]
         },
         {
@@ -104,7 +105,7 @@ const CommandsMenu = {
             icon: '🎮',
             isOpen: false,
             commands: [
-                { id: 'rap', name: 'Rap', description: 'Spustí rapové akce', icon: '🎤', command: 'rap' }
+                { id: 'reward-system', name: 'Systém odměn', description: 'Otevře dialog odměňovacího systému', icon: '🐱', command: 'odměňovací systém' }
             ]
         }
     ],
@@ -126,6 +127,42 @@ const CommandsMenu = {
         this.setupEventListeners();
 
         console.log('Modul menu příkazů byl inicializován');
+    },
+
+    // Obnovení menu příkazů
+    refreshMenu() {
+        console.log('Obnovuji menu příkazů...');
+
+        // Odstranění starého menu
+        const oldOverlay = document.getElementById('commandsOverlay');
+        const oldMenu = document.getElementById('commandsMenu');
+
+        if (oldOverlay) {
+            oldOverlay.remove();
+        }
+
+        if (oldMenu) {
+            oldMenu.remove();
+        }
+
+        // Otevření kategorie Zábava
+        const funCategory = this.categories.find(cat => cat.id === 'fun');
+        if (funCategory) {
+            funCategory.isOpen = true;
+        }
+
+        // Vytvoření nového menu
+        this.createCommandsMenu();
+
+        // Zobrazení menu
+        this.toggleCommandsMenu();
+
+        // Zobrazení zprávy o obnovení
+        if (typeof addMessage !== 'undefined') {
+            addMessage('Menu příkazů bylo obnoveno. Kategorie Zábava byla otevřena.', false);
+        }
+
+        console.log('Menu příkazů bylo obnoveno');
     },
 
     // Načtení nastavení
@@ -892,21 +929,57 @@ Email: podatelna@ho.mpsv.cz`;
             return true;
         }
 
-        if (command === 'rap') {
-            if (typeof addMessage !== 'undefined') {
-                addMessage('Yo, let me drop some beats for you!', false);
-                setTimeout(() => {
-                    const message = `AI Map on the mic, I'm mapping your way,
-Navigating streets, making your day,
-From Hodonín to Hrušky, I know the route,
-Got the best locations, without a doubt!`;
-                    addMessage(message, false);
+        // Příkaz 'rap' byl odstraněn a nahrazen příkazem 'odměňovací systém'
 
-                    // Přidání XP za použití rapu
-                    if (typeof UserProgress !== 'undefined') {
-                        UserProgress.addXP(10, 'Rapová akce');
-                    }
-                }, 1500);
+        // Příkaz pro obnovení menu
+        if (command === 'obnovit menu') {
+            this.refreshMenu();
+            return true;
+        }
+
+        // Příkaz pro systém odměn
+        if (command === 'odměňovací systém') {
+            // Nejprve obnovíme menu, aby se zobrazily všechny aktuální položky
+            this.refreshMenu();
+
+            if (typeof RewardSystem !== 'undefined') {
+                // Inicializace modulu odměňovacího systému, pokud ještě nebyl inicializován
+                if (!RewardSystem.isInitialized) {
+                    RewardSystem.init();
+                }
+
+                // Otevření dialogu odměňovacího systému
+                RewardSystem.openRewardSystemDialog();
+
+                // Zobrazení informace o systému odměn
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Otevírám systém odměn...', false);
+                    setTimeout(() => {
+                        addMessage('Systém odměn byl otevřen. Vyberte si svoji odměnu! 🐱', false);
+                    }, 1000);
+                }
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Načítám modul systému odměn...', false);
+
+                    // Načtení skriptu odměňovacího systému
+                    const script = document.createElement('script');
+                    script.src = 'js/reward-system.js';
+                    script.onload = () => {
+                        // Inicializace modulu po načtení
+                        if (typeof RewardSystem !== 'undefined') {
+                            RewardSystem.init();
+                            RewardSystem.openRewardSystemDialog();
+                            addMessage('Modul systému odměn byl úspěšně načten. Vyberte si svoji odměnu! 🐱', false);
+                        } else {
+                            addMessage('Nepodařilo se načíst modul systému odměn. Zkuste obnovit stránku.', false);
+                        }
+                    };
+                    script.onerror = () => {
+                        addMessage('Nepodařilo se načíst modul systému odměn. Zkuste obnovit stránku.', false);
+                    };
+                    document.head.appendChild(script);
+                }
             }
             return true;
         }
