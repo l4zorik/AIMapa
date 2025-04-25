@@ -751,7 +751,7 @@ class VirtualWorkClass {
                     });
 
                     // Aktualizace stavu tlačítka pro začátek práce
-                    skipTasksBtn.textContent = this.customTasks.length > 0 ? 'Začít pracovat bez úkolů' : 'Začít pracovat';
+                    skipTasksBtn.textContent = this.customTasks.length > 0 ? 'Začít pracovat s těmito úkoly' : 'Začít pracovat';
 
                     // Implementace drag and drop funkcionality
                     const taskItems = tasksList.querySelectorAll('.custom-task-item');
@@ -848,7 +848,7 @@ class VirtualWorkClass {
 
             // Event listener pro přeskočení definice úkolů
             skipTasksBtn.addEventListener('click', () => {
-                this.customTasks = [];
+                // Zachováme existující úkoly, pokud nějaké jsou
                 this.startWorkWithTasks(dialog, workplace);
             });
 
