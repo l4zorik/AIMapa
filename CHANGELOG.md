@@ -2,6 +2,36 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.6.0] - 2025-06-25 - NAČÍTÁNÍ REÁLNÝCH DAT PODNIKŮ Z INTERNETU A EPICKÁ REORGANIZACE SOUBORŮ
+
+### Nové funkce
+- Přidán nový modul pro načítání reálných dat podniků z internetu
+- Implementováno rozhraní pro výběr oblasti a parametrů načítání
+- Přidána podpora pro OpenStreetMap API pro získání aktuálních dat
+- Implementováno mapování typů podniků z OSM na vlastní kategorie
+- Přidáno zobrazení správných ikon podle typu podniku
+- Implementováno získávání XP za načtení dat podniků
+
+### Vylepšení
+- Vylepšen systém zobrazování podniků na mapě s přesnějšími ikonami
+- Přidána možnost aktualizovat data podniků pro libovolnou oblast
+- Implementována podpora tmavého režimu pro nové prvky
+- Optimalizováno zobrazení podniků pro lepší přehlednost
+- Přidána nová položka do menu příkazů pro načítání dat podniků
+
+### Epická reorganizace souborů
+- Kompletně přepracována struktura souborů pro maximální přehlednost
+- Všechny soubory aplikace přesunuty do jediného adresáře public/app
+- Vyčištěn kořenový adresář projektu od přebytečných souborů
+- Aktualizovány všechny odkazy v HTML souborech na nová umístění
+- Zjednodušena struktura projektu pro snadnější orientaci a údržbu
+
+### Nové skryté funkce
+- Přidána možnost otevřít menu příkazů trojitým kliknutím mimo mapu
+- Implementován handler pro detekci trojitého kliknutí s časovým limitem 1 sekundy
+- Přidána možnost přesouvat menu příkazů pomocí drag and drop
+- Implementováno ukládání pozice menu příkazů mezi relacemi
+
 ## [0.3.5.7] - 2025-06-21 - VYLEPŠENÍ PROPOJENÍ VIRTUÁLNÍ PRÁCE S ODMĚŇOVACÍM SYSTÉMEM
 
 ### Nové funkce

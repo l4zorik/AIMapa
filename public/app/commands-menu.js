@@ -256,6 +256,7 @@ const CommandsMenu = {
         const header = document.createElement('div');
         header.className = 'commands-menu-header';
         header.innerHTML = `
+            <div class="commands-menu-drag-handle">⋮⋮</div>
             <h3>Menu příkazů</h3>
             <button class="commands-menu-close">&times;</button>
         `;
@@ -288,6 +289,9 @@ const CommandsMenu = {
 
         // Přidání menu do dokumentu
         document.body.appendChild(menu);
+
+        // Přidání možnosti přesouvat menu
+        this.makeDraggable(menu, header);
     },
 
     // Vytvoření elementu kategorie
@@ -942,35 +946,35 @@ Email: podatelna@ho.mpsv.cz`;
             // Nejprve obnovíme menu, aby se zobrazily všechny aktuální položky
             this.refreshMenu();
 
-            if (typeof VirtualWork !== 'undefined') {
-                // Inicializace modulu virtuální práce, pokud ještě nebyl inicializován
-                if (!VirtualWork.isInitialized) {
-                    VirtualWork.init();
+            if (typeof RewardSystem !== 'undefined') {
+                // Inicializace modulu odměňovacího systému, pokud ještě nebyl inicializován
+                if (!RewardSystem.isInitialized) {
+                    RewardSystem.init();
                 }
 
-                // Otevření dialogu virtuální práce
-                VirtualWork.openWorkDialog();
+                // Otevření dialogu odměňovacího systému
+                RewardSystem.openRewardSystemDialog();
 
                 // Zobrazení informace o systému odměn
                 if (typeof addMessage !== 'undefined') {
                     addMessage('Otevírám systém odměn...', false);
                     setTimeout(() => {
-                        addMessage('Systém odměn byl otevřen. Dokončete práci a vyberte si svoji odměnu! 🐱', false);
+                        addMessage('Systém odměn byl otevřen. Vyberte si svoji odměnu! 🐱', false);
                     }, 1000);
                 }
             } else {
                 if (typeof addMessage !== 'undefined') {
                     addMessage('Načítám modul systému odměn...', false);
 
-                    // Načtení skriptu virtuální práce
+                    // Načtení skriptu odměňovacího systému
                     const script = document.createElement('script');
-                    script.src = 'js/virtual-work.js';
+                    script.src = 'js/reward-system.js';
                     script.onload = () => {
                         // Inicializace modulu po načtení
-                        if (typeof VirtualWork !== 'undefined') {
-                            VirtualWork.init();
-                            VirtualWork.openWorkDialog();
-                            addMessage('Modul systému odměn byl úspěšně načten. Dokončete práci a vyberte si svoji odměnu! 🐱', false);
+                        if (typeof RewardSystem !== 'undefined') {
+                            RewardSystem.init();
+                            RewardSystem.openRewardSystemDialog();
+                            addMessage('Modul systému odměn byl úspěšně načten. Vyberte si svoji odměnu! 🐱', false);
                         } else {
                             addMessage('Nepodařilo se načíst modul systému odměn. Zkuste obnovit stránku.', false);
                         }
@@ -3955,6 +3959,106 @@ correctionStyles.textContent = `
     }
 `;
 document.head.appendChild(correctionStyles);
+
+// Funkce pro přesouvání menu příkazů
+CommandsMenu.makeDraggable = function(element, handle) {
+    if (!element || !handle) return;
+
+    let isDragging = false;
+    let offsetX, offsetY;
+    let initialX, initialY;
+
+    // Funkce pro zahájení přesouvání
+    const startDrag = (e) => {
+        // Ignorovat, pokud není kliknuto na handle
+        if (e.target !== handle && !handle.contains(e.target)) return;
+
+        // Zabránit výchozímu chování
+        e.preventDefault();
+
+        // Získání počáteční pozice
+        const rect = element.getBoundingClientRect();
+        initialX = rect.left;
+        initialY = rect.top;
+
+        // Výpočet offsetu
+        offsetX = e.clientX - initialX;
+        offsetY = e.clientY - initialY;
+
+        // Nastavení příznaku přesouvání
+        isDragging = true;
+
+        // Přidání třídy pro přesouvání
+        element.classList.add('dragging');
+
+        // Odstranění transformace pro přesné pozicování
+        element.style.transform = 'none';
+        element.style.top = initialY + 'px';
+        element.style.left = initialX + 'px';
+    };
+
+    // Funkce pro přesouvání
+    const drag = (e) => {
+        if (!isDragging) return;
+
+        // Zabránit výchozímu chování
+        e.preventDefault();
+
+        // Výpočet nové pozice
+        const newX = e.clientX - offsetX;
+        const newY = e.clientY - offsetY;
+
+        // Nastavení nové pozice
+        element.style.left = newX + 'px';
+        element.style.top = newY + 'px';
+    };
+
+    // Funkce pro ukončení přesouvání
+    const endDrag = () => {
+        if (!isDragging) return;
+
+        // Odstranění příznaku přesouvání
+        isDragging = false;
+
+        // Odstranění třídy pro přesouvání
+        element.classList.remove('dragging');
+
+        // Uložení pozice do localStorage
+        const rect = element.getBoundingClientRect();
+        const position = {
+            left: rect.left,
+            top: rect.top
+        };
+
+        try {
+            const appState = JSON.parse(localStorage.getItem('appState')) || {};
+            appState.commandsMenuPosition = position;
+            localStorage.setItem('appState', JSON.stringify(appState));
+        } catch (error) {
+            console.error('Chyba při ukládání pozice menu příkazů:', error);
+        }
+    };
+
+    // Přidání event listenerů
+    handle.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', endDrag);
+
+    // Načtení uložené pozice
+    try {
+        const appState = JSON.parse(localStorage.getItem('appState')) || {};
+        const position = appState.commandsMenuPosition;
+
+        if (position) {
+            // Odstranění transformace pro přesné pozicování
+            element.style.transform = 'none';
+            element.style.top = position.top + 'px';
+            element.style.left = position.left + 'px';
+        }
+    } catch (error) {
+        console.error('Chyba při načítání pozice menu příkazů:', error);
+    }
+};
 
 // Inicializace modulu po načtení dokumentu
 document.addEventListener('DOMContentLoaded', () => {

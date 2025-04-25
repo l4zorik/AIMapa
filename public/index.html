@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Map - Into the known v0.3.1.0</title>
-    <link rel="icon" href="icons8-favicon.gif" type="image/gif">
-    <link rel="stylesheet" href="css/styles.css">
+    <title>AI Map - Into the known v0.3.6.0</title>
+    <link rel="icon" href="app/icons8-favicon.gif" type="image/gif">
+    <link rel="stylesheet" href="app/styles.css">
     <!-- Leaflet CSS pro mapu -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <!-- Leaflet Routing Machine CSS -->
@@ -23,12 +23,14 @@
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
 
     <!-- CSS pro novinky a další funkce -->
-    <link rel="stylesheet" href="css/updates-notification.css">
-    <link rel="stylesheet" href="css/user-progress.css">
-    <link rel="stylesheet" href="css/route-utils.css">
-    <link rel="stylesheet" href="css/feedback-survey.css">
-    <link rel="stylesheet" href="css/virtual-work.css">
-    <link rel="stylesheet" href="css/money-indicator-enhanced.css">
+    <link rel="stylesheet" href="app/updates-notification.css">
+    <link rel="stylesheet" href="app/user-progress.css">
+    <link rel="stylesheet" href="app/route-utils.css">
+    <link rel="stylesheet" href="app/feedback-survey.css">
+    <link rel="stylesheet" href="app/virtual-work.css">
+    <link rel="stylesheet" href="app/work-history-icons.css">
+    <link rel="stylesheet" href="app/task-definition.css">
+    <link rel="stylesheet" href="app/money-indicator-enhanced.css">
 </head>
 <body>
     <!-- Ikona pro zobrazení novinek a aktualizací byla odstraněna - novinky jsou nyní dostupné přes menu příkazů -->
@@ -342,11 +344,11 @@
     <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
     <!-- Cesium JS je již načten v hlavičce -->
     <!-- Přímá implementace Globe.gl -->
-    <script src="js/globe-simple.js"></script>
+    <script src="app/globe-simple.js"></script>
     <!-- Hlavní skript aplikace -->
-    <script src="js/script.js"></script>
+    <script src="app/script.js"></script>
     <!-- Skripty pro novinky a menu příkazů -->
-    <script src="js/updates-notification.js"></script>
+    <script src="app/updates-notification.js"></script>
     <script>
         // Přímá inicializace UpdatesNotification
         document.addEventListener('DOMContentLoaded', function() {
@@ -359,39 +361,25 @@
         });
     </script>
 
-    <script src="js/user-progress.js"></script>
-    <script src="js/user-progress-extensions.js"></script>
-    <!-- Skript pro vyhledávání spojení veřejnou dopravou -->
-    <script src="js/transport-connections.js"></script>
-    <!-- Skript pro dotazník zpětné vazby -->
-    <script src="js/feedback-survey.js"></script>
-    <!-- Skript pro služby jídla a pití -->
-    <script src="js/food-services.js"></script>
-    <!-- Skript pro lékařské služby -->
-    <script src="js/medical-services.js"></script>
-    <!-- Skript pro služby veřejné dopravy -->
-    <script src="js/transport-services.js"></script>
-    <!-- Skript pro efekty tmavé oblohy -->
-    <script src="js/dark-sky-effects.js"></script>
-    <!-- Skript pro přesunutelné prvky -->
-    <script src="js/draggable-elements.js"></script>
-    <!-- Skript pro ukazatel peněz -->
-    <!-- Ukazatel peněz byl odstraněn a přesunut do menu příkazů -->
-    <!-- Skript pro systém úkolů a questů -->
-    <script src="js/task-system.js"></script>
-    <!-- Skript pro prodej aut -->
-    <script src="js/car-sales.js"></script>
-    <!-- Skript pro virtuální práci -->
-    <script src="js/virtual-work.js"></script>
-    <!-- Testovací skript pro virtuální práci -->
-    <script src="js/virtual-work-test.js"></script>
-    <!-- Skript pro menu příkazů -->
-    <script src="js/commands-menu.js"></script>
-    <!-- Skript pro opravu menu příkazů -->
-    <script src="js/fix-menu.js"></script>
-    <!-- Skript pro zobrazení firem na mapě -->
-    <script src="js/business-markers.js"></script>
-    <!-- Skript pro vylepšený ukazatel peněz -->
-    <script src="js/money-indicator-enhanced.js"></script>
+    <!-- Moduly aplikace -->
+    <script src="app/user-progress.js"></script>
+    <script src="app/user-progress-extensions.js"></script>
+    <script src="app/transport-connections.js"></script>
+    <script src="app/feedback-survey.js"></script>
+    <script src="app/food-services.js"></script>
+    <script src="app/medical-services.js"></script>
+    <script src="app/transport-services.js"></script>
+    <script src="app/dark-sky-effects.js"></script>
+    <script src="app/draggable-elements.js"></script>
+    <script src="app/task-system.js"></script>
+    <script src="app/car-sales.js"></script>
+    <script src="app/virtual-work.js"></script>
+    <script src="app/reward-system.js"></script>
+    <script src="app/commands-menu.js"></script>
+    <script src="app/fix-menu.js"></script>
+    <script src="app/business-markers.js"></script>
+    <script src="app/business-data-loader.js"></script>
+    <script src="app/money-indicator-enhanced.js"></script>
+    <script src="app/triple-click-handler.js"></script>
 </body>
 </html>

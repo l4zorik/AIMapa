@@ -3351,6 +3351,10 @@ body.fullscreen-mode {
     transform: translate(-50%, -50%);
 }
 
+.commands-menu.dragging {
+    transition: none;
+}
+
 .commands-menu-header {
     display: flex;
     justify-content: space-between;
@@ -3360,12 +3364,20 @@ body.fullscreen-mode {
     color: white;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
+    cursor: move;
+}
+
+.commands-menu-drag-handle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 10px;
 }
 
 .commands-menu-header h3 {
     margin: 0;
     font-weight: bold;
     font-size: 16px;
+    flex: 1;
 }
 
 .commands-menu-close {
