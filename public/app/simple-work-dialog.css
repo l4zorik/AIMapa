@@ -409,6 +409,136 @@
     font-size: 1.2rem;
 }
 
+/* Styly pro uložené práce */
+.simple-work-saved-work {
+    margin-bottom: 20px;
+}
+
+.simple-work-saved-work h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.simple-work-saved-work-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.simple-work-saved-work-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-light);
+    border-radius: 8px;
+    padding: 15px;
+    transition: background-color 0.2s;
+}
+
+.simple-work-saved-work-item:hover {
+    background-color: var(--bg-dark);
+}
+
+.simple-work-saved-work-info {
+    flex: 1;
+}
+
+.simple-work-saved-work-title {
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.simple-work-saved-work-description {
+    color: var(--text-color-dark);
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.simple-work-saved-work-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.simple-work-saved-work-reward,
+.simple-work-saved-work-xp,
+.simple-work-saved-work-duration {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.simple-work-saved-work-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.simple-work-saved-work-resume,
+.simple-work-saved-work-delete {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.simple-work-saved-work-resume:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.simple-work-saved-work-delete {
+    background-color: #e74c3c;
+}
+
+.simple-work-saved-work-delete:hover {
+    background-color: #c0392b;
+}
+
+.simple-work-new-work {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    margin-top: 20px;
+}
+
+.simple-work-new-work:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.simple-work-save {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    margin-right: 10px;
+}
+
+.simple-work-save:hover {
+    background-color: #2980b9;
+}
+
 /* Responzivní design */
 @media (max-width: 768px) {
     .simple-work-dialog {
