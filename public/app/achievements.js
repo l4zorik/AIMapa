@@ -350,11 +350,11 @@ const Achievements = {
                 <h3>${achievement.name}</h3>
                 <p>${achievement.description}</p>
                 <div class="achievement-notification-reward">
-                    <p>Odměna:</p>
+                    <p>Získané odměny:</p>
                     <ul>
                         ${achievement.reward.xp ? `<li>${achievement.reward.xp} XP</li>` : ''}
                         ${achievement.reward.money ? `<li>${achievement.reward.money} Kč</li>` : ''}
-                        ${achievement.reward.questPoints ? `<li>${achievement.reward.questPoints} bodů</li>` : ''}
+                        ${achievement.reward.questPoints ? `<li>${achievement.reward.questPoints} quest bodů</li>` : ''}
                     </ul>
                 </div>
                 <button class="achievement-notification-details">Zobrazit všechny achievementy</button>
@@ -399,7 +399,12 @@ const Achievements = {
             });
         }
 
-        // Automatické zavření notifikace po 10 sekundách
+        // Přehrání zvukového efektu (pokud existuje)
+        if (typeof playSound !== 'undefined') {
+            playSound('achievement');
+        }
+
+        // Automatické zavření notifikace po 12 sekundách
         setTimeout(() => {
             if (document.body.contains(notification)) {
                 notification.classList.remove('show');
@@ -411,7 +416,7 @@ const Achievements = {
                     }
                 }, 500);
             }
-        }, 10000);
+        }, 12000);
     },
 
     // Zobrazení dialogu achievementů
@@ -525,7 +530,12 @@ const Achievements = {
     // Vykreslení položky achievementu
     renderAchievementItem(achievement) {
         const progressPercent = Math.min(100, Math.round((achievement.progress / achievement.requirement) * 100));
-        const statusText = achievement.completed ? 'DOKONČENO' : `POSTUP: ${progressPercent}%`;
+        const statusText = achievement.completed ? 'DOKONČENO' : `${progressPercent}%`;
+
+        // Hvězdička pro odměnu
+        const rewardStar = achievement.completed ?
+            `<div class="achievement-star">⭐</div>` :
+            `<div class="achievement-star empty">☆</div>`;
 
         return `
             <div class="achievement-item ${achievement.completed ? 'completed' : ''}">
@@ -554,6 +564,7 @@ const Achievements = {
                         ${achievement.reward.questPoints ? `<li>${achievement.reward.questPoints} quest bodů</li>` : ''}
                     </ul>
                 </div>
+                ${rewardStar}
             </div>
         `;
     },
