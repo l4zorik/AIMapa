@@ -21,11 +21,16 @@ const UpdatesNotification = {
                 'Propojení nabídky práce s dialogem nedokončených prací',
                 'Vylepšení zobrazení stavu financí s kryptoměnami',
                 'Přidání nových kryptoměn do finančního přehledu (ETH, DOGE, XRP)',
+                'Automatické ukládání nedokončené práce při zavření dialogu křížkem nebo tlačítkem "Zrušit"',
+                'Zachování pozice scrollování v menu virtuální práce i po obnovení stránky',
                 'Implementace automatické aktualizace kurzů kryptoměn',
                 'Přidání nových achievementů za práci s kryptoměnami',
                 'Vylepšení vizuálního zobrazení XP a úrovní',
                 'Optimalizace výkonu při získávání XP',
-                'Přidání nových kategorií XP pro detailnější statistiky'
+                'Přidání nových kategorií XP pro detailnější statistiky',
+                'Vylepšení vzhledu nedokončených prací pro lepší čitelnost v tmavém režimu',
+                'Přidání detailního zobrazení historie práce včetně seznamu úkolů a jejich stavu',
+                'Opravena viditelnost bílých prvků v dialogu nedokončených prací'
             ]
         },
         {

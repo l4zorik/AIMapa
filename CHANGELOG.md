@@ -11,6 +11,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Propojení nabídky práce s dialogem nedokončených prací
 - Vylepšení zobrazení stavu financí s kryptoměnami
 - Přidání nových kryptoměn do finančního přehledu (ETH, DOGE, XRP)
+- Automatické ukládání nedokončené práce při zavření dialogu křížkem nebo tlačítkem "Zrušit"
+- Zachování pozice scrollování v menu virtuální práce i po obnovení stránky
 
 ### Vylepšení
 - Implementace automatické aktualizace kurzů kryptoměn
@@ -18,11 +20,14 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vylepšení vizuálního zobrazení XP a úrovní
 - Optimalizace výkonu při získávání XP
 - Přidání nových kategorií XP pro detailnější statistiky
+- Vylepšení vzhledu nedokončených prací pro lepší čitelnost v tmavém režimu
+- Přidání detailního zobrazení historie práce včetně seznamu úkolů a jejich stavu
 
 ### Opravy
 - Opraveno zobrazení stavu financí na mobilních zařízeních
 - Vylepšena kompatibilita s různými prohlížeči
 - Opraveny drobné chyby v systému XP
+- Opravena viditelnost bílých prvků v dialogu nedokončených prací
 
 ## [1.0.0] - 2025-07-01 - PRVNÍ OFICIÁLNÍ RELEASE
 

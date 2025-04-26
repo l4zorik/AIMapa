@@ -19,6 +19,13 @@ class VirtualWorkClass {
         this._skipSavedWorkCheck = false;
         // Příznak, zda uživatel již jednou zvolil uložení práce
         this._userPrefersSaving = false;
+        // Pozice scrollování pro různé části dialogu
+        this.scrollPositions = {
+            workplaces: 0,
+            history: 0,
+            savedWork: 0,
+            tasks: 0
+        };
         this.workplaces = [
             {
                 id: 'office1',
@@ -353,7 +360,8 @@ class VirtualWorkClass {
             elapsedTime: elapsedTimeFormatted,
             tasks: this.customTasks,
             date: new Date().toISOString(),
-            isCompleted: false
+            isCompleted: false,
+            projectName: this.projectName || null // Přidání názvu projektu
         };
 
         // Uložení záznamu do localStorage
@@ -488,6 +496,21 @@ class VirtualWorkClass {
             return;
         }
 
+        // Uložení pozice scrollování z aktuálního zobrazení
+        if (existingDialog) {
+            const currentContent = existingDialog.querySelector('.virtual-work-content');
+            if (currentContent) {
+                // Zjistíme, jaký obsah je aktuálně zobrazen
+                if (currentContent.querySelector('.workplace-list')) {
+                    this.scrollPositions.workplaces = currentContent.scrollTop;
+                } else if (currentContent.querySelector('.work-history-container')) {
+                    this.scrollPositions.history = currentContent.scrollTop;
+                } else if (currentContent.querySelector('.custom-tasks-container')) {
+                    this.scrollPositions.tasks = currentContent.scrollTop;
+                }
+            }
+        }
+
         // Použití existujícího dialogu nebo vytvoření nového
         let dialog = existingDialog || document.querySelector('.virtual-work-dialog');
         if (!dialog) {
@@ -510,7 +533,7 @@ class VirtualWorkClass {
                             <div class="saved-work-item" data-id="${work.id}">
                                 <div class="saved-work-icon">${work.icon}</div>
                                 <div class="saved-work-info">
-                                    <div class="saved-work-name">${work.name}</div>
+                                    <div class="saved-work-name">${work.name}${work.projectName ? ` - ${work.projectName}` : ''}</div>
                                     <div class="saved-work-date">Uloženo: ${formattedDate}</div>
                                     <div class="saved-work-details">
                                         <span class="saved-work-time">⏱️ Odpracováno: ${work.elapsedTime}</span>
@@ -525,6 +548,20 @@ class VirtualWorkClass {
                 </div>
             </div>
         `;
+
+        // Obnovení pozice scrollování pro nedokončené práce
+        const content = dialog.querySelector('.virtual-work-content');
+        if (content) {
+            // Nastavení pozice scrollování po vykreslení obsahu
+            setTimeout(() => {
+                content.scrollTop = this.scrollPositions.savedWork;
+
+                // Přidání event listeneru pro ukládání pozice scrollování
+                content.addEventListener('scroll', () => {
+                    this.scrollPositions.savedWork = content.scrollTop;
+                });
+            }, 50);
+        }
 
         // Přidání tlačítka zpět
         const actionsContainer = dialog.querySelector('.virtual-work-actions');
@@ -565,6 +602,25 @@ class VirtualWorkClass {
 
                         // Nastavení úkolů z uložené práce
                         this.customTasks = workDetail.tasks ? [...workDetail.tasks] : [];
+
+                        // Obnovení názvu projektu, pokud existuje
+                        if (workDetail.projectName) {
+                            this.projectName = workDetail.projectName;
+
+                            // Obnovení informací o projektu
+                            if (!this.projectInfo) {
+                                this.projectInfo = {
+                                    name: this.projectName,
+                                    createdAt: new Date().toISOString(),
+                                    updatedAt: new Date().toISOString(),
+                                    tasks: [...this.customTasks]
+                                };
+                            } else {
+                                this.projectInfo.name = this.projectName;
+                                this.projectInfo.updatedAt = new Date().toISOString();
+                                this.projectInfo.tasks = [...this.customTasks];
+                            }
+                        }
 
                         // Odstranění uložené práce ze seznamu
                         const updatedSavedWork = savedWork.filter(work => work.id !== workId);
@@ -667,6 +723,19 @@ class VirtualWorkClass {
      */
     updateWorkDialog(dialog) {
         console.log('Aktualizace dialogu virtuální práce');
+
+        // Uložení pozice scrollování z aktuálního zobrazení
+        const currentContent = dialog.querySelector('.virtual-work-content');
+        if (currentContent) {
+            // Zjistíme, jaký obsah je aktuálně zobrazen
+            if (currentContent.querySelector('.work-history-container')) {
+                this.scrollPositions.history = currentContent.scrollTop;
+            } else if (currentContent.querySelector('.saved-work-container')) {
+                this.scrollPositions.savedWork = currentContent.scrollTop;
+            } else if (currentContent.querySelector('.custom-tasks-container')) {
+                this.scrollPositions.tasks = currentContent.scrollTop;
+            }
+        }
 
         // Kontrola, zda existují uložené nedokončené práce
         const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
@@ -772,6 +841,20 @@ class VirtualWorkClass {
                 });
             });
         });
+
+        // Obnovení pozice scrollování pro seznam pracovišť
+        const content = dialog.querySelector('.virtual-work-content');
+        if (content) {
+            // Nastavení pozice scrollování po vykreslení obsahu
+            setTimeout(() => {
+                content.scrollTop = this.scrollPositions.workplaces;
+
+                // Přidání event listeneru pro ukládání pozice scrollování
+                content.addEventListener('scroll', () => {
+                    this.scrollPositions.workplaces = content.scrollTop;
+                });
+            }, 50);
+        }
     }
 
     /**
@@ -965,8 +1048,38 @@ class VirtualWorkClass {
         const closeBtn = dialog.querySelector('.virtual-work-close');
         const cancelBtn = dialog.querySelector('#virtual-work-cancel');
 
-        closeBtn.addEventListener('click', () => this.closeDialog(dialog));
-        cancelBtn.addEventListener('click', () => this.closeDialog(dialog));
+        // Přidání event listenerů pro zavření dialogu s automatickým uložením práce
+        closeBtn.addEventListener('click', () => {
+            // Kontrola, zda je vybrané pracoviště a jsou nějaké úkoly
+            if (this.selectedWorkplace && this.customTasks && this.customTasks.length > 0) {
+                // Získání času začátku práce, pokud existuje
+                const startTimeAttr = dialog.getAttribute('data-start-time');
+                if (startTimeAttr) {
+                    const startTime = new Date(startTimeAttr);
+                    // Uložení aktuálního stavu práce
+                    this.saveWorkProgress(dialog, this.selectedWorkplace, startTime);
+                    // Zobrazení notifikace o uložení
+                    this.showSavedWorkNotification(this.selectedWorkplace);
+                }
+            }
+            this.closeDialog(dialog);
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            // Kontrola, zda je vybrané pracoviště a jsou nějaké úkoly
+            if (this.selectedWorkplace && this.customTasks && this.customTasks.length > 0) {
+                // Získání času začátku práce, pokud existuje
+                const startTimeAttr = dialog.getAttribute('data-start-time');
+                if (startTimeAttr) {
+                    const startTime = new Date(startTimeAttr);
+                    // Uložení aktuálního stavu práce
+                    this.saveWorkProgress(dialog, this.selectedWorkplace, startTime);
+                    // Zobrazení notifikace o uložení
+                    this.showSavedWorkNotification(this.selectedWorkplace);
+                }
+            }
+            this.closeDialog(dialog);
+        });
 
         // Výběr pracoviště
         const workplaceItems = dialog.querySelectorAll('.workplace-item');
@@ -1292,6 +1405,19 @@ class VirtualWorkClass {
      * Zobrazení historie práce
      */
     showWorkHistory(dialog) {
+        // Uložení pozice scrollování z aktuálního zobrazení
+        const currentContent = dialog.querySelector('.virtual-work-content');
+        if (currentContent) {
+            // Zjistíme, jaký obsah je aktuálně zobrazen
+            if (currentContent.querySelector('.workplace-list')) {
+                this.scrollPositions.workplaces = currentContent.scrollTop;
+            } else if (currentContent.querySelector('.saved-work-container')) {
+                this.scrollPositions.savedWork = currentContent.scrollTop;
+            } else if (currentContent.querySelector('.custom-tasks-container')) {
+                this.scrollPositions.tasks = currentContent.scrollTop;
+            }
+        }
+
         // Zobrazení historie práce
         dialog.querySelector('.virtual-work-content').innerHTML = `
             <div class="work-history-container">
@@ -1303,26 +1429,95 @@ class VirtualWorkClass {
                             const date = new Date(record.date);
                             const formattedDate = date.toLocaleDateString('cs-CZ') + ' ' + date.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
 
+                            // Kontrola, zda existují úkoly
+                            const hasTasks = record.tasks && record.tasks.length > 0;
+
+                            // Výpočet dokončených úkolů
+                            let completedTasks = 0;
+                            let totalTasks = 0;
+                            let completionPercent = 0;
+
+                            if (hasTasks) {
+                                totalTasks = record.tasks.length;
+                                completedTasks = record.tasks.filter(task => task.completed).length;
+                                completionPercent = Math.round((completedTasks / totalTasks) * 100);
+                            }
+
                             return `
                                 <div class="work-history-item" data-id="${record.id}">
                                     <div class="work-history-icon" data-icon="${record.icon}"></div>
                                     <div class="work-history-info">
-                                        <div class="work-history-name">${record.name}</div>
+                                        <div class="work-history-name">${record.name}${record.projectName ? ` - ${record.projectName}` : ''}</div>
                                         <div class="work-history-date">${formattedDate}</div>
                                         <div class="work-history-details">
                                             <span class="work-history-pay">💰 ${record.pay} Kč</span>
                                             <span class="work-history-xp">⭐ ${record.xp} XP</span>
                                             <span class="work-history-duration">⏱️ ${record.duration || '?'} min</span>
+                                            ${hasTasks ? `<span class="work-history-tasks">📋 Úkolů: ${completedTasks}/${totalTasks} (${completionPercent}%)</span>` : ''}
                                         </div>
                                     </div>
-                                    <button class="work-history-repeat" title="Opakovat tuto práci">🔄</button>
+                                    <div class="work-history-actions">
+                                        <button class="work-history-details-btn" title="Zobrazit detaily" data-id="${record.id}">📋</button>
+                                        <button class="work-history-repeat" title="Opakovat tuto práci">🔄</button>
+                                    </div>
                                 </div>
+                                ${hasTasks ? `
+                                <div class="work-history-details-panel" id="work-details-${record.id}" style="display: none;">
+                                    <div class="work-history-tasks-list">
+                                        <h4>Seznam úkolů:</h4>
+                                        <ul>
+                                            ${record.tasks.map(task => `
+                                                <li class="${task.completed ? 'completed' : 'incomplete'}">
+                                                    <span class="task-status-icon">${task.completed ? '✅' : '❌'}</span>
+                                                    <span class="task-text">${task.text}</span>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                                ` : ''}
                             `;
                         }).join('')}
                     </div>`
                 }
             </div>
         `;
+
+        // Obnovení pozice scrollování pro historii práce
+        const content = dialog.querySelector('.virtual-work-content');
+        if (content) {
+            // Nastavení pozice scrollování po vykreslení obsahu
+            setTimeout(() => {
+                content.scrollTop = this.scrollPositions.history;
+
+                // Přidání event listeneru pro ukládání pozice scrollování
+                content.addEventListener('scroll', () => {
+                    this.scrollPositions.history = content.scrollTop;
+                });
+            }, 50);
+        }
+
+        // Přidání event listenerů pro tlačítka detailů
+        const detailButtons = dialog.querySelectorAll('.work-history-details-btn');
+        detailButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const recordId = e.target.dataset.id;
+                const detailsPanel = dialog.querySelector(`#work-details-${recordId}`);
+
+                if (detailsPanel) {
+                    // Toggle zobrazení detailů
+                    if (detailsPanel.style.display === 'none') {
+                        detailsPanel.style.display = 'block';
+                        e.target.textContent = '🔼';
+                        e.target.title = 'Skrýt detaily';
+                    } else {
+                        detailsPanel.style.display = 'none';
+                        e.target.textContent = '📋';
+                        e.target.title = 'Zobrazit detaily';
+                    }
+                }
+            });
+        });
 
         // Přidání event listenerů pro tlačítka opakování
         const repeatButtons = dialog.querySelectorAll('.work-history-repeat');
@@ -1606,6 +1801,24 @@ class VirtualWorkClass {
                 }
             });
         });
+
+        // Přidání event listeneru pro tlačítko pojmenovat projekt
+        const nameProjectBtn = dialog.querySelector('#name-project-btn');
+        if (nameProjectBtn) {
+            nameProjectBtn.addEventListener('click', () => {
+                console.log('Kliknuto na tlačítko "Pojmenovat projekt"');
+                this.handleNameProject(dialog);
+            });
+        }
+
+        // Přidání event listeneru pro tlačítko informace o projektu
+        const projectInfoBtn = dialog.querySelector('#project-info-btn');
+        if (projectInfoBtn) {
+            projectInfoBtn.addEventListener('click', () => {
+                console.log('Kliknuto na tlačítko "Informace o projektu"');
+                this.showProjectInfo(dialog);
+            });
+        }
 
         // Přidání event listeneru pro tlačítko analyzovat problém
         const analyzeTaskBtn = dialog.querySelector('#analyze-task-btn');
@@ -2395,18 +2608,22 @@ class VirtualWorkClass {
         // Kontrola, zda existují úkoly
         if (!this.customTasks || this.customTasks.length === 0) return;
 
-        // Kontrola, zda existuje mapa
-        if (!window.map) return;
+        // Kontrola, zda existuje mapa a má metodu getCenter
+        if (!window.map || typeof window.map.getCenter !== 'function') {
+            console.log('Mapa není k dispozici nebo nemá metodu getCenter');
+            return;
+        }
 
         // Odstranění existujících markerů
         this.removeTaskMarkersFromMap();
 
-        // Přidání markerů pro každý úkol
-        this.customTasks.forEach((task, index) => {
-            // Vytvoření náhodné pozice v okolí aktuální pozice mapy
-            const center = window.map.getCenter();
-            const lat = center.lat + (Math.random() - 0.5) * 0.01;
-            const lng = center.lng + (Math.random() - 0.5) * 0.01;
+        try {
+            // Přidání markerů pro každý úkol
+            this.customTasks.forEach((task, index) => {
+                // Vytvoření náhodné pozice v okolí aktuální pozice mapy
+                const center = window.map.getCenter();
+                const lat = center.lat + (Math.random() - 0.5) * 0.01;
+                const lng = center.lng + (Math.random() - 0.5) * 0.01;
 
             // Vytvoření ikony markeru
             const icon = L.divIcon({
@@ -2440,6 +2657,9 @@ class VirtualWorkClass {
                 marker: marker
             });
         });
+        } catch (error) {
+            console.error('Chyba při přidávání markerů úkolů na mapu:', error);
+        }
     }
 
     /**
@@ -2449,16 +2669,24 @@ class VirtualWorkClass {
         // Kontrola, zda existují markery
         if (!this.taskMarkers || this.taskMarkers.length === 0) return;
 
-        // Kontrola, zda existuje mapa
-        if (!window.map) return;
+        // Kontrola, zda existuje mapa a má metodu removeLayer
+        if (!window.map || typeof window.map.removeLayer !== 'function') {
+            console.log('Mapa není k dispozici nebo nemá metodu removeLayer');
+            this.taskMarkers = [];
+            return;
+        }
 
-        // Odstranění markerů z mapy
-        this.taskMarkers.forEach(item => {
-            window.map.removeLayer(item.marker);
-        });
-
-        // Vyčištění pole markerů
-        this.taskMarkers = [];
+        try {
+            // Odstranění markerů z mapy
+            this.taskMarkers.forEach(item => {
+                window.map.removeLayer(item.marker);
+            });
+        } catch (error) {
+            console.error('Chyba při odstraňování markerů úkolů z mapy:', error);
+        } finally {
+            // Vyčištění pole markerů
+            this.taskMarkers = [];
+        }
     }
 
     /**
@@ -2471,33 +2699,44 @@ class VirtualWorkClass {
         // Kontrola, zda existuje mapa
         if (!window.map) return;
 
-        // Aktualizace markerů podle stavu úkolů
-        this.taskMarkers.forEach(item => {
-            const task = this.customTasks.find(t => t.id === item.id);
-            if (task) {
-                // Aktualizace třídy ikony podle stavu úkolu
-                const icon = item.marker.getIcon();
-                const iconElement = icon.options.html;
+        try {
+            // Aktualizace markerů podle stavu úkolů
+            this.taskMarkers.forEach(item => {
+                const task = this.customTasks.find(t => t.id === item.id);
+                if (task && item.marker && typeof item.marker.getIcon === 'function') {
+                    // Aktualizace třídy ikony podle stavu úkolu
+                    const icon = item.marker.getIcon();
+                    if (!icon || !icon.options) return;
 
-                // Vytvoření nové ikony s aktualizovanou třídou
-                const newIcon = L.divIcon({
-                    className: `task-marker-icon ${task.completed ? 'completed' : ''}`,
-                    html: iconElement,
-                    iconSize: [30, 30]
-                });
+                    const iconElement = icon.options.html;
 
-                // Nastavení nové ikony
-                item.marker.setIcon(newIcon);
+                    // Vytvoření nové ikony s aktualizovanou třídou
+                    const newIcon = L.divIcon({
+                        className: `task-marker-icon ${task.completed ? 'completed' : ''}`,
+                        html: iconElement,
+                        iconSize: [30, 30]
+                    });
 
-                // Aktualizace popup obsahu
-                const popupContent = item.marker.getPopup().getContent();
-                const newPopupContent = popupContent.replace(
-                    task.completed ? 'Nedokončeno ❌' : 'Dokončeno ✅',
-                    task.completed ? 'Dokončeno ✅' : 'Nedokončeno ❌'
-                );
-                item.marker.getPopup().setContent(newPopupContent);
-            }
-        });
+                    // Nastavení nové ikony
+                    item.marker.setIcon(newIcon);
+
+                    // Aktualizace popup obsahu
+                    if (typeof item.marker.getPopup === 'function' && item.marker.getPopup()) {
+                        const popup = item.marker.getPopup();
+                        if (typeof popup.getContent === 'function' && typeof popup.setContent === 'function') {
+                            const popupContent = popup.getContent();
+                            const newPopupContent = popupContent.replace(
+                                task.completed ? 'Nedokončeno ❌' : 'Dokončeno ✅',
+                                task.completed ? 'Dokončeno ✅' : 'Nedokončeno ❌'
+                            );
+                            popup.setContent(newPopupContent);
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Chyba při aktualizaci markerů úkolů na mapě:', error);
+        }
     }
 
     /**
@@ -2765,7 +3004,8 @@ class VirtualWorkClass {
             duration: totalTimeFormatted,
             date: new Date().toISOString(),
             tasks: this.customTasks,
-            rewardType: rewardType
+            rewardType: rewardType,
+            projectName: this.projectName || null
         };
 
         // Uložení záznamu do API
