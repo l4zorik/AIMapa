@@ -17,6 +17,8 @@ class VirtualWorkClass {
         this.projectNameDialog = null;
         // Příznak přeskočení kontroly nedokončených prací
         this._skipSavedWorkCheck = false;
+        // Příznak, zda uživatel již jednou zvolil uložení práce
+        this._userPrefersSaving = false;
         this.workplaces = [
             {
                 id: 'office1',
@@ -1460,12 +1462,10 @@ class VirtualWorkClass {
         backBtn.addEventListener('click', () => {
             // Kontrola, zda existují nějaké úkoly nebo práce byla zahájena
             if (this.customTasks.length > 0) {
-                // Zobrazení dialogu s možnostmi
-                const confirmDialog = confirm('Chcete uložit rozdělanou práci a vrátit se později? Pokud kliknete na "Zrušit", vrátíte se na výběr práce bez uložení a budete muset začít znovu.');
-
-                if (confirmDialog) {
-                    // Uživatel chce uložit práci
-                    console.log('Ukládám rozdělanou práci před návratem na výběr práce');
+                // Pokud uživatel již dříve zvolil uložení, automaticky uložíme práci
+                if (this._userPrefersSaving) {
+                    // Automatické uložení práce
+                    console.log('Automatické uložení práce (uživatel již dříve zvolil uložení)');
 
                     // Získání času začátku práce
                     const startTime = new Date(dialog.getAttribute('data-start-time') || new Date());
@@ -1476,7 +1476,7 @@ class VirtualWorkClass {
                     // Přidání aktivity do logu
                     const activityLog = dialog.querySelector('.work-activity-log');
                     if (activityLog) {
-                        activityLog.innerHTML = `<div class="work-activity-item new-activity">Práce uložena. Můžete se k ní vrátit později.</div>` + activityLog.innerHTML;
+                        activityLog.innerHTML = `<div class="work-activity-item new-activity">Práce automaticky uložena. Můžete se k ní vrátit později.</div>` + activityLog.innerHTML;
                     }
 
                     // Zobrazení notifikace o uložení
@@ -1491,17 +1491,52 @@ class VirtualWorkClass {
                         this.updateWorkDialog(dialog);
                     }, 500);
                 } else {
-                    // Uživatel nechce uložit práci, vrátíme se na výběr práce
-                    console.log('Návrat na výběr práce bez uložení');
+                    // Zobrazení dialogu s možnostmi
+                    const confirmDialog = confirm('Chcete uložit rozdělanou práci a vrátit se později? Pokud kliknete na "Zrušit", vrátíte se na výběr práce bez uložení a budete muset začít znovu.');
 
-                    // Nastavení příznaku přeskočení kontroly nedokončených prací
-                    this._skipSavedWorkCheck = true;
+                    if (confirmDialog) {
+                        // Uživatel chce uložit práci
+                        console.log('Ukládám rozdělanou práci před návratem na výběr práce');
 
-                    // Aktualizace titulku dialogu
-                    dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+                        // Nastavení příznaku, že uživatel preferuje uložení
+                        this._userPrefersSaving = true;
 
-                    // Místo vytváření nového dialogu aktualizujeme stávající
-                    this.updateWorkDialog(dialog);
+                        // Získání času začátku práce
+                        const startTime = new Date(dialog.getAttribute('data-start-time') || new Date());
+
+                        // Uložení aktuálního stavu práce
+                        this.saveWorkProgress(dialog, this.selectedWorkplace, startTime);
+
+                        // Přidání aktivity do logu
+                        const activityLog = dialog.querySelector('.work-activity-log');
+                        if (activityLog) {
+                            activityLog.innerHTML = `<div class="work-activity-item new-activity">Práce uložena. Můžete se k ní vrátit později.</div>` + activityLog.innerHTML;
+                        }
+
+                        // Zobrazení notifikace o uložení
+                        this.showSavedWorkNotification(this.selectedWorkplace);
+
+                        // Krátká prodleva před přesměrováním
+                        setTimeout(() => {
+                            // Aktualizace titulku dialogu
+                            dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+
+                            // Místo vytváření nového dialogu aktualizujeme stávající
+                            this.updateWorkDialog(dialog);
+                        }, 500);
+                    } else {
+                        // Uživatel nechce uložit práci, vrátíme se na výběr práce
+                        console.log('Návrat na výběr práce bez uložení');
+
+                        // Nastavení příznaku přeskočení kontroly nedokončených prací
+                        this._skipSavedWorkCheck = true;
+
+                        // Aktualizace titulku dialogu
+                        dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+
+                        // Místo vytváření nového dialogu aktualizujeme stávající
+                        this.updateWorkDialog(dialog);
+                    }
                 }
             } else {
                 // Žádné úkoly, můžeme se vrátit bez dotazu
