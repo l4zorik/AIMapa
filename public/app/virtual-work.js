@@ -764,23 +764,39 @@ class VirtualWorkClass {
      * @param {boolean} skipSavedWorkCheck - Volitelný parametr pro přeskočení kontroly nedokončených prací
      */
     openWorkDialog(workplace, existingDialog, skipSavedWorkCheck = false) {
+        console.log('openWorkDialog volán s parametry:', {
+            workplace: workplace ? workplace.id : 'undefined',
+            existingDialog: !!existingDialog,
+            skipSavedWorkCheck
+        });
+
         // Kontrola, zda je dialog již otevřený a není předán existující dialog
-        if (!existingDialog && document.querySelector('.virtual-work-dialog')) return;
+        const existingWorkDialog = document.querySelector('.virtual-work-dialog');
+        if (!existingDialog && existingWorkDialog) {
+            console.log('Dialog již existuje, odstraňuji ho');
+            existingWorkDialog.remove();
+        }
 
         // Pokud je předáno pracoviště, nastavíme ho jako vybrané
         if (workplace) {
             this.selectedWorkplace = workplace;
+            console.log('Nastaveno vybrané pracoviště:', workplace.id);
         }
 
         // Kontrola, zda existují uložené nedokončené práce
         const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
         const hasSavedWork = savedWork.length > 0;
+        console.log('Existují nedokončené práce:', hasSavedWork, 'počet:', savedWork.length);
 
         // Pokud existuje nedokončená práce a nemáme přeskočit kontrolu, rovnou ji zobrazíme
         if (hasSavedWork && !skipSavedWorkCheck) {
+            console.log('Zobrazuji dialog s nedokončenými pracemi');
             this.showSavedWorkDialog();
             return;
         }
+
+        console.log('Pokračuji s vytvořením dialogu pro výběr typu práce');
+
 
         // Použití existujícího dialogu nebo vytvoření nového
         let dialog = existingDialog;

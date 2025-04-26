@@ -226,6 +226,18 @@ const IdleDetection = {
             // Přímé otevření dialogu virtuální práce
             if (typeof VirtualWork !== 'undefined') {
                 console.log('Otevírání dialogu virtuální práce...');
+                console.log('VirtualWork je definován:', !!VirtualWork);
+                console.log('VirtualWork.openWorkDialog je definován:', typeof VirtualWork.openWorkDialog === 'function');
+
+                // Kontrola, zda existuje dialog virtuální práce
+                const existingDialog = document.querySelector('.virtual-work-dialog');
+                console.log('Existující dialog virtuální práce:', !!existingDialog);
+
+                // Pokud existuje dialog, odstraníme ho
+                if (existingDialog) {
+                    console.log('Odstraňuji existující dialog virtuální práce');
+                    existingDialog.remove();
+                }
 
                 // Uložení úkolů z nabídky práce do VirtualWork
                 VirtualWork.customTasks = work.tasks.map((task, index) => ({
@@ -233,16 +245,27 @@ const IdleDetection = {
                     text: task,
                     completed: false
                 }));
+                console.log('Úkoly byly uloženy do VirtualWork.customTasks:', VirtualWork.customTasks);
 
-                // Přímé otevření dialogu s výběrem typu práce, přeskočení kontroly nedokončených prací
-                VirtualWork.openWorkDialog(null, null, true);
+                // Přímé vytvoření a zobrazení dialogu s výběrem typu práce
+                console.log('Volám VirtualWork.openWorkDialog(null, null, true)');
 
-                console.log('Dialog virtuální práce byl otevřen');
+                // Použití setTimeout pro zajištění, že se dialog otevře až po dokončení aktuálního cyklu událostí
+                setTimeout(() => {
+                    try {
+                        VirtualWork.openWorkDialog(null, null, true);
+                        console.log('Dialog virtuální práce byl otevřen');
+                    } catch (innerError) {
+                        console.error('Chyba při otevírání dialogu virtuální práce v setTimeout:', innerError);
+                    }
+                }, 100);
             } else if (typeof SimpleWorkDialog !== 'undefined') {
                 // Záložní řešení - použití jednoduchého dialogu práce
+                console.log('VirtualWork není definován, používám SimpleWorkDialog');
                 SimpleWorkDialog.showWorkDialog(work);
             } else {
                 // Záložní řešení - použití vlastní simulace práce
+                console.log('VirtualWork ani SimpleWorkDialog nejsou definovány, používám vlastní simulaci práce');
                 this.simulateWork(work);
             }
         } catch (error) {
