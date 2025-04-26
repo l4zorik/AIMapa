@@ -15,6 +15,8 @@ class VirtualWorkClass {
         // Stav pro chat
         this.waitingForProjectName = false;
         this.projectNameDialog = null;
+        // Příznak přeskočení kontroly nedokončených prací
+        this._skipSavedWorkCheck = false;
         this.workplaces = [
             {
                 id: 'office1',
@@ -531,6 +533,11 @@ class VirtualWorkClass {
         // Event listener pro tlačítko zpět
         const backBtn = dialog.querySelector('#back-to-workplaces-btn');
         backBtn.addEventListener('click', () => {
+            console.log('Kliknuto na tlačítko "Zpět na výběr práce"');
+
+            // Nastavení příznaku přeskočení kontroly nedokončených prací
+            this._skipSavedWorkCheck = true;
+
             // Aktualizace titulku dialogu
             dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
 
@@ -613,15 +620,11 @@ class VirtualWorkClass {
 
     /**
      * Zavření dialogu
+     * @deprecated Použijte místo toho metodu closeDialog na konci souboru
      */
-    closeDialog(dialog) {
-        // Odstranění markerů úkolů z mapy
-        this.removeTaskMarkersFromMap();
-
-        // Odstranění dialogu
-        if (dialog && dialog.parentNode) {
-            dialog.parentNode.removeChild(dialog);
-        }
+    _legacyCloseDialog(dialog) {
+        console.warn('Používáte zastaralou metodu _legacyCloseDialog, použijte místo toho metodu closeDialog');
+        this.closeDialog(dialog);
     }
 
     /**
@@ -661,15 +664,27 @@ class VirtualWorkClass {
      * @param {HTMLElement} dialog - Existující dialog, který chceme aktualizovat
      */
     updateWorkDialog(dialog) {
+        console.log('Aktualizace dialogu virtuální práce');
+
         // Kontrola, zda existují uložené nedokončené práce
         const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
         const hasSavedWork = savedWork.length > 0;
 
-        // Pokud existuje nedokončená práce, rovnou ji zobrazíme
-        if (hasSavedWork) {
+        // Aktualizace titulku dialogu
+        const dialogTitle = dialog.querySelector('.virtual-work-header h2');
+        if (dialogTitle) {
+            dialogTitle.textContent = 'Virtuální práce';
+        }
+
+        // Pokud existuje nedokončená práce a nejsme v režimu přeskočení kontroly, rovnou ji zobrazíme
+        if (hasSavedWork && !this._skipSavedWorkCheck) {
+            console.log('Zobrazuji dialog s nedokončenými pracemi');
             this.showSavedWorkDialog(dialog);
             return;
         }
+
+        // Resetování příznaku přeskočení kontroly
+        this._skipSavedWorkCheck = false;
 
         // Aktualizace obsahu dialogu
         dialog.querySelector('.virtual-work-content').innerHTML = `
@@ -787,6 +802,9 @@ class VirtualWorkClass {
         const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
         const hasSavedWork = savedWork.length > 0;
         console.log('Existují nedokončené práce:', hasSavedWork, 'počet:', savedWork.length);
+
+        // Nastavení příznaku přeskočení kontroly nedokončených prací
+        this._skipSavedWorkCheck = skipSavedWorkCheck;
 
         // Pokud existuje nedokončená práce a nemáme přeskočit kontrolu, rovnou ji zobrazíme
         if (hasSavedWork && !skipSavedWorkCheck) {
@@ -2862,6 +2880,28 @@ class VirtualWorkClass {
                 }
             }, 100);
         });
+    }
+
+    /**
+     * Zavření dialogu virtuální práce
+     * @param {HTMLElement} dialog - Dialog, který má být zavřen
+     */
+    closeDialog(dialog) {
+        console.log('Zavírání dialogu virtuální práce');
+
+        // Animace zavření
+        dialog.classList.add('closing');
+
+        // Odstranění dialogu po dokončení animace
+        setTimeout(() => {
+            dialog.remove();
+
+            // Resetování stavu nečinnosti, aby se mohla zobrazit nabídka práce
+            if (typeof IdleDetection !== 'undefined') {
+                console.log('Resetování stavu nečinnosti po zavření dialogu virtuální práce');
+                IdleDetection.resetIdleState();
+            }
+        }, 300);
     }
 
     /**

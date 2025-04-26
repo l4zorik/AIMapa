@@ -75,6 +75,25 @@ const IdleDetection = {
         }
     },
 
+    // Resetování stavu nečinnosti
+    resetIdleState() {
+        console.log('Resetování stavu nečinnosti');
+
+        // Aktualizace času poslední aktivity
+        this.state.lastActivity = Date.now();
+
+        // Resetování stavu nečinnosti
+        this.state.isIdle = false;
+
+        // Skrytí nabídky práce, pokud je zobrazena
+        this.hideWorkOffer();
+
+        // Resetování příznaku zobrazení nabídky práce
+        this.state.workOfferShown = false;
+
+        console.log('Stav nečinnosti byl resetován');
+    },
+
     // Spuštění časovače pro kontrolu nečinnosti
     startIdleTimer() {
         // Zrušení existujícího časovače
@@ -93,8 +112,11 @@ const IdleDetection = {
         const now = Date.now();
         const idleTime = now - this.state.lastActivity;
 
-        // Pokud je uživatel nečinný déle než nastavený čas a není již zobrazena nabídka práce
-        if (idleTime >= this.config.idleTime && !this.state.isIdle && !this.state.workOfferShown) {
+        // Kontrola, zda je otevřený dialog virtuální práce
+        const virtualWorkDialogOpen = document.querySelector('.virtual-work-dialog') !== null;
+
+        // Pokud je uživatel nečinný déle než nastavený čas, není již zobrazena nabídka práce a není otevřený dialog virtuální práce
+        if (idleTime >= this.config.idleTime && !this.state.isIdle && !this.state.workOfferShown && !virtualWorkDialogOpen) {
             this.state.isIdle = true;
             this.state.idleCount++;
             console.log('Uživatel je nečinný');
