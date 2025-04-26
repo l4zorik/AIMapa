@@ -116,6 +116,134 @@
     color: var(--text-color-dark);
 }
 
+.simple-work-task-selection {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.simple-work-task-selection label {
+    font-weight: bold;
+    color: var(--text-color);
+    margin-right: 5px;
+}
+
+.simple-work-task-selector {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    min-width: 200px;
+}
+
+.simple-work-show-task-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.simple-work-show-task-btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.simple-work-task-detail {
+    margin-bottom: 20px;
+    background-color: var(--bg-light);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.simple-work-task-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.simple-work-task-description {
+    margin-bottom: 15px;
+}
+
+.simple-work-task-description p {
+    margin: 0;
+    color: var(--text-color-dark);
+}
+
+.simple-work-task-steps {
+    margin-bottom: 20px;
+}
+
+.simple-work-task-step {
+    display: flex;
+    margin-bottom: 12px;
+    align-items: flex-start;
+}
+
+.simple-work-task-step-number {
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.simple-work-task-step-text {
+    flex: 1;
+    color: var(--text-color);
+}
+
+.simple-work-task-notes {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    border-left: 3px solid var(--primary-color);
+    padding: 10px 15px;
+    border-radius: 0 5px 5px 0;
+}
+
+.simple-work-task-notes h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.simple-work-task-notes p {
+    margin: 0;
+    color: var(--text-color-dark);
+    font-size: 0.9rem;
+}
+
+.simple-work-back-btn {
+    background-color: var(--bg-dark);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.simple-work-back-btn:hover {
+    background-color: var(--border-color);
+}
+
 .simple-work-tasks {
     margin-bottom: 20px;
 }
