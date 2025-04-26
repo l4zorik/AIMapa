@@ -1458,11 +1458,64 @@ class VirtualWorkClass {
         // Event listener pro tlačítko zpět
         const backBtn = dialog.querySelector('#back-to-workplaces-btn');
         backBtn.addEventListener('click', () => {
-            // Aktualizace titulku dialogu
-            dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+            // Kontrola, zda existují nějaké úkoly nebo práce byla zahájena
+            if (this.customTasks.length > 0) {
+                // Zobrazení dialogu s možnostmi
+                const confirmDialog = confirm('Chcete uložit rozdělanou práci a vrátit se později? Pokud kliknete na "Zrušit", vrátíte se na výběr práce bez uložení a budete muset začít znovu.');
 
-            // Místo vytváření nového dialogu aktualizujeme stávající
-            this.updateWorkDialog(dialog);
+                if (confirmDialog) {
+                    // Uživatel chce uložit práci
+                    console.log('Ukládám rozdělanou práci před návratem na výběr práce');
+
+                    // Získání času začátku práce
+                    const startTime = new Date(dialog.getAttribute('data-start-time') || new Date());
+
+                    // Uložení aktuálního stavu práce
+                    this.saveWorkProgress(dialog, this.selectedWorkplace, startTime);
+
+                    // Přidání aktivity do logu
+                    const activityLog = dialog.querySelector('.work-activity-log');
+                    if (activityLog) {
+                        activityLog.innerHTML = `<div class="work-activity-item new-activity">Práce uložena. Můžete se k ní vrátit později.</div>` + activityLog.innerHTML;
+                    }
+
+                    // Zobrazení notifikace o uložení
+                    this.showSavedWorkNotification(this.selectedWorkplace);
+
+                    // Krátká prodleva před přesměrováním
+                    setTimeout(() => {
+                        // Aktualizace titulku dialogu
+                        dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+
+                        // Místo vytváření nového dialogu aktualizujeme stávající
+                        this.updateWorkDialog(dialog);
+                    }, 500);
+                } else {
+                    // Uživatel nechce uložit práci, vrátíme se na výběr práce
+                    console.log('Návrat na výběr práce bez uložení');
+
+                    // Nastavení příznaku přeskočení kontroly nedokončených prací
+                    this._skipSavedWorkCheck = true;
+
+                    // Aktualizace titulku dialogu
+                    dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+
+                    // Místo vytváření nového dialogu aktualizujeme stávající
+                    this.updateWorkDialog(dialog);
+                }
+            } else {
+                // Žádné úkoly, můžeme se vrátit bez dotazu
+                console.log('Návrat na výběr práce (žádné úkoly k uložení)');
+
+                // Nastavení příznaku přeskočení kontroly nedokončených prací
+                this._skipSavedWorkCheck = true;
+
+                // Aktualizace titulku dialogu
+                dialog.querySelector('.virtual-work-header h2').textContent = 'Virtuální práce';
+
+                // Místo vytváření nového dialogu aktualizujeme stávající
+                this.updateWorkDialog(dialog);
+            }
         });
 
         // Získání referencí na elementy
