@@ -12,6 +12,9 @@ class VirtualWorkClass {
         // Informace o projektu
         this.projectName = null;
         this.projectInfo = {};
+        // Stav pro chat
+        this.waitingForProjectName = false;
+        this.projectNameDialog = null;
         this.workplaces = [
             {
                 id: 'office1',
@@ -2000,40 +2003,73 @@ class VirtualWorkClass {
      * Obsluha tlačítka pojmenovat projekt
      */
     handleNameProject(dialog) {
+        // Nastavení stavu čekání na odpověď
+        this.waitingForProjectName = true;
+        this.projectNameDialog = dialog;
+
+        // Odeslání zprávy do chatu s otázkou na název projektu
+        if (typeof addMessage === 'function') {
+            const currentName = this.projectName ? ` (aktuální název: "${this.projectName}")` : '';
+            addMessage(`Jak chcete pojmenovat váš projekt${currentName}?`, false);
+        } else {
+            console.error('Funkce addMessage není dostupná');
+            // Fallback na standardní dialog, pokud není dostupná funkce addMessage
+            this.handleProjectNameFallback(dialog);
+        }
+    }
+
+    /**
+     * Fallback metoda pro pojmenování projektu pomocí standardního dialogu
+     */
+    handleProjectNameFallback(dialog) {
         // Zobrazení dialogu pro zadání názvu projektu
         const projectName = prompt('Zadejte název projektu:', this.projectName || '');
 
         if (projectName !== null) {
-            // Uložení názvu projektu
-            this.projectName = projectName.trim();
+            this.setProjectName(projectName.trim(), dialog);
+        }
+    }
 
-            // Uložení informací o projektu
-            this.projectInfo.name = this.projectName;
-            this.projectInfo.createdAt = this.projectInfo.createdAt || new Date().toISOString();
-            this.projectInfo.updatedAt = new Date().toISOString();
+    /**
+     * Nastavení názvu projektu
+     */
+    setProjectName(name, dialog) {
+        if (!name) return;
 
-            // Přidání informací o úkolech
-            this.projectInfo.tasks = [...this.customTasks];
+        // Uložení názvu projektu
+        this.projectName = name;
 
-            // Uložení do localStorage
-            this.saveProjectInfo();
+        // Uložení informací o projektu
+        this.projectInfo.name = this.projectName;
+        this.projectInfo.createdAt = this.projectInfo.createdAt || new Date().toISOString();
+        this.projectInfo.updatedAt = new Date().toISOString();
 
-            // Aktualizace UI
-            this.updateTasksChecklistUI(dialog);
+        // Přidání informací o úkolech
+        this.projectInfo.tasks = [...this.customTasks];
 
-            // Přidání aktivity do logu
-            const activityLog = dialog.querySelector('.work-activity-log');
-            if (activityLog) {
-                activityLog.innerHTML = `<div class="work-activity-item new-activity">Projekt byl pojmenován: ${this.projectName}</div>` + activityLog.innerHTML;
+        // Uložení do localStorage
+        this.saveProjectInfo();
 
-                // Odstranění třídy new-activity po animaci
-                setTimeout(() => {
-                    const newActivity = activityLog.querySelector('.new-activity');
-                    if (newActivity) {
-                        newActivity.classList.remove('new-activity');
-                    }
-                }, 1000);
-            }
+        // Aktualizace UI
+        this.updateTasksChecklistUI(dialog);
+
+        // Přidání aktivity do logu
+        const activityLog = dialog.querySelector('.work-activity-log');
+        if (activityLog) {
+            activityLog.innerHTML = `<div class="work-activity-item new-activity">Projekt byl pojmenován: ${this.projectName}</div>` + activityLog.innerHTML;
+
+            // Odstranění třídy new-activity po animaci
+            setTimeout(() => {
+                const newActivity = activityLog.querySelector('.new-activity');
+                if (newActivity) {
+                    newActivity.classList.remove('new-activity');
+                }
+            }, 1000);
+        }
+
+        // Odeslání potvrzení do chatu
+        if (typeof addMessage === 'function') {
+            addMessage(`Projekt byl úspěšně pojmenován: "${this.projectName}"`, false);
         }
     }
 

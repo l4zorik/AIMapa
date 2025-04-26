@@ -1717,6 +1717,16 @@ function processMessage(message) {
     // Přidání zprávy uživatele do chatu
     addMessage(message, true);
 
+    // Kontrola, zda čekáme na název projektu ve virtuální práci
+    if (VirtualWork && VirtualWork.waitingForProjectName && VirtualWork.projectNameDialog) {
+        // Zpracování názvu projektu
+        VirtualWork.setProjectName(message, VirtualWork.projectNameDialog);
+        // Resetování stavu
+        VirtualWork.waitingForProjectName = false;
+        VirtualWork.projectNameDialog = null;
+        return;
+    }
+
     // Menu příkazů bylo odstraněno
 
     // Simulace odpovědi AI s návrhy dalších akcí

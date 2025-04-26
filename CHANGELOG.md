@@ -2,6 +2,13 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.6.3] - 2025-06-28 - POJMENOVÁNÍ PROJEKTU PŘES CHAT
+
+### Nové funkce
+- Implementována možnost pojmenovat projekt přes chatové rozhraní
+- Přidána interakce s AI asistentem pro zadání názvu projektu
+- Přidáno potvrzení o úspěšném pojmenování projektu v chatu
+
 ## [0.3.6.2] - 2025-06-27 - SPRÁVA PROJEKTŮ VE VIRTUÁLNÍ PRÁCI
 
 ### Nové funkce
