@@ -974,6 +974,35 @@ Email: podatelna@ho.mpsv.cz`;
             return true;
         }
 
+        // Příkaz pro achievementy
+        if (command === 'achievementy') {
+            if (typeof Achievements !== 'undefined') {
+                // Inicializace modulu achievementů, pokud ještě nebyl inicializován
+                if (!Achievements.isInitialized) {
+                    Achievements.init();
+                }
+
+                // Zobrazení dialogu achievementů
+                Achievements.showAchievementsDialog();
+
+                // Zobrazení informace o achievementech
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Zobrazuji achievementy...', false);
+                    setTimeout(() => {
+                        addMessage(`Máte dokončeno ${Achievements.getCompletedCount()} z ${Achievements.getTotalCount()} achievementů (${Achievements.getCompletionPercentage()}%).`, false);
+                    }, 1000);
+                }
+            } else {
+                if (typeof addMessage !== 'undefined') {
+                    addMessage('Načítám modul achievementů...', false);
+                    setTimeout(() => {
+                        addMessage('Modul achievementů není dostupný. Zkuste obnovit stránku.', false);
+                    }, 1000);
+                }
+            }
+            return true;
+        }
+
         // Příkaz pro systém odměn
         if (command === 'odměňovací systém') {
             // Nejprve obnovíme menu, aby se zobrazily všechny aktuální položky
