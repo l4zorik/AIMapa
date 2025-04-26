@@ -1,6 +1,6 @@
 /**
  * Modul pro sledování postupu uživatele, XP a achievementů
- * Verze 0.2.8.6.6
+ * Verze 0.3.8.0
  */
 
 const UserProgress = {
@@ -53,6 +53,11 @@ const UserProgress = {
             work: 0,       // Práce a úkoly
             assistants: 0, // Asistenti a služby
             entertainment: 0, // Zábava
+            crypto: 0,     // Kryptoměny
+            finance: 0,    // Finance
+            social: 0,     // Sociální interakce
+            learning: 0,   // Vzdělávání
+            health: 0,     // Zdraví a fitness
             other: 0       // Ostatní
         },
         byTimeframe: {
@@ -60,6 +65,16 @@ const UserProgress = {
             thisWeek: 0,
             thisMonth: 0,
             allTime: 0
+        },
+        // Nové statistiky pro detailnější analýzu
+        byActivity: {
+            mapInteractions: 0,  // Interakce s mapou (kliknutí, přiblížení, atd.)
+            chatMessages: 0,     // Zprávy v chatu
+            commandsUsed: 0,     // Použité příkazy
+            achievementsEarned: 0, // Získané achievementy
+            questsCompleted: 0,  // Dokončené questy
+            workCompleted: 0,    // Dokončená práce
+            idleTimeReduced: 0   // XP za redukci nečinnosti
         }
     },
 
@@ -128,7 +143,22 @@ const UserProgress = {
         // Achievementy za vyhledávání spojení veřejnou dopravou
         'transport-user': { title: 'Cestovatel', description: 'Vyhledali jste spojení veřejnou dopravou', icon: '🚏', xpReward: 15 },
         'transport-regular': { title: 'Pravidelný cestující', description: 'Vyhledali jste spojení veřejnou dopravou 5krát', icon: '🚆', xpReward: 30 },
-        'transport-expert': { title: 'Expert na jízdní řády', description: 'Vyhledali jste spojení veřejnou dopravou 20krát', icon: '🚇', xpReward: 50 }
+        'transport-expert': { title: 'Expert na jízdní řády', description: 'Vyhledali jste spojení veřejnou dopravou 20krát', icon: '🚇', xpReward: 50 },
+
+        // Nové achievementy za práci s kryptoměnami
+        'crypto-beginner': { title: 'Krypto začátečník', description: 'Zobrazili jste si stav kryptoměn', icon: '₿', xpReward: 15 },
+        'crypto-investor': { title: 'Krypto investor', description: 'Provedli jste první transakci s kryptoměnou', icon: '₿', xpReward: 30 },
+        'crypto-trader': { title: 'Krypto trader', description: 'Provedli jste 5 transakcí s kryptoměnami', icon: '₿', xpReward: 50 },
+        'crypto-whale': { title: 'Krypto velryba', description: 'Vlastníte kryptoměny v hodnotě přes 100 000 Kč', icon: '₿', xpReward: 100 },
+        'eth-holder': { title: 'ETH držitel', description: 'Vlastníte Ethereum', icon: 'Ξ', xpReward: 20 },
+        'doge-fan': { title: 'DOGE fanoušek', description: 'Vlastníte Dogecoin', icon: '🐕', xpReward: 20 },
+        'xrp-supporter': { title: 'XRP podporovatel', description: 'Vlastníte XRP', icon: '✘', xpReward: 20 },
+
+        // Nové achievementy za aktivitu a redukci nečinnosti
+        'active-user': { title: 'Aktivní uživatel', description: 'Používali jste aplikaci bez nečinnosti po dobu 10 minut', icon: '⚡', xpReward: 20 },
+        'productivity-master': { title: 'Mistr produktivity', description: 'Reagovali jste na 5 nabídek práce při nečinnosti', icon: '⏱️', xpReward: 40 },
+        'time-optimizer': { title: 'Optimalizátor času', description: 'Dokončili jste 10 úkolů nabídnutých při nečinnosti', icon: '⏱️', xpReward: 60 },
+        'efficiency-expert': { title: 'Expert na efektivitu', description: 'Získali jste 500 XP za redukci nečinnosti', icon: '⏱️', xpReward: 100 }
     },
 
     // Inicializace modulu

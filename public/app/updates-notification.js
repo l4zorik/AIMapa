@@ -1,14 +1,32 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 1.0.0
+ * Verze 0.3.8.0
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '1.0.0',
+    currentVersion: '0.3.8.0',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.8.0',
+            date: '2025-07-05',
+            title: 'Vylepšení systému XP a detekce nečinnosti',
+            description: 'Rozšíření systému XP a přidání funkce nabídky práce při nečinnosti uživatele',
+            changes: [
+                'Rozšíření systému XP o nové kategorie a způsoby získávání XP',
+                'Implementace detekce nečinnosti uživatele (5 sekund)',
+                'Přidání nabídky práce při nečinnosti uživatele',
+                'Vylepšení zobrazení stavu financí s kryptoměnami',
+                'Přidání nových kryptoměn do finančního přehledu (ETH, DOGE, XRP)',
+                'Implementace automatické aktualizace kurzů kryptoměn',
+                'Přidání nových achievementů za práci s kryptoměnami',
+                'Vylepšení vizuálního zobrazení XP a úrovní',
+                'Optimalizace výkonu při získávání XP',
+                'Přidání nových kategorií XP pro detailnější statistiky'
+            ]
+        },
         {
             version: '1.0.0',
             date: '2025-07-01',

@@ -1,0 +1,184 @@
+/**
+ * Styly pro modul zobrazení stavu financí s kryptoměnami
+ * Verze 0.3.8.0
+ */
+
+/* Tlačítko pro zobrazení stavu financí */
+.finance-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 900;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.finance-button:hover {
+    transform: scale(1.1);
+    background-color: var(--primary-color-dark);
+}
+
+.finance-button-icon {
+    font-size: 1.5rem;
+}
+
+/* Okno s financemi */
+.finance-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 350px;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    overflow: hidden;
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.finance-window.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+.finance-window-header {
+    background-color: var(--primary-color);
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+}
+
+.finance-window-title {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+}
+
+.finance-window-title .icon {
+    font-size: 1.3rem;
+}
+
+.finance-window-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.finance-window-content {
+    padding: 15px;
+}
+
+.finance-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background-color: var(--bg-light);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.finance-item:hover {
+    transform: translateY(-2px);
+    background-color: var(--bg-dark);
+}
+
+.finance-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 1.3rem;
+}
+
+.crypto-icon {
+    background-color: #f7931a; /* Bitcoin oranžová */
+}
+
+.finance-item:nth-child(3) .crypto-icon {
+    background-color: #627eea; /* Ethereum modrá */
+}
+
+.finance-item:nth-child(4) .crypto-icon {
+    background-color: #c3a634; /* Dogecoin žlutá */
+}
+
+.finance-item:nth-child(5) .crypto-icon {
+    background-color: #23292f; /* XRP tmavě šedá */
+}
+
+.finance-info {
+    flex: 1;
+}
+
+.finance-name {
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 3px;
+}
+
+.finance-amount {
+    color: var(--text-color-dark);
+    font-size: 0.9rem;
+}
+
+.finance-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    color: white;
+    margin-top: 15px;
+}
+
+.finance-total-label {
+    font-weight: bold;
+}
+
+.finance-total-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+    .finance-button {
+        bottom: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+    }
+
+    .finance-window {
+        width: 90vw;
+        max-width: 350px;
+    }
+}

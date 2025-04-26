@@ -2,6 +2,27 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.8.0] - 2025-07-05 - VYLEPŠENÍ SYSTÉMU XP A DETEKCE NEČINNOSTI
+
+### Nové funkce
+- Rozšíření systému XP o nové kategorie a způsoby získávání XP
+- Implementace detekce nečinnosti uživatele (5 sekund)
+- Přidání nabídky práce při nečinnosti uživatele
+- Vylepšení zobrazení stavu financí s kryptoměnami
+- Přidání nových kryptoměn do finančního přehledu (ETH, DOGE, XRP)
+
+### Vylepšení
+- Implementace automatické aktualizace kurzů kryptoměn
+- Přidání nových achievementů za práci s kryptoměnami
+- Vylepšení vizuálního zobrazení XP a úrovní
+- Optimalizace výkonu při získávání XP
+- Přidání nových kategorií XP pro detailnější statistiky
+
+### Opravy
+- Opraveno zobrazení stavu financí na mobilních zařízeních
+- Vylepšena kompatibilita s různými prohlížeči
+- Opraveny drobné chyby v systému XP
+
 ## [1.0.0] - 2025-07-01 - PRVNÍ OFICIÁLNÍ RELEASE
 
 ### Hlavní funkce
