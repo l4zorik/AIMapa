@@ -220,10 +220,10 @@ const IdleDetection = {
         // Kontrola achievementu za přijetí nabídky práce
         this.checkWorkAchievements();
 
-        // Kontrola, zda existuje modul VirtualWork
-        if (typeof VirtualWork !== 'undefined') {
-            // Propojení s existujícím systémem virtuální práce
-            this.integrateWithVirtualWork(work);
+        // Použití jednoduchého dialogu práce
+        if (typeof SimpleWorkDialog !== 'undefined') {
+            // Zobrazení jednoduchého dialogu práce
+            SimpleWorkDialog.showWorkDialog(work);
         } else {
             // Záložní řešení - použití vlastní simulace práce
             this.simulateWork(work);
