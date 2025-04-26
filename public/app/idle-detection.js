@@ -234,10 +234,39 @@ const IdleDetection = {
                     completed: false
                 }));
 
-                // Přímé otevření dialogu virtuální práce - stejný dialog jako v menu příkazů
-                VirtualWork.openWorkDialog();
+                // Simulace kliknutí na tlačítko virtuální práce v mapě
+                const virtualWorkBtn = document.querySelector('#virtual-work-btn');
+                if (virtualWorkBtn) {
+                    // Přímé kliknutí na tlačítko
+                    virtualWorkBtn.click();
+                    console.log('Kliknuto na tlačítko virtuální práce');
+                } else {
+                    // Pokud tlačítko neexistuje, vytvoříme ho a klikneme na něj
+                    console.log('Tlačítko virtuální práce neexistuje, vytvářím ho...');
 
-                console.log('Dialog virtuální práce byl otevřen');
+                    // Vytvoření tlačítka
+                    const btn = document.createElement('button');
+                    btn.id = 'virtual-work-btn';
+                    btn.className = 'map-control-btn';
+                    btn.innerHTML = '💼';
+                    btn.title = 'Virtuální práce';
+
+                    // Přidání event listeneru
+                    btn.addEventListener('click', () => {
+                        VirtualWork.openWorkDialog();
+                    });
+
+                    // Přidání tlačítka do dokumentu (dočasně)
+                    document.body.appendChild(btn);
+
+                    // Kliknutí na tlačítko
+                    btn.click();
+
+                    // Odstranění tlačítka
+                    setTimeout(() => {
+                        btn.remove();
+                    }, 100);
+                }
             } else if (typeof SimpleWorkDialog !== 'undefined') {
                 // Záložní řešení - použití jednoduchého dialogu práce
                 SimpleWorkDialog.showWorkDialog(work);
