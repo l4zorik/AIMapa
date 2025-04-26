@@ -758,6 +758,39 @@ const CommandsMenu = {
             return true;
         }
 
+        // Služby bydlení
+        if (command === 'bydlení' && typeof HousingServices !== 'undefined') {
+            if (!HousingServices.isInitialized) {
+                HousingServices.init();
+            }
+            HousingServices.showService('rent');
+            return true;
+        }
+
+        if (command === 'pronájem' && typeof HousingServices !== 'undefined') {
+            if (!HousingServices.isInitialized) {
+                HousingServices.init();
+            }
+            HousingServices.showService('rent');
+            return true;
+        }
+
+        if ((command === 'prodej nemovitostí' || command === 'prodej') && typeof HousingServices !== 'undefined') {
+            if (!HousingServices.isInitialized) {
+                HousingServices.init();
+            }
+            HousingServices.showService('sale');
+            return true;
+        }
+
+        if (command === 'spolubydlení' && typeof HousingServices !== 'undefined') {
+            if (!HousingServices.isInitialized) {
+                HousingServices.init();
+            }
+            HousingServices.showService('roommates');
+            return true;
+        }
+
         // Ostatní příkazy
         if (command === 'tmavý režim') {
             const darkModeToggle = document.getElementById('darkModeToggle');
