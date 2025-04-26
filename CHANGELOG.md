@@ -8,6 +8,7 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Rozšíření systému XP o nové kategorie a způsoby získávání XP
 - Implementace detekce nečinnosti uživatele (5 sekund)
 - Přidání nabídky práce při nečinnosti uživatele
+- Propojení nabídky práce s dialogem nedokončených prací
 - Vylepšení zobrazení stavu financí s kryptoměnami
 - Přidání nových kryptoměn do finančního přehledu (ETH, DOGE, XRP)
 
