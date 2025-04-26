@@ -67,6 +67,24 @@
     color: var(--text-color-dark);
 }
 
+.work-offer-notification {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    border-left: 3px solid var(--primary-color);
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+}
+
+.work-offer-notification .icon {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
 .work-offer-details {
     display: flex;
     flex-wrap: wrap;

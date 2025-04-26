@@ -67,10 +67,8 @@ const IdleDetection = {
             this.state.isIdle = false;
             console.log('Uživatel je opět aktivní');
 
-            // Skrytí nabídky práce, pokud byla zobrazena
-            if (this.state.workOfferShown) {
-                this.hideWorkOffer();
-            }
+            // Nabídka práce zůstává zobrazená i po ukončení nečinnosti
+            // Uživatel ji musí explicitně zavřít nebo přijmout
         }
     },
 
@@ -92,8 +90,8 @@ const IdleDetection = {
         const now = Date.now();
         const idleTime = now - this.state.lastActivity;
 
-        // Pokud je uživatel nečinný déle než nastavený čas
-        if (idleTime >= this.config.idleTime && !this.state.isIdle) {
+        // Pokud je uživatel nečinný déle než nastavený čas a není již zobrazena nabídka práce
+        if (idleTime >= this.config.idleTime && !this.state.isIdle && !this.state.workOfferShown) {
             this.state.isIdle = true;
             this.state.idleCount++;
             console.log('Uživatel je nečinný');
@@ -130,6 +128,9 @@ const IdleDetection = {
                 <button class="work-offer-close">&times;</button>
             </div>
             <div class="work-offer-content">
+                <div class="work-offer-notification">
+                    <i class="icon">ℹ️</i> Tato nabídka zůstane zobrazena, dokud ji nepřijmete nebo nezavřete.
+                </div>
                 <h3>${work.title}</h3>
                 <p>${work.description}</p>
                 <div class="work-offer-details">
@@ -363,7 +364,7 @@ const IdleDetection = {
         // Přidání XP za dokončení práce
         if (typeof UserProgress !== 'undefined') {
             UserProgress.addExperience(work.xpReward, `Dokončení práce: ${work.title}`, 'work');
-            
+
             // Přidání XP do statistiky za redukci nečinnosti
             UserProgress.xpStats.byActivity.idleTimeReduced += work.xpReward;
             UserProgress.saveProgress();
