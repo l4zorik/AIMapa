@@ -1,6 +1,6 @@
 /**
  * Jednoduchý modul pro virtuální práci
- * Verze 0.3.5.7
+ * Verze 0.3.8.0
  */
 
 class VirtualWorkClass {
@@ -759,10 +759,17 @@ class VirtualWorkClass {
 
     /**
      * Otevření dialogu virtuální práce
+     * @param {Object} workplace - Volitelný parametr pro otevření dialogu s předvybraným pracovištěm
+     * @param {HTMLElement} existingDialog - Volitelný parametr pro použití existujícího dialogu
      */
-    openWorkDialog() {
-        // Kontrola, zda je dialog již otevřený
-        if (document.querySelector('.virtual-work-dialog')) return;
+    openWorkDialog(workplace, existingDialog) {
+        // Kontrola, zda je dialog již otevřený a není předán existující dialog
+        if (!existingDialog && document.querySelector('.virtual-work-dialog')) return;
+
+        // Pokud je předáno pracoviště, nastavíme ho jako vybrané
+        if (workplace) {
+            this.selectedWorkplace = workplace;
+        }
 
         // Kontrola, zda existují uložené nedokončené práce
         const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
@@ -774,8 +781,11 @@ class VirtualWorkClass {
             return;
         }
 
-        // Vytvoření dialogu
-        const dialog = document.createElement('div');
+        // Použití existujícího dialogu nebo vytvoření nového
+        let dialog = existingDialog;
+        if (!dialog) {
+            dialog = document.createElement('div');
+        }
         dialog.className = 'virtual-work-dialog';
         dialog.innerHTML = `
             <div class="virtual-work-header">
@@ -863,8 +873,10 @@ class VirtualWorkClass {
             </div>
         `;
 
-        // Přidání dialogu do stránky
-        document.body.appendChild(dialog);
+        // Přidání dialogu do stránky, pokud ještě není přidán
+        if (!dialog.parentNode) {
+            document.body.appendChild(dialog);
+        }
 
         // Přidání event listenerů
         this.setupDialogEvents(dialog);

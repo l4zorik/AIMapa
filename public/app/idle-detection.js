@@ -215,8 +215,65 @@ const IdleDetection = {
         // Kontrola achievementu za přijetí nabídky práce
         this.checkWorkAchievements();
 
-        // Simulace práce
-        this.simulateWork(work);
+        // Kontrola, zda existuje modul VirtualWork
+        if (typeof VirtualWork !== 'undefined') {
+            // Propojení s existujícím systémem virtuální práce
+            this.integrateWithVirtualWork(work);
+        } else {
+            // Záložní řešení - použití vlastní simulace práce
+            this.simulateWork(work);
+        }
+    },
+
+    // Propojení s existujícím systémem virtuální práce
+    integrateWithVirtualWork(work) {
+        console.log('Propojení s VirtualWork systémem...');
+
+        // Převod práce na formát kompatibilní s VirtualWork
+        const workplaceType = this.getWorkplaceTypeFromWork(work);
+
+        // Najít odpovídající pracoviště ve VirtualWork
+        const workplace = VirtualWork.workplaces.find(wp => wp.type === workplaceType) ||
+                          VirtualWork.workplaces[0]; // Použít první pracoviště jako zálohu
+
+        // Převod úkolů na formát kompatibilní s VirtualWork
+        const tasks = work.tasks.map((task, index) => ({
+            id: `task_${Date.now()}_${index}`,
+            title: task,
+            description: '',
+            completed: false,
+            priority: 'medium',
+            category: workplaceType,
+            createdAt: new Date().toISOString()
+        }));
+
+        // Nastavení úkolů ve VirtualWork
+        VirtualWork.customTasks = tasks;
+
+        // Otevření dialogu virtuální práce s vybraným pracovištěm
+        VirtualWork.openWorkDialog(workplace);
+
+        console.log('Práce byla předána do VirtualWork systému', {
+            workplace: workplace,
+            tasks: tasks
+        });
+    },
+
+    // Získání typu pracoviště z práce
+    getWorkplaceTypeFromWork(work) {
+        // Mapování typů prací na typy pracovišť ve VirtualWork
+        const workTypeMapping = {
+            'Analýza dat': 'office',
+            'Testování webové aplikace': 'programming',
+            'Překlad dokumentace': 'office',
+            'Návrh loga': 'creative',
+            'Správa sociálních sítí': 'office',
+            'Průzkum trhu': 'office',
+            'Optimalizace webu': 'programming',
+            'Psaní článku': 'office'
+        };
+
+        return workTypeMapping[work.title] || 'office'; // Výchozí typ je 'office'
     },
 
     // Simulace práce
