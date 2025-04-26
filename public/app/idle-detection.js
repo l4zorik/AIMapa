@@ -220,9 +220,36 @@ const IdleDetection = {
         // Kontrola achievementu za přijetí nabídky práce
         this.checkWorkAchievements();
 
-        // Použití jednoduchého dialogu práce
-        if (typeof SimpleWorkDialog !== 'undefined') {
-            // Zobrazení jednoduchého dialogu práce
+        // Použití VirtualWork pro zobrazení dialogu nedokončených prací
+        if (typeof VirtualWork !== 'undefined') {
+            // Kontrola, zda existují uložené nedokončené práce
+            const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
+
+            // Přidání nové práce do uložených prací
+            const newWork = {
+                id: `work_${Date.now()}`,
+                workplaceId: 'office1', // Výchozí pracoviště
+                name: work.title,
+                icon: '💼',
+                startTime: new Date().toISOString(),
+                elapsedTime: '0:00',
+                tasks: work.tasks.map((task, index) => ({
+                    id: `task_${Date.now()}_${index}`,
+                    text: task,
+                    completed: false
+                })),
+                date: new Date().toISOString(),
+                isCompleted: false
+            };
+
+            // Uložení práce do localStorage
+            savedWork.push(newWork);
+            localStorage.setItem('aiMapaSavedWork', JSON.stringify(savedWork));
+
+            // Zobrazení dialogu s nedokončenými pracemi
+            VirtualWork.showSavedWorkDialog();
+        } else if (typeof SimpleWorkDialog !== 'undefined') {
+            // Záložní řešení - použití jednoduchého dialogu práce
             SimpleWorkDialog.showWorkDialog(work);
         } else {
             // Záložní řešení - použití vlastní simulace práce
