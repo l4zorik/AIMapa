@@ -2,6 +2,14 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.6.4] - 2025-06-29 - PŘIDÁNÍ THC-X DO ODMĚŇOVACÍHO SYSTÉMU
+
+### Nové funkce
+- Přidána nová kategorie THC-X marihuana do odměňovacího systému
+- Implementovány čtyři varianty THC-X: Light, Medium, Strong a Premium
+- Přidáno získávání 60 XP za THC-X odměny
+- Implementováno ukládání historie THC-X odměn do localStorage
+
 ## [0.3.6.3] - 2025-06-28 - POJMENOVÁNÍ PROJEKTU PŘES CHAT
 
 ### Nové funkce

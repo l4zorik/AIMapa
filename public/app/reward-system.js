@@ -285,6 +285,44 @@ class RewardSystemClass {
                 value: 'Meditace',
                 description: 'Dopřejte si 15 minut meditace před spaním pro lepší kvalitu spánku.',
                 cost: 'Nízká'
+            },
+
+            // THC-X marihuana
+            {
+                id: 'thc-light',
+                name: 'THC-X Light',
+                type: 'thc',
+                icon: '🌿',
+                value: 'Light',
+                description: 'Lehká varianta THC-X marihuany pro mírnou relaxaci.',
+                cost: 'Nízká'
+            },
+            {
+                id: 'thc-medium',
+                name: 'THC-X Medium',
+                type: 'thc',
+                icon: '🌿🌿',
+                value: 'Medium',
+                description: 'Středně silná varianta THC-X marihuany pro dobrou relaxaci.',
+                cost: 'Střední'
+            },
+            {
+                id: 'thc-strong',
+                name: 'THC-X Strong',
+                type: 'thc',
+                icon: '🌿🌿🌿',
+                value: 'Strong',
+                description: 'Silná varianta THC-X marihuany pro intenzivní relaxaci.',
+                cost: 'Vysoká'
+            },
+            {
+                id: 'thc-premium',
+                name: 'THC-X Premium',
+                type: 'thc',
+                icon: '🌿✨',
+                value: 'Premium',
+                description: 'Prémiová varianta THC-X marihuany s nejvyšší kvalitou.',
+                cost: 'Velmi vysoká'
             }
         ];
     }
@@ -910,6 +948,7 @@ class RewardSystemClass {
                     <button class="category-btn" data-category="sweets">Sladkosti</button>
                     <button class="category-btn" data-category="gym">Posilovna</button>
                     <button class="category-btn" data-category="sleep">Spánek</button>
+                    <button class="category-btn" data-category="thc">THC-X</button>
                     <button class="category-btn" data-category="other">Ostatní</button>
                 </div>
 
@@ -1018,6 +1057,8 @@ class RewardSystemClass {
                 return `${reward.value} (+50 XP)`;
             case 'sleep':
                 return `${reward.value} (+40 XP)`;
+            case 'thc':
+                return `${reward.value} (+60 XP)`;
             default:
                 return reward.value;
         }
@@ -1148,6 +1189,23 @@ class RewardSystemClass {
                     date: new Date().toISOString()
                 });
                 localStorage.setItem('aiMapaSleepRewards', JSON.stringify(sleepRewards));
+                break;
+
+            case 'thc':
+                // Pro THC-X přidáme ještě více XP, protože je to relaxační
+                if (window.addXP) {
+                    window.addXP(60, `Odměna: ${reward.value} THC-X`);
+                }
+
+                // Uložíme do localStorage informaci o získané odměně
+                const thcRewards = JSON.parse(localStorage.getItem('aiMapaThcRewards') || '[]');
+                thcRewards.push({
+                    name: reward.name,
+                    value: reward.value,
+                    icon: reward.icon,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('aiMapaThcRewards', JSON.stringify(thcRewards));
                 break;
         }
 
