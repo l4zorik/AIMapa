@@ -305,7 +305,8 @@
     }
 }
 
-.work-simulation-complete.pulse {
+.work-simulation-complete.pulse,
+.virtual-work-btn.pulse {
     animation: pulse 1.5s infinite;
 }
 

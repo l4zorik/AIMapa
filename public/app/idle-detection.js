@@ -242,38 +242,195 @@ const IdleDetection = {
             const workplace = VirtualWork.workplaces.find(wp => wp.type === workplaceType) ||
                             VirtualWork.workplaces[0]; // Použít první pracoviště jako zálohu
 
-            // Převod úkolů na formát kompatibilní s VirtualWork
-            const tasks = work.tasks.map((task, index) => ({
-                id: `task_${Date.now()}_${index}`,
-                text: task, // Důležité: VirtualWork očekává 'text' místo 'title'
-                completed: false
-            }));
+            // Přímé předání úkolů do VirtualWork
+            VirtualWork.customTasks = [];
 
-            // Nastavení úkolů ve VirtualWork
-            VirtualWork.customTasks = tasks;
-
-            // Otevření dialogu virtuální práce s vybraným pracovištěm
+            // Přímé otevření dialogu virtuální práce s vybraným pracovištěm a úkoly
             setTimeout(() => {
                 // Použití setTimeout pro zajištění, že se dialog otevře až po dokončení aktuálního cyklu událostí
-                if (typeof VirtualWork.startWorkWithTasks === 'function') {
-                    // Pokud existuje metoda pro přímé spuštění práce s úkoly, použijeme ji
-                    const dialog = VirtualWork.createDialog('Virtuální práce');
-                    VirtualWork.startWorkWithTasks(dialog, workplace);
-                } else {
-                    // Jinak použijeme standardní metodu pro otevření dialogu
-                    VirtualWork.openWorkDialog(workplace);
+                try {
+                    // Vytvoření nového dialogu
+                    const dialog = document.createElement('div');
+                    dialog.className = 'virtual-work-dialog';
+                    dialog.innerHTML = `
+                        <div class="virtual-work-header">
+                            <div class="virtual-work-title">
+                                <i class="icon">${workplace.icon}</i> ${work.title}
+                            </div>
+                            <button class="virtual-work-close">&times;</button>
+                        </div>
+                        <div class="virtual-work-content">
+                            <div class="workplace-info">
+                                <div class="workplace-icon">${workplace.icon}</div>
+                                <div class="workplace-details">
+                                    <h3>${work.title}</h3>
+                                    <p>${work.description}</p>
+                                    <div class="workplace-stats">
+                                        <span class="workplace-pay">💰 ${work.reward} Kč</span>
+                                        <span class="workplace-xp">⭐ ${work.xpReward} XP</span>
+                                        <span class="workplace-duration">⏱️ ${work.duration} min</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="work-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-text">0%</div>
+                            </div>
+                            <div class="task-list">
+                                ${work.tasks.map((task, index) => `
+                                    <div class="task-item" data-task-id="task_${index}">
+                                        <input type="checkbox" id="task_${index}" class="task-checkbox">
+                                        <label for="task_${index}">${task}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="virtual-work-actions">
+                            <button class="virtual-work-btn secondary" id="virtual-work-cancel">Zrušit</button>
+                            <button class="virtual-work-btn primary" id="virtual-work-complete" disabled>Dokončit práci</button>
+                        </div>
+                    `;
+
+                    // Přidání dialogu do stránky
+                    document.body.appendChild(dialog);
+
+                    // Zobrazení dialogu
+                    setTimeout(() => {
+                        dialog.classList.add('show');
+                    }, 10);
+
+                    // Přidání event listeneru pro zavření dialogu
+                    const closeButton = dialog.querySelector('.virtual-work-close');
+                    if (closeButton) {
+                        closeButton.addEventListener('click', () => {
+                            dialog.classList.remove('show');
+                            setTimeout(() => {
+                                dialog.remove();
+                            }, 300);
+                        });
+                    }
+
+                    // Přidání event listeneru pro zrušení práce
+                    const cancelButton = dialog.querySelector('#virtual-work-cancel');
+                    if (cancelButton) {
+                        cancelButton.addEventListener('click', () => {
+                            dialog.classList.remove('show');
+                            setTimeout(() => {
+                                dialog.remove();
+                            }, 300);
+                        });
+                    }
+
+                    // Přidání event listenerů pro checkboxy úkolů
+                    const taskCheckboxes = dialog.querySelectorAll('.task-checkbox');
+                    taskCheckboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', () => {
+                            this.updateVirtualWorkProgress(dialog, work);
+                        });
+                    });
+
+                    // Přidání event listeneru pro dokončení práce
+                    const completeButton = dialog.querySelector('#virtual-work-complete');
+                    if (completeButton) {
+                        completeButton.addEventListener('click', () => {
+                            this.completeVirtualWork(dialog, work, workplace);
+                        });
+                    }
+
+                    console.log('Dialog virtuální práce byl vytvořen a zobrazen');
+                } catch (dialogError) {
+                    console.error('Chyba při vytváření dialogu virtuální práce:', dialogError);
+                    // Záložní řešení - použití vlastní simulace práce
+                    this.simulateWork(work);
                 }
             }, 100);
 
             console.log('Práce byla předána do VirtualWork systému', {
                 workplace: workplace,
-                tasks: tasks
+                tasks: work.tasks
             });
         } catch (error) {
             console.error('Chyba při propojení s VirtualWork:', error);
             // Záložní řešení - použití vlastní simulace práce
             this.simulateWork(work);
         }
+    },
+
+    // Aktualizace postupu virtuální práce
+    updateVirtualWorkProgress(dialog, work) {
+        // Získání všech checkboxů úkolů
+        const taskCheckboxes = dialog.querySelectorAll('.task-checkbox');
+        const completeButton = dialog.querySelector('#virtual-work-complete');
+        const progressFill = dialog.querySelector('.progress-fill');
+        const progressText = dialog.querySelector('.progress-text');
+
+        // Výpočet postupu
+        const totalTasks = taskCheckboxes.length;
+        let completedTasks = 0;
+
+        taskCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                completedTasks++;
+            }
+        });
+
+        const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+        // Aktualizace progress baru
+        if (progressFill) {
+            progressFill.style.width = `${progress}%`;
+        }
+
+        // Aktualizace textu postupu
+        if (progressText) {
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+
+        // Aktivace/deaktivace tlačítka pro dokončení práce
+        if (completeButton) {
+            completeButton.disabled = completedTasks < totalTasks;
+
+            // Přidání pulzující animace, pokud jsou všechny úkoly dokončeny
+            if (completedTasks === totalTasks) {
+                completeButton.classList.add('pulse');
+            } else {
+                completeButton.classList.remove('pulse');
+            }
+        }
+    },
+
+    // Dokončení virtuální práce
+    completeVirtualWork(dialog, work, workplace) {
+        // Skrytí dialogu
+        dialog.classList.remove('show');
+        setTimeout(() => {
+            dialog.remove();
+        }, 300);
+
+        // Zvýšení počtu dokončených prací
+        this.state.workCompleted++;
+
+        // Přidání peněz za dokončení práce
+        if (typeof MoneyIndicator !== 'undefined') {
+            MoneyIndicator.addMoney(work.reward, `Odměna za práci: ${work.title}`);
+        }
+
+        // Přidání XP za dokončení práce
+        if (typeof UserProgress !== 'undefined') {
+            UserProgress.addExperience(work.xpReward, `Dokončení práce: ${work.title}`, 'work');
+
+            // Přidání XP do statistiky za redukci nečinnosti
+            UserProgress.xpStats.byActivity.idleTimeReduced += work.xpReward;
+            UserProgress.saveProgress();
+        }
+
+        // Kontrola achievementu za dokončení práce
+        this.checkWorkAchievements();
+
+        // Zobrazení oznámení o dokončení práce
+        this.showWorkCompletionNotification(work);
     },
 
     // Získání typu pracoviště z práce
