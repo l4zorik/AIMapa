@@ -227,135 +227,17 @@ const IdleDetection = {
             if (typeof VirtualWork !== 'undefined') {
                 console.log('Otevírání dialogu virtuální práce...');
 
-                // Vytvoření nové práce
-                const newWork = {
-                    id: `work_${Date.now()}`,
-                    workplaceId: 'office1',
-                    name: work.title,
-                    icon: '💼',
-                    startTime: new Date().toISOString(),
-                    elapsedTime: '0:00',
-                    tasks: work.tasks.map((task, index) => ({
-                        id: `task_${Date.now()}_${index}`,
-                        text: task,
-                        completed: false
-                    })),
-                    date: new Date().toISOString(),
-                    isCompleted: false
-                };
+                // Uložení úkolů z nabídky práce do VirtualWork
+                VirtualWork.customTasks = work.tasks.map((task, index) => ({
+                    id: `task_${Date.now()}_${index}`,
+                    text: task,
+                    completed: false
+                }));
 
-                // Uložení práce do localStorage
-                const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
-                savedWork.push(newWork);
-                localStorage.setItem('aiMapaSavedWork', JSON.stringify(savedWork));
+                // Přímé otevření dialogu virtuální práce - stejný dialog jako v menu příkazů
+                VirtualWork.openWorkDialog();
 
-                // Přímé otevření dialogu virtuální práce
-                const dialog = document.createElement('div');
-                dialog.className = 'virtual-work-dialog';
-                dialog.innerHTML = `
-                    <div class="virtual-work-header">
-                        <h2>Nedokončená práce</h2>
-                        <button class="virtual-work-close">&times;</button>
-                    </div>
-                    <div class="virtual-work-content">
-                        <div class="saved-work-container">
-                            <h3>Vaše nedokončené práce</h3>
-                            <div class="saved-work-list">
-                                <div class="saved-work-item" data-id="${newWork.id}">
-                                    <div class="saved-work-icon">${newWork.icon}</div>
-                                    <div class="saved-work-info">
-                                        <div class="saved-work-name">${newWork.name}</div>
-                                        <div class="saved-work-date">Uloženo: ${new Date().toLocaleString('cs-CZ')}</div>
-                                        <div class="saved-work-details">
-                                            <span class="saved-work-time">⏱️ Odpracováno: ${newWork.elapsedTime}</span>
-                                            <span class="saved-work-tasks">📋 Úkolů: ${newWork.tasks.length}</span>
-                                        </div>
-                                    </div>
-                                    <button class="saved-work-resume" title="Pokračovat v práci">▶️</button>
-                                    <button class="saved-work-delete" title="Odstranit">🗑️</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="virtual-work-actions">
-                        <button class="virtual-work-btn secondary" id="back-to-workplaces-btn">Zpět na výběr práce</button>
-                    </div>
-                `;
-
-                // Přidání dialogu do stránky
-                document.body.appendChild(dialog);
-
-                // Přidání event listenerů
-                const closeBtn = dialog.querySelector('.virtual-work-close');
-                closeBtn.addEventListener('click', () => {
-                    dialog.remove();
-                });
-
-                // Event listener pro tlačítko zpět
-                const backBtn = dialog.querySelector('#back-to-workplaces-btn');
-                backBtn.addEventListener('click', () => {
-                    dialog.remove();
-                    VirtualWork.openWorkDialog();
-                });
-
-                // Event listenery pro tlačítka pokračování
-                const resumeButtons = dialog.querySelectorAll('.saved-work-resume');
-                resumeButtons.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const workItem = e.target.closest('.saved-work-item');
-                        const workId = workItem.dataset.id;
-
-                        // Načtení detailu uložené práce
-                        const workDetail = savedWork.find(work => work.id === workId);
-                        if (workDetail) {
-                            // Najdeme odpovídající pracoviště
-                            const workplace = VirtualWork.workplaces.find(wp => wp.id === workDetail.workplaceId);
-                            if (workplace) {
-                                // Nastavení vybraného pracoviště
-                                VirtualWork.selectedWorkplace = workplace;
-
-                                // Nastavení úkolů z uložené práce
-                                VirtualWork.customTasks = workDetail.tasks ? [...workDetail.tasks] : [];
-
-                                // Odstranění uložené práce ze seznamu
-                                const updatedSavedWork = savedWork.filter(work => work.id !== workId);
-                                localStorage.setItem('aiMapaSavedWork', JSON.stringify(updatedSavedWork));
-
-                                // Odstranění dialogu
-                                dialog.remove();
-
-                                // Spuštění práce s úkoly
-                                VirtualWork.startWorkWithTasks(null, workplace);
-                            }
-                        }
-                    });
-                });
-
-                // Event listenery pro tlačítka odstranění
-                const deleteButtons = dialog.querySelectorAll('.saved-work-delete');
-                deleteButtons.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const workItem = e.target.closest('.saved-work-item');
-                        const workId = workItem.dataset.id;
-
-                        // Potvrzení odstranění
-                        if (confirm('Opravdu chcete odstranit tuto nedokončenou práci?')) {
-                            // Odstranění uložené práce ze seznamu
-                            const updatedSavedWork = savedWork.filter(work => work.id !== workId);
-                            localStorage.setItem('aiMapaSavedWork', JSON.stringify(updatedSavedWork));
-
-                            // Odstranění položky ze seznamu
-                            workItem.remove();
-
-                            // Pokud byl seznam vyprázdněn, zavřeme dialog
-                            if (updatedSavedWork.length === 0) {
-                                dialog.remove();
-                            }
-                        }
-                    });
-                });
-
-                console.log('Dialog virtuální práce byl vytvořen a zobrazen');
+                console.log('Dialog virtuální práce byl otevřen');
             } else if (typeof SimpleWorkDialog !== 'undefined') {
                 // Záložní řešení - použití jednoduchého dialogu práce
                 SimpleWorkDialog.showWorkDialog(work);
