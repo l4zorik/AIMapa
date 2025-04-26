@@ -12,6 +12,9 @@ const IdleDetection = {
         moneyReward: 50 // Peněžní odměna za dokončení práce
     },
 
+    // Reference na aktuální práci
+    currentWork: null,
+
     // Stav modulu
     state: {
         isIdle: false,
@@ -172,6 +175,8 @@ const IdleDetection = {
 
         if (acceptButton) {
             acceptButton.addEventListener('click', () => {
+                // Uložení reference na práci do objektu, aby byla dostupná i po zavření nabídky
+                this.currentWork = work;
                 this.acceptWork(work);
             });
         }
@@ -229,34 +234,46 @@ const IdleDetection = {
     integrateWithVirtualWork(work) {
         console.log('Propojení s VirtualWork systémem...');
 
-        // Převod práce na formát kompatibilní s VirtualWork
-        const workplaceType = this.getWorkplaceTypeFromWork(work);
+        try {
+            // Převod práce na formát kompatibilní s VirtualWork
+            const workplaceType = this.getWorkplaceTypeFromWork(work);
 
-        // Najít odpovídající pracoviště ve VirtualWork
-        const workplace = VirtualWork.workplaces.find(wp => wp.type === workplaceType) ||
-                          VirtualWork.workplaces[0]; // Použít první pracoviště jako zálohu
+            // Najít odpovídající pracoviště ve VirtualWork
+            const workplace = VirtualWork.workplaces.find(wp => wp.type === workplaceType) ||
+                            VirtualWork.workplaces[0]; // Použít první pracoviště jako zálohu
 
-        // Převod úkolů na formát kompatibilní s VirtualWork
-        const tasks = work.tasks.map((task, index) => ({
-            id: `task_${Date.now()}_${index}`,
-            title: task,
-            description: '',
-            completed: false,
-            priority: 'medium',
-            category: workplaceType,
-            createdAt: new Date().toISOString()
-        }));
+            // Převod úkolů na formát kompatibilní s VirtualWork
+            const tasks = work.tasks.map((task, index) => ({
+                id: `task_${Date.now()}_${index}`,
+                text: task, // Důležité: VirtualWork očekává 'text' místo 'title'
+                completed: false
+            }));
 
-        // Nastavení úkolů ve VirtualWork
-        VirtualWork.customTasks = tasks;
+            // Nastavení úkolů ve VirtualWork
+            VirtualWork.customTasks = tasks;
 
-        // Otevření dialogu virtuální práce s vybraným pracovištěm
-        VirtualWork.openWorkDialog(workplace);
+            // Otevření dialogu virtuální práce s vybraným pracovištěm
+            setTimeout(() => {
+                // Použití setTimeout pro zajištění, že se dialog otevře až po dokončení aktuálního cyklu událostí
+                if (typeof VirtualWork.startWorkWithTasks === 'function') {
+                    // Pokud existuje metoda pro přímé spuštění práce s úkoly, použijeme ji
+                    const dialog = VirtualWork.createDialog('Virtuální práce');
+                    VirtualWork.startWorkWithTasks(dialog, workplace);
+                } else {
+                    // Jinak použijeme standardní metodu pro otevření dialogu
+                    VirtualWork.openWorkDialog(workplace);
+                }
+            }, 100);
 
-        console.log('Práce byla předána do VirtualWork systému', {
-            workplace: workplace,
-            tasks: tasks
-        });
+            console.log('Práce byla předána do VirtualWork systému', {
+                workplace: workplace,
+                tasks: tasks
+            });
+        } catch (error) {
+            console.error('Chyba při propojení s VirtualWork:', error);
+            // Záložní řešení - použití vlastní simulace práce
+            this.simulateWork(work);
+        }
     },
 
     // Získání typu pracoviště z práce
