@@ -761,8 +761,9 @@ class VirtualWorkClass {
      * Otevření dialogu virtuální práce
      * @param {Object} workplace - Volitelný parametr pro otevření dialogu s předvybraným pracovištěm
      * @param {HTMLElement} existingDialog - Volitelný parametr pro použití existujícího dialogu
+     * @param {boolean} skipSavedWorkCheck - Volitelný parametr pro přeskočení kontroly nedokončených prací
      */
-    openWorkDialog(workplace, existingDialog) {
+    openWorkDialog(workplace, existingDialog, skipSavedWorkCheck = false) {
         // Kontrola, zda je dialog již otevřený a není předán existující dialog
         if (!existingDialog && document.querySelector('.virtual-work-dialog')) return;
 
@@ -775,8 +776,8 @@ class VirtualWorkClass {
         const savedWork = JSON.parse(localStorage.getItem('aiMapaSavedWork') || '[]');
         const hasSavedWork = savedWork.length > 0;
 
-        // Pokud existuje nedokončená práce, rovnou ji zobrazíme
-        if (hasSavedWork) {
+        // Pokud existuje nedokončená práce a nemáme přeskočit kontrolu, rovnou ji zobrazíme
+        if (hasSavedWork && !skipSavedWorkCheck) {
             this.showSavedWorkDialog();
             return;
         }
