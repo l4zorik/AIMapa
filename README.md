@@ -59,7 +59,7 @@ npm run dev
 
 ## Verze
 
-Aktuální verze: 0.3.1.0
+Aktuální verze: 0.3.7.0
 
 Podrobný seznam změn najdete v souboru [CHANGELOG.md](CHANGELOG.md).
 

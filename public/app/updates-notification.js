@@ -1,17 +1,40 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.7.0
+ * Verze 1.0.0
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.7.0',
+    currentVersion: '1.0.0',
 
     // Informace o aktualizacích
     updates: [
         {
-            version: '0.3.7.0',
+            version: '1.0.0',
             date: '2025-07-01',
+            title: 'První oficiální release',
+            description: 'První oficiální stabilní verze aplikace s kompletní implementací všech plánovaných funkcí',
+            changes: [
+                'První oficiální stabilní verze aplikace',
+                'Kompletní implementace všech plánovaných funkcí pro verzi 1.0',
+                'Optimalizace výkonu a stability pro produkční nasazení',
+                'Plná podpora pro všechny moderní prohlížeče',
+                'Optimalizace pro mobilní zařízení',
+                'Vylepšena celková stabilita aplikace',
+                'Optimalizováno načítání aplikace pro rychlejší start',
+                'Vylepšena správa paměti a výkon při dlouhodobém používání',
+                'Sjednocen design všech dialogů a oken',
+                'Vylepšen responzivní design pro různé velikosti obrazovky',
+                'Aktualizována dokumentace s aktuálními informacemi',
+                'Opraveno zpracování příkazů v menu příkazů',
+                'Opraveny konflikty mezi moduly při zpracování příkazů',
+                'Opraveny chyby v zobrazení na mobilních zařízeních',
+                'Opraveny problémy s kompatibilitou v různých prohlížečích'
+            ]
+        },
+        {
+            version: '0.3.7.0',
+            date: '2025-06-30',
             title: 'Příprava na ostrý release a přidání achievementů',
             description: 'Zahájení přípravy aplikace na ostrý release a přidání modulu achievementů',
             changes: [
@@ -25,8 +48,8 @@ const UpdatesNotification = {
                 'Vylepšení stability a výkonu aplikace',
                 'Optimalizace pro mobilní zařízení',
                 'Testování kompatibility s různými prohlížeči',
-                'Implementace automatických testů',
-                'Příprava dokumentace pro uživatele'
+                'Aktualizace verzí ve všech souborech',
+                'Aktualizace dokumentace projektu'
             ]
         },
         {

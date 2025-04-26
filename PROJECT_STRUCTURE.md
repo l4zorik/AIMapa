@@ -6,21 +6,26 @@ Tento dokument poskytuje přehled souborů v projektu, jejich účel a stav výv
 
 | Soubor | Verze | Stav | Popis |
 |--------|-------|------|-------|
-| index.html | 0.2.8.7.4 | Stabilní | Hlavní HTML soubor aplikace |
-| script.js | 0.2.8.7.4 | Stabilní | Hlavní JavaScript soubor s logikou aplikace |
-| styles.css | 0.2.8.7.4 | Stabilní | Hlavní CSS soubor s definicí stylů |
+| index.html | 0.3.7.0 | Stabilní | Hlavní HTML soubor aplikace |
+| script.js | 0.3.7.0 | Stabilní | Hlavní JavaScript soubor s logikou aplikace |
+| styles.css | 0.3.7.0 | Stabilní | Hlavní CSS soubor s definicí stylů |
 
 ## Moduly a komponenty
 
 | Soubor | Verze | Stav | Popis |
 |--------|-------|------|-------|
-| ~~commands-menu.js~~ | 0.2.8.7.4 | Odstraněno | Modul pro menu příkazů vedle chatu - odstraněno v 0.2.8.7.5 |
-| ~~commands-menu.css~~ | 0.2.8.7.3 | Odstraněno | Styly pro menu příkazů - odstraněno v 0.2.8.7.5 |
-| ~~commands-menu-extensions.css~~ | 0.2.8.7.3 | Odstraněno | Rozšířené styly pro menu příkazů - odstraněno v 0.2.8.7.5 |
-| updates-notification.js | 0.2.8.7.4 | Stabilní | Modul pro zobrazení novinek a aktualizací |
-| updates-notification.css | 0.2.8.7.4 | Stabilní | Styly pro modul novinek |
-| user-progress.js | 0.2.8.7.3 | Stabilní | Modul pro sledování postupu uživatele (XP, úrovně) |
-| user-progress.css | 0.2.8.7.3 | Stabilní | Styly pro modul postupu uživatele |
+| updates-notification.js | 0.3.7.0 | Stabilní | Modul pro zobrazení novinek a aktualizací |
+| updates-notification.css | 0.3.7.0 | Stabilní | Styly pro modul novinek |
+| user-progress.js | 0.3.7.0 | Stabilní | Modul pro sledování postupu uživatele (XP, úrovně) |
+| user-progress.css | 0.3.7.0 | Stabilní | Styly pro modul postupu uživatele |
+| achievements.js | 0.3.7.0 | Stabilní | Modul pro správu a zobrazení achievementů |
+| achievements.css | 0.3.7.0 | Stabilní | Styly pro modul achievementů |
+| virtual-work.js | 0.3.7.0 | Stabilní | Modul pro virtuální práci |
+| virtual-work.css | 0.3.7.0 | Stabilní | Styly pro modul virtuální práce |
+| reward-system.js | 0.3.7.0 | Stabilní | Modul pro odměňovací systém |
+| reward-system.css | 0.3.7.0 | Stabilní | Styly pro odměňovací systém |
+| task-system.js | 0.3.7.0 | Stabilní | Modul pro systém úkolů a denních questů |
+| task-system.css | 0.3.7.0 | Stabilní | Styly pro systém úkolů |
 | user-progress-extensions.js | 0.2.8.7.3 | Stabilní | Rozšíření modulu postupu uživatele |
 | globe-simple.js | 0.2.8.7.3 | Stabilní | Implementace jednoduchého 3D glóbusu |
 | transport-connections.js | 0.2.8.7.3 | Stabilní | Modul pro vyhledávání spojení veřejnou dopravou |
@@ -43,30 +48,37 @@ Tento dokument poskytuje přehled souborů v projektu, jejich účel a stav výv
 - Sledování postupu uživatele (user-progress.js)
 - Glóbus režim (globe-simple.js)
 - Vyhledávání spojení (transport-connections.js)
+- Achievementy (achievements.js)
+- Virtuální práce (virtual-work.js)
+- Odměňovací systém (reward-system.js)
+- Systém úkolů a denních questů (task-system.js)
+- Služby bydlení (housing-services.js)
+- Služby jídla (food-services.js)
+- Lékařské služby (medical-services.js)
+- Dopravní služby (transport-services.js)
+- Načítání reálných dat podniků (business-data-loader.js)
 
-### Odstraněné moduly
-- Menu příkazů (commands-menu.js) - odstraněno v 0.2.8.7.5
-
-### Nové moduly (ve vývoji)
-- Dotazník zpětné vazby (feedback-survey.js) - přidáno ve verzi 0.2.8.7.4
-
-### Plánované moduly (dosud neimplementované)
+### Plánované moduly (pro verzi 0.4.0)
 - Offline režim
 - Synchronizace dat s cloudem
+- Uživatelské účty a přihlašování
 - Pokročilé statistiky tras
 - Rozšířené možnosti sdílení
 
 ## Poznámky k vývoji
 
-1. **Priorita oprav:**
-   - ~~Opravy menu příkazů ve fullscreen režimu (dokončeno v 0.2.8.7.4)~~ - Menu příkazů odstraněno v 0.2.8.7.5
-   - Optimalizace výkonu při zobrazení 3D budov
-   - Vylepšení UX při plánování tras
+1. **Priorita oprav pro plný release:**
+   - Optimalizace výkonu při načítání aplikace
+   - Vylepšení správy paměti a výkonu při dlouhodobém používání
+   - Testování kompatibility s různými prohlížeči
+   - Oprava zpracování příkazů v menu příkazů
 
-2. **Priorita nových funkcí:**
-   - Dotazník zpětné vazby (implementováno v 0.2.8.7.4)
+2. **Priorita nových funkcí pro verzi 0.4.0:**
+   - Implementace databáze MongoDB pro ukládání dat
+   - Přidání uživatelských účtů a přihlašování
+   - Implementace cloudové synchronizace dat
    - Rozšíření gamifikačních prvků
-   - Integrace s dalšími mapovými službami
+   - Implementace offline režimu
 
 ## Závislosti
 

@@ -2837,7 +2837,7 @@ function saveAppState() {
         deletedMarkerCommands: deletedMarkerCommands,
         isFullscreen: isFullscreen, // Uložení stavu fullscreen režimu
         lastSaved: new Date().toISOString(),
-        version: '0.2.4.2' // Přidání verze pro lepší správu kompatibility
+        version: '0.3.7.0' // Přidání verze pro lepší správu kompatibility
     };
 
     // Uložení do localStorage s kompresí pro úsporu místa
@@ -2978,7 +2978,7 @@ function loadAppState() {
         console.log('Načten stav aplikace:', appState);
 
         // Kontrola verze pro zajištění kompatibility
-        if (appState.version && appState.version !== '0.2.4.2') {
+        if (appState.version && appState.version !== '0.3.7.0') {
             console.log(`Načten stav z jiné verze aplikace (${appState.version}). Probíhá konverze...`);
             // Zde by mohla být logika pro konverzi dat mezi verzemi, pokud by bylo potřeba
         }
