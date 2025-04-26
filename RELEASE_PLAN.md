@@ -4,7 +4,7 @@ Tento dokument popisuje plán přípravy aplikace AIMapa na ostrý release, poč
 
 ## Aktuální stav aplikace
 
-Aplikace AIMapa je nyní ve verzi 0.3.6.5 a obsahuje následující klíčové funkce:
+Aplikace AIMapa je nyní ve verzi 0.3.7.0 a obsahuje následující klíčové funkce:
 
 ### Implementované funkce
 - Interaktivní mapa s možností přidávání bodů a tras
@@ -18,6 +18,7 @@ Aplikace AIMapa je nyní ve verzi 0.3.6.5 a obsahuje následující klíčové f
 - Automatické ověření a korekce bodů
 - Vyhledávání spojení veřejnou dopravou
 - Načítání reálných dat podniků z internetu
+- Modul achievementů s odměnami za dokončení
 
 ### Technologie
 - **Frontend**: HTML, CSS, JavaScript, Leaflet.js

@@ -12,21 +12,21 @@ const UpdatesNotification = {
         {
             version: '0.3.7.0',
             date: '2025-07-01',
-            title: 'Příprava na ostrý release',
-            description: 'Zahájení přípravy aplikace na ostrý release s vylepšením stability a výkonu',
+            title: 'Příprava na ostrý release a přidání achievementů',
+            description: 'Zahájení přípravy aplikace na ostrý release a přidání modulu achievementů',
             changes: [
+                'Přidán nový modul pro správu a zobrazení achievementů',
+                'Implementováno 10 základních achievementů v různých kategoriích',
+                'Přidáno zobrazení notifikací o dokončení achievementů',
+                'Implementováno filtrování achievementů podle kategorií',
+                'Přidáno získávání odměn za dokončení achievementů (XP, peníze, quest body)',
+                'Přidána položka "Achievementy" do menu příkazů v kategorii "Služby"',
                 'Zahájení přípravy aplikace na ostrý release',
                 'Vylepšení stability a výkonu aplikace',
                 'Optimalizace pro mobilní zařízení',
                 'Testování kompatibility s různými prohlížeči',
                 'Implementace automatických testů',
-                'Příprava dokumentace pro uživatele',
-                'Optimalizace načítání aplikace pro rychlejší start',
-                'Vylepšení správy paměti a výkonu',
-                'Implementace offline režimu s ukládáním dat',
-                'Vylepšení uživatelského rozhraní pro lepší přístupnost',
-                'Přidání nápovědy a tutoriálů pro nové uživatele',
-                'Implementace systému pro hlášení chyb přímo z aplikace'
+                'Příprava dokumentace pro uživatele'
             ]
         },
         {

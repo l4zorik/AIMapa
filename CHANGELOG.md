@@ -2,7 +2,15 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.3.7.0] - 2025-07-01 - PŘÍPRAVA NA OSTRÝ RELEASE
+## [0.3.7.0] - 2025-07-01 - PŘÍPRAVA NA OSTRÝ RELEASE A PŘIDÁNÍ ACHIEVEMENTŮ
+
+### Nové funkce
+- Přidán nový modul pro správu a zobrazení achievementů
+- Implementováno 10 základních achievementů v různých kategoriích
+- Přidáno zobrazení notifikací o dokončení achievementů
+- Implementováno filtrování achievementů podle kategorií
+- Přidáno získávání odměn za dokončení achievementů (XP, peníze, quest body)
+- Přidána položka "Achievementy" do menu příkazů v kategorii "Služby"
 
 ### Plán přípravy na ostrý release
 - Zahájení přípravy aplikace na ostrý release
