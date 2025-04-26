@@ -1,0 +1,312 @@
+/**
+ * Styly pro služby bydlení
+ * Verze 0.3.6.5
+ */
+
+/* Kontejner služby */
+.housing-service-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 1000px;
+    height: 80%;
+    max-height: 800px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Hlavička služby */
+.housing-service-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.housing-service-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.housing-service-icon {
+    font-size: 24px;
+}
+
+.housing-service-title h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.housing-service-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.housing-service-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Obsah služby */
+.housing-service-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Vyhledávací lišta */
+.housing-search-bar {
+    padding: 10px 0;
+}
+
+.housing-search-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.housing-search-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+/* Seznam nemovitostí */
+.housing-properties-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Položka nemovitosti */
+.housing-property-item {
+    display: flex;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.housing-property-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Obrázek nemovitosti */
+.property-image {
+    width: 300px;
+    min-width: 300px;
+    height: 200px;
+    overflow: hidden;
+}
+
+.property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.housing-property-item:hover .property-image img {
+    transform: scale(1.05);
+}
+
+/* Informace o nemovitosti */
+.property-info {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.property-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.property-address {
+    margin: 0;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.property-price {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #e74c3c;
+}
+
+.property-description {
+    margin: 0;
+    font-size: 14px;
+    color: #34495e;
+    line-height: 1.5;
+}
+
+/* Vlastnosti nemovitosti */
+.property-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.property-feature {
+    background-color: #edf2f7;
+    color: #4a5568;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.property-available {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+    color: #2ecc71;
+    font-weight: 500;
+}
+
+.property-contact {
+    margin: 0;
+    font-size: 14px;
+    color: #3498db;
+}
+
+/* Akce pro nemovitost */
+.property-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.property-contact-btn, .property-favorite-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.property-contact-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.property-contact-btn:hover {
+    background-color: #2980b9;
+}
+
+.property-favorite-btn {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.property-favorite-btn:hover {
+    background-color: #e2e8f0;
+    color: #475569;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+    .housing-property-item {
+        flex-direction: column;
+    }
+    
+    .property-image {
+        width: 100%;
+        height: 200px;
+    }
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .housing-service-container {
+    background-color: #1a202c;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme="dark"] .housing-service-header {
+    background: linear-gradient(135deg, #2980b9, #1a5276);
+}
+
+body[data-theme="dark"] .housing-search-input {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] .housing-search-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+}
+
+body[data-theme="dark"] .housing-property-item {
+    background-color: #2d3748;
+}
+
+body[data-theme="dark"] .property-name {
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] .property-address {
+    color: #a0aec0;
+}
+
+body[data-theme="dark"] .property-price {
+    color: #fc8181;
+}
+
+body[data-theme="dark"] .property-description {
+    color: #cbd5e0;
+}
+
+body[data-theme="dark"] .property-feature {
+    background-color: #4a5568;
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] .property-favorite-btn {
+    background-color: #4a5568;
+    color: #e2e8f0;
+    border-color: #2d3748;
+}
+
+body[data-theme="dark"] .property-favorite-btn:hover {
+    background-color: #2d3748;
+    color: #e2e8f0;
+}

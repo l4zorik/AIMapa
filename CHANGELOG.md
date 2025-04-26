@@ -2,6 +2,16 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.6.5] - 2025-06-30 - PŘIDÁNÍ SLUŽBY BYDLENÍ
+
+### Nové funkce
+- Přidán nový modul pro služby bydlení s nabídkami pronájmů, prodejů a spolubydlení
+- Implementovány tři kategorie: Pronájem, Prodej a Spolubydlení
+- Přidáno vyhledávání nemovitostí podle názvu, adresy a popisu
+- Implementována možnost kontaktování ohledně nemovitosti a přidání do oblíbených
+- Přidáno získávání XP za používání služeb bydlení
+- Implementována podpora tmavého režimu pro nové prvky
+
 ## [0.3.6.4] - 2025-06-29 - PŘIDÁNÍ THC-X DO ODMĚŇOVACÍHO SYSTÉMU
 
 ### Nové funkce
