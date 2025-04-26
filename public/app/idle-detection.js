@@ -467,6 +467,19 @@ const IdleDetection = {
         if (typeof UserProgress !== 'undefined') {
             UserProgress.addExperience(work.xpReward, `Dokončení práce: ${work.title}`, 'work');
 
+            // Kontrola, zda existuje objekt byActivity a inicializace, pokud neexistuje
+            if (!UserProgress.xpStats.byActivity) {
+                UserProgress.xpStats.byActivity = {
+                    mapInteractions: 0,
+                    chatMessages: 0,
+                    commandsUsed: 0,
+                    achievementsEarned: 0,
+                    questsCompleted: 0,
+                    workCompleted: 0,
+                    idleTimeReduced: 0
+                };
+            }
+
             // Přidání XP do statistiky za redukci nečinnosti
             UserProgress.xpStats.byActivity.idleTimeReduced += work.xpReward;
             UserProgress.saveProgress();
@@ -642,6 +655,19 @@ const IdleDetection = {
         if (typeof UserProgress !== 'undefined') {
             UserProgress.addExperience(work.xpReward, `Dokončení práce: ${work.title}`, 'work');
 
+            // Kontrola, zda existuje objekt byActivity a inicializace, pokud neexistuje
+            if (!UserProgress.xpStats.byActivity) {
+                UserProgress.xpStats.byActivity = {
+                    mapInteractions: 0,
+                    chatMessages: 0,
+                    commandsUsed: 0,
+                    achievementsEarned: 0,
+                    questsCompleted: 0,
+                    workCompleted: 0,
+                    idleTimeReduced: 0
+                };
+            }
+
             // Přidání XP do statistiky za redukci nečinnosti
             UserProgress.xpStats.byActivity.idleTimeReduced += work.xpReward;
             UserProgress.saveProgress();
@@ -732,6 +758,19 @@ const IdleDetection = {
         // Kontrola achievementu za dokončení práce
         if (this.state.workCompleted === 1) {
             UserProgress.addAchievement('professional', 'Profesionál', 'Získali jste práci');
+        }
+
+        // Kontrola, zda existuje objekt byActivity a inicializace, pokud neexistuje
+        if (!UserProgress.xpStats.byActivity) {
+            UserProgress.xpStats.byActivity = {
+                mapInteractions: 0,
+                chatMessages: 0,
+                commandsUsed: 0,
+                achievementsEarned: 0,
+                questsCompleted: 0,
+                workCompleted: 0,
+                idleTimeReduced: 0
+            };
         }
 
         // Kontrola achievementů za aktivitu a redukci nečinnosti
