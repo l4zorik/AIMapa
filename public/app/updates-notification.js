@@ -1,14 +1,48 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.6.0
+ * Verze 0.3.7.0
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.6.0',
+    currentVersion: '0.3.7.0',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.7.0',
+            date: '2025-07-01',
+            title: 'Příprava na ostrý release',
+            description: 'Zahájení přípravy aplikace na ostrý release s vylepšením stability a výkonu',
+            changes: [
+                'Zahájení přípravy aplikace na ostrý release',
+                'Vylepšení stability a výkonu aplikace',
+                'Optimalizace pro mobilní zařízení',
+                'Testování kompatibility s různými prohlížeči',
+                'Implementace automatických testů',
+                'Příprava dokumentace pro uživatele',
+                'Optimalizace načítání aplikace pro rychlejší start',
+                'Vylepšení správy paměti a výkonu',
+                'Implementace offline režimu s ukládáním dat',
+                'Vylepšení uživatelského rozhraní pro lepší přístupnost',
+                'Přidání nápovědy a tutoriálů pro nové uživatele',
+                'Implementace systému pro hlášení chyb přímo z aplikace'
+            ]
+        },
+        {
+            version: '0.3.6.5',
+            date: '2025-06-30',
+            title: 'Přidání služby Bydlení',
+            description: 'Přidán nový modul pro služby bydlení s nabídkami pronájmů, prodejů a spolubydlení',
+            changes: [
+                'Přidán nový modul pro služby bydlení s nabídkami pronájmů, prodejů a spolubydlení',
+                'Implementovány tři kategorie: Pronájem, Prodej a Spolubydlení',
+                'Přidáno vyhledávání nemovitostí podle názvu, adresy a popisu',
+                'Implementována možnost kontaktování ohledně nemovitosti a přidání do oblíbených',
+                'Přidáno získávání XP za používání služeb bydlení',
+                'Implementována podpora tmavého režimu pro nové prvky'
+            ]
+        },
         {
             version: '0.3.6.0',
             date: '2025-06-25',

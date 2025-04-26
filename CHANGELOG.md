@@ -2,6 +2,24 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.7.0] - 2025-07-01 - PŘÍPRAVA NA OSTRÝ RELEASE
+
+### Plán přípravy na ostrý release
+- Zahájení přípravy aplikace na ostrý release
+- Plánované vylepšení stability a výkonu aplikace
+- Plánovaná optimalizace pro mobilní zařízení
+- Plánované testování kompatibility s různými prohlížeči
+- Plánovaná implementace automatických testů
+- Plánovaná příprava dokumentace pro uživatele
+
+### Plánovaná vylepšení
+- Optimalizace načítání aplikace pro rychlejší start
+- Vylepšení správy paměti a výkonu
+- Implementace offline režimu s ukládáním dat
+- Vylepšení uživatelského rozhraní pro lepší přístupnost
+- Přidání nápovědy a tutoriálů pro nové uživatele
+- Implementace systému pro hlášení chyb přímo z aplikace
+
 ## [0.3.6.5] - 2025-06-30 - PŘIDÁNÍ SLUŽBY BYDLENÍ
 
 ### Nové funkce
