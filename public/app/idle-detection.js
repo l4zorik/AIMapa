@@ -234,39 +234,135 @@ const IdleDetection = {
                     completed: false
                 }));
 
-                // Simulace kliknutí na tlačítko virtuální práce v mapě
-                const virtualWorkBtn = document.querySelector('#virtual-work-btn');
-                if (virtualWorkBtn) {
-                    // Přímé kliknutí na tlačítko
-                    virtualWorkBtn.click();
-                    console.log('Kliknuto na tlačítko virtuální práce');
-                } else {
-                    // Pokud tlačítko neexistuje, vytvoříme ho a klikneme na něj
-                    console.log('Tlačítko virtuální práce neexistuje, vytvářím ho...');
+                // Přímé vytvoření dialogu s výběrem typu práce
+                // Vytvoření dialogu
+                const dialog = document.createElement('div');
+                dialog.className = 'virtual-work-dialog';
+                dialog.innerHTML = `
+                    <div class="virtual-work-header">
+                        <h2>Virtuální práce</h2>
+                        <button class="virtual-work-close">&times;</button>
+                    </div>
+                    <div class="virtual-work-content">
+                        <h3>Vyberte typ práce:</h3>
 
-                    // Vytvoření tlačítka
-                    const btn = document.createElement('button');
-                    btn.id = 'virtual-work-btn';
-                    btn.className = 'map-control-btn';
-                    btn.innerHTML = '💼';
-                    btn.title = 'Virtuální práce';
+                        <div class="workplace-categories">
+                            <button class="category-btn active" data-category="all">Všechny</button>
+                            <button class="category-btn" data-category="office">Kancelář</button>
+                            <button class="category-btn" data-category="manual">Manuální</button>
+                            <button class="category-btn" data-category="creative">Kreativní</button>
+                        </div>
 
-                    // Přidání event listeneru
+                        <div class="workplace-list">
+                            ${VirtualWork.workplaces.map(workplace => {
+                                // Určení obtížnosti
+                                const difficultyLabel = {
+                                    'easy': 'Snadná',
+                                    'medium': 'Střední',
+                                    'hard': 'Náročná'
+                                }[workplace.difficulty] || '';
+
+                                // Určení barvy obtížnosti
+                                const difficultyColor = {
+                                    'easy': '#27ae60',
+                                    'medium': '#f39c12',
+                                    'hard': '#e74c3c'
+                                }[workplace.difficulty] || '#777';
+
+                                return `
+                                    <div class="workplace-item" data-id="${workplace.id}" data-category="${workplace.type}">
+                                        <div class="workplace-icon" data-icon="${workplace.icon}"></div>
+                                        <div class="workplace-info">
+                                            <div class="workplace-name">${workplace.name}</div>
+                                            <div class="workplace-pay">${workplace.pay} Kč / den</div>
+                                            <div class="workplace-description">${workplace.description}</div>
+                                            <div class="workplace-details">
+                                                <span class="workplace-difficulty" style="color: ${difficultyColor}">
+                                                    ${difficultyLabel}
+                                                </span>
+                                                <span class="workplace-xp">+${workplace.xp} XP</span>
+                                                <span class="workplace-duration">${workplace.duration} min</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <div class="work-stats">
+                            <h3>Vaše statistiky práce</h3>
+                            <div class="work-stats-grid">
+                                <div class="work-stat">
+                                    <div class="work-stat-value">${VirtualWork.getTotalEarnings()} Kč</div>
+                                    <div class="work-stat-label">Celkový výdělek</div>
+                                </div>
+                                <div class="work-stat">
+                                    <div class="work-stat-value">${VirtualWork.workHistory.length}</div>
+                                    <div class="work-stat-label">Dokončených směn</div>
+                                </div>
+                                <div class="work-stat">
+                                    <div class="work-stat-value">${VirtualWork.getTotalXP()} XP</div>
+                                    <div class="work-stat-label">Získané zkušenosti</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="virtual-work-actions">
+                        <button class="virtual-work-btn secondary" id="virtual-work-cancel">Zrušit</button>
+                        <button class="virtual-work-btn secondary" id="virtual-work-history">Historie</button>
+                        <button class="virtual-work-btn primary" id="virtual-work-start" disabled>Začít pracovat</button>
+                    </div>
+                `;
+
+                // Přidání dialogu do stránky
+                document.body.appendChild(dialog);
+
+                // Přidání event listenerů
+                VirtualWork.setupDialogEvents(dialog);
+
+                // Přidání event listenerů pro kategorie
+                const categoryBtns = dialog.querySelectorAll('.category-btn');
+                categoryBtns.forEach(btn => {
                     btn.addEventListener('click', () => {
-                        VirtualWork.openWorkDialog();
+                        // Odstranění aktivní třídy ze všech tlačítek
+                        categoryBtns.forEach(b => b.classList.remove('active'));
+
+                        // Přidání aktivní třídy na kliknuté tlačítko
+                        btn.classList.add('active');
+
+                        // Filtrování pracovišť podle kategorie
+                        const category = btn.dataset.category;
+                        const workplaceItems = dialog.querySelectorAll('.workplace-item');
+
+                        workplaceItems.forEach(item => {
+                            if (category === 'all' || item.dataset.category === category) {
+                                item.style.display = 'flex';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
                     });
+                });
 
-                    // Přidání tlačítka do dokumentu (dočasně)
-                    document.body.appendChild(btn);
+                // Přidání event listeneru pro tlačítko historie
+                const historyBtn = dialog.querySelector('#virtual-work-history');
+                historyBtn.addEventListener('click', () => {
+                    VirtualWork.showWorkHistory(dialog);
+                });
 
-                    // Kliknutí na tlačítko
-                    btn.click();
+                // Přidání event listeneru pro tlačítko zrušit
+                const cancelBtn = dialog.querySelector('#virtual-work-cancel');
+                cancelBtn.addEventListener('click', () => {
+                    VirtualWork.closeDialog(dialog);
+                });
 
-                    // Odstranění tlačítka
-                    setTimeout(() => {
-                        btn.remove();
-                    }, 100);
-                }
+                // Přidání event listeneru pro tlačítko zavřít
+                const closeBtn = dialog.querySelector('.virtual-work-close');
+                closeBtn.addEventListener('click', () => {
+                    VirtualWork.closeDialog(dialog);
+                });
+
+                console.log('Dialog virtuální práce byl vytvořen a zobrazen');
             } else if (typeof SimpleWorkDialog !== 'undefined') {
                 // Záložní řešení - použití jednoduchého dialogu práce
                 SimpleWorkDialog.showWorkDialog(work);
