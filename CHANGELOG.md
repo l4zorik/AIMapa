@@ -2,6 +2,29 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.8.5] - 2025-07-12 - LOKÁLNÍ NODE.JS SERVER S PŘIHLAŠOVACÍM SYSTÉMEM
+
+### Nové funkce
+- Přidána podpora pro lokální Node.js server s funkčním přihlašovacím systémem
+- Implementována hybridní autentizace fungující jak lokálně, tak na Netlify
+- Přidána detekce prostředí (lokální/Netlify) s automatickým přepínáním
+- Vylepšena inicializace mapy pro spolehlivější načítání na všech platformách
+- Přidán debugovací modul pro diagnostiku a opravu problémů s mapou
+
+### Vylepšení
+- Optimalizován proces přihlašování pro plynulejší uživatelský zážitek
+- Vylepšena bezpečnost aplikace s lepší správou autentizačních tokenů
+- Přidána podpora pro offline přihlášení s lokálním ukládáním uživatelských dat
+- Optimalizováno načítání Leaflet.js a dalších externích knihoven
+- Vylepšena kompatibilita s různými prohlížeči a zařízeními
+
+### Opravy
+- Opraveny problémy s načítáním mapy na různých platformách
+- Vyřešeny konflikty mezi lokálním a cloudovým přihlašováním
+- Opraveny problémy s Content Security Policy pro správné načítání externích zdrojů
+- Vylepšena inicializace chatových elementů pro prevenci chyb při načítání
+- Opraveny problémy s přidáváním bodů na mapu před úplnou inicializací Leaflet.js
+
 ## [0.3.8.4] - 2025-07-10 - INTEGRACE SUPABASE A NETLIFY
 
 ### Nové funkce

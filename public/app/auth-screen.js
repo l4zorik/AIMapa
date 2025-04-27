@@ -1,9 +1,10 @@
 /**
  * Přihlašovací obrazovka pro AIMapa
- * Verze 0.3.8.4
+ * Verze 0.3.8.5
  *
  * Tento modul zobrazí přihlašovací obrazovku před přístupem k aplikaci
  * a zajistí, že uživatel je přihlášen před použitím aplikace.
+ * Podporuje hybridní autentizaci pro lokální i Netlify prostředí.
  */
 
 const AuthScreen = {
@@ -32,18 +33,33 @@ const AuthScreen = {
     async checkAuthState() {
         console.log('Kontrola stavu přihlášení...');
 
+        // Pokud je dostupný HybridAuth, použijeme ho pro kontrolu přihlášení
+        if (typeof HybridAuth !== 'undefined') {
+            try {
+                const result = await HybridAuth.getUser();
+
+                if (result.data && result.data.user) {
+                    console.log('Uživatel je přihlášen přes HybridAuth:', result.data.user.email);
+                    this.hideAuthScreen();
+                    return;
+                }
+            } catch (error) {
+                console.error('Chyba při kontrole stavu přihlášení přes HybridAuth:', error);
+            }
+        }
+
         // Pokud je dostupný SupabaseClient, použijeme ho pro kontrolu přihlášení
         if (typeof SupabaseClient !== 'undefined') {
             try {
                 const result = await SupabaseClient.getCurrentUser();
 
                 if (result.success && result.user) {
-                    console.log('Uživatel je přihlášen:', result.user.email);
+                    console.log('Uživatel je přihlášen přes SupabaseClient:', result.user.email);
                     this.hideAuthScreen();
                     return;
                 }
             } catch (error) {
-                console.error('Chyba při kontrole stavu přihlášení:', error);
+                console.error('Chyba při kontrole stavu přihlášení přes SupabaseClient:', error);
             }
         }
 
@@ -52,6 +68,21 @@ const AuthScreen = {
             console.log('Uživatel je přihlášen přes UserAccounts');
             this.hideAuthScreen();
             return;
+        }
+
+        // Pokud je dostupný LocalAuth, použijeme ho pro kontrolu přihlášení
+        if (typeof LocalAuth !== 'undefined') {
+            try {
+                const result = await LocalAuth.getUser();
+
+                if (result.data && result.data.user) {
+                    console.log('Uživatel je přihlášen přes LocalAuth:', result.data.user.email);
+                    this.hideAuthScreen();
+                    return;
+                }
+            } catch (error) {
+                console.error('Chyba při kontrole stavu přihlášení přes LocalAuth:', error);
+            }
         }
 
         // Pokud uživatel není přihlášen, zobrazíme přihlašovací obrazovku
@@ -299,6 +330,36 @@ const AuthScreen = {
             }
         }
 
+        // Přihlášení přes HybridAuth (preferovaná metoda)
+        if (typeof HybridAuth !== 'undefined') {
+            try {
+                const result = await HybridAuth.signIn(sanitizedEmail, password);
+
+                if (result.data && result.data.user) {
+                    console.log('Uživatel byl úspěšně přihlášen přes HybridAuth');
+
+                    // Reset počtu pokusů o přihlášení
+                    if (typeof SecurityUtils !== 'undefined') {
+                        SecurityUtils.resetLoginAttempts(sanitizedEmail);
+                    }
+
+                    this.hideAuthScreen();
+
+                    // Vyvolání události o změně stavu přihlášení
+                    document.dispatchEvent(new CustomEvent('authStateChanged', {
+                        detail: { isLoggedIn: true, user: result.data.user }
+                    }));
+
+                    return;
+                } else if (result.error) {
+                    this.showMessage('loginMessage', result.error.message || 'Přihlášení se nezdařilo', 'error');
+                }
+            } catch (error) {
+                console.error('Chyba při přihlašování přes HybridAuth:', error);
+                this.showMessage('loginMessage', error.message || 'Přihlášení se nezdařilo', 'error');
+            }
+        }
+
         // Přihlášení přes Supabase
         if (typeof SupabaseClient !== 'undefined') {
             try {
@@ -333,6 +394,36 @@ const AuthScreen = {
             }
         }
 
+        // Přihlášení přes LocalAuth
+        if (typeof LocalAuth !== 'undefined') {
+            try {
+                const result = await LocalAuth.signIn(sanitizedEmail, password);
+
+                if (result.data && result.data.user) {
+                    console.log('Uživatel byl úspěšně přihlášen přes LocalAuth');
+
+                    // Reset počtu pokusů o přihlášení
+                    if (typeof SecurityUtils !== 'undefined') {
+                        SecurityUtils.resetLoginAttempts(sanitizedEmail);
+                    }
+
+                    this.hideAuthScreen();
+
+                    // Vyvolání události o změně stavu přihlášení
+                    document.dispatchEvent(new CustomEvent('authStateChanged', {
+                        detail: { isLoggedIn: true, user: result.data.user }
+                    }));
+
+                    return;
+                } else if (result.error) {
+                    this.showMessage('loginMessage', result.error.message || 'Přihlášení se nezdařilo', 'error');
+                }
+            } catch (error) {
+                console.error('Chyba při přihlašování přes LocalAuth:', error);
+                this.showMessage('loginMessage', error.message || 'Přihlášení se nezdařilo', 'error');
+            }
+        }
+
         // Přihlášení přes UserAccounts
         if (typeof UserAccounts !== 'undefined') {
             try {
@@ -358,7 +449,8 @@ const AuthScreen = {
         }
 
         // Pokud není dostupný žádný autentizační systém
-        if (typeof SupabaseClient === 'undefined' && typeof UserAccounts === 'undefined') {
+        if (typeof HybridAuth === 'undefined' && typeof SupabaseClient === 'undefined' &&
+            typeof LocalAuth === 'undefined' && typeof UserAccounts === 'undefined') {
             console.error('Není dostupný žádný autentizační systém');
             this.showMessage('loginMessage', 'Není dostupný žádný autentizační systém', 'error');
         }
@@ -400,6 +492,34 @@ const AuthScreen = {
             }
         }
 
+        // Metadata pro registraci
+        const metadata = { username: sanitizedUsername };
+
+        // Registrace přes HybridAuth (preferovaná metoda)
+        if (typeof HybridAuth !== 'undefined') {
+            try {
+                const result = await HybridAuth.signUp(sanitizedEmail, password, metadata);
+
+                if (result.data && result.data.user) {
+                    console.log('Uživatel byl úspěšně zaregistrován přes HybridAuth');
+                    this.showMessage('registerMessage', 'Registrace byla úspěšná. Nyní se můžete přihlásit.', 'success');
+
+                    // Přepnutí na záložku přihlášení
+                    const loginTab = document.querySelector('.auth-tab[data-tab="login"]');
+                    if (loginTab) {
+                        loginTab.click();
+                    }
+
+                    return;
+                } else if (result.error) {
+                    this.showMessage('registerMessage', result.error.message || 'Registrace se nezdařila', 'error');
+                }
+            } catch (error) {
+                console.error('Chyba při registraci přes HybridAuth:', error);
+                this.showMessage('registerMessage', error.message || 'Registrace se nezdařila', 'error');
+            }
+        }
+
         // Registrace přes Supabase
         if (typeof SupabaseClient !== 'undefined') {
             try {
@@ -425,6 +545,31 @@ const AuthScreen = {
                 }
             } catch (error) {
                 console.error('Chyba při registraci přes Supabase:', error);
+                this.showMessage('registerMessage', error.message || 'Registrace se nezdařila', 'error');
+            }
+        }
+
+        // Registrace přes LocalAuth
+        if (typeof LocalAuth !== 'undefined') {
+            try {
+                const result = await LocalAuth.signUp(sanitizedEmail, password, metadata);
+
+                if (result.data && result.data.user) {
+                    console.log('Uživatel byl úspěšně zaregistrován přes LocalAuth');
+                    this.showMessage('registerMessage', 'Registrace byla úspěšná. Nyní se můžete přihlásit.', 'success');
+
+                    // Přepnutí na záložku přihlášení
+                    const loginTab = document.querySelector('.auth-tab[data-tab="login"]');
+                    if (loginTab) {
+                        loginTab.click();
+                    }
+
+                    return;
+                } else if (result.error) {
+                    this.showMessage('registerMessage', result.error.message || 'Registrace se nezdařila', 'error');
+                }
+            } catch (error) {
+                console.error('Chyba při registraci přes LocalAuth:', error);
                 this.showMessage('registerMessage', error.message || 'Registrace se nezdařila', 'error');
             }
         }
@@ -455,7 +600,8 @@ const AuthScreen = {
         }
 
         // Pokud není dostupný žádný autentizační systém
-        if (typeof SupabaseClient === 'undefined' && typeof UserAccounts === 'undefined') {
+        if (typeof HybridAuth === 'undefined' && typeof SupabaseClient === 'undefined' &&
+            typeof LocalAuth === 'undefined' && typeof UserAccounts === 'undefined') {
             console.error('Není dostupný žádný autentizační systém');
             this.showMessage('registerMessage', 'Není dostupný žádný autentizační systém', 'error');
         }
