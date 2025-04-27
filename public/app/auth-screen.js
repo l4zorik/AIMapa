@@ -63,6 +63,9 @@ const AuthScreen = {
     showAuthScreen() {
         console.log('Zobrazení přihlašovací obrazovky');
 
+        // Skrytí obsahu aplikace
+        this.hideAppContent();
+
         // Kontrola, zda již obrazovka existuje
         if (document.getElementById('authScreen')) {
             document.getElementById('authScreen').style.display = 'flex';
@@ -162,6 +165,43 @@ const AuthScreen = {
         }
 
         this.state.isVisible = false;
+
+        // Zobrazení obsahu aplikace
+        this.showAppContent();
+    },
+
+    // Skrytí obsahu aplikace
+    hideAppContent() {
+        console.log('Skrytí obsahu aplikace');
+
+        // Skrytí hlavního obsahu
+        const mainContent = document.querySelector('main');
+        if (mainContent) {
+            mainContent.style.display = 'none';
+        }
+
+        // Skrytí hlavičky
+        const header = document.querySelector('header');
+        if (header) {
+            header.style.display = 'none';
+        }
+    },
+
+    // Zobrazení obsahu aplikace
+    showAppContent() {
+        console.log('Zobrazení obsahu aplikace');
+
+        // Zobrazení hlavního obsahu
+        const mainContent = document.querySelector('main');
+        if (mainContent) {
+            mainContent.style.display = 'flex';
+        }
+
+        // Zobrazení hlavičky
+        const header = document.querySelector('header');
+        if (header) {
+            header.style.display = 'flex';
+        }
     },
 
     // Nastavení posluchačů událostí
