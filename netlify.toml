@@ -30,17 +30,6 @@
   to = "/index.html"
   status = 200
 
-# Hlavičky pro zabezpečení
-[[headers]]
-  # Hlavičky pro všechny soubory
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' https://cdn.jsdelivr.net https://*.supabase.co https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.unpkg.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://*.supabase.co https://*.unpkg.com https://*.leafletjs.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.unpkg.com https://*.leafletjs.com; img-src 'self' data: https://via.placeholder.com https://unpkg.com https://*.supabase.co https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.unpkg.com https://*.leafletjs.com; connect-src 'self' https://*.supabase.co https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.unpkg.com https://*.leafletjs.com;"
-
 # Nastavení pro Supabase a Node.js
 [build.environment]
   # Proměnné prostředí pro Supabase budou nastaveny automaticky Netlify
