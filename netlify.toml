@@ -3,8 +3,6 @@
 
 # Základní nastavení buildu
 [build]
-  # Příkaz pro build aplikace
-  command = "npm run build"
   # Adresář, který bude nasazen (výchozí je public)
   publish = "public"
   # Funkce pro serverless funkce
@@ -43,7 +41,8 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self' https://cdn.jsdelivr.net https://*.supabase.co; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.supabase.co; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://via.placeholder.com https://unpkg.com https://*.supabase.co; connect-src 'self' https://*.supabase.co;"
 
-# Nastavení pro Supabase
+# Nastavení pro Supabase a Node.js
 [build.environment]
   # Proměnné prostředí pro Supabase budou nastaveny automaticky Netlify
   SUPABASE_PROJECT = "AI Mapa"
+  NODE_VERSION = "16"
