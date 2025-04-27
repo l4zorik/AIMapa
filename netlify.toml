@@ -13,17 +13,17 @@
 # Nastavení pro produkční prostředí
 [context.production]
   # Proměnné prostředí pro produkci
-  environment = { NODE_VERSION = "18.x" }
+  environment = { NODE_VERSION = "16" }
 
 # Nastavení pro vývojové prostředí
 [context.branch-deploy]
   # Proměnné prostředí pro vývojové větve
-  environment = { NODE_VERSION = "18.x" }
+  environment = { NODE_VERSION = "16" }
 
 # Nastavení pro deploy preview
 [context.deploy-preview]
   # Proměnné prostředí pro náhledy
-  environment = { NODE_VERSION = "18.x" }
+  environment = { NODE_VERSION = "16" }
 
 # Přesměrování a hlavičky
 [[redirects]]
