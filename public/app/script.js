@@ -3,6 +3,60 @@
  * Verze 0.3.8.4
  */
 
+// Globální proměnná pro kontrolu, zda je Leaflet načten
+let leafletLoadAttempts = 0;
+const MAX_LEAFLET_LOAD_ATTEMPTS = 10;
+
+// Funkce pro načtení Leaflet.js, pokud není dostupný
+function loadLeaflet() {
+    console.log('Pokus o načtení Leaflet.js...');
+
+    // Pokud je Leaflet již načten, není potřeba ho načítat znovu
+    if (typeof L !== 'undefined') {
+        console.log('Leaflet.js je již načten.');
+        return Promise.resolve();
+    }
+
+    // Pokud jsme překročili maximální počet pokusů, vrátíme chybu
+    if (leafletLoadAttempts >= MAX_LEAFLET_LOAD_ATTEMPTS) {
+        return Promise.reject(new Error('Překročen maximální počet pokusů o načtení Leaflet.js.'));
+    }
+
+    leafletLoadAttempts++;
+
+    return new Promise((resolve, reject) => {
+        // Vytvoření skriptu pro načtení Leaflet.js
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+        script.crossOrigin = '';
+
+        // Vytvoření CSS pro Leaflet.js
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+        link.crossOrigin = '';
+
+        // Přidání CSS do hlavičky
+        document.head.appendChild(link);
+
+        // Nastavení callbacků pro načtení skriptu
+        script.onload = () => {
+            console.log('Leaflet.js byl úspěšně načten.');
+            resolve();
+        };
+
+        script.onerror = () => {
+            console.error('Chyba při načítání Leaflet.js.');
+            reject(new Error('Chyba při načítání Leaflet.js.'));
+        };
+
+        // Přidání skriptu do hlavičky
+        document.head.appendChild(script);
+    });
+}
+
 // Funkce pro inicializaci mapy - bude volána po načtení stránky
 function initializeMap() {
     console.log('Inicializace mapy...');
@@ -10,8 +64,19 @@ function initializeMap() {
     try {
         // Kontrola, zda je dostupný Leaflet
         if (typeof L === 'undefined') {
-            console.error('Leaflet není načten! Zkouším znovu za 1 sekundu...');
-            setTimeout(initializeMap, 1000);
+            console.error('Leaflet není načten! Zkouším načíst Leaflet.js...');
+
+            // Pokus o načtení Leaflet.js
+            loadLeaflet()
+                .then(() => {
+                    console.log('Leaflet.js byl úspěšně načten, pokračuji v inicializaci mapy...');
+                    setTimeout(initializeMap, 500);
+                })
+                .catch(error => {
+                    console.error('Chyba při načítání Leaflet.js:', error);
+                    setTimeout(initializeMap, 2000);
+                });
+
             return;
         }
 
@@ -1928,11 +1993,42 @@ function toggleMainChatMinimize() {
 }
 
 // Funkce pro AI chat
-const chatMessages = document.getElementById('chatMessages');
-const messageInput = document.getElementById('messageInput');
-const sendButton = document.getElementById('sendMessage');
+// Globální proměnné pro chat - inicializujeme je zde, aby byly dostupné pro všechny funkce
+let chatMessages = null;
+let messageInput = null;
+let sendButton = null;
+
+// Funkce pro inicializaci chat elementů
+function initChatElements() {
+    chatMessages = document.getElementById('chatMessages');
+    messageInput = document.getElementById('messageInput');
+    sendButton = document.getElementById('sendMessage');
+
+    console.log('Chat elementy byly inicializovány:', {
+        chatMessages: !!chatMessages,
+        messageInput: !!messageInput,
+        sendButton: !!sendButton
+    });
+}
+
+// Inicializace chat elementů po načtení DOMu
+document.addEventListener('DOMContentLoaded', initChatElements);
+
+// Globální proměnná pro sledování, zda byly chat elementy inicializovány
+let chatElementsInitialized = false;
 
 function addMessage(message, isUser = false, suggestions = null) {
+    // Kontrola, zda jsou chat elementy inicializovány
+    if (!chatMessages) {
+        // Pokus o inicializaci chat elementů
+        initChatElements();
+
+        // Pokud stále nemáme chatMessages, vypíšeme chybu a vrátíme se
+        if (!chatMessages) {
+            console.error('Element pro zprávy chatu nebyl nalezen! Zpráva nebude přidána:', message);
+            return;
+        }
+    }
     // Vytvoření kontejneru pro zprávu a případné návrhy
     const messageContainer = document.createElement('div');
     messageContainer.className = 'message-container';

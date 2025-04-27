@@ -350,17 +350,17 @@
         </div>
     </div>
 
-    <!-- Leaflet JS pro mapu -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet JS pro mapu - přidáno defer=false a async=false pro zajištění správného pořadí načítání -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer="false" async="false"></script>
     <!-- OpenRouteService API pro přesné směrování po silnicích -->
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js" defer="false" async="false"></script>
     <!-- OSM Buildings JS pro 3D budovy -->
-    <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
+    <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js" defer="false" async="false"></script>
     <!-- Cesium JS je již načten v hlavičce -->
     <!-- Přímá implementace Globe.gl -->
     <script src="app/globe-simple.js"></script>
-    <!-- Hlavní skript aplikace -->
-    <script src="app/script.js"></script>
+    <!-- Hlavní skript aplikace - přidáno defer pro zajištění, že se načte až po Leaflet.js -->
+    <script src="app/script.js" defer></script>
     <!-- Skripty pro novinky a menu příkazů -->
     <script src="app/updates-notification.js"></script>
     <script>

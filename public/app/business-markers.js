@@ -343,9 +343,19 @@ const BusinessMarkers = {
 
     // Přidání firem na mapu
     addBusinessesToMap() {
-        // Kontrola, zda existuje mapa
+        // Kontrola, zda existuje mapa a Leaflet
         if (typeof map === 'undefined') {
             console.error('Mapa není inicializována');
+            // Zkusíme znovu za 2 sekundy
+            setTimeout(() => this.addBusinessesToMap(), 2000);
+            return;
+        }
+
+        // Kontrola, zda je Leaflet načten
+        if (typeof L === 'undefined') {
+            console.error('Leaflet není načten');
+            // Zkusíme znovu za 2 sekundy
+            setTimeout(() => this.addBusinessesToMap(), 2000);
             return;
         }
 
@@ -362,6 +372,14 @@ const BusinessMarkers = {
 
     // Přidání jedné firmy na mapu
     addBusinessToMap(business) {
+        // Kontrola, zda je Leaflet načten
+        if (typeof L === 'undefined') {
+            console.error('Leaflet není načten při přidávání firmy na mapu');
+            // Zkusíme znovu za 2 sekundy
+            setTimeout(() => this.addBusinessToMap(business), 2000);
+            return;
+        }
+
         // Získání typu firmy
         const businessType = this.businessTypes[business.type] || { icon: '🏢', name: 'Firma', color: '#7f8c8d' };
 
