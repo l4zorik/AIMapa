@@ -1,47 +1,98 @@
 /**
  * Hlavní skript aplikace
- * Verze 0.2.9.4
+ * Verze 0.3.8.4
  */
 
-// Inicializace mapy
-const map = L.map('map', {
-    zoomAnimation: true, // Povolit animaci zoomu
-    markerZoomAnimation: true, // Povolit animaci markerů při zoomu
-    fadeAnimation: true, // Povolit animaci přechodů
-    zoomSnap: 0.5, // Jemnější zoom
-    wheelPxPerZoomLevel: 120, // Jemnější zoom kolečkem myši
-    minZoom: 2, // Minimální úroveň zoomu - zabrání příliš velkému oddálení
-    maxZoom: 18, // Maximální úroveň zoomu
-    maxBounds: [[-90, -180], [90, 180]], // Omezení pohybu mapy na celý svět
-    maxBoundsViscosity: 1.0 // Zajistí, že mapa nebude moci být posunuta mimo hranice
-}).setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
+// Funkce pro inicializaci mapy - bude volána po načtení stránky
+function initializeMap() {
+    console.log('Inicializace mapy...');
 
-// Přidání OpenStreetMap podkladu
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    minZoom: 2, // Minimální úroveň zoomu pro dlaždice
-    maxZoom: 18, // Maximální úroveň zoomu pro dlaždice
-    noWrap: true, // Zabrání opakování dlaždic horizontálně
-    bounds: [[-90, -180], [90, 180]] // Omezení dlaždic na celý svět
-}).addTo(map);
+    try {
+        // Kontrola, zda je dostupný Leaflet
+        if (typeof L === 'undefined') {
+            console.error('Leaflet není načten! Zkouším znovu za 1 sekundu...');
+            setTimeout(initializeMap, 1000);
+            return;
+        }
 
-// Inicializace ukazatele souřadnic
-const coordinatesDisplay = document.getElementById('coordinates');
+        // Kontrola, zda existuje element pro mapu
+        const mapElement = document.getElementById('map');
+        if (!mapElement) {
+            console.error('Element pro mapu nebyl nalezen! Zkouším znovu za 1 sekundu...');
+            setTimeout(initializeMap, 1000);
+            return;
+        }
 
-// Přidání event listeneru pro pohyb myši na mapě
-map.on('mousemove', function(e) {
-    // Získání souřadnic
-    const lat = e.latlng.lat.toFixed(6);
-    const lng = e.latlng.lng.toFixed(6);
+        // Inicializace mapy
+        window.map = L.map('map', {
+            zoomAnimation: true, // Povolit animaci zoomu
+            markerZoomAnimation: true, // Povolit animaci markerů při zoomu
+            fadeAnimation: true, // Povolit animaci přechodů
+            zoomSnap: 0.5, // Jemnější zoom
+            wheelPxPerZoomLevel: 120, // Jemnější zoom kolečkem myši
+            minZoom: 2, // Minimální úroveň zoomu - zabrání příliš velkému oddálení
+            maxZoom: 18, // Maximální úroveň zoomu
+            maxBounds: [[-90, -180], [90, 180]], // Omezení pohybu mapy na celý svět
+            maxBoundsViscosity: 1.0 // Zajistí, že mapa nebude moci být posunuta mimo hranice
+        }).setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
 
-    // Zobrazení souřadnic
-    coordinatesDisplay.innerHTML = `Lat: ${lat} | Lng: ${lng}`;
-});
+        // Přidání OpenStreetMap podkladu
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            minZoom: 2, // Minimální úroveň zoomu pro dlaždice
+            maxZoom: 18, // Maximální úroveň zoomu pro dlaždice
+            noWrap: true, // Zabrání opakování dlaždic horizontálně
+            bounds: [[-90, -180], [90, 180]] // Omezení dlaždic na celý svět
+        }).addTo(window.map);
 
-// Skrytí ukazatele souřadnic, když myš opustí mapu
-map.on('mouseout', function() {
-    coordinatesDisplay.innerHTML = '';
-});
+        console.log('Mapa byla úspěšně inicializována');
+
+        // Inicializace ostatních funkcí mapy
+        initializeMapFunctions();
+    } catch (error) {
+        console.error('Chyba při inicializaci mapy:', error);
+        console.log('Zkouším znovu za 2 sekundy...');
+        setTimeout(initializeMap, 2000);
+    }
+}
+
+// Globální proměnné pro mapu
+let map = null;
+
+// Funkce pro inicializaci ostatních funkcí mapy
+function initializeMapFunctions() {
+    console.log('Inicializace funkcí mapy...');
+
+    try {
+        // Použití globální proměnné map
+        map = window.map;
+
+        // Inicializace ukazatele souřadnic
+        const coordinatesDisplay = document.getElementById('coordinates');
+        if (!coordinatesDisplay) {
+            console.error('Element pro zobrazení souřadnic nebyl nalezen!');
+        } else {
+            // Přidání event listeneru pro pohyb myši na mapě
+            map.on('mousemove', function(e) {
+                // Získání souřadnic
+                const lat = e.latlng.lat.toFixed(6);
+                const lng = e.latlng.lng.toFixed(6);
+
+                // Zobrazení souřadnic
+                coordinatesDisplay.innerHTML = `Lat: ${lat} | Lng: ${lng}`;
+            });
+
+            // Skrytí ukazatele souřadnic, když myš opustí mapu
+            map.on('mouseout', function() {
+                coordinatesDisplay.innerHTML = '';
+            });
+        }
+
+        console.log('Funkce mapy byly úspěšně inicializovány');
+    } catch (error) {
+        console.error('Chyba při inicializaci funkcí mapy:', error);
+    }
+}
 
 // Proměnné pro ukládání bodů a tras
 let markers = [];
@@ -4521,3 +4572,89 @@ processUserInput = function(input) {
 
     return originalProcessUserInput(input);
 };
+
+// Inicializace modulu po načtení stránky
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded - inicializace aplikace...');
+
+    // Inicializace mapy
+    initializeMap();
+
+    // Inicializace modulu pro novinky
+    if (typeof UpdatesNotification !== 'undefined') {
+        UpdatesNotification.init();
+    }
+
+    // Inicializace modulu pro menu příkazů
+    if (typeof CommandsMenu !== 'undefined') {
+        CommandsMenu.init();
+    }
+
+    // Inicializace modulu pro uživatelský pokrok
+    if (typeof UserProgress !== 'undefined') {
+        UserProgress.init();
+    }
+
+    // Inicializace modulu pro virtuální práci
+    if (typeof VirtualWork !== 'undefined') {
+        VirtualWork.init();
+    }
+
+    // Inicializace modulu pro systém odměn
+    if (typeof RewardSystem !== 'undefined') {
+        RewardSystem.init();
+    }
+
+    // Inicializace modulu pro indikátor peněz
+    if (typeof MoneyIndicator !== 'undefined') {
+        MoneyIndicator.init();
+    }
+
+    // Inicializace modulu pro achievementy
+    if (typeof Achievements !== 'undefined') {
+        Achievements.init();
+    }
+
+    // Inicializace modulu pro detekci nečinnosti
+    if (typeof IdleDetection !== 'undefined') {
+        IdleDetection.init();
+    }
+
+    // Inicializace modulu pro kryptoměny
+    if (typeof CryptoFinances !== 'undefined') {
+        CryptoFinances.init();
+    }
+
+    // Inicializace modulu pro uživatelské účty
+    if (typeof UserAccounts !== 'undefined') {
+        UserAccounts.init();
+    }
+
+    // Inicializace modulu pro jednoduchý dialog práce
+    if (typeof SimpleWorkDialog !== 'undefined') {
+        SimpleWorkDialog.init();
+    }
+
+    // Inicializace Supabase klienta
+    if (typeof SupabaseClient !== 'undefined') {
+        SupabaseClient.init();
+    }
+
+    // Inicializace autentizace
+    if (typeof SupabaseAuth !== 'undefined') {
+        SupabaseAuth.init();
+    }
+
+    // Inicializace Netlify integrace
+    if (typeof NetlifyIntegration !== 'undefined') {
+        NetlifyIntegration.init();
+    }
+
+    // Inicializace přihlašovací obrazovky
+    if (typeof AuthScreen !== 'undefined') {
+        AuthScreen.init();
+    }
+
+    // Načtení stavu aplikace
+    loadAppState();
+});
