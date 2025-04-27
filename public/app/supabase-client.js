@@ -80,19 +80,37 @@ const SupabaseClient = {
     },
 
     // Autentizace uživatele pomocí emailu a hesla
-    async signIn(email, password) {
+    async signIn(email, password, csrfToken = null) {
         try {
             const client = this.getClient();
             if (!client) throw new Error('Supabase klient není inicializován');
 
+            // Přidání CSRF tokenu do hlaviček
+            const options = {};
+            if (csrfToken) {
+                options.headers = {
+                    'X-CSRF-Token': csrfToken
+                };
+            }
+
             const { data, error } = await client.auth.signInWithPassword({
                 email,
                 password
-            });
+            }, options);
 
             if (error) throw error;
 
             console.log('Uživatel byl úspěšně přihlášen:', data.user.email);
+
+            // Uložení informace o přihlášení do localStorage
+            if (typeof SecurityUtils !== 'undefined') {
+                SecurityUtils.secureLocalStorageSet('lastLogin', Date.now());
+                SecurityUtils.secureLocalStorageSet('userEmail', email);
+            } else {
+                localStorage.setItem('lastLogin', Date.now());
+                localStorage.setItem('userEmail', email);
+            }
+
             return { success: true, user: data.user, session: data.session };
         } catch (error) {
             console.error('Chyba při přihlašování uživatele:', error);
@@ -101,16 +119,29 @@ const SupabaseClient = {
     },
 
     // Registrace nového uživatele
-    async signUp(email, password, username) {
+    async signUp(email, password, username, csrfToken = null) {
         try {
             const client = this.getClient();
             if (!client) throw new Error('Supabase klient není inicializován');
 
+            // Přidání CSRF tokenu do hlaviček
+            const options = {};
+            if (csrfToken) {
+                options.headers = {
+                    'X-CSRF-Token': csrfToken
+                };
+            }
+
             // Registrace uživatele
             const { data: authData, error: authError } = await client.auth.signUp({
                 email,
-                password
-            });
+                password,
+                options: {
+                    data: {
+                        security_level: 1 // Základní úroveň zabezpečení
+                    }
+                }
+            }, options);
 
             if (authError) throw authError;
 
@@ -151,6 +182,28 @@ const SupabaseClient = {
             }
 
             console.log('Uživatel byl úspěšně zaregistrován:', email);
+
+            // Vytvoření záznamu v tabulce security_logs
+            if (authData.user) {
+                try {
+                    const { error: logError } = await client
+                        .from('security_logs')
+                        .insert([{
+                            user_id: authData.user.id,
+                            action: 'registration',
+                            ip_address: 'unknown', // V prohlížeči nemáme přístup k IP adrese
+                            user_agent: navigator.userAgent,
+                            timestamp: new Date().toISOString()
+                        }]);
+
+                    if (logError) {
+                        console.error('Chyba při vytváření bezpečnostního logu:', logError);
+                    }
+                } catch (logError) {
+                    console.error('Chyba při vytváření bezpečnostního logu:', logError);
+                }
+            }
+
             return { success: true, user: authData.user };
         } catch (error) {
             console.error('Chyba při registraci uživatele:', error);

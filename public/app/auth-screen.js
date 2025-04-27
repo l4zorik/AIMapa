@@ -1,7 +1,7 @@
 /**
  * Přihlašovací obrazovka pro AIMapa
  * Verze 0.3.8.4
- * 
+ *
  * Tento modul zobrazí přihlašovací obrazovku před přístupem k aplikaci
  * a zajistí, že uživatel je přihlášen před použitím aplikace.
  */
@@ -13,30 +13,30 @@ const AuthScreen = {
         isVisible: false,
         activeTab: 'login' // 'login' nebo 'register'
     },
-    
+
     // Inicializace modulu
     init() {
         console.log('Inicializace modulu AuthScreen...');
-        
+
         // Kontrola, zda je uživatel přihlášen
         this.checkAuthState();
-        
+
         // Nastavení posluchačů událostí
         this.setupEventListeners();
-        
+
         this.state.isInitialized = true;
         console.log('Modul AuthScreen byl inicializován');
     },
-    
+
     // Kontrola stavu přihlášení
     async checkAuthState() {
         console.log('Kontrola stavu přihlášení...');
-        
+
         // Pokud je dostupný SupabaseClient, použijeme ho pro kontrolu přihlášení
         if (typeof SupabaseClient !== 'undefined') {
             try {
                 const result = await SupabaseClient.getCurrentUser();
-                
+
                 if (result.success && result.user) {
                     console.log('Uživatel je přihlášen:', result.user.email);
                     this.hideAuthScreen();
@@ -46,35 +46,35 @@ const AuthScreen = {
                 console.error('Chyba při kontrole stavu přihlášení:', error);
             }
         }
-        
+
         // Pokud je dostupný UserAccounts, použijeme ho pro kontrolu přihlášení
         if (typeof UserAccounts !== 'undefined' && UserAccounts.state.isLoggedIn) {
             console.log('Uživatel je přihlášen přes UserAccounts');
             this.hideAuthScreen();
             return;
         }
-        
+
         // Pokud uživatel není přihlášen, zobrazíme přihlašovací obrazovku
         console.log('Uživatel není přihlášen, zobrazuji přihlašovací obrazovku');
         this.showAuthScreen();
     },
-    
+
     // Zobrazení přihlašovací obrazovky
     showAuthScreen() {
         console.log('Zobrazení přihlašovací obrazovky');
-        
+
         // Kontrola, zda již obrazovka existuje
         if (document.getElementById('authScreen')) {
             document.getElementById('authScreen').style.display = 'flex';
             this.state.isVisible = true;
             return;
         }
-        
+
         // Vytvoření přihlašovací obrazovky
         const authScreen = document.createElement('div');
         authScreen.id = 'authScreen';
         authScreen.className = 'auth-screen';
-        
+
         // Nastavení obsahu
         authScreen.innerHTML = `
             <div class="auth-container">
@@ -82,12 +82,12 @@ const AuthScreen = {
                     <h1>AI Mapa</h1>
                     <p>Pro pokračování se prosím přihlaste nebo zaregistrujte</p>
                 </div>
-                
+
                 <div class="auth-tabs">
                     <button class="auth-tab active" data-tab="login">Přihlášení</button>
                     <button class="auth-tab" data-tab="register">Registrace</button>
                 </div>
-                
+
                 <div class="auth-content">
                     <div class="auth-form login-form active">
                         <div class="form-group">
@@ -103,7 +103,7 @@ const AuthScreen = {
                         </div>
                         <div class="auth-message" id="loginMessage"></div>
                     </div>
-                    
+
                     <div class="auth-form register-form">
                         <div class="form-group">
                             <label for="registerUsername">Uživatelské jméno</label>
@@ -115,11 +115,19 @@ const AuthScreen = {
                         </div>
                         <div class="form-group">
                             <label for="registerPassword">Heslo</label>
-                            <input type="password" id="registerPassword" placeholder="Zadejte heslo">
+                            <input type="password" id="registerPassword" placeholder="Zadejte heslo" oninput="AuthScreen.checkPasswordStrength()">
+                            <div class="password-strength-meter">
+                                <div class="password-strength-meter-bar" id="passwordStrengthBar"></div>
+                            </div>
+                            <div class="password-strength-text" id="passwordStrengthText"></div>
                         </div>
                         <div class="form-group">
                             <label for="registerPasswordConfirm">Potvrzení hesla</label>
                             <input type="password" id="registerPasswordConfirm" placeholder="Potvrďte heslo">
+                        </div>
+                        <div class="security-alert info">
+                            <span class="security-alert-icon">ℹ️</span>
+                            <span>Heslo musí mít alespoň 8 znaků a obsahovat velké písmeno, malé písmeno, číslo a speciální znak.</span>
                         </div>
                         <div class="form-actions">
                             <button id="registerButton" class="auth-button">Zaregistrovat se</button>
@@ -127,43 +135,43 @@ const AuthScreen = {
                         <div class="auth-message" id="registerMessage"></div>
                     </div>
                 </div>
-                
+
                 <div class="auth-footer">
                     <p>© 2025 AI Mapa - Všechna práva vyhrazena</p>
                 </div>
             </div>
         `;
-        
+
         // Přidání do dokumentu
         document.body.appendChild(authScreen);
-        
+
         // Nastavení posluchačů událostí
         this.setupFormEventListeners();
-        
+
         // Nastavení stavu
         this.state.isVisible = true;
     },
-    
+
     // Skrytí přihlašovací obrazovky
     hideAuthScreen() {
         console.log('Skrytí přihlašovací obrazovky');
-        
+
         const authScreen = document.getElementById('authScreen');
         if (authScreen) {
             authScreen.style.display = 'none';
         }
-        
+
         this.state.isVisible = false;
     },
-    
+
     // Nastavení posluchačů událostí
     setupEventListeners() {
         console.log('Nastavení posluchačů událostí');
-        
+
         // Posluchač pro změnu stavu přihlášení
         document.addEventListener('authStateChanged', (event) => {
             console.log('Událost authStateChanged:', event.detail);
-            
+
             if (event.detail.isLoggedIn) {
                 this.hideAuthScreen();
             } else {
@@ -171,35 +179,35 @@ const AuthScreen = {
             }
         });
     },
-    
+
     // Nastavení posluchačů událostí pro formuláře
     setupFormEventListeners() {
         console.log('Nastavení posluchačů událostí pro formuláře');
-        
+
         // Přepínání mezi záložkami
         const tabs = document.querySelectorAll('.auth-tab');
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 // Odstranění aktivní třídy ze všech záložek
                 tabs.forEach(t => t.classList.remove('active'));
-                
+
                 // Přidání aktivní třídy na kliknutou záložku
                 tab.classList.add('active');
-                
+
                 // Nastavení aktivní záložky
                 this.state.activeTab = tab.getAttribute('data-tab');
-                
+
                 // Zobrazení odpovídajícího formuláře
                 const forms = document.querySelectorAll('.auth-form');
                 forms.forEach(form => form.classList.remove('active'));
-                
+
                 const activeForm = document.querySelector(`.${this.state.activeTab}-form`);
                 if (activeForm) {
                     activeForm.classList.add('active');
                 }
             });
         });
-        
+
         // Přihlášení
         const loginButton = document.getElementById('loginButton');
         if (loginButton) {
@@ -207,7 +215,7 @@ const AuthScreen = {
                 this.login();
             });
         }
-        
+
         // Registrace
         const registerButton = document.getElementById('registerButton');
         if (registerButton) {
@@ -216,35 +224,65 @@ const AuthScreen = {
             });
         }
     },
-    
+
     // Přihlášení uživatele
     async login() {
         console.log('Přihlášení uživatele');
-        
+
         // Získání hodnot z formuláře
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
-        
+
         // Validace
         if (!email || !password) {
             this.showMessage('loginMessage', 'Vyplňte prosím všechna pole', 'error');
             return;
         }
-        
+
+        // Sanitizace vstupu
+        const sanitizedEmail = typeof SecurityUtils !== 'undefined' ?
+            SecurityUtils.sanitizeInput(email) : email;
+
+        // Kontrola uzamčení účtu
+        if (typeof SecurityUtils !== 'undefined') {
+            const lockStatus = SecurityUtils.isAccountLocked(sanitizedEmail);
+            if (lockStatus.locked) {
+                this.showMessage('loginMessage', lockStatus.message, 'error');
+                return;
+            }
+
+            // Přidání pokusu o přihlášení
+            const attemptResult = SecurityUtils.addLoginAttempt(sanitizedEmail);
+            if (attemptResult.locked) {
+                this.showMessage('loginMessage', attemptResult.message, 'error');
+                return;
+            }
+        }
+
         // Přihlášení přes Supabase
         if (typeof SupabaseClient !== 'undefined') {
             try {
-                const result = await SupabaseClient.signIn(email, password);
-                
+                // Přidání CSRF tokenu do požadavku
+                const csrfToken = typeof SecurityUtils !== 'undefined' ?
+                    SecurityUtils.getCsrfToken() : null;
+
+                const result = await SupabaseClient.signIn(sanitizedEmail, password, csrfToken);
+
                 if (result.success) {
                     console.log('Uživatel byl úspěšně přihlášen přes Supabase');
+
+                    // Reset počtu pokusů o přihlášení
+                    if (typeof SecurityUtils !== 'undefined') {
+                        SecurityUtils.resetLoginAttempts(sanitizedEmail);
+                    }
+
                     this.hideAuthScreen();
-                    
+
                     // Vyvolání události o změně stavu přihlášení
                     document.dispatchEvent(new CustomEvent('authStateChanged', {
                         detail: { isLoggedIn: true, user: result.user }
                     }));
-                    
+
                     return;
                 } else {
                     this.showMessage('loginMessage', result.error || 'Přihlášení se nezdařilo', 'error');
@@ -254,21 +292,21 @@ const AuthScreen = {
                 this.showMessage('loginMessage', error.message || 'Přihlášení se nezdařilo', 'error');
             }
         }
-        
+
         // Přihlášení přes UserAccounts
         if (typeof UserAccounts !== 'undefined') {
             try {
                 const result = UserAccounts.login(email, password);
-                
+
                 if (result.success) {
                     console.log('Uživatel byl úspěšně přihlášen přes UserAccounts');
                     this.hideAuthScreen();
-                    
+
                     // Vyvolání události o změně stavu přihlášení
                     document.dispatchEvent(new CustomEvent('authStateChanged', {
                         detail: { isLoggedIn: true, user: UserAccounts.state.currentUser }
                     }));
-                    
+
                     return;
                 } else {
                     this.showMessage('loginMessage', result.error || 'Přihlášení se nezdařilo', 'error');
@@ -278,50 +316,69 @@ const AuthScreen = {
                 this.showMessage('loginMessage', error.message || 'Přihlášení se nezdařilo', 'error');
             }
         }
-        
+
         // Pokud není dostupný žádný autentizační systém
         if (typeof SupabaseClient === 'undefined' && typeof UserAccounts === 'undefined') {
             console.error('Není dostupný žádný autentizační systém');
             this.showMessage('loginMessage', 'Není dostupný žádný autentizační systém', 'error');
         }
     },
-    
+
     // Registrace uživatele
     async register() {
         console.log('Registrace uživatele');
-        
+
         // Získání hodnot z formuláře
         const username = document.getElementById('registerUsername').value;
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
         const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-        
+
         // Validace
         if (!username || !email || !password || !passwordConfirm) {
             this.showMessage('registerMessage', 'Vyplňte prosím všechna pole', 'error');
             return;
         }
-        
+
         if (password !== passwordConfirm) {
             this.showMessage('registerMessage', 'Hesla se neshodují', 'error');
             return;
         }
-        
+
+        // Sanitizace vstupu
+        const sanitizedUsername = typeof SecurityUtils !== 'undefined' ?
+            SecurityUtils.sanitizeInput(username) : username;
+        const sanitizedEmail = typeof SecurityUtils !== 'undefined' ?
+            SecurityUtils.sanitizeInput(email) : email;
+
+        // Validace síly hesla
+        if (typeof SecurityUtils !== 'undefined') {
+            const passwordValidation = SecurityUtils.validatePassword(password);
+            if (!passwordValidation.valid) {
+                this.showMessage('registerMessage', passwordValidation.errors.join('<br>'), 'error');
+                return;
+            }
+        }
+
         // Registrace přes Supabase
         if (typeof SupabaseClient !== 'undefined') {
             try {
-                const result = await SupabaseClient.signUp(email, password, username);
-                
+                // Přidání CSRF tokenu do požadavku
+                const csrfToken = typeof SecurityUtils !== 'undefined' ?
+                    SecurityUtils.getCsrfToken() : null;
+
+                const result = await SupabaseClient.signUp(sanitizedEmail, password, sanitizedUsername, csrfToken);
+
                 if (result.success) {
                     console.log('Uživatel byl úspěšně zaregistrován přes Supabase');
                     this.showMessage('registerMessage', 'Registrace byla úspěšná. Nyní se můžete přihlásit.', 'success');
-                    
+
                     // Přepnutí na záložku přihlášení
                     const loginTab = document.querySelector('.auth-tab[data-tab="login"]');
                     if (loginTab) {
                         loginTab.click();
                     }
-                    
+
                     return;
                 } else {
                     this.showMessage('registerMessage', result.error || 'Registrace se nezdařila', 'error');
@@ -331,22 +388,22 @@ const AuthScreen = {
                 this.showMessage('registerMessage', error.message || 'Registrace se nezdařila', 'error');
             }
         }
-        
+
         // Registrace přes UserAccounts
         if (typeof UserAccounts !== 'undefined') {
             try {
                 const result = UserAccounts.register(username, email, password);
-                
+
                 if (result.success) {
                     console.log('Uživatel byl úspěšně zaregistrován přes UserAccounts');
                     this.showMessage('registerMessage', 'Registrace byla úspěšná. Nyní se můžete přihlásit.', 'success');
-                    
+
                     // Přepnutí na záložku přihlášení
                     const loginTab = document.querySelector('.auth-tab[data-tab="login"]');
                     if (loginTab) {
                         loginTab.click();
                     }
-                    
+
                     return;
                 } else {
                     this.showMessage('registerMessage', result.error || 'Registrace se nezdařila', 'error');
@@ -356,29 +413,120 @@ const AuthScreen = {
                 this.showMessage('registerMessage', error.message || 'Registrace se nezdařila', 'error');
             }
         }
-        
+
         // Pokud není dostupný žádný autentizační systém
         if (typeof SupabaseClient === 'undefined' && typeof UserAccounts === 'undefined') {
             console.error('Není dostupný žádný autentizační systém');
             this.showMessage('registerMessage', 'Není dostupný žádný autentizační systém', 'error');
         }
     },
-    
+
     // Zobrazení zprávy
     showMessage(elementId, message, type = 'info') {
         console.log(`Zobrazení zprávy (${type}):`, message);
-        
+
         const messageElement = document.getElementById(elementId);
         if (!messageElement) return;
-        
-        messageElement.textContent = message;
+
+        messageElement.innerHTML = message; // Použití innerHTML pro podporu HTML formátování
         messageElement.className = 'auth-message ' + type;
-        
+
         // Automatické skrytí zprávy po 5 sekundách
         setTimeout(() => {
             messageElement.textContent = '';
             messageElement.className = 'auth-message';
         }, 5000);
+    },
+
+    // Kontrola síly hesla
+    checkPasswordStrength() {
+        const password = document.getElementById('registerPassword').value;
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        const strengthText = document.getElementById('passwordStrengthText');
+
+        if (!password) {
+            strengthBar.className = 'password-strength-meter-bar';
+            strengthBar.style.width = '0%';
+            strengthText.textContent = '';
+            return;
+        }
+
+        // Výpočet síly hesla
+        let strength = 0;
+        let feedback = [];
+
+        // Délka hesla
+        if (password.length >= 12) {
+            strength += 25;
+        } else if (password.length >= 8) {
+            strength += 15;
+        } else if (password.length >= 6) {
+            strength += 5;
+        }
+
+        // Velká písmena
+        if (/[A-Z]/.test(password)) {
+            strength += 15;
+        } else {
+            feedback.push('Přidejte velké písmeno');
+        }
+
+        // Malá písmena
+        if (/[a-z]/.test(password)) {
+            strength += 15;
+        } else {
+            feedback.push('Přidejte malé písmeno');
+        }
+
+        // Čísla
+        if (/[0-9]/.test(password)) {
+            strength += 15;
+        } else {
+            feedback.push('Přidejte číslo');
+        }
+
+        // Speciální znaky
+        if (/[^A-Za-z0-9]/.test(password)) {
+            strength += 20;
+        } else {
+            feedback.push('Přidejte speciální znak');
+        }
+
+        // Různorodost znaků
+        const uniqueChars = new Set(password.split('')).size;
+        const uniqueRatio = uniqueChars / password.length;
+        strength += Math.round(uniqueRatio * 10);
+
+        // Nastavení třídy a textu podle síly hesla
+        let strengthClass = '';
+        let strengthMessage = '';
+
+        if (strength >= 80) {
+            strengthClass = 'very-strong';
+            strengthMessage = 'Velmi silné heslo';
+        } else if (strength >= 60) {
+            strengthClass = 'strong';
+            strengthMessage = 'Silné heslo';
+        } else if (strength >= 40) {
+            strengthClass = 'medium';
+            strengthMessage = 'Středně silné heslo';
+        } else if (strength >= 20) {
+            strengthClass = 'weak';
+            strengthMessage = 'Slabé heslo';
+        } else {
+            strengthClass = 'very-weak';
+            strengthMessage = 'Velmi slabé heslo';
+        }
+
+        // Aktualizace UI
+        strengthBar.className = 'password-strength-meter-bar ' + strengthClass;
+        strengthBar.style.width = strength + '%';
+
+        if (feedback.length > 0 && strength < 60) {
+            strengthText.textContent = `${strengthMessage} - ${feedback.join(', ')}`;
+        } else {
+            strengthText.textContent = strengthMessage;
+        }
     }
 };
 

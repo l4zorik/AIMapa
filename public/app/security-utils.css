@@ -1,0 +1,165 @@
+/**
+ * Styly pro bezpečnostní prvky AIMapa
+ * Verze 0.3.8.4
+ */
+
+/* Indikátor síly hesla */
+.password-strength-meter {
+    height: 5px;
+    width: 100%;
+    background-color: #ddd;
+    margin: 10px 0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.password-strength-meter-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.password-strength-meter-bar.very-weak {
+    width: 20%;
+    background-color: #e74c3c;
+}
+
+.password-strength-meter-bar.weak {
+    width: 40%;
+    background-color: #e67e22;
+}
+
+.password-strength-meter-bar.medium {
+    width: 60%;
+    background-color: #f1c40f;
+}
+
+.password-strength-meter-bar.strong {
+    width: 80%;
+    background-color: #2ecc71;
+}
+
+.password-strength-meter-bar.very-strong {
+    width: 100%;
+    background-color: #27ae60;
+}
+
+.password-strength-text {
+    font-size: 12px;
+    margin-top: 5px;
+    color: var(--text-color-secondary, #777);
+}
+
+/* Bezpečnostní upozornění */
+.security-alert {
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.security-alert.info {
+    background-color: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    color: #3498db;
+}
+
+.security-alert.warning {
+    background-color: rgba(241, 196, 15, 0.1);
+    border: 1px solid rgba(241, 196, 15, 0.3);
+    color: #f39c12;
+}
+
+.security-alert.error {
+    background-color: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+}
+
+.security-alert.success {
+    background-color: rgba(46, 204, 113, 0.1);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    color: #2ecc71;
+}
+
+.security-alert-icon {
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+/* Animace pro bezpečnostní upozornění */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Bezpečnostní nastavení */
+.security-settings-section {
+    margin-bottom: 20px;
+}
+
+.security-settings-section h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: var(--text-color, #333);
+}
+
+.security-settings-option {
+    margin-bottom: 15px;
+}
+
+.security-settings-option label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-color, #333);
+}
+
+.security-settings-option input[type="number"],
+.security-settings-option input[type="text"],
+.security-settings-option select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.security-settings-option .checkbox-container {
+    display: flex;
+    align-items: center;
+}
+
+.security-settings-option .checkbox-container input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .password-strength-text {
+    color: var(--dark-text-secondary, #999);
+}
+
+body[data-theme="dark"] .security-settings-section h3 {
+    color: var(--dark-text, #eee);
+}
+
+body[data-theme="dark"] .security-settings-option label {
+    color: var(--dark-text, #eee);
+}
+
+body[data-theme="dark"] .security-settings-option input[type="number"],
+body[data-theme="dark"] .security-settings-option input[type="text"],
+body[data-theme="dark"] .security-settings-option select {
+    background-color: var(--dark-input-background, #333);
+    border-color: var(--dark-border, #444);
+    color: var(--dark-text, #eee);
+}

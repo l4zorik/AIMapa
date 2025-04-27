@@ -3,3 +3,6 @@
   X-XSS-Protection: 1; mode=block
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(self), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'self' https://cdn.jsdelivr.net https://*.supabase.co https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.unpkg.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://*.supabase.co https://*.unpkg.com https://*.leafletjs.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.unpkg.com https://*.leafletjs.com; img-src 'self' data: https://via.placeholder.com https://unpkg.com https://*.supabase.co https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.unpkg.com https://*.leafletjs.com; connect-src 'self' https://*.supabase.co https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.unpkg.com https://*.leafletjs.com;
