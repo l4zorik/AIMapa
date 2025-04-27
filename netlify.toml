@@ -1,0 +1,49 @@
+# Netlify konfigurace pro AIMapa
+# Verze 0.3.8.4
+
+# Základní nastavení buildu
+[build]
+  # Příkaz pro build aplikace
+  command = "npm run build"
+  # Adresář, který bude nasazen (výchozí je public)
+  publish = "public"
+  # Funkce pro serverless funkce
+  functions = "functions"
+
+# Nastavení pro produkční prostředí
+[context.production]
+  # Proměnné prostředí pro produkci
+  environment = { NODE_VERSION = "18.x" }
+
+# Nastavení pro vývojové prostředí
+[context.branch-deploy]
+  # Proměnné prostředí pro vývojové větve
+  environment = { NODE_VERSION = "18.x" }
+
+# Nastavení pro deploy preview
+[context.deploy-preview]
+  # Proměnné prostředí pro náhledy
+  environment = { NODE_VERSION = "18.x" }
+
+# Přesměrování a hlavičky
+[[redirects]]
+  # Přesměrování všech požadavků na index.html pro SPA
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Hlavičky pro zabezpečení
+[[headers]]
+  # Hlavičky pro všechny soubory
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self' https://cdn.jsdelivr.net https://*.supabase.co; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.supabase.co; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://via.placeholder.com https://unpkg.com https://*.supabase.co; connect-src 'self' https://*.supabase.co;"
+
+# Nastavení pro Supabase
+[build.environment]
+  # Proměnné prostředí pro Supabase budou nastaveny automaticky Netlify
+  SUPABASE_PROJECT = "AI Mapa"

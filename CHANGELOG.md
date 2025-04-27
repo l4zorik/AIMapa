@@ -2,6 +2,76 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.8.4] - 2025-07-10 - INTEGRACE SUPABASE A NETLIFY
+
+### Nové funkce
+- Přidána integrace s Supabase pro ukládání dat v cloudu a autentizaci uživatelů
+- Implementována synchronizace uživatelských dat mezi zařízeními přes Supabase
+- Přidána podpora pro nasazení aplikace na Netlify s automatickým CI/CD
+- Implementována konfigurace pro automatické nasazení při push do hlavní větve
+- Přidána možnost přihlášení přes Google, Facebook a GitHub účty
+- Implementována správa uživatelských rolí a oprávnění
+- Přidána možnost ukládání uživatelských nastavení v cloudu
+
+### Vylepšení
+- Vylepšena bezpečnost aplikace s využitím Row Level Security v Supabase
+- Optimalizován proces synchronizace dat pro minimální využití přenosů
+- Přidána možnost offline práce s automatickou synchronizací po připojení
+- Vylepšena správa uživatelských účtů s možností resetování hesla
+- Implementována podpora pro více zařízení jednoho uživatele
+- Přidána možnost exportu a importu dat z/do Supabase
+
+### Opravy
+- Opraveny problémy s ukládáním dat při výpadku připojení
+- Vylepšena odolnost aplikace proti chybám při synchronizaci
+- Optimalizována velikost přenášených dat pro rychlejší načítání
+
+## [0.3.8.2] - 2025-07-08 - UŽIVATELSKÉ ÚČTY, OFFLINE REŽIM A MOBILNÍ OPTIMALIZACE
+
+### Nové funkce
+- Implementován plně funkční systém uživatelských účtů s lokálním přihlašováním
+- Přidána možnost nastavení profilového obrázku a úpravy uživatelských údajů
+- Implementován základní offline režim s ukládáním dat do IndexedDB
+- Přidána synchronizace uživatelských dat mezi zařízeními
+- Přidáno 10 nových achievementů zaměřených na mobilní používání a offline režim
+- Implementována detekce typu zařízení s automatickým přizpůsobením rozhraní
+
+### Vylepšení
+- Kompletně přepracován tmavý režim, který nyní ovlivňuje celou mapu včetně markerů a tras
+- Přidány nové efekty noční oblohy s realistickými souhvězdími a padajícími hvězdami
+- Optimalizováno uživatelské rozhraní pro mobilní zařízení s dotykovým ovládáním
+- Vylepšena responzivita všech dialogů a oken pro různé velikosti obrazovky
+- Přidána podpora pro gesta na dotykových zařízeních (přiblížení, rotace mapy)
+- Optimalizována velikost aplikace pro rychlejší načítání na mobilních zařízeních
+- Přidána možnost exportu a importu uživatelských dat pro přenos mezi zařízeními
+- Vylepšen systém achievementů s detailnějšími statistikami a vizuálním zobrazením postupu
+
+### Opravy
+- Opraveno zobrazení na zařízeních s malou obrazovkou (telefony, tablety)
+- Vyřešeny problémy s překrýváním prvků na mobilních zařízeních
+- Optimalizována spotřeba baterie v tmavém režimu na mobilních zařízeních
+- Opraveny problémy s dotykovým ovládáním na různých typech zařízení
+
+## [0.3.8.1] - 2025-07-06 - PŘESOUVATELNÉ DIALOGY A VYLEPŠENÍ NOTIFIKACÍ
+
+### Nové funkce
+- Přidána možnost přesouvat dialog nedokončené práce pomocí drag and drop
+- Implementována vizuální indikace přesouvatelnosti dialogu v hlavičce
+- Přidáno automatické omezení pohybu dialogu, aby nezmizel mimo obrazovku
+
+### Vylepšení
+- Extrémně zmenšena notifikace o uložení práce pro minimální rušení
+- Zkrácena doba zobrazení notifikace z 5 na 1 sekundu
+- Maximálně zjednodušen obsah notifikace - pouze ikona zaškrtnutí a text "Uloženo"
+- Odstraněno tlačítko zavření z notifikace - nyní se zavírá kliknutím kamkoliv na notifikaci
+- Přidán hover efekt na notifikaci pro indikaci klikatelnosti
+- Vylepšen design hlavičky dialogu s indikací přesouvatelnosti
+- Vycentrován nadpis v hlavičce dialogu pro lepší vzhled
+
+### Opravy
+- Opraveno překrývání notifikace s jinými prvky uživatelského rozhraní
+- Vylepšena viditelnost notifikace v tmavém režimu
+
 ## [0.3.8.0] - 2025-07-05 - VYLEPŠENÍ SYSTÉMU XP A DETEKCE NEČINNOSTI
 
 ### Nové funkce

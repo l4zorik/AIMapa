@@ -15,7 +15,8 @@ AIMapa je webová aplikace, která kombinuje interaktivní mapu s funkcemi uměl
 
 - **Frontend**: HTML, CSS, JavaScript, Leaflet.js
 - **Backend**: Node.js, Express.js
-- **Databáze**: MongoDB (připraveno pro implementaci)
+- **Databáze**: Supabase (PostgreSQL)
+- **Nasazení**: Netlify
 
 ## Instalace
 
@@ -33,7 +34,8 @@ AIMapa je webová aplikace, která kombinuje interaktivní mapu s funkcemi uměl
 3. Vytvořte soubor `.env` s následujícím obsahem:
    ```
    PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/aimapa
+   SUPABASE_URL=https://your-project-id.supabase.co
+   SUPABASE_ANON_KEY=your-anon-key
    ```
 
 4. Spusťte aplikaci:
@@ -53,13 +55,19 @@ npm run dev
 ## Struktura projektu
 
 - `public/` - Statické soubory (HTML, CSS, klientský JavaScript)
+- `public/app/` - Moduly aplikace
 - `routes/` - API endpointy
 - `server.js` - Hlavní soubor serveru
 - `package.json` - Konfigurace projektu a závislosti
+- `netlify.toml` - Konfigurace nasazení na Netlify
+
+## Integrace s Supabase a Netlify
+
+AIMapa je integrována s Supabase pro ukládání dat v cloudu a autentizaci uživatelů, a s Netlify pro automatické nasazení aplikace. Podrobné informace o integraci najdete v souboru [SUPABASE_NETLIFY_INTEGRATION.md](SUPABASE_NETLIFY_INTEGRATION.md).
 
 ## Verze
 
-Aktuální verze: 0.3.7.0
+Aktuální verze: 0.3.8.4
 
 Podrobný seznam změn najdete v souboru [CHANGELOG.md](CHANGELOG.md).
 

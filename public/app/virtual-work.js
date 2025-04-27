@@ -132,6 +132,64 @@ class VirtualWorkClass {
     }
 
     /**
+     * Inicializace přesouvání dialogu
+     * @param {HTMLElement} dialog - Dialog, který chceme přesouvat
+     */
+    initDraggable(dialog) {
+        if (!dialog) return;
+
+        const header = dialog.querySelector('.virtual-work-header');
+        if (!header) return;
+
+        header.addEventListener('mousedown', (e) => {
+            // Ignorovat kliknutí na tlačítko zavření
+            if (e.target.closest('.virtual-work-close')) return;
+
+            this.isDragging = true;
+
+            // Uložení počáteční pozice myši
+            const rect = dialog.getBoundingClientRect();
+            this.dragOffset = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+
+            // Odstranění transformace pro přesné pozicování
+            dialog.style.transform = 'none';
+            dialog.style.top = rect.top + 'px';
+            dialog.style.left = rect.left + 'px';
+
+            // Přidání třídy pro indikaci přesouvání
+            dialog.classList.add('dragging');
+
+            // Zabránění výchozímu chování
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!this.isDragging) return;
+
+            // Výpočet nové pozice
+            const newLeft = e.clientX - this.dragOffset.x;
+            const newTop = e.clientY - this.dragOffset.y;
+
+            // Omezení pohybu, aby dialog nezmizel mimo obrazovku
+            const maxLeft = window.innerWidth - dialog.offsetWidth;
+            const maxTop = window.innerHeight - dialog.offsetHeight;
+
+            dialog.style.left = Math.max(0, Math.min(newLeft, maxLeft)) + 'px';
+            dialog.style.top = Math.max(0, Math.min(newTop, maxTop)) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (this.isDragging) {
+                this.isDragging = false;
+                dialog.classList.remove('dragging');
+            }
+        });
+    }
+
+    /**
      * Načtení informací o projektu z localStorage
      */
     loadProjectInfo() {
@@ -449,20 +507,17 @@ class VirtualWorkClass {
         const notification = document.createElement('div');
         notification.className = 'saved-work-notification';
         notification.innerHTML = `
-            <div class="saved-work-notification-icon">${workplace.icon}</div>
+            <div class="saved-work-notification-icon">✓</div>
             <div class="saved-work-notification-content">
-                <div class="saved-work-notification-title">Práce uložena</div>
-                <div class="saved-work-notification-text">Vaše práce jako ${workplace.name} byla uložena. Můžete se k ní vrátit později.</div>
+                <div class="saved-work-notification-title">Uloženo</div>
             </div>
-            <button class="saved-work-notification-close">&times;</button>
         `;
 
         // Přidání notifikace do stránky
         document.body.appendChild(notification);
 
-        // Přidání event listeneru pro zavření notifikace
-        const closeBtn = notification.querySelector('.saved-work-notification-close');
-        closeBtn.addEventListener('click', () => {
+        // Přidání event listeneru pro zavření notifikace při kliknutí na notifikaci
+        notification.addEventListener('click', () => {
             notification.classList.add('closing');
             setTimeout(() => {
                 if (notification.parentNode) {
@@ -471,7 +526,7 @@ class VirtualWorkClass {
             }, 300);
         });
 
-        // Automatické zavření notifikace po 5 sekundách
+        // Automatické zavření notifikace po 1 sekundě
         setTimeout(() => {
             notification.classList.add('closing');
             setTimeout(() => {
@@ -479,7 +534,7 @@ class VirtualWorkClass {
                     notification.parentNode.removeChild(notification);
                 }
             }, 300);
-        }, 5000);
+        }, 1000);
     }
 
     /**
@@ -518,6 +573,12 @@ class VirtualWorkClass {
         } else {
             // Aktualizace titulku existujícího dialogu
             dialog.querySelector('.virtual-work-header h2').textContent = 'Nedokončená práce';
+
+            // Inicializace přesouvání dialogu, pokud ještě nebylo inicializováno
+            if (!dialog.classList.contains('draggable-initialized')) {
+                this.initDraggable(dialog);
+                dialog.classList.add('draggable-initialized');
+            }
         }
 
         // Zobrazení seznamu nedokončených prací
@@ -713,6 +774,9 @@ class VirtualWorkClass {
         // Přidání základních event listenerů
         const closeBtn = dialog.querySelector('.virtual-work-close');
         closeBtn.addEventListener('click', () => this.closeDialog(dialog));
+
+        // Inicializace přesouvání dialogu
+        this.initDraggable(dialog);
 
         return dialog;
     }
@@ -997,6 +1061,10 @@ class VirtualWorkClass {
         if (!dialog.parentNode) {
             document.body.appendChild(dialog);
         }
+
+        // Inicializace přesouvání dialogu
+        this.initDraggable(dialog);
+        dialog.classList.add('draggable-initialized');
 
         // Přidání event listenerů
         this.setupDialogEvents(dialog);

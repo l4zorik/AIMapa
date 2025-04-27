@@ -108,12 +108,43 @@
     overflow: hidden;
     margin-right: 15px;
     border: 3px solid var(--primary-color);
+    cursor: pointer;
 }
 
 .account-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.account-avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+}
+
+.account-avatar:hover .account-avatar-overlay {
+    opacity: 1;
+}
+
+.account-avatar-change-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.account-avatar-change-text {
+    font-size: 12px;
+    font-weight: bold;
 }
 
 .account-level {
