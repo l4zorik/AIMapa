@@ -2,6 +2,20 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.8.1] - 2025-07-06 - STABILNÍ VERZE S FUNKČNÍ MAPOU A NODE.JS SERVEREM
+
+### Stabilní funkce
+- Plně funkční mapa s Leaflet.js a správnou inicializací
+- Spolehlivý Node.js server pro poskytování aplikace
+- Funkční systém uživatelských účtů s lokálním přihlašováním
+- Stabilní implementace virtuální práce a odměňovacího systému
+- Optimalizace pro mobilní zařízení a různé prohlížeče
+
+### Poznámky
+- Tato verze je označena jako stabilní a doporučená pro produkční nasazení
+- Všechny kritické funkce byly důkladně otestovány a fungují správně
+- Verze je připravena pro integraci s Supabase a nasazení na Netlify
+
 ## [0.3.8.0] - 2025-07-05 - VYLEPŠENÍ SYSTÉMU XP A DETEKCE NEČINNOSTI
 
 ### Nové funkce
