@@ -21,8 +21,15 @@ const Auth0Auth = {
         redirectUri: window.location.origin,
         // Přidání podpory pro vývojovou verzi na Netlify
         netlifyDevRedirectUri: 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app',
+        // Lokální vývojové prostředí
+        localDevRedirectUri: 'http://localhost:3000',
         audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
-        scope: 'openid profile email read:users read:user_idp_tokens'
+        scope: 'openid profile email read:users read:user_idp_tokens',
+        // Nastavení pro SPA aplikaci
+        authorizationParams: {
+            response_type: 'code',
+            audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/'
+        }
     },
 
     // Logování pro debugování
@@ -106,7 +113,15 @@ const Auth0Auth = {
             // Kontrola, zda je dostupná Auth0 knihovna
             if (typeof auth0 === 'undefined') {
                 console.error('Auth0 knihovna není dostupná. Ujistěte se, že je načten skript auth0-spa-js.');
-                return false;
+
+                // Pokus o načtení Auth0 knihovny z CDN
+                console.log('Pokouším se načíst Auth0 knihovnu z CDN...');
+                await this.loadAuth0Script();
+
+                if (typeof auth0 === 'undefined') {
+                    console.error('Nepodařilo se načíst Auth0 knihovnu z CDN.');
+                    return false;
+                }
             }
 
             // Načtení konfigurace ze serveru
@@ -120,6 +135,11 @@ const Auth0Auth = {
                 console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
                 redirectUri = this.config.netlifyDevRedirectUri;
             }
+            // Kontrola, zda jsme na localhost:3000
+            else if (window.location.href.includes('localhost:3000')) {
+                console.log('Jsme na lokálním vývojovém prostředí, používám localhost URL pro přesměrování');
+                redirectUri = this.config.localDevRedirectUri;
+            }
 
             console.log('Inicializace Auth0 klienta s URL pro přesměrování:', redirectUri);
 
@@ -130,8 +150,11 @@ const Auth0Auth = {
                 authorizationParams: {
                     redirect_uri: redirectUri,
                     audience: this.config.audience,
-                    scope: this.config.scope
-                }
+                    scope: this.config.scope,
+                    response_type: 'code'
+                },
+                useRefreshTokens: true,
+                cacheLocation: 'localstorage'
             });
 
             console.log('Auth0 klient byl úspěšně načten');
@@ -140,6 +163,18 @@ const Auth0Auth = {
             console.error('Chyba při načítání Auth0 klienta:', error);
             return false;
         }
+    },
+
+    // Načtení Auth0 skriptu z CDN
+    loadAuth0Script() {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
+            script.async = true;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
     },
 
     // Kontrola, zda je uživatel přihlášen
@@ -279,6 +314,11 @@ const Auth0Auth = {
                 console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
                 redirectUri = this.config.netlifyDevRedirectUri;
             }
+            // Kontrola, zda jsme na localhost:3000
+            else if (window.location.href.includes('localhost:3000')) {
+                console.log('Jsme na lokálním vývojovém prostředí, používám localhost URL pro přesměrování');
+                redirectUri = this.config.localDevRedirectUri;
+            }
 
             console.log('Přesměrování na Auth0 přihlašovací stránku s URL:', redirectUri);
 
@@ -302,7 +342,9 @@ const Auth0Auth = {
             console.log('Používám Auth0 SDK pro přesměrování...');
             await this.state.auth0Client.loginWithRedirect({
                 authorizationParams: {
-                    redirect_uri: redirectUri
+                    redirect_uri: redirectUri,
+                    response_type: 'code',
+                    scope: this.config.scope
                 }
             });
 
@@ -371,13 +413,19 @@ const Auth0Auth = {
                 console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování po odhlášení');
                 returnTo = this.config.netlifyDevRedirectUri;
             }
+            // Kontrola, zda jsme na localhost:3000
+            else if (window.location.href.includes('localhost:3000')) {
+                console.log('Jsme na lokálním vývojovém prostředí, používám localhost URL pro přesměrování po odhlášení');
+                returnTo = this.config.localDevRedirectUri;
+            }
 
             console.log('Odhlášení z Auth0 s URL pro přesměrování:', returnTo);
 
             // Odhlášení uživatele
             await this.state.auth0Client.logout({
                 logoutParams: {
-                    returnTo: returnTo
+                    returnTo: returnTo,
+                    client_id: this.config.clientId
                 }
             });
 
