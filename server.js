@@ -13,7 +13,19 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const request = require('request');
+
+// Načtení proměnných prostředí z .env souboru
 require('dotenv').config();
+
+// Kontrola načtení proměnných prostředí
+console.log('Kontrola načtení proměnných prostředí:');
+console.log('AUTH0_DOMAIN:', process.env.AUTH0_DOMAIN ? 'Načteno' : 'Chybí');
+console.log('AUTH0_CLIENT_ID:', process.env.AUTH0_CLIENT_ID ? 'Načteno' : 'Chybí');
+console.log('AUTH0_CLIENT_SECRET:', process.env.AUTH0_CLIENT_SECRET ? 'Načteno' : 'Chybí');
+console.log('AUTH0_AUDIENCE:', process.env.AUTH0_AUDIENCE ? 'Načteno' : 'Chybí');
+console.log('AUTH0_CALLBACK_URL:', process.env.AUTH0_CALLBACK_URL ? 'Načteno' : 'Chybí');
+console.log('AUTH0_LOGOUT_URL:', process.env.AUTH0_LOGOUT_URL ? 'Načteno' : 'Chybí');
+console.log('AUTH0_SCOPE:', process.env.AUTH0_SCOPE ? 'Načteno' : 'Chybí');
 
 // Pomocné funkce
 function generateUUID() {

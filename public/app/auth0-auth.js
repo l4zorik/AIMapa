@@ -110,15 +110,17 @@ const Auth0Auth = {
     // Načtení Auth0 klienta
     async loadAuth0Client() {
         try {
+            console.log('Začínám načítat Auth0 klienta...');
+
             // Kontrola, zda je dostupná Auth0 knihovna
-            if (typeof auth0 === 'undefined') {
+            if (typeof createAuth0Client === 'undefined') {
                 console.error('Auth0 knihovna není dostupná. Ujistěte se, že je načten skript auth0-spa-js.');
 
                 // Pokus o načtení Auth0 knihovny z CDN
                 console.log('Pokouším se načíst Auth0 knihovnu z CDN...');
                 await this.loadAuth0Script();
 
-                if (typeof auth0 === 'undefined') {
+                if (typeof createAuth0Client === 'undefined') {
                     console.error('Nepodařilo se načíst Auth0 knihovnu z CDN.');
                     return false;
                 }
@@ -142,9 +144,14 @@ const Auth0Auth = {
             }
 
             console.log('Inicializace Auth0 klienta s URL pro přesměrování:', redirectUri);
+            console.log('Auth0 konfigurace:', {
+                domain: this.config.domain,
+                clientId: this.config.clientId,
+                redirectUri: redirectUri
+            });
 
             // Vytvoření instance Auth0 klienta
-            this.state.auth0Client = await auth0.createAuth0Client({
+            this.state.auth0Client = await createAuth0Client({
                 domain: this.config.domain,
                 clientId: this.config.clientId,
                 authorizationParams: {
@@ -161,6 +168,8 @@ const Auth0Auth = {
             return true;
         } catch (error) {
             console.error('Chyba při načítání Auth0 klienta:', error);
+            console.error('Detail chyby:', error.message);
+            console.error('Stack trace:', error.stack);
             return false;
         }
     },
@@ -168,11 +177,46 @@ const Auth0Auth = {
     // Načtení Auth0 skriptu z CDN
     loadAuth0Script() {
         return new Promise((resolve, reject) => {
+            // Kontrola, zda již skript není načten
+            if (document.querySelector('script[src*="auth0-spa-js"]')) {
+                console.log('Auth0 skript je již načten, čekám na jeho inicializaci...');
+
+                // Kontrola, zda je createAuth0Client definován každých 100ms po dobu 5 sekund
+                let attempts = 0;
+                const maxAttempts = 50; // 5 sekund
+
+                const checkInterval = setInterval(() => {
+                    attempts++;
+
+                    if (typeof createAuth0Client !== 'undefined') {
+                        clearInterval(checkInterval);
+                        console.log('Auth0 knihovna je nyní dostupná');
+                        resolve();
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(checkInterval);
+                        console.error('Nepodařilo se načíst Auth0 knihovnu ani po opakovaných pokusech');
+                        reject(new Error('Timeout při čekání na načtení Auth0 knihovny'));
+                    }
+                }, 100);
+
+                return;
+            }
+
+            console.log('Načítám Auth0 skript z CDN...');
             const script = document.createElement('script');
             script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
-            script.async = true;
-            script.onload = resolve;
-            script.onerror = reject;
+            script.async = false; // Synchronní načtení pro zajištění dostupnosti před dalším kódem
+
+            script.onload = () => {
+                console.log('Auth0 skript byl úspěšně načten z CDN');
+                resolve();
+            };
+
+            script.onerror = (error) => {
+                console.error('Chyba při načítání Auth0 skriptu z CDN:', error);
+                reject(error);
+            };
+
             document.head.appendChild(script);
         });
     },
@@ -180,48 +224,132 @@ const Auth0Auth = {
     // Kontrola, zda je uživatel přihlášen
     async checkCurrentUser() {
         try {
+            console.log('Kontrola přihlášení uživatele...');
+
             if (!this.state.auth0Client) {
-                console.error('Auth0 klient není inicializován');
-                return false;
+                console.error('Auth0 klient není inicializován, pokouším se ho inicializovat...');
+                const success = await this.loadAuth0Client();
+                if (!success) {
+                    console.error('Nepodařilo se inicializovat Auth0 klienta');
+                    return false;
+                }
             }
 
-            // Kontrola, zda je uživatel přihlášen
-            const isAuthenticated = await this.state.auth0Client.isAuthenticated();
+            // Kontrola, zda je v URL autorizační kód
+            const query = window.location.search;
+            if (query.includes('code=') && query.includes('state=')) {
+                console.log('Detekován autorizační kód v URL, zpracovávám callback...');
 
-            if (isAuthenticated) {
-                // Získání informací o uživateli
-                const user = await this.state.auth0Client.getUser();
-                this.state.isLoggedIn = true;
-                this.state.currentUser = user;
-
-                // Aktualizace tlačítka autentizace
-                this.updateAuthButton();
-
-                // Vyvolání události o změně stavu přihlášení
-                document.dispatchEvent(new CustomEvent('authStateChanged', {
-                    detail: { isLoggedIn: true, user: user }
-                }));
-
-                console.log('Uživatel je přihlášen přes Auth0:', user.email);
-                return true;
-            } else {
-                // Kontrola, zda je v URL autentizační kód
-                const query = window.location.search;
-                if (query.includes('code=') && query.includes('state=')) {
+                try {
                     // Zpracování autentizačního kódu
-                    await this.state.auth0Client.handleRedirectCallback();
+                    const result = await this.state.auth0Client.handleRedirectCallback();
+                    console.log('Callback byl úspěšně zpracován:', result);
+
+                    // Získání informací o uživateli
+                    const user = await this.state.auth0Client.getUser();
+                    console.log('Získán uživatel po zpracování callbacku:', user);
+
+                    if (user) {
+                        // Aktualizace stavu
+                        this.state.isLoggedIn = true;
+                        this.state.currentUser = user;
+
+                        // Uložení stavu přihlášení
+                        localStorage.setItem('aiMapaLoggedIn', 'true');
+                        localStorage.setItem('aiMapaUserEmail', user.email || user.name || 'auth0user');
+
+                        // Aktualizace tlačítka autentizace
+                        this.updateAuthButton();
+
+                        // Vyvolání události o změně stavu přihlášení
+                        document.dispatchEvent(new CustomEvent('authStateChanged', {
+                            detail: { isLoggedIn: true, user: user }
+                        }));
+                    }
 
                     // Odstranění autentizačních parametrů z URL
                     window.history.replaceState({}, document.title, window.location.pathname);
 
-                    // Opětovná kontrola přihlášení
-                    return await this.checkCurrentUser();
+                    return true;
+                } catch (callbackError) {
+                    console.error('Chyba při zpracování callbacku:', callbackError);
+                    console.error('Detail chyby:', callbackError.message);
+                    console.error('Stack trace:', callbackError.stack);
+
+                    // Pokus o přímé získání uživatele i přes chybu callbacku
+                    try {
+                        const isAuthenticated = await this.state.auth0Client.isAuthenticated();
+
+                        if (isAuthenticated) {
+                            const user = await this.state.auth0Client.getUser();
+                            console.log('Uživatel je autentizován i přes chybu callbacku:', user);
+
+                            // Aktualizace stavu
+                            this.state.isLoggedIn = true;
+                            this.state.currentUser = user;
+
+                            // Uložení stavu přihlášení
+                            localStorage.setItem('aiMapaLoggedIn', 'true');
+                            localStorage.setItem('aiMapaUserEmail', user.email || user.name || 'auth0user');
+
+                            // Aktualizace tlačítka autentizace
+                            this.updateAuthButton();
+
+                            // Vyvolání události o změně stavu přihlášení
+                            document.dispatchEvent(new CustomEvent('authStateChanged', {
+                                detail: { isLoggedIn: true, user: user }
+                            }));
+
+                            // Odstranění autentizačních parametrů z URL
+                            window.history.replaceState({}, document.title, window.location.pathname);
+
+                            return true;
+                        }
+                    } catch (userError) {
+                        console.error('Chyba při pokusu o získání uživatele po chybě callbacku:', userError);
+                    }
+
+                    // Odstranění autentizačních parametrů z URL i v případě chyby
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            } else {
+                // Kontrola, zda je uživatel přihlášen
+                const isAuthenticated = await this.state.auth0Client.isAuthenticated();
+
+                if (isAuthenticated) {
+                    // Získání informací o uživateli
+                    const user = await this.state.auth0Client.getUser();
+
+                    if (user) {
+                        console.log('Uživatel je přihlášen přes Auth0:', user.email || user.name || 'auth0user');
+
+                        // Aktualizace stavu
+                        this.state.isLoggedIn = true;
+                        this.state.currentUser = user;
+
+                        // Uložení stavu přihlášení
+                        localStorage.setItem('aiMapaLoggedIn', 'true');
+                        localStorage.setItem('aiMapaUserEmail', user.email || user.name || 'auth0user');
+
+                        // Aktualizace tlačítka autentizace
+                        this.updateAuthButton();
+
+                        // Vyvolání události o změně stavu přihlášení
+                        document.dispatchEvent(new CustomEvent('authStateChanged', {
+                            detail: { isLoggedIn: true, user: user }
+                        }));
+
+                        return true;
+                    }
                 }
             }
 
+            console.log('Uživatel není přihlášen přes Auth0');
             return false;
         } catch (error) {
             console.error('Chyba při kontrole přihlášení uživatele:', error);
+            console.error('Detail chyby:', error.message);
+            console.error('Stack trace:', error.stack);
             return false;
         }
     },
@@ -302,7 +430,30 @@ const Auth0Auth = {
                 await this.loadAuth0Client();
 
                 if (!this.state.auth0Client) {
-                    return { error: 'Auth0 klient není inicializován ani po opětovném pokusu' };
+                    console.error('Nepodařilo se inicializovat Auth0 klienta, používám přímé přesměrování...');
+
+                    // Určení správné URL pro přesměrování
+                    let redirectUri = this.config.redirectUri;
+
+                    // Kontrola, zda jsme na vývojové verzi na Netlify
+                    if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
+                        redirectUri = this.config.netlifyDevRedirectUri;
+                    }
+                    // Kontrola, zda jsme na localhost:3000
+                    else if (window.location.href.includes('localhost:3000')) {
+                        redirectUri = this.config.localDevRedirectUri;
+                    }
+
+                    // Vytvoření kompletní URL pro přesměrování
+                    const authUrl = `https://${this.config.domain}/authorize?` +
+                        `client_id=${this.config.clientId}&` +
+                        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+                        `response_type=code&` +
+                        `scope=${encodeURIComponent(this.config.scope)}`;
+
+                    console.log('Přímé přesměrování na Auth0 URL:', authUrl);
+                    window.location.href = authUrl;
+                    return { success: true };
                 }
             }
 
@@ -331,13 +482,12 @@ const Auth0Auth = {
 
             console.log('Kompletní Auth0 URL:', authUrl);
 
-            // Možnost přímého přesměrování pro debugování
-            if (this.debug) {
-                console.log('Používám přímé přesměrování pro debugování...');
-                window.location.href = authUrl;
-                return { success: true };
-            }
+            // Vždy používáme přímé přesměrování pro zajištění spolehlivosti
+            console.log('Používám přímé přesměrování na Auth0...');
+            window.location.href = authUrl;
+            return { success: true };
 
+            /* Zakomentováno pro spolehlivější fungování
             // Standardní přesměrování přes Auth0 SDK
             console.log('Používám Auth0 SDK pro přesměrování...');
             await this.state.auth0Client.loginWithRedirect({
@@ -347,11 +497,42 @@ const Auth0Auth = {
                     scope: this.config.scope
                 }
             });
-
-            return { success: true };
+            */
         } catch (error) {
             console.error('Chyba při přihlašování přes Auth0:', error);
-            return { error: error.message || 'Přihlášení se nezdařilo' };
+            console.error('Detail chyby:', error.message);
+            console.error('Stack trace:', error.stack);
+
+            // Pokus o přímé přesměrování v případě chyby
+            try {
+                console.log('Pokouším se o přímé přesměrování po chybě...');
+
+                // Určení správné URL pro přesměrování
+                let redirectUri = this.config.redirectUri;
+
+                // Kontrola, zda jsme na vývojové verzi na Netlify
+                if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
+                    redirectUri = this.config.netlifyDevRedirectUri;
+                }
+                // Kontrola, zda jsme na localhost:3000
+                else if (window.location.href.includes('localhost:3000')) {
+                    redirectUri = this.config.localDevRedirectUri;
+                }
+
+                // Vytvoření kompletní URL pro přesměrování
+                const authUrl = `https://${this.config.domain}/authorize?` +
+                    `client_id=${this.config.clientId}&` +
+                    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+                    `response_type=code&` +
+                    `scope=${encodeURIComponent(this.config.scope)}`;
+
+                console.log('Přímé přesměrování na Auth0 URL po chybě:', authUrl);
+                window.location.href = authUrl;
+                return { success: true };
+            } catch (redirectError) {
+                console.error('Chyba i při pokusu o přímé přesměrování:', redirectError);
+                return { error: error.message || 'Přihlášení se nezdařilo' };
+            }
         }
     },
 
@@ -659,8 +840,32 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Jsme na vývojové verzi na Netlify');
     }
 
+    // Kontrola, zda je v URL autorizační kód z Auth0
+    const query = window.location.search;
+    const hasAuthCode = query.includes('code=') && query.includes('state=');
+
+    if (hasAuthCode) {
+        console.log('Detekován autorizační kód v URL, prioritně inicializuji Auth0...');
+
+        // Pokus o inicializaci Auth0 klienta
+        Auth0Auth.loadAuth0Client().then(success => {
+            if (success) {
+                console.log('Auth0 klient byl úspěšně inicializován, zpracovávám callback...');
+                Auth0Auth.checkCurrentUser().then(isLoggedIn => {
+                    console.log('Kontrola přihlášení uživatele po zpracování callbacku:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+                });
+            } else {
+                console.error('Nepodařilo se inicializovat Auth0 klienta pro zpracování callbacku');
+            }
+        }).catch(error => {
+            console.error('Chyba při inicializaci Auth0 klienta pro zpracování callbacku:', error);
+        });
+
+        return;
+    }
+
     // Kontrola, zda je dostupná Auth0 knihovna
-    if (typeof auth0 !== 'undefined') {
+    if (typeof createAuth0Client !== 'undefined') {
         // Inicializace modulu
         console.log('Auth0 knihovna je dostupná, inicializuji Auth0Auth');
         Auth0Auth.init().catch(error => {
@@ -673,15 +878,26 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Pokouším se načíst Auth0 knihovnu...');
         const script = document.createElement('script');
         script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
+        script.async = false; // Synchronní načtení pro zajištění dostupnosti před dalším kódem
+
         script.onload = function() {
             console.log('Auth0 knihovna byla úspěšně načtena');
-            Auth0Auth.init().catch(error => {
-                console.error('Chyba při inicializaci Auth0Auth po načtení knihovny:', error);
-            });
+
+            // Krátká pauza pro zajištění, že knihovna je plně inicializována
+            setTimeout(() => {
+                Auth0Auth.init().catch(error => {
+                    console.error('Chyba při inicializaci Auth0Auth po načtení knihovny:', error);
+                });
+            }, 100);
         };
-        script.onerror = function() {
-            console.error('Chyba při načítání Auth0 knihovny');
+
+        script.onerror = function(error) {
+            console.error('Chyba při načítání Auth0 knihovny:', error);
         };
+
         document.head.appendChild(script);
     }
 });
+
+// Export modulu
+window.Auth0Auth = Auth0Auth;

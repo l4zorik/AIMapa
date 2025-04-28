@@ -356,7 +356,7 @@
         </div>
     </div>
 
-    <!-- Auth0 SPA SDK -->
+    <!-- Auth0 SPA SDK - načtení před ostatními skripty bez defer -->
     <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 
     <!-- Leaflet JS pro mapu -->
@@ -413,13 +413,17 @@
     <script src="app/crypto-finances.js"></script>
     <script src="app/user-accounts.js"></script>
     <script src="app/simple-work-dialog.js"></script>
+    <!-- Bezpečnostní a autentizační moduly -->
+    <script src="app/security-utils.js"></script>
+
+    <!-- Auth0 autentizace - načtení před ostatními autentizačními moduly -->
+    <script src="app/auth0-auth.js"></script>
+
     <!-- Supabase a Netlify integrace -->
     <script src="app/supabase-client.js"></script>
     <script src="app/supabase-auth.js"></script>
     <script src="app/netlify-integration.js"></script>
-    <script src="app/security-utils.js"></script>
     <script src="app/local-auth.js"></script>
-    <script src="app/auth0-auth.js"></script>
     <script src="app/hybrid-auth.js"></script>
     <script src="app/auth-screen.js"></script>
     <script src="app/user-profile.js"></script>
@@ -468,10 +472,29 @@
     <!-- Inicializace Auth0 -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Kontrola, zda je v URL autorizační kód z Auth0
+            const query = window.location.search;
+            const hasAuthCode = query.includes('code=') && query.includes('state=');
+
+            if (hasAuthCode) {
+                console.log('Detekován autorizační kód v URL, prioritně inicializuji Auth0...');
+            }
+
             // Inicializace Auth0 modulu
             if (typeof Auth0Auth !== 'undefined') {
                 console.log('Inicializace Auth0 modulu...');
-                Auth0Auth.init();
+
+                // Inicializace Auth0
+                Auth0Auth.init().then(() => {
+                    console.log('Auth0 modul byl úspěšně inicializován');
+
+                    // Kontrola, zda je uživatel přihlášen
+                    Auth0Auth.checkCurrentUser().then(isLoggedIn => {
+                        console.log('Kontrola přihlášení uživatele:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+                    });
+                }).catch(error => {
+                    console.error('Chyba při inicializaci Auth0 modulu:', error);
+                });
 
                 // Přidání tlačítka pro přímé přihlášení přes Auth0 (pro testování)
                 const authButton = document.createElement('button');
@@ -490,12 +513,37 @@
 
                 authButton.addEventListener('click', function() {
                     console.log('Kliknutí na tlačítko přímého přihlášení přes Auth0');
-                    Auth0Auth.login();
+                    Auth0Auth.login().catch(error => {
+                        console.error('Chyba při přihlašování přes Auth0:', error);
+                    });
                 });
 
                 document.body.appendChild(authButton);
             } else {
                 console.error('Auth0Auth modul nebyl nalezen!');
+
+                // Pokus o načtení Auth0 knihovny
+                console.log('Pokouším se načíst Auth0 knihovnu...');
+                const script = document.createElement('script');
+                script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
+                script.onload = function() {
+                    console.log('Auth0 knihovna byla úspěšně načtena');
+
+                    // Pokus o načtení Auth0Auth modulu
+                    const auth0AuthScript = document.createElement('script');
+                    auth0AuthScript.src = 'app/auth0-auth.js';
+                    auth0AuthScript.onload = function() {
+                        console.log('Auth0Auth modul byl úspěšně načten');
+
+                        if (typeof Auth0Auth !== 'undefined') {
+                            Auth0Auth.init().catch(error => {
+                                console.error('Chyba při inicializaci Auth0Auth po načtení:', error);
+                            });
+                        }
+                    };
+                    document.head.appendChild(auth0AuthScript);
+                };
+                document.head.appendChild(script);
             }
         });
     </script>
