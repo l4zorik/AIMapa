@@ -29,6 +29,9 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vylepšeno zobrazení uživatelského profilu s detailními informacemi o přihlášení
 - Přidán informativní spinner a stavové zprávy během procesu přihlašování
 - Implementováno automatické přesměrování na Auth0 přihlašovací stránku
+- Přidána podpora pro více zdrojů Auth0 SDK pro zajištění spolehlivého načítání
+- Implementován robustní systém detekce a řešení chyb při načítání Auth0 SDK
+- Přidána událost pro signalizaci úspěšného načtení Auth0 SDK
 
 ### Opravy
 - Vyřešeny konflikty mezi Auth0 a Supabase autentizací
@@ -42,6 +45,10 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Opraveno zobrazení uživatelského profilu po přihlášení přes Auth0
 - Odstraněny duplicitní soubory a funkce pro lepší údržbu kódu
 - Implementovány záložní mechanismy pro případ selhání Auth0 SDK
+- Opraveno načítání Auth0 SDK s podporou až tří různých CDN zdrojů
+- Vyřešen problém s detekcí načteného Auth0 SDK
+- Implementována lepší synchronizace mezi Auth0 a překryvnou vrstvou přihlašování
+- Opravena inicializace Auth0 klienta s robustnější detekcí chyb a zotavením
 
 ## [0.3.8.4] - 2025-07-10 - INTEGRACE SUPABASE A NETLIFY
 
