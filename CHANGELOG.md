@@ -2,6 +2,25 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.8.3] - 2025-07-10 - OPRAVA GLÓBUS REŽIMU A INTEGRACE SUPABASE
+
+### Opravy
+- Opraveno přepínání do glóbus režimu, který se nyní správně zobrazuje
+- Vylepšena detekce a načítání Globe.gl knihovny
+- Přidána podpora pro různé varianty exportu Globe.gl knihovny
+- Opraveno zobrazení glóbusu po přepnutí režimu
+
+### Vylepšení
+- Dokončena integrace s Supabase pro ukládání dat
+- Přidána podpora pro PostgreSQL připojení
+- Vylepšena stabilita aplikace při přepínání mezi režimy zobrazení
+- Optimalizováno načítání externích knihoven
+- Aktualizovány verze ve všech souborech pro konzistenci
+
+### Poznámky
+- Tato verze opravuje problém s glóbus režimem, který byl v předchozí verzi
+- Všechny kritické funkce byly otestovány a fungují správně
+
 ## [0.3.8.2] - 2025-07-08 - OPRAVA INICIALIZACE LEAFLET.JS A PŘÍPRAVA PRO NASAZENÍ
 
 ### Opravy

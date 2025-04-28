@@ -2152,15 +2152,37 @@ function toggleGlobeMode() {
 
         try {
             // Kontrola, zda je Globe.GL dostupný
-            if (typeof Globe === 'undefined') {
+            if (typeof Globe === 'undefined' && typeof window.globe === 'undefined' && typeof window.globeGL === 'undefined') {
                 console.error('Globe.GL knihovna není dostupná');
-                console.log('Dostupné globální objekty:', Object.keys(window));
+                console.log('Dostupné globální objekty:', Object.keys(window).filter(key => key.toLowerCase().includes('globe')));
+
                 // Pokus o načtení Globe.gl z CDN
                 const script = document.createElement('script');
                 script.src = 'https://unpkg.com/globe.gl';
                 script.async = true;
                 script.onload = function() {
                     console.log('Globe.gl knihovna byla načtena z CDN');
+
+                    // Kontrola, zda byla knihovna správně načtena
+                    if (typeof window.globe !== 'undefined') {
+                        console.log('Knihovna načtena jako window.globe');
+                        window.Globe = window.globe;
+                    } else if (typeof window.globeGL !== 'undefined') {
+                        console.log('Knihovna načtena jako window.globeGL');
+                        window.Globe = window.globeGL;
+                    } else if (typeof window.Globe === 'undefined') {
+                        // Pokud stále není dostupná, vytvoříme alias na globální funkci
+                        const globeFunc = Object.keys(window).find(key =>
+                            typeof window[key] === 'function' &&
+                            key.toLowerCase().includes('globe')
+                        );
+
+                        if (globeFunc) {
+                            console.log(`Knihovna načtena jako window.${globeFunc}`);
+                            window.Globe = window[globeFunc];
+                        }
+                    }
+
                     toggleGlobeMode(); // Zkusíme znovu aktivovat glóbus režim
                 };
                 script.onerror = function() {

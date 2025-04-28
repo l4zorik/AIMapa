@@ -1,6 +1,6 @@
 {
   "name": "aimapa",
-  "version": "0.3.8.2",
+  "version": "0.3.8.3",
   "description": "Interaktivní mapa s AI funkcemi",
   "main": "server.js",
   "scripts": {

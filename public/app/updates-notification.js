@@ -1,14 +1,30 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.8.2
+ * Verze 0.3.8.3
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.8.2',
+    currentVersion: '0.3.8.3',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.8.3',
+            date: '2025-07-10',
+            title: 'Oprava glóbus režimu a integrace Supabase',
+            description: 'Oprava přepínání do glóbus režimu a dokončení integrace Supabase',
+            changes: [
+                'Opraveno přepínání do glóbus režimu, který se nyní správně zobrazuje',
+                'Vylepšena detekce a načítání Globe.gl knihovny',
+                'Přidána podpora pro různé varianty exportu Globe.gl knihovny',
+                'Dokončena integrace s Supabase pro ukládání dat',
+                'Přidána podpora pro PostgreSQL připojení',
+                'Vylepšena stabilita aplikace při přepínání mezi režimy zobrazení',
+                'Optimalizováno načítání externích knihoven',
+                'Aktualizovány verze ve všech souborech pro konzistenci'
+            ]
+        },
         {
             version: '0.3.8.2',
             date: '2025-07-08',

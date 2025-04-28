@@ -13,8 +13,22 @@ function initSimpleGlobe() {
     try {
         // Kontrola, zda je Globe.gl dostupný
         if (typeof Globe === 'undefined') {
-            console.error('Globe.gl knihovna není dostupná');
-            return false;
+            console.log('Kontrola dostupnosti Globe.gl knihovny...');
+
+            // Pokud není Globe dostupný, zkontrolujeme, zda je dostupný globeGL
+            if (typeof window.globe === 'undefined' && typeof window.globeGL === 'undefined') {
+                console.error('Globe.gl knihovna není dostupná');
+                return false;
+            }
+
+            // Pokud je dostupný globeGL, použijeme ho
+            if (typeof window.globeGL !== 'undefined') {
+                console.log('Použití globeGL místo Globe');
+                window.Globe = window.globeGL;
+            } else if (typeof window.globe !== 'undefined') {
+                console.log('Použití globe místo Globe');
+                window.Globe = window.globe;
+            }
         }
 
         // Vytvoření kontejneru pro Globe.gl
