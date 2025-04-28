@@ -710,6 +710,77 @@ const Auth0Auth = {
                     if (code && state) {
                         console.log('Autorizační kód byl úspěšně získán');
 
+                        // Pokus o zpracování callbacku pomocí Auth0 klienta
+                        if (this.state.auth0Client && typeof this.state.auth0Client.handleRedirectCallback === 'function') {
+                            try {
+                                console.log('Zpracování callbacku pomocí Auth0 klienta...');
+                                await this.state.auth0Client.handleRedirectCallback();
+                                console.log('Callback byl úspěšně zpracován pomocí Auth0 klienta');
+
+                                // Získání uživatele z Auth0 klienta
+                                const user = await this.state.auth0Client.getUser();
+                                if (user) {
+                                    console.log('Získán uživatel z Auth0 klienta:', user);
+
+                                    // Zpracování uživatelských dat ve formátu Auth0
+                                    const processedUserInfo = {
+                                        sub: user.sub,
+                                        nickname: user.nickname || user.name?.split('@')[0] || 'uživatel',
+                                        name: user.name || user.email || user.sub,
+                                        email: user.email || (user.name?.includes('@') ? user.name : null),
+                                        picture: user.picture || 'https://cdn.auth0.com/avatars/default.png',
+                                        updated_at: user.updated_at || new Date().toISOString()
+                                    };
+
+                                    this.state.currentUser = processedUserInfo;
+                                    this.state.isLoggedIn = true;
+
+                                    // Uložení stavu přihlášení do localStorage
+                                    localStorage.setItem('aiMapaLoggedIn', 'true');
+                                    localStorage.setItem('aiMapaUserEmail', processedUserInfo.email || processedUserInfo.name);
+                                    localStorage.setItem('aiMapaUserProfile', JSON.stringify(processedUserInfo));
+
+                                    // Aktualizace tlačítka autentizace
+                                    this.updateAuthButton();
+
+                                    // Zobrazení profilu uživatele
+                                    this.displayUserProfile();
+
+                                    // Vyvolání události o změně stavu přihlášení
+                                    document.dispatchEvent(new CustomEvent('authStateChanged', {
+                                        detail: { isLoggedIn: true, user: processedUserInfo }
+                                    }));
+
+                                    // Odstranění parametrů z URL
+                                    window.history.replaceState({}, document.title, window.location.pathname);
+
+                                    console.log('Uživatel je přihlášen:', processedUserInfo.email || processedUserInfo.name);
+
+                                    // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
+                                    const authOverlay = document.getElementById('auth-overlay');
+                                    if (authOverlay) {
+                                        console.log('Odstraňuji překryvnou vrstvu pro přihlášení...');
+                                        authOverlay.style.opacity = '0';
+                                        authOverlay.style.transition = 'opacity 0.8s ease';
+                                        setTimeout(() => {
+                                            authOverlay.remove();
+                                        }, 800);
+                                    }
+
+                                    // Nastavení časovače pro kontrolu přihlášení
+                                    this.setupAuthCheckInterval();
+
+                                    return true;
+                                }
+                            } catch (clientError) {
+                                console.error('Chyba při zpracování callbacku pomocí Auth0 klienta:', clientError);
+                                // Pokračujeme manuálním zpracováním níže
+                            }
+                        }
+
+                        // Manuální zpracování callbacku, pokud Auth0 klient selhal nebo není dostupný
+                        console.log('Manuální zpracování callbacku...');
+
                         // Nastavení stavu přihlášení
                         this.state.isLoggedIn = true;
 
@@ -762,6 +833,17 @@ const Auth0Auth = {
                         window.history.replaceState({}, document.title, window.location.pathname);
 
                         console.log('Uživatel je přihlášen:', userInfo.email || userInfo.name);
+
+                        // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
+                        const authOverlay = document.getElementById('auth-overlay');
+                        if (authOverlay) {
+                            console.log('Odstraňuji překryvnou vrstvu pro přihlášení...');
+                            authOverlay.style.opacity = '0';
+                            authOverlay.style.transition = 'opacity 0.8s ease';
+                            setTimeout(() => {
+                                authOverlay.remove();
+                            }, 800);
+                        }
 
                         // Nastavení časovače pro kontrolu přihlášení
                         this.setupAuthCheckInterval();
