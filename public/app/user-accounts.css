@@ -1,6 +1,6 @@
 /**
  * Styly pro modul uživatelských účtů ve stylu PocketOption.com
- * Verze 0.3.8.0
+ * Verze 0.3.8.4
  */
 
 /* Tlačítko pro zobrazení účtu */
@@ -538,11 +538,47 @@
     border-left: 4px solid #f7b731;
 }
 
+/* Tlačítko pro odhlášení */
+.logout-button {
+    position: fixed;
+    top: 20px;
+    right: 70px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 900;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.logout-button:hover {
+    transform: scale(1.1);
+    background-color: #c0392b;
+}
+
+.logout-button-icon {
+    font-size: 1.2rem;
+}
+
 /* Responzivní design */
 @media (max-width: 768px) {
     .account-button {
         top: 15px;
         right: 15px;
+        width: 35px;
+        height: 35px;
+    }
+
+    .logout-button {
+        top: 15px;
+        right: 60px;
         width: 35px;
         height: 35px;
     }

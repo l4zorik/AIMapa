@@ -3,3 +3,47 @@ node_modules/
 .DS_Store
 .env
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Dočasné soubory
+.tmp/
+.temp/
+tmp/
+temp/
+
+# Soubory IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Soubory sestavení
+/build
+/dist
+
+# Soubory závislostí
+package-lock.json
+yarn.lock
+
+# Soubory s citlivými údaji
+config.js
+secrets.json
+credentials.json
+
+# Logy a výstupy
+logs/
+*.log
+npm-debug.log*
+
+# Soubory operačního systému
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

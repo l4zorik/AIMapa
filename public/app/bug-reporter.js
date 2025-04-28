@@ -1,6 +1,6 @@
 /**
  * Modul pro reportování bugů
- * Verze 0.3.8.0
+ * Verze 0.3.8.4
  */
 
 const BugReporter = {
@@ -830,7 +830,7 @@ const BugReporter = {
 
         // Získání informací o aplikaci
         const appInfo = {
-            version: '0.3.8.0',
+            version: '0.3.8.2',
             darkMode: document.body.getAttribute('data-theme') === 'dark',
             mapLoaded: typeof map !== 'undefined',
             modulesLoaded: {

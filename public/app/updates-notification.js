@@ -1,14 +1,75 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.8.0
+ * Verze 0.3.8.4
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.8.0',
+    currentVersion: '0.3.8.4',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.8.4',
+            date: '2025-07-15',
+            title: 'Oprava Content Security Policy a povinné přihlašování',
+            description: 'Oprava problémů s načítáním externích knihoven a implementace povinného přihlašování',
+            changes: [
+                'Opraveny problémy s Content Security Policy (CSP) na Netlify',
+                'Přidány chybějící domény do CSP pro načítání externích skriptů a stylů',
+                'Opraveno načítání knihoven z cdn.jsdelivr.net a cesium.com',
+                'Implementováno povinné přihlašování pro přístup k aplikaci',
+                'Přidána registrace nových uživatelů s ověřením emailu',
+                'Implementováno odhlašování uživatelů',
+                'Přidána ochrana proti neoprávněnému přístupu k funkcím aplikace',
+                'Vylepšena integrace s Supabase pro správu uživatelských účtů'
+            ]
+        },
+        {
+            version: '0.3.8.3',
+            date: '2025-07-10',
+            title: 'Oprava glóbus režimu a integrace Supabase',
+            description: 'Oprava přepínání do glóbus režimu a dokončení integrace Supabase',
+            changes: [
+                'Opraveno přepínání do glóbus režimu, který se nyní správně zobrazuje',
+                'Vylepšena detekce a načítání Globe.gl knihovny',
+                'Přidána podpora pro různé varianty exportu Globe.gl knihovny',
+                'Dokončena integrace s Supabase pro ukládání dat',
+                'Přidána podpora pro PostgreSQL připojení',
+                'Vylepšena stabilita aplikace při přepínání mezi režimy zobrazení',
+                'Optimalizováno načítání externích knihoven',
+                'Aktualizovány verze ve všech souborech pro konzistenci'
+            ]
+        },
+        {
+            version: '0.3.8.2',
+            date: '2025-07-08',
+            title: 'Oprava inicializace Leaflet.js a příprava pro nasazení',
+            description: 'Oprava inicializace mapy a příprava aplikace pro produkční nasazení',
+            changes: [
+                'Opravena inicializace Leaflet.js pro spolehlivé načítání mapy',
+                'Vyřešen problém s chybějícím souborem leaflet_js.js',
+                'Vylepšeno pořadí načítání skriptů pro zajištění správné funkčnosti',
+                'Přidána robustnější detekce a ošetření chyb při inicializaci mapy',
+                'Optimalizováno načítání externích knihoven',
+                'Aktualizovány verze ve všech souborech pro konzistenci',
+                'Vylepšena stabilita aplikace pro nasazení na Netlify',
+                'Příprava pro integraci s Supabase'
+            ]
+        },
+        {
+            version: '0.3.8.1',
+            date: '2025-07-06',
+            title: 'Stabilní verze s funkční mapou a Node.js serverem',
+            description: 'Stabilní verze aplikace s funkční mapou a Node.js serverem',
+            changes: [
+                'Plně funkční mapa s Leaflet.js a správnou inicializací',
+                'Spolehlivý Node.js server pro poskytování aplikace',
+                'Funkční systém uživatelských účtů s lokálním přihlašováním',
+                'Stabilní implementace virtuální práce a odměňovacího systému',
+                'Optimalizace pro mobilní zařízení a různé prohlížeče'
+            ]
+        },
         {
             version: '0.3.8.0',
             date: '2025-07-05',

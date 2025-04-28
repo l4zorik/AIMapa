@@ -1,6 +1,6 @@
 /**
  * Modul pro správu uživatelských účtů ve stylu PocketOption.com
- * Verze 0.3.8.0
+ * Verze 0.3.8.4
  */
 
 const UserAccounts = {
@@ -27,16 +27,39 @@ const UserAccounts = {
     init() {
         console.log('Inicializace modulu uživatelských účtů...');
 
+        // Kontrola, zda je uživatel přihlášen
+        if (!this.checkLogin()) {
+            console.log('Uživatel není přihlášen, přesměrování na přihlašovací stránku');
+            window.location.href = 'login.html';
+            return;
+        }
+
         // Načtení uživatelských dat z localStorage
         this.loadUserData();
 
         // Přidání tlačítka pro zobrazení účtu
         this.addAccountButton();
 
+        // Přidání tlačítka pro odhlášení
+        this.addLogoutButton();
+
         // Kontrola denního přihlášení
         this.checkDailyLogin();
 
         console.log('Modul uživatelských účtů byl inicializován');
+    },
+
+    // Kontrola, zda je uživatel přihlášen
+    checkLogin() {
+        const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+        const userEmail = localStorage.getItem('aiMapaUserEmail');
+
+        if (isLoggedIn && userEmail) {
+            this.state.isLoggedIn = true;
+            return true;
+        }
+
+        return false;
     },
 
     // Načtení uživatelských dat z localStorage
@@ -62,10 +85,27 @@ const UserAccounts = {
 
     // Vytvoření výchozího uživatele
     createDefaultUser() {
+        // Získání e-mailu z localStorage
+        const userEmail = localStorage.getItem('aiMapaUserEmail') || '';
+        const isGuest = localStorage.getItem('aiMapaIsGuest') === 'true';
+
+        // Vytvoření uživatelského jména z e-mailu
+        let username = 'Uživatel';
+        if (userEmail && userEmail.includes('@')) {
+            username = userEmail.split('@')[0];
+            // První písmeno velké
+            username = username.charAt(0).toUpperCase() + username.slice(1);
+        }
+
+        // Pokud je to host, přidáme k uživatelskému jménu "Host"
+        if (isGuest) {
+            username = 'Host';
+        }
+
         const defaultUser = {
             id: 'user_' + Date.now(),
-            username: 'Uživatel',
-            email: '',
+            username: username,
+            email: userEmail,
             avatar: this.config.defaultAvatar,
             balance: this.config.defaultBalance,
             currency: this.config.defaultCurrency,
@@ -83,7 +123,7 @@ const UserAccounts = {
             },
             settings: {
                 notifications: true,
-                darkMode: true,
+                darkMode: localStorage.getItem('aiMapaDarkMode') === 'true',
                 language: 'cs'
             }
         };
@@ -91,7 +131,7 @@ const UserAccounts = {
         this.state.currentUser = defaultUser;
         this.state.isLoggedIn = true;
         this.saveUserData();
-        console.log('Vytvořen výchozí uživatel');
+        console.log('Vytvořen výchozí uživatel:', username);
     },
 
     // Uložení uživatelských dat do localStorage
@@ -117,12 +157,50 @@ const UserAccounts = {
             accountButton.id = 'accountButton';
             accountButton.className = 'account-button';
             accountButton.innerHTML = '<span class="account-button-icon">👤</span>';
+            accountButton.title = 'Váš účet';
             document.body.appendChild(accountButton);
 
             // Přidání event listeneru
             accountButton.addEventListener('click', () => {
                 this.toggleAccountWindow();
             });
+        }
+    },
+
+    // Přidání tlačítka pro odhlášení
+    addLogoutButton() {
+        // Kontrola, zda již tlačítko existuje
+        let logoutButton = document.getElementById('logoutButton');
+
+        // Pokud tlačítko neexistuje, vytvoříme ho
+        if (!logoutButton) {
+            logoutButton = document.createElement('button');
+            logoutButton.id = 'logoutButton';
+            logoutButton.className = 'logout-button';
+            logoutButton.innerHTML = '<span class="logout-button-icon">🚪</span>';
+            logoutButton.title = 'Odhlásit se';
+            document.body.appendChild(logoutButton);
+
+            // Přidání event listeneru
+            logoutButton.addEventListener('click', () => {
+                this.logout();
+            });
+        }
+    },
+
+    // Odhlášení uživatele
+    logout() {
+        // Zobrazení potvrzovacího dialogu
+        if (confirm('Opravdu se chcete odhlásit?')) {
+            // Odstranění informací o přihlášení
+            localStorage.removeItem('aiMapaLoggedIn');
+            localStorage.removeItem('aiMapaIsGuest');
+
+            // Zachování e-mailu pro příští přihlášení
+            // localStorage.removeItem('aiMapaUserEmail');
+
+            // Přesměrování na přihlašovací stránku
+            window.location.href = 'login.html';
         }
     },
 

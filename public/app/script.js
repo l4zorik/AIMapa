@@ -248,6 +248,14 @@ const routingOptions = {
     router: L.Routing.osrmv1({
         serviceUrl: 'https://router.project-osrm.org/route/v1',
         profile: 'driving', // Možnosti: driving, walking, cycling
+<<<<<<< HEAD:script.js
+        timeout: 5000, // Časový limit pro API požadavek (5 sekund)
+        geometryOnly: false, // Optimalizace pro získání pouze geometrie trasy
+        urlParameters: {
+            alternatives: false, // Nezobrazovat alternativní trasy
+            steps: false, // Nezobrazovat kroky trasy
+            overview: 'full' // Získat plnou geometrii trasy
+=======
         timeout: 3000, // Snížený časový limit pro API požadavek (3 sekundy) pro rychlejší odezvu
         geometryOnly: true, // Optimalizace pro získání pouze geometrie trasy - zrychlení
         urlParameters: {
@@ -255,6 +263,7 @@ const routingOptions = {
             steps: false, // Nezobrazovat kroky trasy
             overview: 'full', // Získat plnou geometrii trasy
             annotations: false // Vypnutí anotací pro rychlejší odezvu
+>>>>>>> v0.3.8.3:public/app/script.js
         }
     }),
     lineOptions: {
@@ -276,9 +285,14 @@ const routingOptions = {
     addWaypoints: false, // Nezobrazovat průjezdní body
     waypointMode: 'connect', // Pouze propojit body bez možnosti přidávání nových
     autoRoute: true, // Automaticky vypočítat trasu
+<<<<<<< HEAD:script.js
+    routeDragInterval: 500, // Interval pro přepočet trasy při přesouvní (vyšší hodnota = méně časté přepočty)
+    collapsible: true // Možnost sbalit panel s instrukcemi
+=======
     routeDragInterval: 500, // Interval pro přepočet trasy při přesouvní
     collapsible: true, // Možnost sbalit panel s instrukcemi
     maxGeoJSONChunkSize: 1000 // Optimalizace pro velké trasy
+>>>>>>> v0.3.8.3:public/app/script.js
 };
 
 // Reference na HTML elementy pro informace o trase
@@ -1050,6 +1064,39 @@ function calculateRouteFunction() {
 
     // Použití přímého volání OSRM API pro rychlejší výpočet trasy
     // Toto je rychlejší než použití Leaflet Routing Machine
+<<<<<<< HEAD:script.js
+    const fetchDirectRoute = async () => {
+        try {
+            // Vytvoření URL pro OSRM API
+            const coordinates = points.map(p => `${p.lng},${p.lat}`).join(';');
+            const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=polyline&steps=false&alternatives=false`;
+
+            // Nastavení časového limitu pro fetch
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+            // Provedení požadavku na API
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`API responded with status ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+                throw new Error('No route found');
+            }
+
+            // Získání trasy z odpovědi
+            const routeData = data.routes[0];
+
+            // Dekódování polyline
+            const decodedRoute = L.Polyline.fromEncoded(routeData.geometry).getLatLngs();
+
+            // Vytvoření trasy na mapě
+=======
     // Optimalizovaná verze pro lepší výkon
     const fetchDirectRoute = async () => {
         try {
@@ -1117,10 +1164,18 @@ function calculateRouteFunction() {
             }
 
             // Vytvoření trasy na mapě s optimalizovanými nastaveními
+>>>>>>> v0.3.8.3:public/app/script.js
             if (route) {
                 map.removeLayer(route);
             }
 
+<<<<<<< HEAD:script.js
+            route = L.polyline(decodedRoute, {
+                color: 'blue',
+                weight: 5,
+                opacity: 0.9,
+                smoothFactor: 1
+=======
             route = L.polyline(optimizedRoute, {
                 color: 'blue',
                 weight: 5,
@@ -1128,6 +1183,7 @@ function calculateRouteFunction() {
                 smoothFactor: 1.5,
                 renderer: L.canvas({ tolerance: 5 }), // Použití canvas rendereru s vyšší tolerancí pro lepší výkon
                 interactive: false // Vypnutí interaktivity pro lepší výkon
+>>>>>>> v0.3.8.3:public/app/script.js
             }).addTo(map);
 
             // Výpočet vzdálenosti a času
@@ -1147,6 +1203,10 @@ function calculateRouteFunction() {
             // Přidání zprávy do chatu s informacemi o trase
             addMessage(`Trasa vypočítána po skutečných silnicích. Celková vzdálenost: ${distanceKm} km, čas cesty: ${timeString}`, false);
 
+<<<<<<< HEAD:script.js
+            // Přizpůsobení mapy, aby zobrazovala celou trasu
+            map.fitBounds(route.getBounds(), {padding: [50, 50]});
+=======
             // Přidání XP za výpočet trasy, pokud je dostupný modul UserProgress
             if (typeof UserProgress !== 'undefined') {
                 // XP závisí na délce trasy - čím delší trasa, tím více XP
@@ -1200,10 +1260,16 @@ function calculateRouteFunction() {
             setTimeout(() => {
                 fitBoundsButton.classList.remove('new');
             }, 2000);
+>>>>>>> v0.3.8.3:public/app/script.js
 
             // Uložení stavu aplikace po výpočtu trasy
             saveAppState();
 
+<<<<<<< HEAD:script.js
+            return true;
+        } catch (error) {
+            console.error('Chyba při přímém volání OSRM API:', error);
+=======
             // Vysílání události o vypočítané trase
             const routeCalculatedEvent = new CustomEvent('routeCalculated', {
                 detail: {
@@ -1224,6 +1290,7 @@ function calculateRouteFunction() {
                 loadingIndicator.remove();
             }
 
+>>>>>>> v0.3.8.3:public/app/script.js
             return false;
         }
     };
@@ -1249,7 +1316,11 @@ function calculateRouteFunction() {
 
             // Nastavení časového limitu pro získání trasy
             const routeTimeout = setTimeout(() => {
+<<<<<<< HEAD:script.js
+                // Pokud se trasa nezobrazí do 2 sekund, vytvoříme přímou trasu
+=======
                 // Pokud se trasa nezobrazí do 1 sekundy, vytvoříme přímou trasu
+>>>>>>> v0.3.8.3:public/app/script.js
                 if (routeControl && !route) {
                     addMessage('Výpočet přesné trasy trvá déle. Zobrazuji dočasnou přímou trasu.', false);
 
@@ -1294,7 +1365,11 @@ function calculateRouteFunction() {
                         console.log('Přímá trasa byla přidána na glóbus');
                     }
                 }
+<<<<<<< HEAD:script.js
+            }, 2000);
+=======
             }, 1000);
+>>>>>>> v0.3.8.3:public/app/script.js
 
             // Poslech na událost 'routesfound' pro získání informací o trase
             routeControl.on('routesfound', function(e) {
@@ -1833,6 +1908,8 @@ function processMessage(message) {
     // Přidání zprávy uživatele do chatu
     addMessage(message, true);
 
+<<<<<<< HEAD:script.js
+=======
     // Kontrola, zda čekáme na název projektu ve virtuální práci
     if (VirtualWork && VirtualWork.waitingForProjectName && VirtualWork.projectNameDialog) {
         // Zpracování názvu projektu
@@ -1845,6 +1922,7 @@ function processMessage(message) {
 
     // Menu příkazů bylo odstraněno
 
+>>>>>>> v0.3.8.3:public/app/script.js
     // Simulace odpovědi AI s návrhy dalších akcí
     setTimeout(() => {
         const { response, suggestions } = generateResponseWithSuggestions(message);
@@ -2039,6 +2117,8 @@ function addMessage(message, isUser = false, suggestions = null) {
     messageDiv.textContent = message;
     messageContainer.appendChild(messageDiv);
 
+<<<<<<< HEAD:script.js
+=======
     // Přidání XP za rozhodnutí uživatele
     if (isUser && typeof UserProgress !== 'undefined') {
         // Získání XP za každé rozhodnutí uživatele (2-5 XP)
@@ -2054,6 +2134,7 @@ function addMessage(message, isUser = false, suggestions = null) {
         UserProgress.addExperience(xpAmount, 'Rozhodnutí v chatu', 'decisions');
     }
 
+>>>>>>> v0.3.8.3:public/app/script.js
     // Přidání návrhů dalších akcí, pokud existují
     if (!isUser && suggestions && Array.isArray(suggestions) && suggestions.length > 0) {
         const suggestionsContainer = document.createElement('div');
@@ -2299,15 +2380,35 @@ function toggleGlobeMode() {
 
         try {
             // Kontrola, zda je Globe.GL dostupný
-            if (typeof Globe === 'undefined') {
+            if (typeof Globe === 'undefined' && typeof window.globe === 'undefined' && typeof window.globeGL === 'undefined') {
                 console.error('Globe.GL knihovna není dostupná');
-                console.log('Dostupné globální objekty:', Object.keys(window));
+                console.log('Dostupné globální objekty:', Object.keys(window).filter(key => key.toLowerCase().includes('globe')));
                 // Pokus o načtení Globe.gl z CDN
                 const script = document.createElement('script');
                 script.src = 'https://unpkg.com/globe.gl';
                 script.async = true;
                 script.onload = function() {
                     console.log('Globe.gl knihovna byla načtena z CDN');
+
+                    // Kontrola, zda byla knihovna správně načtena
+                    if (typeof window.globe !== 'undefined') {
+                        console.log('Knihovna načtena jako window.globe');
+                        window.Globe = window.globe;
+                    } else if (typeof window.globeGL !== 'undefined') {
+                        console.log('Knihovna načtena jako window.globeGL');
+                        window.Globe = window.globeGL;
+                    } else if (typeof window.Globe === 'undefined') {
+                        // Pokud stále není dostupná, vytvoříme alias na globální funkci
+                        const globeFunc = Object.keys(window).find(key =>
+                            typeof window[key] === 'function' &&
+                            key.toLowerCase().includes('globe')
+                        );
+
+                        if (globeFunc) {
+                            console.log(`Knihovna načtena jako window.${globeFunc}`);
+                            window.Globe = window[globeFunc];
+                        }
+                    }
                     toggleGlobeMode(); // Zkusíme znovu aktivovat glóbus režim
                 };
                 script.onerror = function() {
@@ -2982,9 +3083,14 @@ function saveAppState() {
         settings: settings,
         mapState: mapState,
         deletedMarkerCommands: deletedMarkerCommands,
+<<<<<<< HEAD:script.js
+        lastSaved: new Date().toISOString(),
+        version: '0.2.4.2' // Přidání verze pro lepší správu kompatibility
+=======
         isFullscreen: isFullscreen, // Uložení stavu fullscreen režimu
         lastSaved: new Date().toISOString(),
         version: '0.3.7.0' // Přidání verze pro lepší správu kompatibility
+>>>>>>> v0.3.8.3:public/app/script.js
     };
 
     // Uložení do localStorage s kompresí pro úsporu místa
@@ -3125,7 +3231,11 @@ function loadAppState() {
         console.log('Načten stav aplikace:', appState);
 
         // Kontrola verze pro zajištění kompatibility
+<<<<<<< HEAD:script.js
+        if (appState.version && appState.version !== '0.2.4.2') {
+=======
         if (appState.version && appState.version !== '0.3.7.0') {
+>>>>>>> v0.3.8.3:public/app/script.js
             console.log(`Načten stav z jiné verze aplikace (${appState.version}). Probíhá konverze...`);
             // Zde by mohla být logika pro konverzi dat mezi verzemi, pokud by bylo potřeba
         }
@@ -3248,6 +3358,8 @@ function loadAppState() {
                 console.error('Chyba při nastavení pohledu mapy:', mapError);
                 map.setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
             }
+<<<<<<< HEAD:script.js
+=======
         }
 
         // Načtení stavu fullscreen režimu
@@ -3266,6 +3378,7 @@ function loadAppState() {
                     }, 500);
                 }
             }
+>>>>>>> v0.3.8.3:public/app/script.js
         }
 
         // Načtení smazaných příkazů
@@ -3590,11 +3703,14 @@ window.addEventListener('load', () => {
 
     // Přidání uvítací zprávy s návrhy akcí
     addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?', false, ['Přidat aktivitu', 'Vypočítat trasu', 'Otevírací doba', 'Alexa']);
+<<<<<<< HEAD:script.js
+=======
 
     // Přidání možnosti přesouvat hlavní chat pouze ve fullscreen režimu
     setTimeout(() => {
         setupMainChatDraggable(false); // Chat není přesunutelný v normálním režimu
     }, 500); // Zpoždění pro zajištění, že DraggableElements modul je inicializován
+>>>>>>> v0.3.8.3:public/app/script.js
 
     // Pokus o načtení stavu aplikace
     const stateLoaded = loadAppState();
