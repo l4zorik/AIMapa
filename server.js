@@ -169,11 +169,19 @@ const auth0Config = {
     domain: process.env.AUTH0_DOMAIN,
     clientId: process.env.AUTH0_CLIENT_ID,
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
-    audience: process.env.AUTH0_AUDIENCE,
-    callbackUrl: process.env.AUTH0_CALLBACK_URL,
-    logoutUrl: process.env.AUTH0_LOGOUT_URL,
+    audience: process.env.AUTH0_AUDIENCE ? process.env.AUTH0_AUDIENCE.split(',') : [],
+    callbackUrl: process.env.AUTH0_CALLBACK_URL ? process.env.AUTH0_CALLBACK_URL.split(',') : [],
+    logoutUrl: process.env.AUTH0_LOGOUT_URL ? process.env.AUTH0_LOGOUT_URL.split(',') : [],
     scope: process.env.AUTH0_SCOPE
 };
+
+// Logování Auth0 konfigurace pro debugování
+console.log('Auth0 konfigurace:');
+console.log('Domain:', auth0Config.domain);
+console.log('ClientId:', auth0Config.clientId);
+console.log('Audience:', auth0Config.audience);
+console.log('CallbackUrl:', auth0Config.callbackUrl);
+console.log('LogoutUrl:', auth0Config.logoutUrl);
 
 // Proměnná pro uložení Auth0 Management API tokenu
 let auth0ManagementToken = null;
@@ -229,11 +237,33 @@ function getAuth0ManagementToken() {
 
 // Endpoint pro získání Auth0 konfigurace (pouze clientId a domain pro klienta)
 app.get('/auth/config', (_req, res) => {
+    // Určení správné URL pro přesměrování na základě prostředí
+    let callbackUrl = '';
+    let logoutUrl = '';
+
+    // Kontrola, zda jsme na Netlify
+    const host = _req.headers.host || '';
+    const isNetlify = host.includes('netlify.app');
+
+    if (isNetlify) {
+        // Jsme na Netlify, použijeme URL pro Netlify
+        callbackUrl = 'https://remarkable-cajeta-76cfd9.netlify.app';
+        logoutUrl = 'https://remarkable-cajeta-76cfd9.netlify.app';
+        console.log('Detekováno Netlify prostředí, používám URL:', callbackUrl);
+    } else {
+        // Jsme na lokálním prostředí, použijeme localhost URL
+        callbackUrl = `http://${host}`;
+        logoutUrl = `http://${host}`;
+        console.log('Detekováno lokální prostředí, používám URL:', callbackUrl);
+    }
+
     res.json({
         domain: auth0Config.domain,
         clientId: auth0Config.clientId,
-        audience: auth0Config.audience,
-        scope: auth0Config.scope
+        audience: auth0Config.audience[0], // Použijeme první URL z pole
+        scope: auth0Config.scope,
+        callbackUrl: callbackUrl,
+        logoutUrl: logoutUrl
     });
 });
 
@@ -358,8 +388,26 @@ app.get('/', (_req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Zpracování argumentů příkazové řádky
+const args = process.argv.slice(2);
+let portArg = null;
+
+// Hledání argumentu --port nebo -p
+for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--port=')) {
+        portArg = args[i].split('=')[1];
+        break;
+    } else if (args[i] === '--port' || args[i] === '-p') {
+        if (i + 1 < args.length) {
+            portArg = args[i + 1];
+            break;
+        }
+    }
+}
+
 // Nastavení portu
-const PORT = process.env.PORT || 3000;
+const PORT = portArg || process.env.PORT || 3001;
+console.log(`Použití portu: ${PORT}`);
 
 // Funkce pro kontrolu dostupnosti mapy
 function checkMapAvailability() {
