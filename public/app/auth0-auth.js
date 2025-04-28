@@ -199,7 +199,7 @@ const Auth0Auth = {
             console.log('Začínám načítat Auth0 klienta...');
 
             // Kontrola, zda je dostupná Auth0 knihovna
-            if (typeof window.createAuth0Client === 'undefined') {
+            if (typeof window.createAuth0Client === 'undefined' && typeof createAuth0Client === 'undefined') {
                 console.error('Auth0 knihovna není dostupná. Ujistěte se, že je načten skript auth0-spa-js.');
 
                 // Pokus o načtení Auth0 knihovny z CDN
@@ -207,74 +207,26 @@ const Auth0Auth = {
                 await this.loadAuth0Script();
 
                 // Čekání na načtení knihovny
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
-                if (typeof window.createAuth0Client === 'undefined') {
+                // Kontrola, zda je knihovna nyní dostupná
+                if (typeof window.createAuth0Client === 'undefined' && typeof createAuth0Client === 'undefined') {
                     console.error('Nepodařilo se načíst Auth0 knihovnu z CDN.');
 
-                    // Pokus o přímé vytvoření Auth0 klienta pomocí alternativního přístupu
-                    console.log('Pokouším se vytvořit Auth0 klienta alternativním způsobem...');
-
-                    // Načtení konfigurace ze serveru
-                    await this.loadConfig();
-
-                    // Určení správné URL pro přesměrování
-                    let redirectUri = this.config.redirectUri;
-
-                    // Kontrola, zda jsme na vývojové verzi na Netlify
-                    if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
-                        redirectUri = this.config.netlifyDevRedirectUri;
+                    // Vytvoření simulovaného Auth0 klienta
+                    return this.createSimulatedAuth0Client();
+                } else {
+                    // Přiřazení createAuth0Client do window, pokud je definováno pouze lokálně
+                    if (typeof createAuth0Client !== 'undefined' && typeof window.createAuth0Client === 'undefined') {
+                        window.createAuth0Client = createAuth0Client;
+                        console.log('createAuth0Client přiřazeno do window objektu');
                     }
-                    // Kontrola, zda jsme na localhost:3000
-                    else if (window.location.href.includes('localhost:3000')) {
-                        redirectUri = this.config.localDevRedirectUri;
-                    }
-
-                    // Vytvoření jednoduchého objektu pro simulaci Auth0 klienta
-                    this.state.auth0Client = {
-                        loginWithRedirect: async () => {
-                            // Přímé přesměrování na Auth0 přihlašovací stránku
-                            const authUrl = `https://${this.config.domain}/authorize?` +
-                                `client_id=${this.config.clientId}&` +
-                                `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-                                `response_type=code&` +
-                                `scope=${encodeURIComponent(this.config.scope)}`;
-
-                            console.log('Přímé přesměrování na Auth0 URL:', authUrl);
-                            window.location.href = authUrl;
-                        },
-                        handleRedirectCallback: async () => {
-                            console.log('Simulace zpracování callbacku');
-                            return {};
-                        },
-                        isAuthenticated: async () => {
-                            // Kontrola, zda je uživatel přihlášen podle localStorage
-                            return localStorage.getItem('aiMapaLoggedIn') === 'true';
-                        },
-                        getUser: async () => {
-                            // Vrácení jednoduchého objektu uživatele
-                            return {
-                                email: localStorage.getItem('aiMapaUserEmail') || 'auth0user',
-                                name: localStorage.getItem('aiMapaUserEmail') || 'Auth0 User'
-                            };
-                        },
-                        logout: async (options) => {
-                            // Přímé přesměrování na Auth0 odhlašovací stránku
-                            const logoutUrl = `https://${this.config.domain}/v2/logout?` +
-                                `client_id=${this.config.clientId}&` +
-                                `returnTo=${encodeURIComponent(options?.logoutParams?.returnTo || redirectUri)}`;
-
-                            // Odstranění stavu přihlášení z localStorage
-                            localStorage.removeItem('aiMapaLoggedIn');
-                            localStorage.removeItem('aiMapaUserEmail');
-
-                            console.log('Přímé přesměrování na Auth0 odhlašovací URL:', logoutUrl);
-                            window.location.href = logoutUrl;
-                        }
-                    };
-
-                    console.log('Auth0 klient byl vytvořen alternativním způsobem');
-                    return true;
+                }
+            } else {
+                // Přiřazení createAuth0Client do window, pokud je definováno pouze lokálně
+                if (typeof createAuth0Client !== 'undefined' && typeof window.createAuth0Client === 'undefined') {
+                    window.createAuth0Client = createAuth0Client;
+                    console.log('createAuth0Client přiřazeno do window objektu');
                 }
             }
 
@@ -318,6 +270,10 @@ const Auth0Auth = {
                 });
 
                 console.log('Auth0 klient byl úspěšně načten');
+
+                // Vyvolání události o úspěšném načtení Auth0 klienta
+                document.dispatchEvent(new CustomEvent('auth0ClientLoaded'));
+
                 return true;
             } catch (clientError) {
                 console.error('Chyba při vytváření Auth0 klienta:', clientError);
@@ -335,57 +291,16 @@ const Auth0Auth = {
                     });
 
                     console.log('Auth0 klient byl úspěšně načten s minimální konfigurací');
+
+                    // Vyvolání události o úspěšném načtení Auth0 klienta
+                    document.dispatchEvent(new CustomEvent('auth0ClientLoaded'));
+
                     return true;
                 } catch (minimalError) {
                     console.error('Chyba při vytváření Auth0 klienta s minimální konfigurací:', minimalError);
 
-                    // Vytvoření jednoduchého objektu pro simulaci Auth0 klienta
-                    console.log('Vytvářím simulovaný Auth0 klient...');
-
-                    this.state.auth0Client = {
-                        loginWithRedirect: async () => {
-                            // Přímé přesměrování na Auth0 přihlašovací stránku
-                            const authUrl = `https://${this.config.domain}/authorize?` +
-                                `client_id=${this.config.clientId}&` +
-                                `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-                                `response_type=code&` +
-                                `scope=${encodeURIComponent(this.config.scope)}`;
-
-                            console.log('Přímé přesměrování na Auth0 URL:', authUrl);
-                            window.location.href = authUrl;
-                        },
-                        handleRedirectCallback: async () => {
-                            console.log('Simulace zpracování callbacku');
-                            return {};
-                        },
-                        isAuthenticated: async () => {
-                            // Kontrola, zda je uživatel přihlášen podle localStorage
-                            return localStorage.getItem('aiMapaLoggedIn') === 'true';
-                        },
-                        getUser: async () => {
-                            // Vrácení jednoduchého objektu uživatele
-                            return {
-                                email: localStorage.getItem('aiMapaUserEmail') || 'auth0user',
-                                name: localStorage.getItem('aiMapaUserEmail') || 'Auth0 User'
-                            };
-                        },
-                        logout: async (options) => {
-                            // Přímé přesměrování na Auth0 odhlašovací stránku
-                            const logoutUrl = `https://${this.config.domain}/v2/logout?` +
-                                `client_id=${this.config.clientId}&` +
-                                `returnTo=${encodeURIComponent(options?.logoutParams?.returnTo || redirectUri)}`;
-
-                            // Odstranění stavu přihlášení z localStorage
-                            localStorage.removeItem('aiMapaLoggedIn');
-                            localStorage.removeItem('aiMapaUserEmail');
-
-                            console.log('Přímé přesměrování na Auth0 odhlašovací URL:', logoutUrl);
-                            window.location.href = logoutUrl;
-                        }
-                    };
-
-                    console.log('Simulovaný Auth0 klient byl vytvořen');
-                    return true;
+                    // Vytvoření simulovaného Auth0 klienta
+                    return this.createSimulatedAuth0Client();
                 }
             }
         } catch (error) {
@@ -393,68 +308,8 @@ const Auth0Auth = {
             console.error('Detail chyby:', error.message);
             console.error('Stack trace:', error.stack);
 
-            // Vytvoření jednoduchého objektu pro simulaci Auth0 klienta
-            console.log('Vytvářím simulovaný Auth0 klient po chybě...');
-
-            // Načtení konfigurace ze serveru
-            await this.loadConfig();
-
-            // Určení správné URL pro přesměrování
-            let redirectUri = this.config.redirectUri;
-
-            // Kontrola, zda jsme na vývojové verzi na Netlify
-            if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
-                redirectUri = this.config.netlifyDevRedirectUri;
-            }
-            // Kontrola, zda jsme na localhost:3000
-            else if (window.location.href.includes('localhost:3000')) {
-                redirectUri = this.config.localDevRedirectUri;
-            }
-
-            this.state.auth0Client = {
-                loginWithRedirect: async () => {
-                    // Přímé přesměrování na Auth0 přihlašovací stránku
-                    const authUrl = `https://${this.config.domain}/authorize?` +
-                        `client_id=${this.config.clientId}&` +
-                        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-                        `response_type=code&` +
-                        `scope=${encodeURIComponent(this.config.scope)}`;
-
-                    console.log('Přímé přesměrování na Auth0 URL:', authUrl);
-                    window.location.href = authUrl;
-                },
-                handleRedirectCallback: async () => {
-                    console.log('Simulace zpracování callbacku');
-                    return {};
-                },
-                isAuthenticated: async () => {
-                    // Kontrola, zda je uživatel přihlášen podle localStorage
-                    return localStorage.getItem('aiMapaLoggedIn') === 'true';
-                },
-                getUser: async () => {
-                    // Vrácení jednoduchého objektu uživatele
-                    return {
-                        email: localStorage.getItem('aiMapaUserEmail') || 'auth0user',
-                        name: localStorage.getItem('aiMapaUserEmail') || 'Auth0 User'
-                    };
-                },
-                logout: async (options) => {
-                    // Přímé přesměrování na Auth0 odhlašovací stránku
-                    const logoutUrl = `https://${this.config.domain}/v2/logout?` +
-                        `client_id=${this.config.clientId}&` +
-                        `returnTo=${encodeURIComponent(options?.logoutParams?.returnTo || redirectUri)}`;
-
-                    // Odstranění stavu přihlášení z localStorage
-                    localStorage.removeItem('aiMapaLoggedIn');
-                    localStorage.removeItem('aiMapaUserEmail');
-
-                    console.log('Přímé přesměrování na Auth0 odhlašovací URL:', logoutUrl);
-                    window.location.href = logoutUrl;
-                }
-            };
-
-            console.log('Simulovaný Auth0 klient byl vytvořen po chybě');
-            return true;
+            // Vytvoření simulovaného Auth0 klienta
+            return this.createSimulatedAuth0Client();
         }
     },
 
@@ -530,8 +385,23 @@ const Auth0Auth = {
     // Načtení Auth0 skriptu z CDN
     loadAuth0Script() {
         return new Promise((resolve, reject) => {
+            // Kontrola, zda je Auth0 SDK již dostupný
+            if (typeof window.createAuth0Client !== 'undefined') {
+                console.log('Auth0 SDK je již dostupný (window.createAuth0Client)');
+                resolve();
+                return;
+            } else if (typeof createAuth0Client !== 'undefined') {
+                // Pokud je createAuth0Client definováno jako lokální proměnná, přiřadíme ji do window
+                window.createAuth0Client = createAuth0Client;
+                console.log('Auth0 SDK je již dostupný (createAuth0Client přiřazeno do window)');
+                resolve();
+                return;
+            }
+
             // Kontrola, zda již skript není načten
-            if (document.querySelector('script[src*="auth0-spa-js"]')) {
+            const existingScript = document.getElementById('auth0-spa-script') || document.getElementById('auth0-spa-script-backup') || document.querySelector('script[src*="auth0-spa-js"]');
+
+            if (existingScript) {
                 console.log('Auth0 skript je již načten, čekám na jeho inicializaci...');
 
                 // Kontrola, zda je createAuth0Client definován každých 100ms po dobu 5 sekund
@@ -561,45 +431,12 @@ const Auth0Auth = {
                         console.log('Pokouším se znovu načíst Auth0 skript...');
 
                         // Odstranění existujícího skriptu
-                        const existingScript = document.querySelector('script[src*="auth0-spa-js"]');
                         if (existingScript) {
                             existingScript.remove();
                         }
 
                         // Načtení alternativního zdroje
-                        const alternativeScript = document.createElement('script');
-                        alternativeScript.src = 'https://cdn.jsdelivr.net/npm/@auth0/auth0-spa-js@2.0/dist/auth0-spa-js.production.js';
-                        alternativeScript.async = false;
-                        alternativeScript.type = 'text/javascript';
-
-                        alternativeScript.onload = () => {
-                            console.log('Auth0 skript byl úspěšně načten z alternativního zdroje');
-
-                            // Kontrola, zda je createAuth0Client definováno
-                            if (typeof window.createAuth0Client !== 'undefined') {
-                                console.log('createAuth0Client je definováno po načtení alternativního skriptu');
-                                resolve();
-                            } else if (typeof createAuth0Client !== 'undefined') {
-                                window.createAuth0Client = createAuth0Client;
-                                console.log('createAuth0Client přiřazeno do window po načtení alternativního skriptu');
-                                resolve();
-                            } else {
-                                console.log('createAuth0Client stále není definováno po načtení alternativního skriptu, používám simulovaného klienta');
-
-                                // Vytvoření simulovaného Auth0 klienta
-                                this.createSimulatedAuth0Client();
-
-                                // Úspěšné vyřešení promise, i když jsme museli použít simulovaného klienta
-                                resolve();
-                            }
-                        };
-
-                        alternativeScript.onerror = (alternativeError) => {
-                            console.error('Chyba při načítání Auth0 skriptu z alternativního zdroje:', alternativeError);
-                            reject(alternativeError);
-                        };
-
-                        document.head.appendChild(alternativeScript);
+                        this.loadAlternativeAuth0Script(resolve, reject);
                     }
                 }, 100);
 
@@ -608,6 +445,7 @@ const Auth0Auth = {
 
             console.log('Načítám Auth0 skript z CDN...');
             const script = document.createElement('script');
+            script.id = 'auth0-spa-script-dynamic';
             script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
             script.async = false; // Synchronní načtení pro zajištění dostupnosti před dalším kódem
             script.type = 'text/javascript';
@@ -618,9 +456,11 @@ const Auth0Auth = {
                 // Kontrola, zda je createAuth0Client definováno
                 if (typeof window.createAuth0Client !== 'undefined') {
                     console.log('createAuth0Client je definováno po načtení skriptu (window.createAuth0Client)');
+                    resolve();
                 } else if (typeof createAuth0Client !== 'undefined') {
                     window.createAuth0Client = createAuth0Client;
                     console.log('createAuth0Client přiřazeno do window po načtení skriptu');
+                    resolve();
                 } else {
                     console.warn('createAuth0Client není definováno po načtení skriptu, čekám na jeho inicializaci...');
 
@@ -647,91 +487,103 @@ const Auth0Auth = {
                             console.error('Nepodařilo se načíst Auth0 knihovnu ani po opakovaných pokusech');
 
                             // Pokus o načtení alternativního zdroje
-                            console.log('Pokouším se načíst Auth0 skript z alternativního zdroje...');
-
-                            const alternativeScript = document.createElement('script');
-                            alternativeScript.src = 'https://cdn.jsdelivr.net/npm/@auth0/auth0-spa-js@2.0/dist/auth0-spa-js.production.js';
-                            alternativeScript.async = false;
-                            alternativeScript.type = 'text/javascript';
-
-                            alternativeScript.onload = () => {
-                                console.log('Auth0 skript byl úspěšně načten z alternativního zdroje');
-
-                                // Kontrola, zda je createAuth0Client definováno
-                                if (typeof window.createAuth0Client !== 'undefined') {
-                                    console.log('createAuth0Client je definováno po načtení alternativního skriptu');
-                                    resolve();
-                                } else if (typeof createAuth0Client !== 'undefined') {
-                                    window.createAuth0Client = createAuth0Client;
-                                    console.log('createAuth0Client přiřazeno do window po načtení alternativního skriptu');
-                                    resolve();
-                                } else {
-                                    console.log('createAuth0Client stále není definováno po načtení alternativního skriptu, používám simulovaného klienta');
-
-                                    // Vytvoření simulovaného Auth0 klienta
-                                    this.createSimulatedAuth0Client();
-
-                                    // Úspěšné vyřešení promise, i když jsme museli použít simulovaného klienta
-                                    resolve();
-                                }
-                            };
-
-                            alternativeScript.onerror = (alternativeError) => {
-                                console.error('Chyba při načítání Auth0 skriptu z alternativního zdroje:', alternativeError);
-                                reject(alternativeError);
-                            };
-
-                            document.head.appendChild(alternativeScript);
+                            this.loadAlternativeAuth0Script(resolve, reject);
                         }
                     }, 100);
                 }
-
-                resolve();
             };
 
             script.onerror = (error) => {
                 console.error('Chyba při načítání Auth0 skriptu z CDN:', error);
 
                 // Pokus o načtení alternativního zdroje
-                console.log('Pokouším se načíst Auth0 skript z alternativního zdroje po chybě...');
-
-                const alternativeScript = document.createElement('script');
-                alternativeScript.src = 'https://cdn.jsdelivr.net/npm/@auth0/auth0-spa-js@2.0/dist/auth0-spa-js.production.js';
-                alternativeScript.async = false;
-                alternativeScript.type = 'text/javascript';
-
-                alternativeScript.onload = () => {
-                    console.log('Auth0 skript byl úspěšně načten z alternativního zdroje');
-
-                    // Kontrola, zda je createAuth0Client definováno
-                    if (typeof window.createAuth0Client !== 'undefined') {
-                        console.log('createAuth0Client je definováno po načtení alternativního skriptu');
-                        resolve();
-                    } else if (typeof createAuth0Client !== 'undefined') {
-                        window.createAuth0Client = createAuth0Client;
-                        console.log('createAuth0Client přiřazeno do window po načtení alternativního skriptu');
-                        resolve();
-                    } else {
-                        console.log('createAuth0Client stále není definováno po načtení alternativního skriptu, používám simulovaného klienta');
-
-                        // Vytvoření simulovaného Auth0 klienta
-                        this.createSimulatedAuth0Client();
-
-                        // Úspěšné vyřešení promise, i když jsme museli použít simulovaného klienta
-                        resolve();
-                    }
-                };
-
-                alternativeScript.onerror = (alternativeError) => {
-                    console.error('Chyba při načítání Auth0 skriptu z alternativního zdroje:', alternativeError);
-                    reject(alternativeError);
-                };
-
-                document.head.appendChild(alternativeScript);
+                this.loadAlternativeAuth0Script(resolve, reject);
             };
 
             document.head.appendChild(script);
         });
+    },
+
+    // Načtení Auth0 skriptu z alternativního zdroje
+    loadAlternativeAuth0Script(resolve, reject) {
+        console.log('Pokouším se načíst Auth0 skript z alternativního zdroje...');
+
+        const alternativeScript = document.createElement('script');
+        alternativeScript.id = 'auth0-spa-script-alternative';
+        alternativeScript.src = 'https://cdn.jsdelivr.net/npm/@auth0/auth0-spa-js@2.0/dist/auth0-spa-js.production.js';
+        alternativeScript.async = false;
+        alternativeScript.type = 'text/javascript';
+
+        alternativeScript.onload = () => {
+            console.log('Auth0 skript byl úspěšně načten z alternativního zdroje');
+
+            // Kontrola, zda je createAuth0Client definováno
+            if (typeof window.createAuth0Client !== 'undefined') {
+                console.log('createAuth0Client je definováno po načtení alternativního skriptu');
+                resolve();
+            } else if (typeof createAuth0Client !== 'undefined') {
+                window.createAuth0Client = createAuth0Client;
+                console.log('createAuth0Client přiřazeno do window po načtení alternativního skriptu');
+                resolve();
+            } else {
+                console.log('createAuth0Client stále není definováno po načtení alternativního skriptu, používám simulovaného klienta');
+
+                // Vytvoření simulovaného Auth0 klienta
+                this.createSimulatedAuth0Client();
+
+                // Úspěšné vyřešení promise, i když jsme museli použít simulovaného klienta
+                resolve();
+            }
+        };
+
+        alternativeScript.onerror = (alternativeError) => {
+            console.error('Chyba při načítání Auth0 skriptu z alternativního zdroje:', alternativeError);
+
+            // Pokus o načtení třetího zdroje
+            console.log('Pokouším se načíst Auth0 skript z třetího zdroje...');
+
+            const thirdScript = document.createElement('script');
+            thirdScript.id = 'auth0-spa-script-third';
+            thirdScript.src = 'https://unpkg.com/@auth0/auth0-spa-js@2.0/dist/auth0-spa-js.production.js';
+            thirdScript.async = false;
+            thirdScript.type = 'text/javascript';
+
+            thirdScript.onload = () => {
+                console.log('Auth0 skript byl úspěšně načten z třetího zdroje');
+
+                // Kontrola, zda je createAuth0Client definováno
+                if (typeof window.createAuth0Client !== 'undefined') {
+                    console.log('createAuth0Client je definováno po načtení třetího skriptu');
+                    resolve();
+                } else if (typeof createAuth0Client !== 'undefined') {
+                    window.createAuth0Client = createAuth0Client;
+                    console.log('createAuth0Client přiřazeno do window po načtení třetího skriptu');
+                    resolve();
+                } else {
+                    console.log('createAuth0Client stále není definováno po načtení třetího skriptu, používám simulovaného klienta');
+
+                    // Vytvoření simulovaného Auth0 klienta
+                    this.createSimulatedAuth0Client();
+
+                    // Úspěšné vyřešení promise, i když jsme museli použít simulovaného klienta
+                    resolve();
+                }
+            };
+
+            thirdScript.onerror = (thirdError) => {
+                console.error('Chyba při načítání Auth0 skriptu z třetího zdroje:', thirdError);
+
+                // Vytvoření simulovaného Auth0 klienta jako poslední možnost
+                this.createSimulatedAuth0Client();
+
+                // Úspěšné vyřešení promise, i když jsme museli použít simulovaného klienta
+                resolve();
+            };
+
+            document.head.appendChild(thirdScript);
+        };
+
+        document.head.appendChild(alternativeScript);
     },
 
     // Kontrola, zda je uživatel přihlášen
@@ -1587,8 +1439,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const query = window.location.search;
     const hasAuthCode = query.includes('code=') && query.includes('state=');
 
-    if (hasAuthCode) {
-        console.log('Detekován autorizační kód v URL, prioritně inicializuji Auth0...');
+    // Kontrola, zda je v URL hash s tokeny z Auth0
+    const hash = window.location.hash;
+    const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+    if (hasAuthCode || hasAuthTokens) {
+        console.log('Detekován autorizační kód nebo tokeny v URL, prioritně inicializuji Auth0...');
 
         // Pokus o inicializaci Auth0 klienta
         Auth0Auth.loadAuth0Client().then(success => {
@@ -1596,6 +1452,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Auth0 klient byl úspěšně inicializován, zpracovávám callback...');
                 Auth0Auth.checkCurrentUser().then(isLoggedIn => {
                     console.log('Kontrola přihlášení uživatele po zpracování callbacku:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+                    // Vyvolání události o změně stavu přihlášení
+                    document.dispatchEvent(new CustomEvent('authStateChanged', {
+                        detail: { isLoggedIn: isLoggedIn, user: Auth0Auth.state.currentUser }
+                    }));
                 });
             } else {
                 console.error('Nepodařilo se inicializovat Auth0 klienta pro zpracování callbacku');
@@ -1607,38 +1468,100 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Posluchač události pro načtení Auth0 SDK
+    document.addEventListener('auth0SDKLoaded', function() {
+        console.log('Zachycena událost auth0SDKLoaded, inicializuji Auth0Auth...');
+
+        // Inicializace modulu
+        Auth0Auth.init().then(success => {
+            console.log('Auth0Auth byl úspěšně inicializován po načtení SDK');
+
+            // Kontrola, zda je uživatel přihlášen
+            Auth0Auth.checkCurrentUser().then(isLoggedIn => {
+                console.log('Kontrola přihlášení uživatele:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+                // Vyvolání události o změně stavu přihlášení
+                document.dispatchEvent(new CustomEvent('authStateChanged', {
+                    detail: { isLoggedIn: isLoggedIn, user: Auth0Auth.state.currentUser }
+                }));
+            });
+        }).catch(error => {
+            console.error('Chyba při inicializaci Auth0Auth po načtení SDK:', error);
+        });
+    });
+
     // Kontrola, zda je dostupná Auth0 knihovna
-    if (typeof createAuth0Client !== 'undefined') {
+    if (typeof window.createAuth0Client !== 'undefined' || typeof createAuth0Client !== 'undefined') {
         // Inicializace modulu
         console.log('Auth0 knihovna je dostupná, inicializuji Auth0Auth');
-        Auth0Auth.init().catch(error => {
+
+        // Přiřazení createAuth0Client do window, pokud je definováno pouze lokálně
+        if (typeof createAuth0Client !== 'undefined' && typeof window.createAuth0Client === 'undefined') {
+            window.createAuth0Client = createAuth0Client;
+            console.log('createAuth0Client přiřazeno do window objektu');
+        }
+
+        Auth0Auth.init().then(success => {
+            console.log('Auth0Auth byl úspěšně inicializován');
+
+            // Kontrola, zda je uživatel přihlášen
+            Auth0Auth.checkCurrentUser().then(isLoggedIn => {
+                console.log('Kontrola přihlášení uživatele:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+                // Vyvolání události o změně stavu přihlášení
+                document.dispatchEvent(new CustomEvent('authStateChanged', {
+                    detail: { isLoggedIn: isLoggedIn, user: Auth0Auth.state.currentUser }
+                }));
+            });
+        }).catch(error => {
             console.error('Chyba při inicializaci Auth0Auth:', error);
         });
     } else {
-        console.error('Auth0 knihovna není dostupná. Ujistěte se, že je načten skript auth0-spa-js.');
+        console.log('Auth0 knihovna není dostupná, pokouším se ji načíst...');
 
         // Pokus o načtení Auth0 knihovny
-        console.log('Pokouším se načíst Auth0 knihovnu...');
-        const script = document.createElement('script');
-        script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
-        script.async = false; // Synchronní načtení pro zajištění dostupnosti před dalším kódem
+        Auth0Auth.loadAuth0Script().then(() => {
+            console.log('Auth0 knihovna byla úspěšně načtena, inicializuji Auth0Auth...');
 
-        script.onload = function() {
-            console.log('Auth0 knihovna byla úspěšně načtena');
+            // Inicializace modulu
+            Auth0Auth.init().then(success => {
+                console.log('Auth0Auth byl úspěšně inicializován po načtení knihovny');
 
-            // Krátká pauza pro zajištění, že knihovna je plně inicializována
-            setTimeout(() => {
-                Auth0Auth.init().catch(error => {
-                    console.error('Chyba při inicializaci Auth0Auth po načtení knihovny:', error);
+                // Kontrola, zda je uživatel přihlášen
+                Auth0Auth.checkCurrentUser().then(isLoggedIn => {
+                    console.log('Kontrola přihlášení uživatele:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+                    // Vyvolání události o změně stavu přihlášení
+                    document.dispatchEvent(new CustomEvent('authStateChanged', {
+                        detail: { isLoggedIn: isLoggedIn, user: Auth0Auth.state.currentUser }
+                    }));
                 });
-            }, 100);
-        };
-
-        script.onerror = function(error) {
+            }).catch(error => {
+                console.error('Chyba při inicializaci Auth0Auth po načtení knihovny:', error);
+            });
+        }).catch(error => {
             console.error('Chyba při načítání Auth0 knihovny:', error);
-        };
 
-        document.head.appendChild(script);
+            // Vytvoření simulovaného Auth0 klienta jako poslední možnost
+            Auth0Auth.createSimulatedAuth0Client();
+
+            // Inicializace modulu se simulovaným klientem
+            Auth0Auth.init().then(success => {
+                console.log('Auth0Auth byl inicializován se simulovaným klientem');
+
+                // Kontrola, zda je uživatel přihlášen
+                Auth0Auth.checkCurrentUser().then(isLoggedIn => {
+                    console.log('Kontrola přihlášení uživatele (simulovaný klient):', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+                    // Vyvolání události o změně stavu přihlášení
+                    document.dispatchEvent(new CustomEvent('authStateChanged', {
+                        detail: { isLoggedIn: isLoggedIn, user: Auth0Auth.state.currentUser }
+                    }));
+                });
+            }).catch(error => {
+                console.error('Chyba při inicializaci Auth0Auth se simulovaným klientem:', error);
+            });
+        });
     }
 });
 
