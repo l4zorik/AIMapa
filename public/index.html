@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="app/styles.css">
     <!-- Leaflet CSS pro mapu -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- Jednoduché CSS pro mapu -->
+    <link rel="stylesheet" href="app/simple-map.css">
     <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <!-- OSM Buildings CSS -->
@@ -43,8 +45,18 @@
     <link rel="stylesheet" href="app/auth-screen.css">
     <!-- Bezpečnostní utility -->
     <link rel="stylesheet" href="app/security-utils.css">
+    <!-- Auth0 integrace -->
+    <link rel="stylesheet" href="app/auth0-auth.css">
+    <!-- Uživatelský profil -->
+    <link rel="stylesheet" href="app/user-profile.css">
+    <!-- Předplatné -->
+    <link rel="stylesheet" href="app/subscription-service.css">
+    <!-- Font Awesome pro ikony -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase klient -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Auth0 klient -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 </head>
 <body>
     <!-- Ikona pro zobrazení novinek a aktualizací byla odstraněna - novinky jsou nyní dostupné přes menu příkazů -->
@@ -66,17 +78,11 @@
 
                 <h2>Mapa aktivit</h2>
                 <div class="map-wrapper">
+                    <!-- Hlavní mapa -->
                     <div id="map"></div>
-                    <div id="cesiumContainer" class="cesium-container"></div>
-                    <div id="threeGlobeContainer" class="three-globe-container"></div>
+                    <!-- Ovládací prvky mapy -->
                     <button id="fullscreenButton" class="map-control-btn" title="Fullscreen režim">
                         <i class="icon">⛶</i>
-                    </button>
-                    <button id="toggleGlobeMode" class="map-control-btn" title="Glóbus režim">
-                        <i class="icon">🌎</i>
-                    </button>
-                    <button id="exitGlobeMode" class="map-control-btn" title="Zpět na mapu" style="display: none;">
-                        <i class="icon">🗺️</i>
                     </button>
                     <div id="coordinates" class="coordinates-display"></div>
                 </div>
@@ -350,15 +356,17 @@
         </div>
     </div>
 
-    <!-- Leaflet JS pro mapu - přidáno defer=false a async=false pro zajištění správného pořadí načítání -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer="false" async="false"></script>
+    <!-- Leaflet JS pro mapu -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <!-- OpenRouteService API pro přesné směrování po silnicích -->
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js" defer="false" async="false"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js" defer></script>
     <!-- OSM Buildings JS pro 3D budovy -->
-    <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js" defer="false" async="false"></script>
+    <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js" defer></script>
     <!-- Cesium JS je již načten v hlavičce -->
     <!-- Přímá implementace Globe.gl -->
-    <script src="app/globe-simple.js"></script>
+    <script src="app/globe-simple.js" defer></script>
+    <!-- Jednoduchá inicializace mapy -->
+    <script src="app/simple-map.js" defer></script>
     <!-- Hlavní skript aplikace - přidáno defer pro zajištění, že se načte až po Leaflet.js -->
     <script src="app/script.js" defer></script>
     <!-- Skripty pro novinky a menu příkazů -->
@@ -391,8 +399,8 @@
     <script src="app/reward-system.js"></script>
     <script src="app/commands-menu.js"></script>
     <script src="app/fix-menu.js"></script>
-    <script src="app/business-markers.js"></script>
-    <script src="app/business-data-loader.js"></script>
+    <script src="app/business-markers.js" defer></script>
+    <script src="app/business-data-loader.js" defer></script>
     <script src="app/money-indicator-enhanced.js"></script>
     <script src="app/triple-click-handler.js"></script>
     <script src="app/bug-reporter.js"></script>
@@ -408,9 +416,63 @@
     <script src="app/netlify-integration.js"></script>
     <script src="app/security-utils.js"></script>
     <script src="app/local-auth.js"></script>
+    <script src="app/auth0-auth.js"></script>
     <script src="app/hybrid-auth.js"></script>
     <script src="app/auth-screen.js"></script>
+    <script src="app/user-profile.js"></script>
+    <script src="app/subscription-service.js"></script>
     <!-- Debugovací skript pro mapu -->
-    <script src="app/map-debug.js"></script>
+    <script src="app/map-debug.js" defer></script>
+
+    <!-- Testovací skripty (pouze pro lokální vývoj) -->
+    <script>
+        // Kontrola, zda jsme v lokálním vývojovém prostředí
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Načtení testovacích skriptů
+            const testScripts = [
+                '/tests/auth-test.js',
+                '/tests/supabase-test.js',
+                '/tests/form-test.js',
+                '/tests/csp-test.js'
+            ];
+
+            testScripts.forEach(script => {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script;
+                document.head.appendChild(scriptElement);
+            });
+
+            // Přidání odkazu na testovací stránku
+            document.addEventListener('DOMContentLoaded', () => {
+                const testLink = document.createElement('a');
+                testLink.href = '/tests/index.html';
+                testLink.target = '_blank';
+                testLink.textContent = 'Otevřít testovací stránku';
+                testLink.style.position = 'fixed';
+                testLink.style.bottom = '10px';
+                testLink.style.right = '10px';
+                testLink.style.padding = '8px 16px';
+                testLink.style.backgroundColor = '#6d28d9';
+                testLink.style.color = 'white';
+                testLink.style.borderRadius = '4px';
+                testLink.style.textDecoration = 'none';
+                testLink.style.zIndex = '9999';
+                document.body.appendChild(testLink);
+            });
+        }
+    </script>
+
+    <!-- Inicializace Auth0 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializace Auth0 modulu
+            if (typeof Auth0Auth !== 'undefined') {
+                console.log('Inicializace Auth0 modulu...');
+                Auth0Auth.init();
+            } else {
+                console.error('Auth0Auth modul nebyl nalezen!');
+            }
+        });
+    </script>
 </body>
 </html>

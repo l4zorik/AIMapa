@@ -529,10 +529,48 @@
 
             // Kontrola, zda je uživatel již přihlášen
             const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
-            if (isLoggedIn) {
+            // Přesměrování pouze pokud nejsme na testovací stránce
+            if (isLoggedIn && !window.location.href.includes('/tests/')) {
                 window.location.href = 'index.html';
             }
         });
+    </script>
+
+    <!-- Testovací skripty (pouze pro lokální vývoj) -->
+    <script>
+        // Kontrola, zda jsme v lokálním vývojovém prostředí
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Načtení testovacích skriptů
+            const testScripts = [
+                '/tests/auth-test.js',
+                '/tests/form-test.js',
+                '/tests/csp-test.js'
+            ];
+
+            testScripts.forEach(script => {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script;
+                document.head.appendChild(scriptElement);
+            });
+
+            // Přidání odkazu na testovací stránku
+            document.addEventListener('DOMContentLoaded', () => {
+                const testLink = document.createElement('a');
+                testLink.href = '/tests/index.html';
+                testLink.target = '_blank';
+                testLink.textContent = 'Otevřít testovací stránku';
+                testLink.style.position = 'fixed';
+                testLink.style.bottom = '10px';
+                testLink.style.right = '10px';
+                testLink.style.padding = '8px 16px';
+                testLink.style.backgroundColor = '#6d28d9';
+                testLink.style.color = 'white';
+                testLink.style.borderRadius = '4px';
+                testLink.style.textDecoration = 'none';
+                testLink.style.zIndex = '9999';
+                document.body.appendChild(testLink);
+            });
+        }
     </script>
 </body>
 </html>

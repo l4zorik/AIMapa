@@ -1,0 +1,95 @@
+/**
+ * Styly pro Auth0 autentizaci v AIMapa
+ * Verze 0.3.8.5
+ */
+
+/* Tlačítko pro autentizaci */
+.auth0-auth-button {
+    position: fixed;
+    top: 20px;
+    right: 120px; /* Umístění vedle ostatních tlačítek */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ff4f1f; /* Auth0 oranžová barva */
+    color: white;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 900;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.auth0-auth-button:hover {
+    transform: scale(1.1);
+    background-color: #eb5424; /* Tmavší Auth0 oranžová barva */
+}
+
+.auth0-auth-button.logged-in {
+    background-color: #44c7f4; /* Auth0 modrá barva */
+}
+
+.auth0-auth-button.logged-in:hover {
+    background-color: #16214d; /* Auth0 tmavě modrá barva */
+}
+
+/* Tlačítko pro přihlášení přes Auth0 v přihlašovacím formuláři */
+.auth0-login-button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background-color: #ff4f1f; /* Auth0 oranžová barva */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s;
+}
+
+.auth0-login-button:hover {
+    background-color: #eb5424; /* Tmavší Auth0 oranžová barva */
+}
+
+.auth0-login-button i {
+    font-size: 18px;
+}
+
+/* Oddělovač pro sociální přihlášení */
+.auth-social-separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: var(--text-color, #333);
+}
+
+.auth-social-separator::before,
+.auth-social-separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color, #ddd);
+}
+
+.auth-social-separator::before {
+    margin-right: 10px;
+}
+
+.auth-social-separator::after {
+    margin-left: 10px;
+}
+
+/* Kontejner pro sociální přihlášení */
+.auth-social-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}

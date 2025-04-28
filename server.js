@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const request = require('request');
 require('dotenv').config();
 
 // Pomocné funkce
@@ -73,8 +74,98 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Statické soubory
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Testovací soubory (pouze pro lokální vývoj)
+app.use('/tests', express.static(path.join(__dirname, 'tests')));
+
 // API Routes
 app.use('/api', require('./routes/api'));
+
+// Auth0 konfigurace
+const auth0Config = {
+    domain: process.env.AUTH0_DOMAIN,
+    clientId: process.env.AUTH0_CLIENT_ID,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET,
+    audience: process.env.AUTH0_AUDIENCE,
+    callbackUrl: process.env.AUTH0_CALLBACK_URL,
+    logoutUrl: process.env.AUTH0_LOGOUT_URL,
+    scope: process.env.AUTH0_SCOPE
+};
+
+// Proměnná pro uložení Auth0 Management API tokenu
+let auth0ManagementToken = null;
+let auth0TokenExpiry = 0;
+
+// Funkce pro získání Auth0 Management API tokenu
+function getAuth0ManagementToken() {
+    return new Promise((resolve, reject) => {
+        // Kontrola, zda máme platný token
+        const now = Date.now();
+        if (auth0ManagementToken && auth0TokenExpiry > now) {
+            return resolve(auth0ManagementToken);
+        }
+
+        // Nastavení požadavku pro získání tokenu
+        const options = {
+            method: 'POST',
+            url: `https://${auth0Config.domain}/oauth/token`,
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+                client_id: auth0Config.clientId,
+                client_secret: auth0Config.clientSecret,
+                audience: auth0Config.audience,
+                grant_type: 'client_credentials'
+            })
+        };
+
+        // Odeslání požadavku
+        request(options, (error, response, body) => {
+            if (error) {
+                console.error('Chyba při získávání Auth0 Management API tokenu:', error);
+                return reject(error);
+            }
+
+            try {
+                // Parsování odpovědi
+                const data = JSON.parse(body);
+
+                // Uložení tokenu a času expirace
+                auth0ManagementToken = data.access_token;
+                // Nastavení expirace tokenu (obvykle 24 hodin, ale pro jistotu nastavíme na 23 hodin)
+                auth0TokenExpiry = now + (data.expires_in * 1000) - (60 * 60 * 1000);
+
+                console.log('Auth0 Management API token byl úspěšně získán');
+                resolve(auth0ManagementToken);
+            } catch (parseError) {
+                console.error('Chyba při parsování odpovědi z Auth0:', parseError);
+                reject(parseError);
+            }
+        });
+    });
+}
+
+// Endpoint pro získání Auth0 konfigurace (pouze clientId a domain pro klienta)
+app.get('/auth/config', (_req, res) => {
+    res.json({
+        domain: auth0Config.domain,
+        clientId: auth0Config.clientId,
+        audience: auth0Config.audience,
+        scope: auth0Config.scope
+    });
+});
+
+// Endpoint pro získání Auth0 Management API tokenu (pouze pro autorizované požadavky)
+app.get('/auth/management-token', async (req, res) => {
+    try {
+        // Zde by měla být implementována autorizace požadavku
+        // Pro jednoduchost nyní poskytujeme token bez autorizace, ale v produkci by to mělo být zabezpečeno
+
+        const token = await getAuth0ManagementToken();
+        res.json({ access_token: token });
+    } catch (error) {
+        console.error('Chyba při získávání Auth0 Management API tokenu:', error);
+        res.status(500).json({ error: 'Nepodařilo se získat token' });
+    }
+});
 
 // API pro autentizaci
 app.post('/auth/login', (req, res) => {

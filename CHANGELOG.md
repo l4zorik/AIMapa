@@ -17,6 +17,9 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Přidána podpora pro offline přihlášení s lokálním ukládáním uživatelských dat
 - Optimalizováno načítání Leaflet.js a dalších externích knihoven
 - Vylepšena kompatibilita s různými prohlížeči a zařízeními
+- Přidána podpora pro vývojovou verzi na Netlify s automatickou detekcí prostředí
+- Vylepšena inicializace Auth0 autentizace s automatickým přesměrováním na přihlašovací stránku
+- Optimalizováno načítání skriptů s atributem defer pro lepší výkon a spolehlivost
 
 ### Opravy
 - Opraveny problémy s načítáním mapy na různých platformách
@@ -24,6 +27,11 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Opraveny problémy s Content Security Policy pro správné načítání externích zdrojů
 - Vylepšena inicializace chatových elementů pro prevenci chyb při načítání
 - Opraveny problémy s přidáváním bodů na mapu před úplnou inicializací Leaflet.js
+- Vyřešeny problémy s načítáním Leaflet.js na vývojové verzi na Netlify
+- Opravena inicializace mapy s robustnější detekcí a opravou chyb
+- Vylepšena spolehlivost zobrazování firem na mapě s opakovanými pokusy o inicializaci
+- Přidána lepší diagnostika a logování pro snadnější identifikaci problémů
+- Implementováno automatické opakování inicializace mapy při selhání
 
 ## [0.3.8.4] - 2025-07-10 - INTEGRACE SUPABASE A NETLIFY
 

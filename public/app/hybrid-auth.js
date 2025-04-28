@@ -51,6 +51,13 @@ const HybridAuth = {
 
     // Výběr poskytovatele autentizace
     selectAuthProvider() {
+        // Nejprve zkontrolujeme, zda je dostupný Auth0 modul
+        if (typeof window.Auth0Auth !== 'undefined') {
+            console.log('Používám Auth0 autentizaci');
+            this.state.authProvider = window.Auth0Auth;
+            return;
+        }
+
         if (this.state.isNetlify) {
             // Kontrola, zda je dostupný Supabase modul
             if (typeof window.SupabaseAuth !== 'undefined') {

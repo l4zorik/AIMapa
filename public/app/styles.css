@@ -339,13 +339,8 @@ body[data-theme="dark"] .btn:hover {
     padding: 12px 15px;
     background-color: var(--primary-color);
     color: white;
-    cursor: default;
+    cursor: move; /* Vždy nastaveno na move */
     font-weight: 500;
-}
-
-/* Kurzor pro přesunutelný chat ve fullscreen režimu */
-.map-fullscreen .chat-header {
-    cursor: move;
 }
 
 .chat-drag-handle {

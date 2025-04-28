@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMapa - Testovací stránka</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        h1, h2, h3 {
+            color: #6d28d9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .test-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #6d28d9;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #5b21b6;
+        }
+
+        .results {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 4px;
+            border-left: 4px solid #6d28d9;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .success {
+            border-left-color: #10b981;
+        }
+
+        .error {
+            border-left-color: #ef4444;
+        }
+
+        .nav-links {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            color: #6d28d9;
+            text-decoration: none;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AIMapa - Testovací stránka</h1>
+        <p>Tato stránka slouží k testování různých funkcí aplikace AIMapa verze 0.3.8.5.</p>
+
+        <div class="nav-links">
+            <a href="http://localhost:3000" target="_blank">Otevřít aplikaci</a>
+            <a href="http://localhost:3000/login.html" target="_blank">Otevřít přihlašovací stránku</a>
+        </div>
+
+        <div class="test-section">
+            <h2>Testování autentizace</h2>
+            <p>Testy pro ověření funkčnosti přihlášení, registrace a odhlášení.</p>
+
+            <div class="test-buttons">
+                <button onclick="runAuthTest('registration')">Test registrace</button>
+                <button onclick="runAuthTest('login')">Test přihlášení</button>
+                <button onclick="runAuthTest('logout')">Test odhlášení</button>
+                <button onclick="runAuthTest('all')">Spustit všechny testy</button>
+            </div>
+
+            <div id="auth-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Testování Supabase integrace</h2>
+            <p>Testy pro ověření funkčnosti integrace se Supabase.</p>
+
+            <div class="test-buttons">
+                <button onclick="runSupabaseTest('connection')">Test připojení</button>
+                <button onclick="runSupabaseTest('saving')">Test ukládání dat</button>
+                <button onclick="runSupabaseTest('loading')">Test načítání dat</button>
+                <button onclick="runSupabaseTest('updating')">Test aktualizace dat</button>
+                <button onclick="runSupabaseTest('deleting')">Test mazání dat</button>
+                <button onclick="runSupabaseTest('all')">Spustit všechny testy</button>
+            </div>
+
+            <div id="supabase-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Testování formulářů</h2>
+            <p>Testy pro ověření správnosti formulářů a jejich validace.</p>
+
+            <div class="test-buttons">
+                <button onclick="runFormTest('elements')">Test formulářových prvků</button>
+                <button onclick="runFormTest('accessibility')">Test přístupnosti</button>
+                <button onclick="runFormTest('validation')">Test validace</button>
+                <button onclick="runFormTest('all')">Spustit všechny testy</button>
+            </div>
+
+            <div id="form-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Testování Content Security Policy</h2>
+            <p>Testy pro ověření správnosti nastavení Content Security Policy.</p>
+
+            <div class="test-buttons">
+                <button onclick="runCSPTest('resources')">Test externích zdrojů</button>
+                <button onclick="runCSPTest('eval')">Test eval</button>
+                <button onclick="runCSPTest('inline')">Test inline skriptů</button>
+                <button onclick="runCSPTest('fetch')">Test fetch požadavků</button>
+                <button onclick="runCSPTest('all')">Spustit všechny testy</button>
+            </div>
+
+            <div id="csp-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+    </div>
+
+    <script>
+        // Načtení testovacích skriptů
+        function loadScript(url) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Načtení všech testovacích skriptů
+        Promise.all([
+            loadScript('/tests/auth-test.js'),
+            loadScript('/tests/supabase-test.js'),
+            loadScript('/tests/form-test.js'),
+            loadScript('/tests/csp-test.js')
+        ]).then(() => {
+            console.log('Všechny testovací skripty byly načteny');
+        }).catch(error => {
+            console.error('Chyba při načítání testovacích skriptů:', error);
+        });
+
+        // Funkce pro spuštění testů autentizace
+        async function runAuthTest(testType) {
+            const resultsElement = document.getElementById('auth-results');
+            resultsElement.textContent = 'Spouštění testů...';
+            resultsElement.className = 'results';
+
+            try {
+                if (!window.AuthTest) {
+                    throw new Error('Testovací skript pro autentizaci nebyl načten');
+                }
+
+                let result;
+
+                switch (testType) {
+                    case 'registration':
+                        result = await window.AuthTest.testRegistration(window.AuthTest.testUsers[0]);
+                        break;
+                    case 'login':
+                        result = await window.AuthTest.testLogin(window.AuthTest.testUsers[0]);
+                        break;
+                    case 'logout':
+                        result = await window.AuthTest.testLogout();
+                        break;
+                    case 'all':
+                        result = await window.AuthTest.runAllTests();
+                        break;
+                    default:
+                        throw new Error('Neznámý typ testu');
+                }
+
+                resultsElement.textContent = JSON.stringify(result, null, 2);
+                resultsElement.classList.add('success');
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění testů autentizace:', error);
+            }
+        }
+
+        // Funkce pro spuštění testů Supabase integrace
+        async function runSupabaseTest(testType) {
+            const resultsElement = document.getElementById('supabase-results');
+            resultsElement.textContent = 'Spouštění testů...';
+            resultsElement.className = 'results';
+
+            try {
+                if (!window.SupabaseTest) {
+                    throw new Error('Testovací skript pro Supabase integraci nebyl načten');
+                }
+
+                let result;
+
+                switch (testType) {
+                    case 'connection':
+                        result = await window.SupabaseTest.testConnection();
+                        break;
+                    case 'saving':
+                        result = await window.SupabaseTest.testDataSaving();
+                        break;
+                    case 'loading':
+                        result = await window.SupabaseTest.testDataLoading();
+                        break;
+                    case 'updating':
+                        result = await window.SupabaseTest.testDataUpdating();
+                        break;
+                    case 'deleting':
+                        result = await window.SupabaseTest.testDataDeleting();
+                        break;
+                    case 'all':
+                        result = await window.SupabaseTest.runAllTests();
+                        break;
+                    default:
+                        throw new Error('Neznámý typ testu');
+                }
+
+                resultsElement.textContent = JSON.stringify(result, null, 2);
+                resultsElement.classList.add('success');
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění testů Supabase integrace:', error);
+            }
+        }
+
+        // Funkce pro spuštění testů formulářů
+        async function runFormTest(testType) {
+            const resultsElement = document.getElementById('form-results');
+            resultsElement.textContent = 'Spouštění testů...';
+            resultsElement.className = 'results';
+
+            try {
+                if (!window.FormTest) {
+                    throw new Error('Testovací skript pro formuláře nebyl načten');
+                }
+
+                let result;
+
+                switch (testType) {
+                    case 'elements':
+                        result = window.FormTest.testFormElements();
+                        break;
+                    case 'accessibility':
+                        result = window.FormTest.testFormAccessibility();
+                        break;
+                    case 'validation':
+                        result = window.FormTest.testFormValidation();
+                        break;
+                    case 'all':
+                        result = window.FormTest.runAllTests();
+                        break;
+                    default:
+                        throw new Error('Neznámý typ testu');
+                }
+
+                resultsElement.textContent = JSON.stringify(result, null, 2);
+                resultsElement.classList.add('success');
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění testů formulářů:', error);
+            }
+        }
+
+        // Funkce pro spuštění testů Content Security Policy
+        async function runCSPTest(testType) {
+            const resultsElement = document.getElementById('csp-results');
+            resultsElement.textContent = 'Spouštění testů...';
+            resultsElement.className = 'results';
+
+            try {
+                if (!window.CSPTest) {
+                    throw new Error('Testovací skript pro Content Security Policy nebyl načten');
+                }
+
+                let result;
+
+                switch (testType) {
+                    case 'resources':
+                        result = await window.CSPTest.testExternalResources();
+                        break;
+                    case 'eval':
+                        result = window.CSPTest.testEval();
+                        break;
+                    case 'inline':
+                        result = window.CSPTest.testInlineScript();
+                        break;
+                    case 'fetch':
+                        result = await window.CSPTest.testFetchRequests();
+                        break;
+                    case 'all':
+                        result = await window.CSPTest.runAllTests();
+                        break;
+                    default:
+                        throw new Error('Neznámý typ testu');
+                }
+
+                resultsElement.textContent = JSON.stringify(result, null, 2);
+                resultsElement.classList.add('success');
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění testů Content Security Policy:', error);
+            }
+        }
+    </script>
+</body>
+</html>
