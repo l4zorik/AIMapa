@@ -382,10 +382,81 @@
             console.warn('Nepodařilo se vytvořit proxy pro ethereum:', e);
         }
 
-        // Kontrola, zda je Auth0 SDK správně načten
-        window.addEventListener('load', function() {
+        // Skrytí obsahu aplikace dokud není uživatel přihlášen
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vytvoření překryvné vrstvy pro blokování přístupu
+            const authOverlay = document.createElement('div');
+            authOverlay.id = 'auth-overlay';
+            authOverlay.style.position = 'fixed';
+            authOverlay.style.top = '0';
+            authOverlay.style.left = '0';
+            authOverlay.style.width = '100%';
+            authOverlay.style.height = '100%';
+            authOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+            authOverlay.style.zIndex = '9999';
+            authOverlay.style.display = 'flex';
+            authOverlay.style.flexDirection = 'column';
+            authOverlay.style.justifyContent = 'center';
+            authOverlay.style.alignItems = 'center';
+            authOverlay.style.color = 'white';
+            authOverlay.style.textAlign = 'center';
+            authOverlay.style.padding = '20px';
+
+            // Přidání obsahu překryvné vrstvy
+            authOverlay.innerHTML = `
+                <h2 style="font-size: 24px; margin-bottom: 20px;">Přístup k AI Mapě vyžaduje přihlášení</h2>
+                <p style="font-size: 16px; margin-bottom: 30px;">Pro pokračování se prosím přihlaste pomocí Auth0.</p>
+                <div id="auth-overlay-spinner" style="border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid #ff4f1f; width: 40px; height: 40px; animation: auth-spin 1s linear infinite; margin-bottom: 20px;"></div>
+                <p id="auth-overlay-status" style="font-size: 14px;">Inicializace přihlašování...</p>
+            `;
+
+            // Přidání animace pro spinner
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes auth-spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Přidání překryvné vrstvy do dokumentu
+            document.body.appendChild(authOverlay);
+
+            // Funkce pro aktualizaci stavu přihlašování
+            function updateAuthStatus(message) {
+                const statusElement = document.getElementById('auth-overlay-status');
+                if (statusElement) {
+                    statusElement.textContent = message;
+                }
+            }
+
+            // Funkce pro odstranění překryvné vrstvy po přihlášení
+            function removeAuthOverlay() {
+                const overlay = document.getElementById('auth-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    overlay.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        overlay.remove();
+                    }, 500);
+                }
+            }
+
+            // Posluchač události pro změnu stavu přihlášení
+            document.addEventListener('authStateChanged', function(event) {
+                if (event.detail.isLoggedIn) {
+                    console.log('Uživatel je přihlášen, odstraňuji překryvnou vrstvu...');
+                    removeAuthOverlay();
+                } else {
+                    console.log('Uživatel není přihlášen, ponechávám překryvnou vrstvu...');
+                }
+            });
+
+            // Kontrola, zda je Auth0 SDK správně načten
             if (typeof createAuth0Client === 'undefined') {
                 console.error('Auth0 SDK nebyl správně načten, pokouším se ho načíst znovu...');
+                updateAuthStatus('Načítání Auth0 SDK...');
 
                 // Pokus o opětovné načtení Auth0 SDK
                 const script = document.createElement('script');
@@ -394,6 +465,7 @@
 
                 script.onload = function() {
                     console.log('Auth0 SDK byl úspěšně načten');
+                    updateAuthStatus('Auth0 SDK načten, inicializuji přihlašování...');
 
                     // Kontrola, zda je createAuth0Client definováno
                     if (typeof createAuth0Client !== 'undefined') {
@@ -402,37 +474,98 @@
                         // Pokus o inicializaci Auth0Auth
                         if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.init === 'function') {
                             console.log('Pokouším se inicializovat Auth0Auth...');
-                            Auth0Auth.init().catch(function(error) {
+                            updateAuthStatus('Inicializuji Auth0 přihlašování...');
+
+                            Auth0Auth.init().then(function() {
+                                // Kontrola, zda je uživatel přihlášen
+                                if (!Auth0Auth.state.isLoggedIn) {
+                                    console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
+                                    updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
+                                    setTimeout(function() {
+                                        Auth0Auth.login();
+                                    }, 1000);
+                                } else {
+                                    console.log('Uživatel je již přihlášen, odstraňuji překryvnou vrstvu...');
+                                    removeAuthOverlay();
+                                }
+                            }).catch(function(error) {
                                 console.error('Chyba při inicializaci Auth0Auth:', error);
+                                updateAuthStatus('Chyba při inicializaci přihlašování. Zkouším znovu...');
+
+                                // Pokus o přímé přihlášení
+                                setTimeout(function() {
+                                    Auth0Auth.login();
+                                }, 2000);
                             });
+                        } else {
+                            console.error('Auth0Auth není definováno nebo nemá metodu init');
+                            updateAuthStatus('Chyba: Auth0Auth není dostupný. Zkouším přímé přihlášení...');
+
+                            // Přímé přesměrování na Auth0 přihlašovací stránku
+                            setTimeout(function() {
+                                window.location.href = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?client_id=TKzCgYPmkETVCBjC3418MgKDJY60rppl&redirect_uri=' + encodeURIComponent(window.location.origin) + '&response_type=code&scope=openid%20profile%20email';
+                            }, 2000);
                         }
                     } else {
                         console.error('createAuth0Client stále není definováno po opětovném načtení Auth0 SDK');
+                        updateAuthStatus('Chyba: Auth0 SDK není dostupný. Zkouším přímé přihlášení...');
+
+                        // Přímé přesměrování na Auth0 přihlašovací stránku
+                        setTimeout(function() {
+                            window.location.href = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?client_id=TKzCgYPmkETVCBjC3418MgKDJY60rppl&redirect_uri=' + encodeURIComponent(window.location.origin) + '&response_type=code&scope=openid%20profile%20email';
+                        }, 2000);
                     }
                 };
 
                 script.onerror = function(error) {
                     console.error('Chyba při opětovném načítání Auth0 SDK:', error);
+                    updateAuthStatus('Chyba při načítání Auth0 SDK. Zkouším přímé přihlášení...');
+
+                    // Přímé přesměrování na Auth0 přihlašovací stránku
+                    setTimeout(function() {
+                        window.location.href = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?client_id=TKzCgYPmkETVCBjC3418MgKDJY60rppl&redirect_uri=' + encodeURIComponent(window.location.origin) + '&response_type=code&scope=openid%20profile%20email';
+                    }, 2000);
                 };
 
                 document.head.appendChild(script);
             } else {
                 console.log('Auth0 SDK je správně načten, createAuth0Client je definováno');
+                updateAuthStatus('Auth0 SDK je připraven, inicializuji přihlašování...');
 
                 // Inicializace Auth0Auth a automatické přihlášení
                 if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.init === 'function') {
                     console.log('Inicializuji Auth0Auth a automaticky přihlašuji uživatele...');
+                    updateAuthStatus('Inicializuji Auth0 přihlašování...');
+
                     Auth0Auth.init().then(function() {
                         // Kontrola, zda je uživatel přihlášen
                         if (!Auth0Auth.state.isLoggedIn) {
                             console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
+                            updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
                             setTimeout(function() {
                                 Auth0Auth.login();
-                            }, 500);
+                            }, 1000);
+                        } else {
+                            console.log('Uživatel je již přihlášen, odstraňuji překryvnou vrstvu...');
+                            removeAuthOverlay();
                         }
                     }).catch(function(error) {
                         console.error('Chyba při inicializaci Auth0Auth:', error);
+                        updateAuthStatus('Chyba při inicializaci přihlašování. Zkouším znovu...');
+
+                        // Pokus o přímé přihlášení
+                        setTimeout(function() {
+                            Auth0Auth.login();
+                        }, 2000);
                     });
+                } else {
+                    console.error('Auth0Auth není definováno nebo nemá metodu init');
+                    updateAuthStatus('Chyba: Auth0Auth není dostupný. Zkouším přímé přihlášení...');
+
+                    // Přímé přesměrování na Auth0 přihlašovací stránku
+                    setTimeout(function() {
+                        window.location.href = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?client_id=TKzCgYPmkETVCBjC3418MgKDJY60rppl&redirect_uri=' + encodeURIComponent(window.location.origin) + '&response_type=code&scope=openid%20profile%20email';
+                    }, 2000);
                 }
             }
         });

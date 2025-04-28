@@ -12,6 +12,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vytvořeny SQL migrace pro Supabase s Row Level Security (RLS) politikami
 - Přidána serverová část pro Stripe API s webhooky pro zpracování událostí
 - Implementována synchronizace uživatelských dat mezi Auth0 a Supabase
+- Přidáno povinné přihlášení přes Auth0 před přístupem k aplikaci
+- Implementována překryvná vrstva blokující přístup nepřihlášeným uživatelům
 
 ### Vylepšení
 - Vytvořena nová adresářová struktura s logickým rozdělením modulů
@@ -25,6 +27,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Vylepšeno zobrazení stavu přihlášení s jasnou indikací Auth0 autentizace
 - Přidána vizuální zpětná vazba pro přihlášeného uživatele (pulzující tlačítko profilu)
 - Vylepšeno zobrazení uživatelského profilu s detailními informacemi o přihlášení
+- Přidán informativní spinner a stavové zprávy během procesu přihlašování
+- Implementováno automatické přesměrování na Auth0 přihlašovací stránku
 
 ### Opravy
 - Vyřešeny konflikty mezi Auth0 a Supabase autentizací
@@ -36,6 +40,8 @@ Všechny významné změny v projektu AIMapa budou dokumentovány v tomto soubor
 - Opravena funkčnost tlačítka profilu pro zobrazení uživatelských informací
 - Vyřešeny problémy s Auth0 přihlášením a zobrazením stavu autentizace
 - Opraveno zobrazení uživatelského profilu po přihlášení přes Auth0
+- Odstraněny duplicitní soubory a funkce pro lepší údržbu kódu
+- Implementovány záložní mechanismy pro případ selhání Auth0 SDK
 
 ## [0.3.8.4] - 2025-07-10 - INTEGRACE SUPABASE A NETLIFY
 
