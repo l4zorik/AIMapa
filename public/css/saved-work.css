@@ -1,0 +1,371 @@
+/* Styly pro uložené práce */
+.saved-work-container {
+    padding: 10px;
+}
+
+.saved-work-list {
+    margin-top: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.saved-work-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #2c3e50;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s;
+    border: 1px solid #34495e;
+}
+
+.saved-work-item:hover {
+    background-color: #34495e;
+}
+
+.saved-work-icon {
+    font-size: 24px;
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a2530;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border: 1px solid #3a546b;
+}
+
+.saved-work-info {
+    flex: 1;
+}
+
+.saved-work-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.saved-work-date {
+    font-size: 12px;
+    color: #b3c1d1;
+    margin-bottom: 5px;
+}
+
+.saved-work-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.saved-work-time, .saved-work-tasks {
+    background-color: #3a546b;
+    padding: 2px 6px;
+    border-radius: 10px;
+    color: #ecf0f1;
+}
+
+.saved-work-resume, .saved-work-delete {
+    background: #1a2530;
+    border: 1px solid #3a546b;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    color: white;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.saved-work-resume:hover, .saved-work-delete:hover {
+    background-color: #3a546b;
+}
+
+/* Styly pro banner nedokončené práce */
+.saved-work-banner {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    background-color: #2c3e50;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid #34495e;
+}
+
+.saved-work-banner-icon {
+    font-size: 24px;
+    margin-right: 15px;
+    color: #ecf0f1;
+}
+
+.saved-work-banner-text {
+    flex: 1;
+    font-weight: 600;
+    color: #ecf0f1;
+}
+
+.saved-work-banner-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.saved-work-banner-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Styly pro notifikaci */
+.saved-work-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+    transform: translateX(120%);
+    transition: transform 0.3s ease-out;
+}
+
+.saved-work-notification.show {
+    transform: translateX(0);
+}
+
+.saved-work-notification.closing {
+    transform: translateX(120%);
+}
+
+.saved-work-notification-icon {
+    font-size: 24px;
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+}
+
+.saved-work-notification-content {
+    flex: 1;
+}
+
+.saved-work-notification-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.saved-work-notification-text {
+    font-size: 12px;
+    color: #666;
+}
+
+.saved-work-notification-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 5px;
+}
+
+/* Styly pro historii práce */
+.work-history-container {
+    padding: 10px;
+}
+
+.work-history-list {
+    margin-top: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.work-history-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+}
+
+.work-history-item:hover {
+    background-color: #e9e9e9;
+}
+
+.work-history-icon {
+    font-size: 24px;
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.work-history-info {
+    flex: 1;
+}
+
+.work-history-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.work-history-date {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.work-history-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.work-history-pay, .work-history-xp, .work-history-duration, .work-history-tasks {
+    background-color: #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.work-history-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.work-history-details-btn, .work-history-repeat {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.work-history-details-btn:hover, .work-history-repeat:hover {
+    background-color: #ddd;
+}
+
+/* Styly pro panel detailů historie */
+.work-history-details-panel {
+    background-color: #f9f9f9;
+    border-radius: 0 0 5px 5px;
+    padding: 10px;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.work-history-tasks-list h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.work-history-tasks-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.work-history-tasks-list li {
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.work-history-tasks-list li:last-child {
+    border-bottom: none;
+}
+
+.work-history-tasks-list .task-status-icon {
+    margin-right: 10px;
+}
+
+.work-history-tasks-list .completed .task-text {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.work-history-tasks-list .incomplete .task-text {
+    color: #333;
+}
+
+/* Styly pro statistiky práce */
+.work-stats {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+}
+
+.work-stats h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.work-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.work-stat {
+    text-align: center;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.work-stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.work-stat-label {
+    font-size: 12px;
+    color: #666;
+}
+
+.no-history {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}

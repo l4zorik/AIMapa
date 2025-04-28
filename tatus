@@ -1,0 +1,20 @@
+[33m0405c68[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mv0.3.8.4[m[33m, [m[1;31morigin/v0.3.8.4[m[33m)[m Verze 0.3.8.5 - Lokální Node.js server s přihlašovacím systémem
+[33m83e8e28[m Oprava problémů s mapou a přihlašováním
+[33mc485cc6[m Oprava zobrazení mapy a implementace povinného přihlášení
+[33m14bccf3[m Přidání bezpečnostních opatření a zabezpečení aplikace
+[33ma7b6758[m Přidání povinného přihlášení a oprava načítání mapy
+[33m8e4edfb[m Přidání _headers souboru pro Netlify bez CSP
+[33mebd6ec4[m Odstranění Content Security Policy pro opravu problémů s mapou
+[33mc0e1fb8[m Rozšíření Content Security Policy pro povolení map a externích zdrojů
+[33mdfb737e[m Oprava konfigurace buildu pro Netlify
+[33m902b379[m Oprava konfigurace Node.js verze pro Netlify
+[33m2205b28[m Integrace Supabase a Netlify - verze 0.3.8.4
+[33m79b1364[m[33m ([m[1;31morigin/v0.3.8.1[m[33m, [m[1;32mv0.3.8.1[m[33m, [m[1;32mv0.3.8.0[m[33m)[m Verze 0.3.8.0 - Automatické ukládání nedokončené práce, zachování pozice scrollování a vylepšení vzhledu
+[33m5a99966[m[33m ([m[1;32mv0.3.6.0[m[33m)[m Přidání automatického ukládání práce při opakovaném kliknutí na 'Zpět na výběr práce'
+[33mcb7a0de[m Přidání dialogu pro uložení práce při kliknutí na 'Zpět na výběr práce'
+[33m7a73644[m[33m ([m[1;31morigin/v0.3.6.0[m[33m)[m Oprava tlačítka 'Zpět na výběr práce' v dialogu nedokončené práce
+[33m322cfed[m Oprava chyby 'Cannot read properties of undefined (reading 'idleTimeReduced')' v modulu idle-detection.js
+[33m7681b8f[m Oprava funkce 'Přijmout práci' pro správné zobrazení dialogu s výběrem typu práce
+[33mf02df4b[m Přidání debug popupu po kliknutí na modrou kuličku v pravém dolním rohu
+[33m6ce39d1[m Úprava funkce 'openWorkDialog' pro přeskočení kontroly nedokončených prací a přímé zobrazení dialogu s výběrem typu práce
+[33m4fe0488[m Úprava funkce 'Přijmout práci' pro přímé zobrazení dialogu s výběrem typu práce

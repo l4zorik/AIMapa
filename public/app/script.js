@@ -1,3 +1,8 @@
+/**
+ * Hlavní skript aplikace
+ * Verze 0.2.9.4
+ */
+
 // Inicializace mapy
 const map = L.map('map', {
     zoomAnimation: true, // Povolit animaci zoomu
@@ -127,12 +132,22 @@ const routingOptions = {
     router: L.Routing.osrmv1({
         serviceUrl: 'https://router.project-osrm.org/route/v1',
         profile: 'driving', // Možnosti: driving, walking, cycling
+<<<<<<< HEAD:script.js
         timeout: 5000, // Časový limit pro API požadavek (5 sekund)
         geometryOnly: false, // Optimalizace pro získání pouze geometrie trasy
         urlParameters: {
             alternatives: false, // Nezobrazovat alternativní trasy
             steps: false, // Nezobrazovat kroky trasy
             overview: 'full' // Získat plnou geometrii trasy
+=======
+        timeout: 3000, // Snížený časový limit pro API požadavek (3 sekundy) pro rychlejší odezvu
+        geometryOnly: true, // Optimalizace pro získání pouze geometrie trasy - zrychlení
+        urlParameters: {
+            alternatives: false, // Nezobrazovat alternativní trasy
+            steps: false, // Nezobrazovat kroky trasy
+            overview: 'full', // Získat plnou geometrii trasy
+            annotations: false // Vypnutí anotací pro rychlejší odezvu
+>>>>>>> v0.3.8.3:public/app/script.js
         }
     }),
     lineOptions: {
@@ -146,7 +161,7 @@ const routingOptions = {
     },
     show: false, // Nezobrazovat instrukce pro trasu
     showAlternatives: false,
-    fitSelectedRoutes: false,
+    fitSelectedRoutes: false, // Vypnuto automatické přizpůsobení mapy
     draggableWaypoints: false,
     createMarker: function() { return null; }, // Nepoužívat výchozí markery
     routeWhileDragging: false, // Zabrání přepočítávání trasy při přesouvní mapy
@@ -154,8 +169,14 @@ const routingOptions = {
     addWaypoints: false, // Nezobrazovat průjezdní body
     waypointMode: 'connect', // Pouze propojit body bez možnosti přidávání nových
     autoRoute: true, // Automaticky vypočítat trasu
+<<<<<<< HEAD:script.js
     routeDragInterval: 500, // Interval pro přepočet trasy při přesouvní (vyšší hodnota = méně časté přepočty)
     collapsible: true // Možnost sbalit panel s instrukcemi
+=======
+    routeDragInterval: 500, // Interval pro přepočet trasy při přesouvní
+    collapsible: true, // Možnost sbalit panel s instrukcemi
+    maxGeoJSONChunkSize: 1000 // Optimalizace pro velké trasy
+>>>>>>> v0.3.8.3:public/app/script.js
 };
 
 // Reference na HTML elementy pro informace o trase
@@ -570,6 +591,11 @@ function addMarkerToMap(latlng) {
     // Přidání zprávy do chatu
     addMessage(`Přidán bod "${markerProperties[markerIndex].name}" na souřadnicích [${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}]. Klikněte na bod pro úpravu.`, false);
 
+    // Sledování interakce s mapou a přidání XP
+    if (typeof UserProgressExtensions !== 'undefined') {
+        UserProgressExtensions.trackMapInteraction('addPoint');
+    }
+
     // Přidání event listeneru pro přesunutí markeru
     marker.on('dragend', function() {
         const newPos = marker.getLatLng();
@@ -922,6 +948,7 @@ function calculateRouteFunction() {
 
     // Použití přímého volání OSRM API pro rychlejší výpočet trasy
     // Toto je rychlejší než použití Leaflet Routing Machine
+<<<<<<< HEAD:script.js
     const fetchDirectRoute = async () => {
         try {
             // Vytvoření URL pro OSRM API
@@ -953,15 +980,94 @@ function calculateRouteFunction() {
             const decodedRoute = L.Polyline.fromEncoded(routeData.geometry).getLatLngs();
 
             // Vytvoření trasy na mapě
+=======
+    // Optimalizovaná verze pro lepší výkon
+    const fetchDirectRoute = async () => {
+        try {
+            // Zobrazení indikátoru načítání
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'route-loading-indicator';
+            loadingIndicator.innerHTML = '<div class="spinner"></div><div>Výpočet trasy...</div>';
+            document.body.appendChild(loadingIndicator);
+
+            // Vytvoření URL pro OSRM API s optimalizovanými parametry
+            // Omezení počtu bodů pro rychlejší výpočet
+            const maxPoints = 10; // Omezení počtu bodů pro rychlejší výpočet
+            let optimizedPoints = points;
+            if (points.length > maxPoints) {
+                // Pokud je bodů příliš mnoho, vybereme jen některé (první, poslední a několik mezi nimi)
+                const step = Math.floor(points.length / (maxPoints - 2));
+                optimizedPoints = [points[0]]; // První bod
+                for (let i = step; i < points.length - 1; i += step) {
+                    optimizedPoints.push(points[i]);
+                    if (optimizedPoints.length >= maxPoints - 1) break;
+                }
+                optimizedPoints.push(points[points.length - 1]); // Poslední bod
+            }
+
+            const coordinates = optimizedPoints.map(p => `${p.lng},${p.lat}`).join(';');
+            const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=polyline&steps=false&alternatives=false&annotations=false&continue_straight=true`;
+
+            // Nastavení časového limitu pro fetch - snížený na 2 sekundy pro rychlejší odezvu
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+            // Provedení požadavku na API s prioritou a optimalizací
+            const response = await fetch(url, {
+                signal: controller.signal,
+                priority: 'high',
+                cache: 'force-cache', // Použití cache pro rychlejší odezvu
+                headers: {
+                    'Accept': 'application/json',
+                    'Accept-Encoding': 'gzip' // Komprese dat pro rychlejší přenos
+                }
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`API responded with status ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+                throw new Error('No route found');
+            }
+
+            // Získání trasy z odpovědi
+            const routeData = data.routes[0];
+
+            // Dekódování polyline s optimalizací pro výkon
+            const decodedRoute = L.Polyline.fromEncoded(routeData.geometry).getLatLngs();
+
+            // Optimalizace počtu bodů pro dlouhé trasy (snížení počtu bodů pro lepší výkon)
+            let optimizedRoute = decodedRoute;
+            if (decodedRoute.length > 500) {
+                // Použití algoritmu pro redukci bodů při zachování tvaru trasy
+                optimizedRoute = L.LineUtil.simplify(decodedRoute, 0.0002);
+            }
+
+            // Vytvoření trasy na mapě s optimalizovanými nastaveními
+>>>>>>> v0.3.8.3:public/app/script.js
             if (route) {
                 map.removeLayer(route);
             }
 
+<<<<<<< HEAD:script.js
             route = L.polyline(decodedRoute, {
                 color: 'blue',
                 weight: 5,
                 opacity: 0.9,
                 smoothFactor: 1
+=======
+            route = L.polyline(optimizedRoute, {
+                color: 'blue',
+                weight: 5,
+                opacity: 0.9,
+                smoothFactor: 1.5,
+                renderer: L.canvas({ tolerance: 5 }), // Použití canvas rendereru s vyšší tolerancí pro lepší výkon
+                interactive: false // Vypnutí interaktivity pro lepší výkon
+>>>>>>> v0.3.8.3:public/app/script.js
             }).addTo(map);
 
             // Výpočet vzdálenosti a času
@@ -981,15 +1087,94 @@ function calculateRouteFunction() {
             // Přidání zprávy do chatu s informacemi o trase
             addMessage(`Trasa vypočítána po skutečných silnicích. Celková vzdálenost: ${distanceKm} km, čas cesty: ${timeString}`, false);
 
+<<<<<<< HEAD:script.js
             // Přizpůsobení mapy, aby zobrazovala celou trasu
             map.fitBounds(route.getBounds(), {padding: [50, 50]});
+=======
+            // Přidání XP za výpočet trasy, pokud je dostupný modul UserProgress
+            if (typeof UserProgress !== 'undefined') {
+                // XP závisí na délce trasy - čím delší trasa, tím více XP
+                const routeXP = Math.min(Math.ceil(distanceKm / 10), 20); // Maximum 20 XP
+                UserProgress.addExperience(routeXP, `Výpočet trasy o délce ${distanceKm} km`);
+
+                // Achievement za výpočet první trasy
+                UserProgress.addAchievement('navigator-bronze', 'Navigátor (bronz)', 'Vypočítali jste svou první trasu');
+
+                // Achievement za výpočet delší trasy
+                if (distanceKm > 50) {
+                    UserProgress.addAchievement('navigator-silver', 'Navigátor (stříbro)', 'Vypočítali jste trasu delší než 50 km');
+                }
+
+                // Achievement za výpočet velmi dlouhé trasy
+                if (distanceKm > 200) {
+                    UserProgress.addAchievement('navigator-gold', 'Navigátor (zlato)', 'Vypočítali jste trasu delší než 200 km');
+                }
+            }
+
+            // Aktualizace statistik tras, pokud je dostupné rozšíření
+            if (typeof UserProgressExtensions !== 'undefined') {
+                UserProgressExtensions.updateRouteStats(distanceKm);
+            }
+
+            // Odstranění indikátoru načítání
+            loadingIndicator.remove();
+
+            // Přidání tlačítka pro přizpůsobení mapy na trasu (místo automatického přizpůsobení)
+            const fitBoundsButton = document.createElement('button');
+            fitBoundsButton.className = 'fit-route-button new';
+            fitBoundsButton.textContent = 'Zobrazit celou trasu';
+            fitBoundsButton.addEventListener('click', () => {
+                map.fitBounds(route.getBounds(), {padding: [50, 50]});
+
+                // Přidání XP za použití funkce, pokud je dostupný modul UserProgress
+                if (typeof UserProgress !== 'undefined') {
+                    UserProgress.addExperience(2, 'Použití funkce zobrazení celé trasy');
+                }
+            });
+
+            // Odstranění existujícího tlačítka, pokud existuje
+            const existingButton = document.querySelector('.fit-route-button');
+            if (existingButton) {
+                existingButton.remove();
+            }
+
+            document.body.appendChild(fitBoundsButton);
+
+            // Odstranění třídy 'new' po 2 sekundách
+            setTimeout(() => {
+                fitBoundsButton.classList.remove('new');
+            }, 2000);
+>>>>>>> v0.3.8.3:public/app/script.js
 
             // Uložení stavu aplikace po výpočtu trasy
             saveAppState();
 
+<<<<<<< HEAD:script.js
             return true;
         } catch (error) {
             console.error('Chyba při přímém volání OSRM API:', error);
+=======
+            // Vysílání události o vypočítané trase
+            const routeCalculatedEvent = new CustomEvent('routeCalculated', {
+                detail: {
+                    points: points,
+                    distance: distanceKm,
+                    time: timeString
+                }
+            });
+            document.dispatchEvent(routeCalculatedEvent);
+
+            return true;
+        } catch (error) {
+            console.error('Chyba při přímém volání OSRM API:', error);
+
+            // Odstranění indikátoru načítání v případě chyby
+            const loadingIndicator = document.querySelector('.route-loading-indicator');
+            if (loadingIndicator) {
+                loadingIndicator.remove();
+            }
+
+>>>>>>> v0.3.8.3:public/app/script.js
             return false;
         }
     };
@@ -1015,7 +1200,11 @@ function calculateRouteFunction() {
 
             // Nastavení časového limitu pro získání trasy
             const routeTimeout = setTimeout(() => {
+<<<<<<< HEAD:script.js
                 // Pokud se trasa nezobrazí do 2 sekund, vytvoříme přímou trasu
+=======
+                // Pokud se trasa nezobrazí do 1 sekundy, vytvoříme přímou trasu
+>>>>>>> v0.3.8.3:public/app/script.js
                 if (routeControl && !route) {
                     addMessage('Výpočet přesné trasy trvá déle. Zobrazuji dočasnou přímou trasu.', false);
 
@@ -1060,7 +1249,11 @@ function calculateRouteFunction() {
                         console.log('Přímá trasa byla přidána na glóbus');
                     }
                 }
+<<<<<<< HEAD:script.js
             }, 2000);
+=======
+            }, 1000);
+>>>>>>> v0.3.8.3:public/app/script.js
 
             // Poslech na událost 'routesfound' pro získání informací o trase
             routeControl.on('routesfound', function(e) {
@@ -1340,6 +1533,14 @@ function toggleFullscreen() {
         // Přidání plovoucího chatu do fullscreen režimu
         createFloatingChat();
 
+        // Skrytí hlavního chatu v fullscreen režimu
+        const aiAssistant = document.getElementById('aiAssistant');
+        if (aiAssistant) {
+            aiAssistant.style.display = 'none';
+        }
+
+        // Menu příkazů bylo odstraněno
+
         // Zobrazení informace o fullscreen režimu
         addMessage('Mapa je nyní v režimu celé obrazovky. Pro návrat stiskněte klávesu ESC nebo klikněte na tlačítko v pravém horním rohu.', false);
 
@@ -1369,15 +1570,41 @@ function toggleFullscreen() {
 
         // Odstranění plovoucího chatu
         removeFloatingChat();
+
+        // Zobrazení hlavního chatu po návratu z fullscreen režimu
+        const aiAssistant = document.getElementById('aiAssistant');
+        if (aiAssistant) {
+            aiAssistant.style.display = 'flex';
+        }
     }
 
     // Aktualizace velikosti mapy po změně režimu
     setTimeout(() => {
-        map.invalidateSize();
+        map.invalidateSize({animate: true});
         if (route) {
             map.fitBounds(route.getBounds(), {padding: [50, 50]});
         }
-    }, 300); // Zvýšení času pro lepší přechod
+    }, 500); // Zvýšení času pro lepší přechod
+
+    // Vytvoření a odeslání události o změně fullscreen režimu
+    const event = new CustomEvent('fullscreenChange', {
+        detail: {
+            isFullscreen: isFullscreen
+        }
+    });
+    document.dispatchEvent(event);
+
+    // Nastavení přesouvatelnosti chatu podle režimu
+    if (typeof DraggableElements !== 'undefined') {
+        const aiAssistant = document.getElementById('aiAssistant');
+        if (aiAssistant) {
+            // V normálním režimu chat není přesunutelný
+            DraggableElements.setElementDraggable(aiAssistant, false);
+        }
+    }
+
+    // Uložení stavu aplikace po změně fullscreen režimu
+    saveAppState();
 }
 
 // Přidání event listeneru pro tlačítko fullscreen
@@ -1448,6 +1675,8 @@ function createFloatingChat() {
     // Přidání kontejneru do mapy
     mapWrapper.appendChild(floatingChatContainer);
 
+    // Menu příkazů bylo odstraněno
+
     // Přidání event listenerů pro ovládací prvky chatu
     document.getElementById('minimizeChat').addEventListener('click', toggleChatMinimize);
     document.getElementById('toggleChatPosition').addEventListener('click', toggleChatPosition);
@@ -1458,8 +1687,16 @@ function createFloatingChat() {
         }
     });
 
+    // Tlačítko menu příkazů bylo odstraněno
+
     // Přidání možnosti přesouvat chat
-    makeChatDraggable(floatingChatContainer, chatHeader);
+    if (typeof DraggableElements !== 'undefined') {
+        DraggableElements.makeDraggable(floatingChatContainer, chatHeader, 'floatingChatContainer');
+        DraggableElements.setElementDraggable(floatingChatContainer, true);
+    } else {
+        // Fallback na základní implementaci
+        makeChatDraggable(floatingChatContainer, chatHeader);
+    }
 }
 
 // Funkce pro odstranění plovoucího chatu
@@ -1555,6 +1792,21 @@ function processMessage(message) {
     // Přidání zprávy uživatele do chatu
     addMessage(message, true);
 
+<<<<<<< HEAD:script.js
+=======
+    // Kontrola, zda čekáme na název projektu ve virtuální práci
+    if (VirtualWork && VirtualWork.waitingForProjectName && VirtualWork.projectNameDialog) {
+        // Zpracování názvu projektu
+        VirtualWork.setProjectName(message, VirtualWork.projectNameDialog);
+        // Resetování stavu
+        VirtualWork.waitingForProjectName = false;
+        VirtualWork.projectNameDialog = null;
+        return;
+    }
+
+    // Menu příkazů bylo odstraněno
+
+>>>>>>> v0.3.8.3:public/app/script.js
     // Simulace odpovědi AI s návrhy dalších akcí
     setTimeout(() => {
         const { response, suggestions } = generateResponseWithSuggestions(message);
@@ -1568,6 +1820,8 @@ function sendFloatingChatMessage() {
     const messageText = floatingMessageInput.value.trim();
 
     if (messageText) {
+        // Menu příkazů bylo odstraněno
+
         // Použití existující funkce pro zpracování zprávy
         processMessage(messageText);
 
@@ -1579,8 +1833,10 @@ function sendFloatingChatMessage() {
 // Funkce pro přidání možnosti přesouvat chat
 function makeChatDraggable(element, handle) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    let isDragging = false;
 
     handle.onmousedown = dragMouseDown;
+    handle.style.cursor = 'move'; // Nastavení kurzoru pro indikaci přesouvatelnosti
 
     function dragMouseDown(e) {
         e.preventDefault();
@@ -1590,27 +1846,111 @@ function makeChatDraggable(element, handle) {
         document.onmouseup = closeDragElement;
         // Volat funkci při pohybu myši
         document.onmousemove = elementDrag;
+        isDragging = true;
+        element.classList.add('dragging'); // Přidání třídy pro indikaci přesouvatelnosti
     }
 
     function elementDrag(e) {
+        if (!isDragging) return;
+
         e.preventDefault();
         // Výpočet nové pozice
         pos1 = pos3 - e.clientX;
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
+
         // Nastavení nové pozice elementu
         element.style.top = (element.offsetTop - pos2) + "px";
         element.style.left = (element.offsetLeft - pos1) + "px";
 
         // Odstranění tříd pro pozici, pokud jsou přítomny
         element.classList.remove('chat-left', 'chat-right');
+
+        // Kontrola, zda element neopustil okno
+        checkElementBounds(element);
     }
 
     function closeDragElement() {
         // Zastavení pohybu při uvolnění tlačítka myši
         document.onmouseup = null;
         document.onmousemove = null;
+        isDragging = false;
+        element.classList.remove('dragging');
+
+        // Uložení pozice, pokud je dostupný modul DraggableElements
+        if (typeof DraggableElements !== 'undefined' && element.id) {
+            DraggableElements.saveElementPosition(element.id, element);
+        }
+    }
+
+    // Kontrola, zda element neopustil okno
+    function checkElementBounds(el) {
+        const rect = el.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // Kontrola, zda element neopustil okno
+        if (rect.right < 50) {
+            el.style.left = (-rect.width + 50) + 'px';
+        } else if (rect.left > windowWidth - 50) {
+            el.style.left = (windowWidth - 50) + 'px';
+        }
+
+        if (rect.bottom < 50) {
+            el.style.top = (-rect.height + 50) + 'px';
+        } else if (rect.top > windowHeight - 50) {
+            el.style.top = (windowHeight - 50) + 'px';
+        }
+    }
+}
+
+// Funkce pro nastavení přesouvatelnosti hlavního chatu
+function setupMainChatDraggable(draggable = false) {
+    const aiAssistant = document.getElementById('aiAssistant');
+    const chatHeader = aiAssistant.querySelector('.chat-header');
+    const minimizeBtn = document.getElementById('minimizeMainChat');
+
+    // Přidání možnosti přesouvat chat pomocí DraggableElements modulu
+    if (typeof DraggableElements !== 'undefined') {
+        // Nejprve vytvoříme prvek jako přesunutelný
+        DraggableElements.makeDraggable(aiAssistant, chatHeader, 'aiAssistant');
+
+        // Pak nastavíme, zda má být přesunutelný nebo ne
+        DraggableElements.setElementDraggable(aiAssistant, draggable);
+    } else {
+        // Fallback na základní implementaci
+        if (draggable) {
+            makeChatDraggable(aiAssistant, chatHeader);
+        }
+    }
+
+    // Přidání event listeneru pro minimalizaci chatu
+    if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', toggleMainChatMinimize);
+    }
+}
+
+// Funkce pro přepnutí minimalizace hlavního chatu
+function toggleMainChatMinimize() {
+    const aiAssistant = document.getElementById('aiAssistant');
+    const chatContent = aiAssistant.querySelector('.chat-content');
+    const minimizeBtn = document.getElementById('minimizeMainChat');
+
+    if (!aiAssistant || !chatContent || !minimizeBtn) return;
+
+    if (aiAssistant.classList.contains('minimized')) {
+        // Maximalizovat chat
+        aiAssistant.classList.remove('minimized');
+        chatContent.style.display = 'flex';
+        minimizeBtn.textContent = '−'; // Symbol minus
+        minimizeBtn.title = 'Minimalizovat chat';
+    } else {
+        // Minimalizovat chat
+        aiAssistant.classList.add('minimized');
+        chatContent.style.display = 'none';
+        minimizeBtn.textContent = '+'; // Symbol plus
+        minimizeBtn.title = 'Maximalizovat chat';
     }
 }
 
@@ -1630,6 +1970,24 @@ function addMessage(message, isUser = false, suggestions = null) {
     messageDiv.textContent = message;
     messageContainer.appendChild(messageDiv);
 
+<<<<<<< HEAD:script.js
+=======
+    // Přidání XP za rozhodnutí uživatele
+    if (isUser && typeof UserProgress !== 'undefined') {
+        // Získání XP za každé rozhodnutí uživatele (2-5 XP)
+        const messageLength = message.length;
+        let xpAmount = 2; // Základní hodnota XP
+
+        // Delší zprávy získávají více XP (až do maxima 5 XP)
+        if (messageLength > 20) xpAmount = 3;
+        if (messageLength > 50) xpAmount = 4;
+        if (messageLength > 100) xpAmount = 5;
+
+        // Přidání XP s kategorií 'decisions'
+        UserProgress.addExperience(xpAmount, 'Rozhodnutí v chatu', 'decisions');
+    }
+
+>>>>>>> v0.3.8.3:public/app/script.js
     // Přidání návrhů dalších akcí, pokud existují
     if (!isUser && suggestions && Array.isArray(suggestions) && suggestions.length > 0) {
         const suggestionsContainer = document.createElement('div');
@@ -1712,6 +2070,11 @@ function toggle3DMode() {
 
         // Informace pro uživatele
         addMessage('3D režim byl aktivován. Nyní můžete vidět budovy ve 3D. Použijte ovládací prvky pro rotaci a náklon.', false);
+
+        // Sledování interakce s mapou a přidání XP
+        if (typeof UserProgressExtensions !== 'undefined') {
+            UserProgressExtensions.trackMapInteraction('threeDMode');
+        }
     } else {
         // Deaktivace 3D režimu
         toggle3DBtn.classList.remove('active');
@@ -1729,6 +2092,11 @@ function toggle3DMode() {
 
         // Informace pro uživatele
         addMessage('3D režim byl deaktivován. Mapa je nyní v klasickém 2D zobrazení.', false);
+
+        // Sledování interakce s mapou a přidání XP
+        if (typeof UserProgressExtensions !== 'undefined') {
+            UserProgressExtensions.trackMapInteraction('standardMode');
+        }
     }
 
     // Aktualizace velikosti mapy po změně režimu
@@ -1854,21 +2222,46 @@ function toggleGlobeMode() {
         // Přidání třídy pro glóbus režim
         document.getElementById('map').classList.add('map-globe-mode');
 
+        // Sledování interakce s mapou a přidání XP
+        if (typeof UserProgressExtensions !== 'undefined') {
+            UserProgressExtensions.trackMapInteraction('globeMode');
+        }
+
         // Uložení aktuálního středu mapy
         const center = map.getCenter();
         console.log('Střed mapy:', center);
 
         try {
             // Kontrola, zda je Globe.GL dostupný
-            if (typeof Globe === 'undefined') {
+            if (typeof Globe === 'undefined' && typeof window.globe === 'undefined' && typeof window.globeGL === 'undefined') {
                 console.error('Globe.GL knihovna není dostupná');
-                console.log('Dostupné globální objekty:', Object.keys(window));
+                console.log('Dostupné globální objekty:', Object.keys(window).filter(key => key.toLowerCase().includes('globe')));
                 // Pokus o načtení Globe.gl z CDN
                 const script = document.createElement('script');
                 script.src = 'https://unpkg.com/globe.gl';
                 script.async = true;
                 script.onload = function() {
                     console.log('Globe.gl knihovna byla načtena z CDN');
+
+                    // Kontrola, zda byla knihovna správně načtena
+                    if (typeof window.globe !== 'undefined') {
+                        console.log('Knihovna načtena jako window.globe');
+                        window.Globe = window.globe;
+                    } else if (typeof window.globeGL !== 'undefined') {
+                        console.log('Knihovna načtena jako window.globeGL');
+                        window.Globe = window.globeGL;
+                    } else if (typeof window.Globe === 'undefined') {
+                        // Pokud stále není dostupná, vytvoříme alias na globální funkci
+                        const globeFunc = Object.keys(window).find(key =>
+                            typeof window[key] === 'function' &&
+                            key.toLowerCase().includes('globe')
+                        );
+
+                        if (globeFunc) {
+                            console.log(`Knihovna načtena jako window.${globeFunc}`);
+                            window.Globe = window[globeFunc];
+                        }
+                    }
                     toggleGlobeMode(); // Zkusíme znovu aktivovat glóbus režim
                 };
                 script.onerror = function() {
@@ -2524,7 +2917,8 @@ function saveAppState() {
         darkMode: document.getElementById('darkModeToggle').checked,
         colorScheme: document.querySelector('.color-option.active')?.getAttribute('data-color') || 'blue',
         markerStyle: markerStyle,
-        markerEffectsEnabled: markerEffectsEnabled
+        markerEffectsEnabled: markerEffectsEnabled,
+        commandsMenuEnabled: document.getElementById('commandsMenuToggle')?.checked !== false
     };
 
     // Uložení stavu mapy
@@ -2542,8 +2936,14 @@ function saveAppState() {
         settings: settings,
         mapState: mapState,
         deletedMarkerCommands: deletedMarkerCommands,
+<<<<<<< HEAD:script.js
         lastSaved: new Date().toISOString(),
         version: '0.2.4.2' // Přidání verze pro lepší správu kompatibility
+=======
+        isFullscreen: isFullscreen, // Uložení stavu fullscreen režimu
+        lastSaved: new Date().toISOString(),
+        version: '0.3.7.0' // Přidání verze pro lepší správu kompatibility
+>>>>>>> v0.3.8.3:public/app/script.js
     };
 
     // Uložení do localStorage s kompresí pro úsporu místa
@@ -2684,7 +3084,11 @@ function loadAppState() {
         console.log('Načten stav aplikace:', appState);
 
         // Kontrola verze pro zajištění kompatibility
+<<<<<<< HEAD:script.js
         if (appState.version && appState.version !== '0.2.4.2') {
+=======
+        if (appState.version && appState.version !== '0.3.7.0') {
+>>>>>>> v0.3.8.3:public/app/script.js
             console.log(`Načten stav z jiné verze aplikace (${appState.version}). Probíhá konverze...`);
             // Zde by mohla být logika pro konverzi dat mezi verzemi, pokud by bylo potřeba
         }
@@ -2771,6 +3175,20 @@ function loadAppState() {
                     markerEffectsToggle.checked = markerEffectsEnabled;
                 }
             }
+
+            // Nastavení menu příkazů
+            if (appState.settings.commandsMenuEnabled !== undefined) {
+                // Aktualizace přepínače v UI
+                const commandsMenuToggle = document.getElementById('commandsMenuToggle');
+                if (commandsMenuToggle) {
+                    commandsMenuToggle.checked = appState.settings.commandsMenuEnabled;
+                }
+
+                // Odeslat událost o změně nastavení menu příkazů
+                if (typeof CommandsMenu !== 'undefined') {
+                    CommandsMenu.setEnabled(appState.settings.commandsMenuEnabled);
+                }
+            }
         }
 
         // Načtení stavu mapy
@@ -2793,6 +3211,27 @@ function loadAppState() {
                 console.error('Chyba při nastavení pohledu mapy:', mapError);
                 map.setView([49.8175, 15.4730], 7); // Výchozí pohled na ČR
             }
+<<<<<<< HEAD:script.js
+=======
+        }
+
+        // Načtení stavu fullscreen režimu
+        if (appState.isFullscreen !== undefined) {
+            // Pokud byl uložen stav fullscreen režimu a je jiný než aktuální, přepneme ho
+            if (appState.isFullscreen !== isFullscreen) {
+                console.log('Obnovuji stav fullscreen režimu:', appState.isFullscreen);
+                // Nastavíme globální proměnnou
+                isFullscreen = appState.isFullscreen;
+
+                // Pokud má být fullscreen aktivní, aktivujeme ho
+                if (isFullscreen) {
+                    // Použijeme setTimeout, aby se nejprve načetla mapa a pak teprve aktivoval fullscreen
+                    setTimeout(() => {
+                        toggleFullscreen();
+                    }, 500);
+                }
+            }
+>>>>>>> v0.3.8.3:public/app/script.js
         }
 
         // Načtení smazaných příkazů
@@ -3066,6 +3505,30 @@ function setupMarkerStyleOptions() {
             addMessage(message, false);
         });
     }
+
+    // Přidání event listeneru pro přepínač menu příkazů
+    const commandsMenuToggle = document.getElementById('commandsMenuToggle');
+    if (commandsMenuToggle) {
+        commandsMenuToggle.addEventListener('change', () => {
+            // Uložení stavu aplikace
+            saveAppState();
+
+            // Odeslat událost o změně nastavení menu příkazů
+            if (typeof CommandsMenu !== 'undefined') {
+                CommandsMenu.setEnabled(commandsMenuToggle.checked);
+            }
+
+            // Informace pro uživatele
+            const message = commandsMenuToggle.checked ?
+                'Menu příkazů bylo povoleno.' :
+                'Menu příkazů bylo zakázáno.';
+            addMessage(message, false);
+
+            // Vytvoření a odeslání události o změně nastavení
+            const event = new CustomEvent('settingsChanged');
+            window.dispatchEvent(event);
+        });
+    }
 }
 
 // Funkce pro aktualizaci všech markerů na mapě
@@ -3079,13 +3542,28 @@ function updateAllMarkers() {
     });
 }
 
-// Inicializace chatu
+// Inicializace chatu a přizpůsobení mapy
 window.addEventListener('load', () => {
+    // Menu příkazů bylo odstraněno
+
+    // Aktualizace velikosti mapy po načtení stránky
+    setTimeout(() => {
+        map.invalidateSize({animate: true});
+    }, 300);
+
     // Vyčištění předem definovaných zpráv
     chatMessages.innerHTML = '';
 
     // Přidání uvítací zprávy s návrhy akcí
     addMessage('Vítejte v AI Map - Časovém Manažeru! Můžete přidávat aktivity na mapu, vypočítat trasu mezi nimi a vytisknout mapu. Jak vám mohu pomoci?', false, ['Přidat aktivitu', 'Vypočítat trasu', 'Otevírací doba', 'Alexa']);
+<<<<<<< HEAD:script.js
+=======
+
+    // Přidání možnosti přesouvat hlavní chat pouze ve fullscreen režimu
+    setTimeout(() => {
+        setupMainChatDraggable(false); // Chat není přesunutelný v normálním režimu
+    }, 500); // Zpoždění pro zajištění, že DraggableElements modul je inicializován
+>>>>>>> v0.3.8.3:public/app/script.js
 
     // Pokus o načtení stavu aplikace
     const stateLoaded = loadAppState();

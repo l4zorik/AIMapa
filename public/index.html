@@ -3,26 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Map - Into the known</title>
-    <link rel="icon" href="icons8-favicon.gif" type="image/gif">
-    <link rel="stylesheet" href="styles.css">
+    <title>AI Map - Into the known v0.3.8.3</title>
+    <link rel="icon" href="app/icons8-favicon.gif" type="image/gif">
+    <link rel="stylesheet" href="app/styles.css">
     <!-- Leaflet CSS pro mapu -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <!-- OSM Buildings CSS -->
     <link rel="stylesheet" href="https://cdn.osmbuildings.org/4.1.1/OSMBuildings.css">
-    <!-- Cesium CSS a JS - použijeme nejnovější verzi z CDN -->
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Cesium.js"></script>
+    <!-- Three.js pro 3D glóbus -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Cesium CSS a JS (ponecháno pro zpětnou kompatibilitu) -->
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
 
-    <!-- Přidáme také jQuery pro lepší manipulaci s DOM -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Přidáme Three.js pro lepší 3D efekty -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- CSS pro novinky a další funkce -->
+    <link rel="stylesheet" href="app/updates-notification.css">
+    <link rel="stylesheet" href="app/user-progress.css">
+    <link rel="stylesheet" href="app/route-utils.css">
+    <link rel="stylesheet" href="app/feedback-survey.css">
+    <link rel="stylesheet" href="app/virtual-work.css">
+    <link rel="stylesheet" href="app/work-history-icons.css">
+    <link rel="stylesheet" href="app/task-definition.css">
+    <link rel="stylesheet" href="app/money-indicator-enhanced.css">
+    <link rel="stylesheet" href="app/housing-services.css">
+    <link rel="stylesheet" href="app/achievements.css">
+    <link rel="stylesheet" href="app/idle-detection.css">
+    <link rel="stylesheet" href="app/crypto-finances.css">
+    <link rel="stylesheet" href="app/user-accounts.css">
+    <link rel="stylesheet" href="app/simple-work-dialog.css">
 </head>
 <body>
+    <!-- Ikona pro zobrazení novinek a aktualizací byla odstraněna - novinky jsou nyní dostupné přes menu příkazů -->
+
     <div class="container">
         <header>
             <h1>AI Map - Into the known</h1>
@@ -42,12 +58,20 @@
                 <div class="map-wrapper">
                     <div id="map"></div>
                     <div id="cesiumContainer" class="cesium-container"></div>
+                    <div id="threeGlobeContainer" class="three-globe-container"></div>
+                    <div id="simpleGlobeContainer" class="simple-globe-container"></div>
                     <div id="loadingOverlay" class="loading-overlay">
                         <div class="loading-spinner"></div>
                         <div class="loading-text">Načítání 3D glóbusu...</div>
                     </div>
                     <button id="fullscreenButton" class="map-control-btn" title="Fullscreen režim">
                         <i class="icon">⛶</i>
+                    </button>
+                    <button id="toggleGlobeMode" class="map-control-btn" title="Glóbus režim">
+                        <i class="icon">🌎</i>
+                    </button>
+                    <button id="exitGlobeMode" class="map-control-btn" title="Zpět na mapu" style="display: none;">
+                        <i class="icon">🗺️</i>
                     </button>
                     <div id="coordinates" class="coordinates-display"></div>
                 </div>
@@ -80,22 +104,24 @@
                 </div>
             </div>
 
-            <div class="ai-assistant">
-                <h2>AI Asistent</h2>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai">
-                        Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
-                    </div>
-                    <div class="message ai">
-                        Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
-                    </div>
-                    <div class="message ai">
-                        Trasa byde vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
+            <div class="ai-assistant" id="aiAssistant">
+                <div class="chat-header">
+                    <div class="chat-drag-handle">⋮⋮</div>
+                    <h2>AI Asistent</h2>
+                    <div class="chat-controls">
+                        <button id="minimizeMainChat" class="chat-control-btn minimize-btn" title="Minimalizovat chat">−</button>
                     </div>
                 </div>
-                <div class="chat-input">
-                    <input type="text" id="messageInput" placeholder="Napište zprávu...">
-                    <button class="send-btn" id="sendMessage">➤</button>
+                <div class="chat-content">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="messageInput" placeholder="Napište zprávu...">
+                        <button class="send-btn" id="sendMessage">➤</button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -131,6 +157,17 @@
                     </div>
                 </div>
 
+                <div class="settings-section">
+                    <h3>Menu příkazů</h3>
+                    <div class="toggle-container">
+                        <span>Vypnuto</span>
+                        <label class="switch">
+                            <input type="checkbox" id="commandsMenuToggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                        <span>Zapnuto</span>
+                    </div>
+                </div>
 
 
                 <div class="settings-section">
@@ -308,14 +345,62 @@
         </div>
     </div>
 
+    <!-- Modul pro inicializaci Leaflet.js -->
+    <script src="app/leaflet-init.js"></script>
     <!-- Leaflet JS pro mapu -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- OpenRouteService API pro přesné směrování po silnicích -->
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <!-- OSM Buildings JS pro 3D budovy -->
     <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js"></script>
-    <!-- Cesium JS je již načten v hlavičce -->
-    <script src="cesium-handler.js"></script>
-    <script src="script.js"></script>
+    <!-- Globe.gl knihovna pro 3D glóbus -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <!-- Přímá implementace Globe.gl -->
+    <script src="app/globe-simple.js"></script>
+    <!-- Hlavní skript aplikace -->
+    <script src="app/script.js"></script>
+    <!-- Skripty pro novinky a menu příkazů -->
+    <script src="app/updates-notification.js"></script>
+    <script>
+        // Přímá inicializace UpdatesNotification
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof UpdatesNotification !== 'undefined') {
+                console.log('Přímá inicializace UpdatesNotification...');
+                UpdatesNotification.init();
+            } else {
+                console.error('UpdatesNotification modul nebyl nalezen!');
+            }
+        });
+    </script>
+
+    <!-- Moduly aplikace -->
+    <script src="app/user-progress.js"></script>
+    <script src="app/user-progress-extensions.js"></script>
+    <script src="app/transport-connections.js"></script>
+    <script src="app/feedback-survey.js"></script>
+    <script src="app/food-services.js"></script>
+    <script src="app/medical-services.js"></script>
+    <script src="app/transport-services.js"></script>
+    <script src="app/dark-sky-effects.js"></script>
+    <script src="app/draggable-elements.js"></script>
+    <script src="app/task-system.js"></script>
+    <script src="app/car-sales.js"></script>
+    <script src="app/virtual-work.js"></script>
+    <script src="app/reward-system.js"></script>
+    <script src="app/commands-menu.js"></script>
+    <script src="app/fix-menu.js"></script>
+    <script src="app/business-markers.js"></script>
+    <script src="app/business-data-loader.js"></script>
+    <script src="app/money-indicator-enhanced.js"></script>
+    <script src="app/triple-click-handler.js"></script>
+    <script src="app/bug-reporter.js"></script>
+    <script src="app/housing-services.js"></script>
+    <script src="app/achievements.js"></script>
+    <script src="app/idle-detection.js"></script>
+    <script src="app/crypto-finances.js"></script>
+    <script src="app/user-accounts.js"></script>
+    <script src="app/simple-work-dialog.js"></script>
+    <!-- Supabase integrace -->
+    <script src="app/supabase-integration.js"></script>
 </body>
 </html>

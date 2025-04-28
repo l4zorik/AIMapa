@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globe.GL Test</title>
+    <style>
+        body { margin: 0; padding: 0; }
+        #globe { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="globe"></div>
+
+    <!-- Načtení Globe.GL z lokálních souborů -->
+    <script src="kapsule-link.js"></script>
+    <script src="globe.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="globe.css">
+
+    <script>
+        // Kontrola, zda je Globe.GL dostupný
+        console.log('Globe dostupný:', typeof Globe);
+        
+        // Inicializace Globe.GL
+        const globeEl = document.getElementById('globe');
+        
+        // Vytvoření instance Globe.GL
+        const globe = Globe()
+            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+            .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+            .width(globeEl.clientWidth)
+            .height(globeEl.clientHeight)
+            .pointOfView({ lat: 49.8, lng: 15.5, altitude: 2.5 }) // Výchozí pohled na ČR
+            .showGraticules(true)
+            .showAtmosphere(true);
+            
+        // Přidání Globe.GL do kontejneru
+        globe(globeEl);
+        
+        // Přidání testovacích bodů
+        const points = [
+            { lat: 49.8, lng: 15.5, name: 'Česká republika', color: '#ff0000', size: 0.5 },
+            { lat: 48.9, lng: 17.1, name: 'Hodonín', color: '#00ff00', size: 0.5 }
+        ];
+        
+        globe
+            .pointsData(points)
+            .pointLabel('name')
+            .pointColor('color')
+            .pointAltitude(0.01)
+            .pointRadius('size');
+            
+        // Přidání testovací trasy
+        const arcs = [
+            { 
+                startLat: 49.8, 
+                startLng: 15.5, 
+                endLat: 48.9, 
+                endLng: 17.1, 
+                color: '#0000ff', 
+                stroke: 0.5 
+            }
+        ];
+        
+        globe
+            .arcsData(arcs)
+            .arcColor('color')
+            .arcStroke('stroke')
+            .arcDashLength(0.4)
+            .arcDashGap(0.2)
+            .arcDashAnimateTime(1000);
+    </script>
+</body>
+</html>

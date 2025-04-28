@@ -1,5 +1,6 @@
 :root {
     --primary-color: #8B5CF6;
+    --primary-color-rgb: 139, 92, 246;
     --primary-color-dark: #7c4ddf;
     --dark-bg: #1a1b26;
     --card-bg: #1F2937;
@@ -21,24 +22,36 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background-color: var(--dark-bg);
     color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 header {
     position: relative;
+    margin-bottom: 20px;
 }
 
 header h1 {
     background-color: var(--primary-color);
-    padding: 15px;
-    border-radius: 10px;
+    padding: 15px 0;
     text-align: center;
-    margin: 0 0 20px 0;
+    margin: 0;
+    width: 100%;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .settings-button {
@@ -54,43 +67,54 @@ header h1 {
 }
 
 main {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 30px;
-    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    flex: 1;
 }
 
 .map-container {
     background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 10px;
+    padding: 15px;
+    border-radius: 4px;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1400px;
 }
 
 .status-bar {
     background-color: #064e3b;
     color: #fff;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border-radius: 4px;
     margin-bottom: 15px;
     display: flex;
     align-items: center;
+    border-left: 3px solid #34d399;
+    font-size: 0.95rem;
 }
 
 .status-icon {
     color: #34d399;
-    margin-right: 10px;
+    margin-right: 12px;
+    font-size: 1.1rem;
 }
 
 .map-wrapper {
     position: relative;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
 }
 
 #map {
-    height: 600px;
-    border-radius: 8px;
+    height: 700px;
+    border-radius: 4px;
     width: 100%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .map-control-btn {
@@ -250,30 +274,33 @@ body[data-theme="dark"] .route-info {
 .controls {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 15px;
+    margin: 20px auto 0;
+    max-width: 800px;
+    width: 100%;
 }
 
 .btn {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s, opacity 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: normal;
+    transition: background-color 0.2s ease;
 }
 
 .btn:hover {
-    opacity: 0.9;
+    background-color: var(--primary-color-dark);
 }
 
 .btn.active {
     background-color: var(--primary-color-dark);
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    transform: translateY(1px);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 body[data-theme="dark"] .btn:hover {
@@ -281,47 +308,127 @@ body[data-theme="dark"] .btn:hover {
 }
 
 .icon {
-    margin-right: 5px;
+    margin-right: 10px;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ai-assistant {
     background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 10px;
+    border-radius: 4px;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    width: 350px;
+    height: auto;
+    max-height: 500px;
+    overflow: hidden;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: default;
+    font-weight: 500;
+}
+
+/* Kurzor pro přesunutelný chat ve fullscreen režimu */
+.map-fullscreen .chat-header {
+    cursor: move;
+}
+
+.chat-drag-handle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: move;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 14px;
+    flex: 1;
+    text-align: center;
+}
+
+.chat-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.chat-control-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.chat-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 15px;
 }
 
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: 500px;
-    transition: background-color 0.3s;
+    max-height: 320px;
+    border-radius: 4px;
 }
 
 body[data-theme="dark"] .chat-messages {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .message {
+<<<<<<< HEAD:styles.css
     padding: 10px;
     border-radius: 5px;
     max-width: 90%;
     white-space: pre-line;
+=======
+    padding: 10px 12px;
+    border-radius: 4px;
+    max-width: 85%;
+    white-space: pre-line;
+    font-size: 0.95rem;
+    line-height: 1.4;
+>>>>>>> v0.3.8.3:public/app/styles.css
 }
 
 .message.ai {
     background-color: #374151;
     align-self: flex-start;
-    transition: background-color 0.3s;
+    border-top-left-radius: 0;
 }
 
 body[data-theme="dark"] .message.ai {
@@ -331,6 +438,54 @@ body[data-theme="dark"] .message.ai {
 .message.user {
     background-color: var(--primary-color);
     align-self: flex-end;
+    border-top-right-radius: 0;
+}
+
+/* Styly pro návrhy dalších akcí */
+.message-container {
+    margin-bottom: 15px;
+}
+
+.suggestions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+    margin-left: 12px;
+}
+
+.suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.15);
+    color: var(--primary-color);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.suggestion-btn:active {
+    background-color: rgba(139, 92, 246, 0.35);
+    transform: scale(0.98);
+}
+
+/* Tmavý režim pro návrhy */
+[data-theme="dark"] .suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+[data-theme="dark"] .suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
 }
 
 /* Styly pro návrhy dalších akcí */
@@ -383,16 +538,26 @@ body[data-theme="dark"] .message.ai {
 .chat-input {
     display: flex;
     gap: 10px;
+    align-items: center;
+    position: relative;
+    padding: 0 0 5px 0;
 }
 
 .chat-input input {
     flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
     color: white;
-    transition: background-color 0.3s, color 0.3s;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.chat-input input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.15);
 }
 
 body[data-theme="dark"] .chat-input input {
@@ -405,13 +570,269 @@ body[data-theme="dark"] .chat-input input {
     color: white;
     border: none;
     padding: 10px 15px;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
 }
 
 .send-btn:hover {
     background-color: var(--primary-color-dark);
+}
+
+/* Command Menu Styles */
+.commands-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.commands-button:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.commands-button .icon {
+    margin: 0;
+    font-size: 18px;
+}
+
+.commands-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.commands-overlay.show {
+    opacity: 1;
+}
+
+.commands-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    max-width: 800px;
+    max-height: 85vh;
+    background-color: var(--card-bg);
+    border-radius: 6px;
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s ease;
+}
+
+.commands-menu.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+
+.commands-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 25px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 6px 6px 0 0;
+}
+
+.commands-menu-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.commands-menu-close {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    color: var(--text-color);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.commands-menu-close:hover {
+    color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.commands-menu-search {
+    padding: 15px 25px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.commands-search-input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg-dark);
+    color: var(--text-color);
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.commands-search-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.commands-menu-body {
+    flex: 1;
+    overflow: hidden;
+}
+
+.commands-menu-scroll-container {
+    height: 100%;
+    max-height: calc(80vh - 120px);
+    overflow-y: auto;
+    padding: 10px 20px 20px;
+}
+
+.commands-category {
+    margin-bottom: 15px;
+}
+
+.commands-category-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, border-left-color 0.2s ease;
+}
+
+.commands-category-header:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--primary-color);
+}
+
+.commands-category-icon {
+    margin-right: 12px;
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.commands-category-name {
+    flex: 1;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.commands-category-toggle {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.commands-category-header:hover .commands-category-toggle {
+    color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.2);
+    transform: rotate(180deg);
+}
+
+.commands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 5px 0 15px 45px;
+    margin-top: 5px;
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    transition: background-color 0.2s ease, border-left-color 0.2s ease;
+}
+
+.command-item:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--primary-color);
+}
+
+.command-icon {
+    margin-right: 12px;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+    font-size: 15px;
+}
+
+.command-description {
+    font-size: 13px;
+    opacity: 0.7;
+    line-height: 1.4;
+}
+
+.no-commands-results {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.7;
 }
 
 /* Custom Marker Styles */
@@ -423,60 +844,23 @@ body[data-theme="dark"] .chat-input input {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--primary-color) 0%, var(--primary-color-dark) 70%);
+    background-color: var(--primary-color);
     color: white;
     font-weight: bold;
-    box-shadow: 0 0 8px rgba(139, 92, 246, 0.6), 0 0 16px rgba(139, 92, 246, 0.3);
     border: 2px solid white;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: none; /* Odstranění levitace */
     font-size: 14px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
     z-index: 500;
     position: relative;
-    overflow: hidden;
-}
-
-/* Shiny effect inside marker */
-.custom-marker::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.4) 40%, rgba(255, 255, 255, 0.4) 60%, transparent 70%);
-    transform: rotate(45deg);
-    animation: shine 4s linear infinite;
-    pointer-events: none;
-}
-
-/* Ripple effect for markers */
-.custom-marker::after {
-    content: '';
-    position: absolute;
-    top: -20%;
-    left: -20%;
-    width: 140%;
-    height: 140%;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    animation: ripple 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
-    opacity: 0;
-    pointer-events: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .custom-marker:hover {
-    transform: scale(1.2); /* Zmenšeno z 1.3 a odstraněno translateY */
-    box-shadow: 0 3px 10px rgba(139, 92, 246, 0.7), 0 5px 15px rgba(139, 92, 246, 0.3);
-    animation-play-state: paused;
-}
-
-.custom-marker:hover::after {
-    animation-play-state: running;
+    background-color: var(--primary-color-dark);
+    transform: scale(1.1);
 }
 
 /* Number inside marker */
@@ -661,48 +1045,44 @@ body[data-theme="dark"] .chat-input input {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
-/* Marker colors for different indices with improved gradients */
+/* Marker colors for different indices */
 .custom-marker.color-1 {
-    background: radial-gradient(circle, #8B5CF6 0%, #7c4ddf 50%, #6d3fcf 100%);
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 20px rgba(139, 92, 246, 0.4);
-    animation-delay: 0s;
+    background-color: #8B5CF6;
+    box-shadow: 0 2px 5px rgba(139, 92, 246, 0.5);
 }
 
 .custom-marker.color-2 {
-    background: radial-gradient(circle, #10B981 0%, #0e9f6e 50%, #0c8c5f 100%);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.4);
-    animation-delay: 0.2s;
+    background-color: #10B981;
+    box-shadow: 0 2px 5px rgba(16, 185, 129, 0.5);
 }
 
 .custom-marker.color-3 {
-    background: radial-gradient(circle, #F59E0B 0%, #d97706 50%, #b45309 100%);
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.8), 0 0 20px rgba(245, 158, 11, 0.4);
-    animation-delay: 0.4s;
+    background-color: #F59E0B;
+    box-shadow: 0 2px 5px rgba(245, 158, 11, 0.5);
 }
 
 .custom-marker.color-4 {
-    background: radial-gradient(circle, #EF4444 0%, #dc2626 50%, #b91c1c 100%);
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.4);
-    animation-delay: 0.6s;
+    background-color: #EF4444;
+    box-shadow: 0 2px 5px rgba(239, 68, 68, 0.5);
 }
 
 .custom-marker.color-5 {
-    background: radial-gradient(circle, #3B82F6 0%, #2563eb 50%, #1d4ed8 100%);
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.4);
-    animation-delay: 0.8s;
+    background-color: #3B82F6;
+    box-shadow: 0 2px 5px rgba(59, 130, 246, 0.5);
 }
 
 /* Active marker state */
 .custom-marker.active {
-    transform: scale(1.3); /* Zmenšeno z 1.4 */
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.9), 0 0 30px rgba(139, 92, 246, 0.5);
-    animation: pulse 1s infinite;
+    transform: scale(1.2);
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.6);
+    border-color: #fff;
+    border-width: 3px;
 }
 
 /* Selected marker state */
 .custom-marker.selected {
     border-color: #FFD700;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 3px 8px rgba(255, 215, 0, 0.5);
 }
 
 /* Settings Modal */
@@ -720,98 +1100,73 @@ body[data-theme="dark"] .chat-input input {
 }
 
 .modal-content {
-    background-color: rgba(30, 20, 60, 0.85);
+    background-color: var(--card-bg);
     margin: 50px auto;
     width: 90%;
     max-width: 600px;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     position: relative;
     color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-header {
-    padding: 20px 25px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(to right, rgba(139, 92, 246, 0.3), rgba(30, 20, 60, 0));
-    border-radius: 15px 15px 0 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 6px 6px 0 0;
 }
 
 .modal-header h2 {
     margin: 0;
-    font-size: 1.6rem;
-    font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 500;
     color: #fff;
-    text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 .close-button {
-    font-size: 28px;
+    font-size: 22px;
     font-weight: bold;
     cursor: pointer;
     color: rgba(255, 255, 255, 0.8);
-    transition: all 0.3s ease;
-    width: 36px;
-    height: 36px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .close-button:hover {
     color: #fff;
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: rotate(90deg);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .modal-body {
-    padding: 25px;
-    background: linear-gradient(to bottom, rgba(30, 20, 60, 0.85), rgba(50, 30, 90, 0.85));
-    border-radius: 0 0 15px 15px;
+    padding: 20px;
+    border-radius: 0 0 6px 6px;
 }
 
 .settings-section {
-    margin-bottom: 30px;
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.3s ease;
-}
-
-.settings-section:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .settings-section h3 {
     margin-top: 0;
-    margin-bottom: 18px;
-    font-size: 1.25rem;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
     color: #fff;
-    position: relative;
-    padding-bottom: 10px;
-    display: inline-block;
-}
-
-.settings-section h3::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(to right, var(--primary-color), transparent);
-    border-radius: 2px;
+    font-weight: 500;
 }
 
 /* Color Options */
@@ -895,29 +1250,24 @@ body[data-theme="dark"] .chat-input input {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
     margin-top: 15px;
 }
 
 .toggle-container span {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.8);
-    transition: all 0.3s ease;
 }
 
 .toggle-container span:first-child {
     opacity: 0.6;
 }
 
-.toggle-container:hover span {
-    color: #fff;
-}
-
 .switch {
     position: relative;
     display: inline-block;
-    width: 65px;
-    height: 34px;
+    width: 50px;
+    height: 24px;
 }
 
 .switch input {
@@ -934,39 +1284,31 @@ body[data-theme="dark"] .chat-input input {
     right: 0;
     bottom: 0;
     background-color: rgba(255, 255, 255, 0.2);
-    transition: .4s;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: .3s;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 3px;
-    background: linear-gradient(145deg, #ffffff, #e6e6e6);
-    transition: .4s;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 2px;
+    background-color: white;
+    transition: .3s;
 }
 
 input:checked + .slider {
     background-color: var(--primary-color);
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(139, 92, 246, 0.5);
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px var(--primary-color), 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 input:checked + .slider:before {
-    transform: translateX(30px);
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    transform: translateX(25px);
 }
 
 .slider.round {
-    border-radius: 34px;
+    border-radius: 24px;
 }
 
 .slider.round:before {
@@ -979,8 +1321,6 @@ input:checked ~ span:first-child {
 
 input:checked ~ span:last-child {
     opacity: 1;
-    color: #fff;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 /* Select Container */
@@ -990,82 +1330,72 @@ input:checked ~ span:last-child {
 
 .select-container select {
     width: 100%;
-    padding: 12px 15px;
-    border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.2);
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
     cursor: pointer;
     appearance: none;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
     background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 16px;
-    padding-right: 40px;
+    background-position: right 10px center;
+    background-size: 14px;
+    padding-right: 30px;
 }
 
 .select-container select:hover {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .select-container select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3), 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .select-container select option {
-    background-color: rgba(30, 20, 60, 0.95);
+    background-color: #1e1e1e;
     color: white;
-    padding: 10px;
+    padding: 8px;
 }
 
 /* API Options */
 .api-options {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin: 20px 0;
-    background-color: rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    border-radius: 10px;
+    gap: 8px;
+    margin: 15px 0;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .api-option {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    gap: 10px;
+    padding: 6px 10px;
 }
 
 .api-option:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .api-option input[type="radio"] {
     appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     outline: none;
     cursor: pointer;
     position: relative;
-    transition: all 0.3s ease;
 }
 
 .api-option input[type="radio"]:checked {
     border-color: var(--primary-color);
-    background-color: transparent;
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
 }
 
 .api-option input[type="radio"]:checked::after {
@@ -1074,71 +1404,61 @@ input:checked ~ span:last-child {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background-color: var(--primary-color);
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 .api-option label {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.api-option:hover label {
-    color: #fff;
 }
 
 .api-key-section {
-    margin-top: 25px;
-    background-color: rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    border-radius: 10px;
+    margin-top: 15px;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .api-key-section label {
     color: rgba(255, 255, 255, 0.9);
-    font-size: 1rem;
+    font-size: 0.95rem;
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .api-key-input {
     display: flex;
-    gap: 10px;
-    margin: 15px 0;
+    gap: 8px;
+    margin: 10px 0;
 }
 
 .api-key-input input {
     flex: 1;
-    padding: 12px 15px;
-    border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.2);
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
 }
 
 .api-key-input input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3), 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .show-key-btn {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0 20px;
-    border-radius: 10px;
+    padding: 0 15px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -1146,34 +1466,30 @@ input:checked ~ span:last-child {
 }
 
 .show-key-btn:hover {
-    background-color: rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .checkbox-container {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-top: 15px;
+    gap: 10px;
+    margin-top: 12px;
 }
 
 .checkbox-container input[type="checkbox"] {
     appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 5px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
     outline: none;
     cursor: pointer;
     position: relative;
-    transition: all 0.3s ease;
 }
 
 .checkbox-container input[type="checkbox"]:checked {
     border-color: var(--primary-color);
     background-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
 }
 
 .checkbox-container input[type="checkbox"]:checked::after {
@@ -1183,72 +1499,61 @@ input:checked ~ span:last-child {
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
 }
 
 .checkbox-container label {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.checkbox-container:hover label {
-    color: #fff;
 }
 
 .settings-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-    margin-top: 35px;
+    gap: 10px;
+    margin-top: 25px;
 }
 
 .settings-actions button {
-    padding: 12px 25px;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s ease;
     border: none;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .primary-btn {
-    background: linear-gradient(135deg, #8B5CF6, #7c4ddf);
+    background-color: var(--primary-color);
     color: white;
 }
 
 .primary-btn:hover {
-    background: linear-gradient(135deg, #9d74f7, #8B5CF6);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(139, 92, 246, 0.4);
+    background-color: var(--primary-color-dark);
 }
 
 .secondary-btn {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
     color: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .secondary-btn:hover {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.3);
     color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* Marker Style Options */
 .marker-styles-container {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .marker-style-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
     justify-content: center;
 }
 
@@ -1256,90 +1561,62 @@ input:checked ~ span:last-child {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     cursor: pointer;
-    padding: 15px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    background-color: rgba(0, 0, 0, 0.1);
-    width: 80px;
-    position: relative;
-    overflow: hidden;
-}
-
-.marker-style-option::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.5s ease;
-}
-
-.marker-style-option:hover::before {
-    transform: translateX(100%);
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background-color: rgba(0, 0, 0, 0.05);
+    width: 70px;
 }
 
 .marker-style-option:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.1);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 .marker-style-option.active {
     border-color: var(--primary-color);
-    background-color: rgba(139, 92, 246, 0.15);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    background-color: rgba(139, 92, 246, 0.1);
 }
 
 .marker-preview {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     color: white;
     position: relative;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-}
-
-.marker-style-option:hover .marker-preview {
-    transform: scale(1.1);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .marker-preview span {
     z-index: 2;
-    font-size: 18px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    font-size: 16px;
 }
 
 /* Circle marker (default) */
 .circle-marker {
     border-radius: 50%;
-    background: radial-gradient(circle, #8B5CF6 0%, #7c4ddf 50%, #6d3fcf 100%);
-    border: 3px solid white;
+    background-color: #8B5CF6;
+    border: 2px solid white;
 }
 
 /* Square marker */
 .square-marker {
-    border-radius: 8px;
-    background: radial-gradient(circle, #10B981 0%, #0e9f6e 50%, #0c8c5f 100%);
-    border: 3px solid white;
+    border-radius: 4px;
+    background-color: #10B981;
+    border: 2px solid white;
 }
 
 /* Diamond marker */
 .diamond-marker {
     transform: rotate(45deg);
-    border-radius: 4px;
-    background: radial-gradient(circle, #F59E0B 0%, #d97706 50%, #b45309 100%);
-    border: 3px solid white;
+    border-radius: 2px;
+    background-color: #F59E0B;
+    border: 2px solid white;
 }
 
 .diamond-marker span {
@@ -1350,8 +1627,8 @@ input:checked ~ span:last-child {
 .pin-marker {
     border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg);
-    background: radial-gradient(circle, #EF4444 0%, #dc2626 50%, #b91c1c 100%);
-    border: 3px solid white;
+    background-color: #EF4444;
+    border: 2px solid white;
 }
 
 .pin-marker span {
@@ -1361,61 +1638,51 @@ input:checked ~ span:last-child {
 /* Star marker */
 .star-marker {
     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    background: radial-gradient(circle, #3B82F6 0%, #2563eb 50%, #1d4ed8 100%);
+    background-color: #3B82F6;
     border: none;
-    width: 45px;
-    height: 45px;
+    width: 36px;
+    height: 36px;
 }
 
 .marker-style-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.9);
     text-align: center;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    font-weight: normal;
 }
 
 .marker-style-option:hover .marker-style-label {
     color: #fff;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 .marker-style-option.active .marker-style-label {
     color: #fff;
-    text-shadow: 0 0 8px rgba(139, 92, 246, 0.7);
 }
 
 .marker-effects-toggle {
-    margin-top: 25px;
+    margin-top: 15px;
     display: flex;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.1);
-    padding: 12px;
-    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-}
-
-.marker-effects-toggle:hover {
-    background-color: rgba(0, 0, 0, 0.15);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Popup styly */
 .popup-content {
     min-width: 250px;
     max-width: 350px;
-    transition: all 0.3s ease;
-    padding: 12px;
-    border-radius: 12px;
+    padding: 10px;
+    border-radius: 4px;
 }
 
 .popup-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -1424,84 +1691,73 @@ body[data-theme="dark"] .popup-header {
 }
 
 .popup-title {
-    font-weight: bold;
-    font-size: 1.1rem;
+    font-weight: 500;
+    font-size: 1rem;
     color: var(--primary-color);
 }
 
 .popup-countdown {
-    font-size: 0.9rem;
-    font-weight: bold;
-    padding: 4px 8px;
-    border-radius: 12px;
-    background-color: rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
     color: #333;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     display: none; /* Skryjeme odpočet */
     align-items: center;
     justify-content: center;
-    min-width: 40px;
+    min-width: 36px;
     text-align: center;
-    position: relative;
-    overflow: hidden;
-    margin-left: 10px;
+    margin-left: 8px;
     cursor: pointer;
 }
 
 .popup-countdown:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.15);
 }
 
 .popup-countdown::before {
     content: '⏱️'; /* Emoji hodiny */
-    margin-right: 4px;
+    margin-right: 3px;
     font-size: 0.8rem;
 }
 
 body[data-theme="dark"] .popup-countdown {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.1);
     color: #e0e0e0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .countdown-warning {
     background-color: #f59e0b !important;
     color: white;
-    animation: pulse 1s infinite;
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
 }
 
 .countdown-danger {
     background-color: #ef4444 !important;
     color: white;
-    animation: pulse 0.7s infinite;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
 }
 
 @keyframes pulse {
     0% {
-        transform: scale(1);
+        opacity: 1;
     }
     50% {
-        transform: scale(1.05);
+        opacity: 0.7;
     }
     100% {
-        transform: scale(1);
+        opacity: 1;
     }
 }
 
 .leaflet-popup-content-wrapper {
-    transition: background-color 0.3s, color 0.3s, transform 0.3s;
-    border-radius: 10px;
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .leaflet-popup-tip {
     transition: background-color 0.3s;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Zajistí, že popup okna mají konzistentní velikost při různých úrovních zoomu */
@@ -2375,7 +2631,12 @@ body[data-theme="dark"] .leaflet-routing-line {
 
 /* Glóbus kontejner se zobrazí pouze po kliknutí na tlačítko glóbus */
 .map-globe-mode #simpleGlobeContainer {
+<<<<<<< HEAD:styles.css
     /* display: block; - Toto je nyní řízeno JavaScriptem */
+=======
+    display: block;
+    z-index: 1000;
+>>>>>>> v0.3.8.3:public/app/styles.css
 }
 
 /* Zvýraznění tlačítka návratu z glóbus režimu v glóbus režimu */
@@ -2931,6 +3192,7 @@ body.fullscreen-mode {
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: move; /* Ukazatel, že lze přesouvat */
 }
 
 /* Pozice chatu vlevo/vpravo */
@@ -2960,30 +3222,6 @@ body.fullscreen-mode {
 .chat-title {
     font-weight: bold;
     font-size: 16px;
-}
-
-.chat-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.chat-control-btn {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.chat-control-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Obsah chatu */
@@ -3048,6 +3286,11 @@ body.fullscreen-mode {
     max-height: 48px;
 }
 
+/* Minimalizovaný hlavní chat */
+.ai-assistant.minimized .chat-content {
+    display: none;
+}
+
 /* Optimalizace pro mobilní zařízení */
 @media (max-width: 768px) {
     .exit-fullscreen-btn {
@@ -3077,6 +3320,255 @@ body.fullscreen-mode {
         padding: 8px 12px;
         font-size: 12px;
     }
+}
+
+/* Styly pro tlačítko menu příkazů */
+.commands-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+.commands-button:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.commands-button .icon {
+    font-size: 18px;
+}
+
+/* Styly pro tlačítko menu příkazů ve fullscreen režimu */
+.map-fullscreen .commands-button {
+    background-color: rgba(139, 92, 246, 0.8);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.map-fullscreen .commands-button:hover {
+    background-color: rgba(139, 92, 246, 1);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Překrytí pro menu příkazů */
+.commands-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.commands-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Styly pro menu příkazů */
+.commands-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(-10px);
+    width: 320px;
+    max-height: 500px;
+    background-color: rgba(31, 41, 55, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+}
+
+.commands-menu.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+
+.commands-menu.dragging {
+    transition: none;
+}
+
+.commands-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    cursor: move;
+}
+
+.commands-menu-drag-handle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 10px;
+}
+
+.commands-menu-header h3 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 16px;
+    flex: 1;
+}
+
+.commands-menu-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.commands-menu-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.commands-menu-search {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.commands-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    font-size: 14px;
+}
+
+.commands-menu-body {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.commands-menu-scroll-container {
+    height: 100%;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.commands-category {
+    margin-bottom: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.commands-category-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s;
+}
+
+.commands-category-header:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.commands-category-icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.commands-category-name {
+    flex: 1;
+    font-weight: bold;
+}
+
+.commands-category-toggle {
+    font-size: 12px;
+}
+
+.commands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.command-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.command-icon {
+    margin-right: 10px;
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-name {
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.command-description {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.no-commands-results {
+    padding: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
 }
 
 /* Styly pro 3D režim */
@@ -3591,6 +4083,10 @@ body[data-theme="dark"] .map-globe-control-btn:hover {
 @media (max-width: 768px) {
     main {
         grid-template-columns: 1fr;
+    }
+
+    #map {
+        height: 650px; /* Větší výška na mobilních zařízeních, ale stále menší než na desktopu */
     }
 
     .controls {
