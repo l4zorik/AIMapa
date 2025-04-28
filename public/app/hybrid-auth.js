@@ -1,7 +1,7 @@
 /**
  * Hybridní autentizační modul pro AIMapa
- * Verze 0.3.8.5
- * 
+ * Verze 0.3.8.4
+ *
  * Tento modul poskytuje hybridní autentizaci pro AIMapa, která automaticky přepíná
  * mezi lokální autentizací a Supabase autentizací podle prostředí, ve kterém aplikace běží.
  */
@@ -18,16 +18,16 @@ const HybridAuth = {
     // Inicializace modulu
     init() {
         console.log('Inicializace hybridního autentizačního modulu...');
-        
+
         // Detekce prostředí
         this.detectEnvironment();
-        
+
         // Výběr poskytovatele autentizace
         this.selectAuthProvider();
-        
+
         // Nastavení posluchačů událostí
         this.setupEventListeners();
-        
+
         this.state.isInitialized = true;
         console.log(`Hybridní autentizační modul byl inicializován (prostředí: ${this.state.isNetlify ? 'Netlify' : 'Lokální'})`);
     },
@@ -70,7 +70,7 @@ const HybridAuth = {
                 this.state.authProvider = window.SupabaseAuth;
             }
         }
-        
+
         // Kontrola, zda byl vybrán poskytovatel autentizace
         if (!this.state.authProvider) {
             console.error('Nebyl nalezen žádný poskytovatel autentizace!');
@@ -90,36 +90,36 @@ const HybridAuth = {
     // Registrace nového uživatele
     async signUp(email, password, metadata = {}) {
         console.log('Registrace nového uživatele přes hybridní autentizaci:', email);
-        
+
         if (!this.state.authProvider) {
             console.error('Není dostupný žádný poskytovatel autentizace');
             return { error: { message: 'Není dostupný žádný poskytovatel autentizace' } };
         }
-        
+
         return this.state.authProvider.signUp(email, password, metadata);
     },
 
     // Přihlášení uživatele
     async signIn(email, password) {
         console.log('Přihlašování uživatele přes hybridní autentizaci:', email);
-        
+
         if (!this.state.authProvider) {
             console.error('Není dostupný žádný poskytovatel autentizace');
             return { error: { message: 'Není dostupný žádný poskytovatel autentizace' } };
         }
-        
+
         return this.state.authProvider.signIn(email, password);
     },
 
     // Odhlášení uživatele
     async signOut() {
         console.log('Odhlašování uživatele přes hybridní autentizaci');
-        
+
         if (!this.state.authProvider) {
             console.error('Není dostupný žádný poskytovatel autentizace');
             return { error: { message: 'Není dostupný žádný poskytovatel autentizace' } };
         }
-        
+
         return this.state.authProvider.signOut();
     },
 
@@ -129,19 +129,19 @@ const HybridAuth = {
             console.error('Není dostupný žádný poskytovatel autentizace');
             return { data: { user: null } };
         }
-        
+
         return this.state.authProvider.getUser();
     },
 
     // Resetování hesla
     async resetPassword(email) {
         console.log('Resetování hesla pro uživatele přes hybridní autentizaci:', email);
-        
+
         if (!this.state.authProvider) {
             console.error('Není dostupný žádný poskytovatel autentizace');
             return { error: { message: 'Není dostupný žádný poskytovatel autentizace' } };
         }
-        
+
         return this.state.authProvider.resetPassword(email);
     },
 
@@ -151,17 +151,17 @@ const HybridAuth = {
             console.error('Není dostupný žádný poskytovatel autentizace');
             return { error: { message: 'Není dostupný žádný poskytovatel autentizace' } };
         }
-        
+
         return this.state.authProvider.updateUser(userData);
     },
 
     // Přidání posluchače změn stavu autentizace
     onAuthStateChange(callback) {
         console.log('Přidání posluchače změn stavu autentizace přes hybridní autentizaci');
-        
+
         // Přidání callbacku do seznamu posluchačů
         this.state.authListeners.push(callback);
-        
+
         // Vrácení funkce pro odstranění posluchače
         return {
             data: {
@@ -181,7 +181,7 @@ const HybridAuth = {
     // Oznámení o změně stavu autentizace
     notifyAuthStateChange(event) {
         console.log('Změna stavu autentizace přes hybridní autentizaci:', event);
-        
+
         // Volání všech posluchačů
         this.state.authListeners.forEach(callback => {
             try {

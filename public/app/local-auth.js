@@ -1,7 +1,7 @@
 /**
  * Lokální autentizační modul pro AIMapa
- * Verze 0.3.8.5
- * 
+ * Verze 0.3.8.4
+ *
  * Tento modul poskytuje lokální autentizaci pro AIMapa při spuštění na lokálním Node.js serveru.
  * Funguje jako alternativa k Supabase autentizaci, když aplikace běží lokálně.
  */
@@ -19,19 +19,19 @@ const LocalAuth = {
     // Inicializace modulu
     init() {
         console.log('Inicializace modulu lokální autentizace...');
-        
+
         // Načtení uživatelů z localStorage
         this.loadUsers();
-        
+
         // Kontrola, zda je uživatel přihlášen
         this.checkAuthState();
-        
+
         // Nastavení posluchačů událostí
         this.setupEventListeners();
-        
+
         this.state.isInitialized = true;
         console.log('Modul lokální autentizace byl inicializován');
-        
+
         // Oznámení o změně stavu autentizace
         this.notifyAuthStateChange('INITIAL_SESSION');
     },
@@ -70,7 +70,7 @@ const LocalAuth = {
             try {
                 const userData = JSON.parse(atob(authToken.split('.')[1]));
                 const user = this.state.users.find(u => u.id === userData.sub);
-                
+
                 if (user) {
                     this.state.isAuthenticated = true;
                     this.state.currentUser = user;
@@ -103,14 +103,14 @@ const LocalAuth = {
     // Registrace nového uživatele
     async signUp(email, password, metadata = {}) {
         console.log('Registrace nového uživatele:', email);
-        
+
         // Kontrola, zda uživatel již existuje
         const existingUser = this.state.users.find(u => u.email === email);
         if (existingUser) {
             console.error('Uživatel s tímto emailem již existuje');
             return { error: { message: 'Uživatel s tímto emailem již existuje' } };
         }
-        
+
         // Vytvoření nového uživatele
         const newUser = {
             id: this.generateUUID(),
@@ -120,13 +120,13 @@ const LocalAuth = {
             updated_at: new Date().toISOString(),
             metadata: metadata
         };
-        
+
         // Přidání uživatele do seznamu
         this.state.users.push(newUser);
-        
+
         // Uložení uživatelů do localStorage
         this.saveUsers();
-        
+
         // Automatické přihlášení po registraci
         return this.signIn(email, password);
     },
@@ -134,67 +134,67 @@ const LocalAuth = {
     // Přihlášení uživatele
     async signIn(email, password) {
         console.log('Přihlašování uživatele:', email);
-        
+
         // Nalezení uživatele podle emailu
         const user = this.state.users.find(u => u.email === email);
         if (!user) {
             console.error('Uživatel s tímto emailem nebyl nalezen');
             return { error: { message: 'Nesprávný email nebo heslo' } };
         }
-        
+
         // Kontrola hesla
         if (user.password !== this.hashPassword(password)) {
             console.error('Nesprávné heslo');
             return { error: { message: 'Nesprávný email nebo heslo' } };
         }
-        
+
         // Vytvoření JWT tokenu
         const token = this.generateToken(user);
-        
+
         // Uložení tokenu do localStorage
         localStorage.setItem('localAuthToken', token);
-        
+
         // Aktualizace stavu
         this.state.isAuthenticated = true;
         this.state.currentUser = user;
-        
+
         // Oznámení o změně stavu autentizace
         this.notifyAuthStateChange('SIGNED_IN');
-        
-        return { 
-            data: { 
+
+        return {
+            data: {
                 user: this.sanitizeUser(user),
-                session: { 
-                    access_token: token 
+                session: {
+                    access_token: token
                 }
-            } 
+            }
         };
     },
 
     // Odhlášení uživatele
     async signOut() {
         console.log('Odhlašování uživatele');
-        
+
         // Odstranění tokenu z localStorage
         localStorage.removeItem('localAuthToken');
-        
+
         // Aktualizace stavu
         this.state.isAuthenticated = false;
         this.state.currentUser = null;
-        
+
         // Oznámení o změně stavu autentizace
         this.notifyAuthStateChange('SIGNED_OUT');
-        
+
         return { data: { user: null } };
     },
 
     // Získání aktuálního uživatele
     async getUser() {
         if (this.state.isAuthenticated && this.state.currentUser) {
-            return { 
-                data: { 
-                    user: this.sanitizeUser(this.state.currentUser) 
-                } 
+            return {
+                data: {
+                    user: this.sanitizeUser(this.state.currentUser)
+                }
             };
         } else {
             return { data: { user: null } };
@@ -204,18 +204,18 @@ const LocalAuth = {
     // Resetování hesla
     async resetPassword(email) {
         console.log('Resetování hesla pro uživatele:', email);
-        
+
         // V lokálním prostředí pouze simulujeme reset hesla
         const user = this.state.users.find(u => u.email === email);
         if (!user) {
             console.error('Uživatel s tímto emailem nebyl nalezen');
             return { error: { message: 'Uživatel s tímto emailem nebyl nalezen' } };
         }
-        
+
         // V reálné aplikaci bychom zde poslali email s odkazem na reset hesla
         // Pro lokální prostředí pouze vypíšeme zprávu do konzole
         console.log(`Simulace odeslání emailu pro reset hesla na adresu ${email}`);
-        
+
         return { data: { message: 'Email pro reset hesla byl odeslán' } };
     },
 
@@ -225,42 +225,42 @@ const LocalAuth = {
             console.error('Uživatel není přihlášen');
             return { error: { message: 'Uživatel není přihlášen' } };
         }
-        
+
         console.log('Aktualizace uživatelských dat');
-        
+
         // Nalezení uživatele v seznamu
         const userIndex = this.state.users.findIndex(u => u.id === this.state.currentUser.id);
         if (userIndex === -1) {
             console.error('Uživatel nebyl nalezen v seznamu');
             return { error: { message: 'Uživatel nebyl nalezen' } };
         }
-        
+
         // Aktualizace uživatelských dat
         const updatedUser = {
             ...this.state.users[userIndex],
             ...userData,
             updated_at: new Date().toISOString()
         };
-        
+
         // Aktualizace seznamu uživatelů
         this.state.users[userIndex] = updatedUser;
-        
+
         // Aktualizace aktuálního uživatele
         this.state.currentUser = updatedUser;
-        
+
         // Uložení uživatelů do localStorage
         this.saveUsers();
-        
+
         return { data: { user: this.sanitizeUser(updatedUser) } };
     },
 
     // Přidání posluchače změn stavu autentizace
     onAuthStateChange(callback) {
         console.log('Přidání posluchače změn stavu autentizace');
-        
+
         // Přidání callbacku do seznamu posluchačů
         this.state.authListeners.push(callback);
-        
+
         // Vrácení funkce pro odstranění posluchače
         return {
             data: {
@@ -280,15 +280,15 @@ const LocalAuth = {
     // Oznámení o změně stavu autentizace
     notifyAuthStateChange(event) {
         console.log('Změna stavu autentizace:', event);
-        
+
         // Vytvoření objektu s daty o události
         const eventData = {
             event,
-            session: this.state.isAuthenticated ? { 
-                user: this.sanitizeUser(this.state.currentUser) 
+            session: this.state.isAuthenticated ? {
+                user: this.sanitizeUser(this.state.currentUser)
             } : null
         };
-        
+
         // Volání všech posluchačů
         this.state.authListeners.forEach(callback => {
             try {
@@ -300,7 +300,7 @@ const LocalAuth = {
     },
 
     // Pomocné metody
-    
+
     // Generování UUID
     generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -309,7 +309,7 @@ const LocalAuth = {
             return v.toString(16);
         });
     },
-    
+
     // Hashování hesla (v reálné aplikaci by bylo bezpečnější)
     hashPassword(password) {
         // Pro jednoduchost používáme pouze základní hashování
@@ -322,7 +322,7 @@ const LocalAuth = {
         }
         return hash.toString(16);
     },
-    
+
     // Generování JWT tokenu
     generateToken(user) {
         // Vytvoření hlavičky
@@ -330,7 +330,7 @@ const LocalAuth = {
             alg: 'HS256',
             typ: 'JWT'
         };
-        
+
         // Vytvoření payloadu
         const payload = {
             sub: user.id,
@@ -338,19 +338,19 @@ const LocalAuth = {
             iat: Math.floor(Date.now() / 1000),
             exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24) // 24 hodin
         };
-        
+
         // Kódování hlavičky a payloadu
         const encodedHeader = btoa(JSON.stringify(header));
         const encodedPayload = btoa(JSON.stringify(payload));
-        
+
         // Vytvoření podpisu (v reálné aplikaci by byl bezpečnější)
         // Pro jednoduchost používáme pouze základní podpis
         const signature = btoa(encodedHeader + encodedPayload + 'secret');
-        
+
         // Sestavení tokenu
         return `${encodedHeader}.${encodedPayload}.${signature}`;
     },
-    
+
     // Odstranění citlivých dat z uživatelského objektu
     sanitizeUser(user) {
         const { password, ...sanitizedUser } = user;
