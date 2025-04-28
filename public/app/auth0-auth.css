@@ -21,6 +21,7 @@
     align-items: center;
     z-index: 900;
     transition: transform 0.2s, background-color 0.2s;
+    font-size: 18px;
 }
 
 .auth0-auth-button:hover {
@@ -30,9 +31,82 @@
 
 .auth0-auth-button.logged-in {
     background-color: #44c7f4; /* Auth0 modrá barva */
+    /* Přidání animace pulzování pro zvýraznění přihlášeného stavu */
+    animation: pulse-blue 2s infinite;
+    border: 2px solid #fff;
 }
 
 .auth0-auth-button.logged-in:hover {
+    background-color: #0d96c6; /* Tmavší Auth0 modrá barva */
+    animation: none;
+}
+
+/* Animace pulzování pro zvýraznění přihlášeného stavu */
+@keyframes pulse-blue {
+    0% {
+        box-shadow: 0 0 0 0 rgba(68, 199, 244, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(68, 199, 244, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(68, 199, 244, 0);
+    }
+}
+
+/* Styly pro Auth0 přihlašovací tlačítko v přihlašovacím formuláři */
+.auth0-login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: #ff4f1f; /* Auth0 oranžová barva */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.auth0-login-button:hover {
+    background-color: #eb5424; /* Tmavší Auth0 oranžová barva */
+}
+
+/* Tlačítko pro přihlášení v hlavičce */
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.login-button {
+    background-color: #ff4f1f; /* Auth0 oranžová barva */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s;
+}
+
+.login-button:hover {
+    background-color: #eb5424; /* Tmavší Auth0 oranžová barva */
+}
+
+.login-button.logged-in {
+    background-color: #44c7f4; /* Auth0 modrá barva */
+}
+
+.login-button.logged-in:hover {
     background-color: #16214d; /* Auth0 tmavě modrá barva */
 }
 

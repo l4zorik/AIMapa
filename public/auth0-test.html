@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth0 Test - AIMapa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #0066cc;
+        }
+        .test-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .test-buttons {
+            margin-bottom: 15px;
+        }
+        .test-buttons button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin-right: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-buttons button:hover {
+            background-color: #0055aa;
+        }
+        .test-result {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .warning {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+        }
+        .info {
+            background-color: #d9edf7;
+            color: #31708f;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .test-list {
+            margin-top: 20px;
+        }
+        .test-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 3px solid #ddd;
+        }
+        .test-item.success {
+            border-left-color: #3c763d;
+        }
+        .test-item.error {
+            border-left-color: #a94442;
+        }
+        .test-item.warning {
+            border-left-color: #8a6d3b;
+        }
+    </style>
+    <!-- Auth0 SPA SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script>
+        // Kontrola, zda je Auth0 SDK správně načten
+        window.addEventListener('load', function() {
+            if (typeof createAuth0Client === 'undefined') {
+                console.error('Auth0 SDK nebyl správně načten, pokouším se ho načíst znovu...');
+                
+                // Pokus o opětovné načtení Auth0 SDK
+                const script = document.createElement('script');
+                script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
+                script.async = false;
+                
+                script.onload = function() {
+                    console.log('Auth0 SDK byl úspěšně načten');
+                    
+                    // Kontrola, zda je createAuth0Client definováno
+                    if (typeof createAuth0Client !== 'undefined') {
+                        console.log('createAuth0Client je nyní definováno');
+                        document.getElementById('auth0-status').textContent = 'Auth0 SDK je načten správně';
+                        document.getElementById('auth0-status').className = 'test-result success';
+                    } else {
+                        console.error('createAuth0Client stále není definováno po opětovném načtení Auth0 SDK');
+                        document.getElementById('auth0-status').textContent = 'Auth0 SDK není správně načten';
+                        document.getElementById('auth0-status').className = 'test-result error';
+                    }
+                };
+                
+                script.onerror = function(error) {
+                    console.error('Chyba při opětovném načítání Auth0 SDK:', error);
+                    document.getElementById('auth0-status').textContent = 'Chyba při načítání Auth0 SDK';
+                    document.getElementById('auth0-status').className = 'test-result error';
+                };
+                
+                document.head.appendChild(script);
+            } else {
+                console.log('Auth0 SDK je správně načten, createAuth0Client je definováno');
+                document.getElementById('auth0-status').textContent = 'Auth0 SDK je načten správně';
+                document.getElementById('auth0-status').className = 'test-result success';
+            }
+        });
+
+        // Konfigurace Auth0
+        const auth0Config = {
+            domain: 'dev-zxj8pir0moo4pdk7.us.auth0.com',
+            clientId: 'TKzCgYPmkETVCBjC3418MgKDJY60rppl',
+            redirectUri: window.location.origin + '/auth0-test.html',
+            audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
+            scope: 'openid profile email'
+        };
+
+        // Inicializace Auth0 klienta
+        async function initAuth0() {
+            try {
+                const resultElement = document.getElementById('init-result');
+                resultElement.textContent = 'Inicializuji Auth0 klienta...';
+                resultElement.className = 'test-result info';
+
+                // Kontrola, zda je createAuth0Client definováno
+                if (typeof createAuth0Client === 'undefined') {
+                    resultElement.textContent = 'Chyba: createAuth0Client není definováno';
+                    resultElement.className = 'test-result error';
+                    return null;
+                }
+
+                // Vytvoření instance Auth0 klienta
+                const auth0Client = await createAuth0Client({
+                    domain: auth0Config.domain,
+                    clientId: auth0Config.clientId,
+                    authorizationParams: {
+                        redirect_uri: auth0Config.redirectUri,
+                        audience: auth0Config.audience,
+                        scope: auth0Config.scope
+                    },
+                    useRefreshTokens: true,
+                    cacheLocation: 'localstorage'
+                });
+
+                resultElement.textContent = 'Auth0 klient byl úspěšně inicializován';
+                resultElement.className = 'test-result success';
+                
+                // Aktualizace stavu testů
+                updateTestStatus('test-1', true);
+                
+                return auth0Client;
+            } catch (error) {
+                const resultElement = document.getElementById('init-result');
+                resultElement.textContent = `Chyba při inicializaci Auth0: ${error.message}`;
+                resultElement.className = 'test-result error';
+                console.error('Chyba při inicializaci Auth0:', error);
+                
+                // Aktualizace stavu testů
+                updateTestStatus('test-1', false, error.message);
+                
+                return null;
+            }
+        }
+
+        // Přihlášení uživatele
+        async function login() {
+            try {
+                const resultElement = document.getElementById('login-result');
+                resultElement.textContent = 'Zahajuji přihlášení...';
+                resultElement.className = 'test-result info';
+
+                const auth0Client = await initAuth0();
+                if (!auth0Client) {
+                    resultElement.textContent = 'Nelze se přihlásit, Auth0 klient není inicializován';
+                    resultElement.className = 'test-result error';
+                    return;
+                }
+
+                await auth0Client.loginWithRedirect({
+                    authorizationParams: {
+                        redirect_uri: auth0Config.redirectUri
+                    }
+                });
+            } catch (error) {
+                const resultElement = document.getElementById('login-result');
+                resultElement.textContent = `Chyba při přihlašování: ${error.message}`;
+                resultElement.className = 'test-result error';
+                console.error('Chyba při přihlašování:', error);
+            }
+        }
+
+        // Odhlášení uživatele
+        async function logout() {
+            try {
+                const resultElement = document.getElementById('logout-result');
+                resultElement.textContent = 'Zahajuji odhlášení...';
+                resultElement.className = 'test-result info';
+
+                const auth0Client = await initAuth0();
+                if (!auth0Client) {
+                    resultElement.textContent = 'Nelze se odhlásit, Auth0 klient není inicializován';
+                    resultElement.className = 'test-result error';
+                    return;
+                }
+
+                await auth0Client.logout({
+                    logoutParams: {
+                        returnTo: auth0Config.redirectUri
+                    }
+                });
+
+                resultElement.textContent = 'Uživatel byl úspěšně odhlášen';
+                resultElement.className = 'test-result success';
+            } catch (error) {
+                const resultElement = document.getElementById('logout-result');
+                resultElement.textContent = `Chyba při odhlašování: ${error.message}`;
+                resultElement.className = 'test-result error';
+                console.error('Chyba při odhlašování:', error);
+            }
+        }
+
+        // Získání informací o uživateli
+        async function getUser() {
+            try {
+                const resultElement = document.getElementById('user-result');
+                resultElement.textContent = 'Získávám informace o uživateli...';
+                resultElement.className = 'test-result info';
+
+                const auth0Client = await initAuth0();
+                if (!auth0Client) {
+                    resultElement.textContent = 'Nelze získat uživatele, Auth0 klient není inicializován';
+                    resultElement.className = 'test-result error';
+                    return;
+                }
+
+                // Kontrola, zda je uživatel přihlášen
+                const isAuthenticated = await auth0Client.isAuthenticated();
+                if (!isAuthenticated) {
+                    resultElement.textContent = 'Uživatel není přihlášen';
+                    resultElement.className = 'test-result warning';
+                    return;
+                }
+
+                // Získání informací o uživateli
+                const user = await auth0Client.getUser();
+                resultElement.innerHTML = `Uživatel je přihlášen:<pre>${JSON.stringify(user, null, 2)}</pre>`;
+                resultElement.className = 'test-result success';
+                
+                // Aktualizace stavu testů
+                updateTestStatus('test-3', true);
+            } catch (error) {
+                const resultElement = document.getElementById('user-result');
+                resultElement.textContent = `Chyba při získávání uživatele: ${error.message}`;
+                resultElement.className = 'test-result error';
+                console.error('Chyba při získávání uživatele:', error);
+                
+                // Aktualizace stavu testů
+                updateTestStatus('test-3', false, error.message);
+            }
+        }
+
+        // Zpracování callbacku po přihlášení
+        async function handleCallback() {
+            try {
+                const resultElement = document.getElementById('callback-result');
+                
+                // Kontrola, zda je v URL autorizační kód
+                const query = window.location.search;
+                if (!query.includes('code=') || !query.includes('state=')) {
+                    resultElement.textContent = 'Žádný callback k zpracování';
+                    resultElement.className = 'test-result info';
+                    return;
+                }
+
+                resultElement.textContent = 'Zpracovávám callback...';
+                resultElement.className = 'test-result info';
+
+                const auth0Client = await initAuth0();
+                if (!auth0Client) {
+                    resultElement.textContent = 'Nelze zpracovat callback, Auth0 klient není inicializován';
+                    resultElement.className = 'test-result error';
+                    return;
+                }
+
+                // Zpracování autentizačního kódu
+                const result = await auth0Client.handleRedirectCallback();
+                resultElement.innerHTML = `Callback byl úspěšně zpracován:<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                resultElement.className = 'test-result success';
+                
+                // Aktualizace stavu testů
+                updateTestStatus('test-2', true);
+
+                // Odstranění autentizačních parametrů z URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                // Získání informací o uživateli
+                getUser();
+            } catch (error) {
+                const resultElement = document.getElementById('callback-result');
+                resultElement.textContent = `Chyba při zpracování callbacku: ${error.message}`;
+                resultElement.className = 'test-result error';
+                console.error('Chyba při zpracování callbacku:', error);
+                
+                // Aktualizace stavu testů
+                updateTestStatus('test-2', false, error.message);
+            }
+        }
+
+        // Získání tokenu
+        async function getToken() {
+            try {
+                const resultElement = document.getElementById('token-result');
+                resultElement.textContent = 'Získávám token...';
+                resultElement.className = 'test-result info';
+
+                const auth0Client = await initAuth0();
+                if (!auth0Client) {
+                    resultElement.textContent = 'Nelze získat token, Auth0 klient není inicializován';
+                    resultElement.className = 'test-result error';
+                    return;
+                }
+
+                // Kontrola, zda je uživatel přihlášen
+                const isAuthenticated = await auth0Client.isAuthenticated();
+                if (!isAuthenticated) {
+                    resultElement.textContent = 'Uživatel není přihlášen, nelze získat token';
+                    resultElement.className = 'test-result warning';
+                    return;
+                }
+
+                // Získání tokenu
+                const token = await auth0Client.getTokenSilently();
+                const tokenParts = token.split('.');
+                const tokenHeader = JSON.parse(atob(tokenParts[0]));
+                const tokenPayload = JSON.parse(atob(tokenParts[1]));
+
+                resultElement.innerHTML = `Token byl úspěšně získán:<pre>Header: ${JSON.stringify(tokenHeader, null, 2)}\n\nPayload: ${JSON.stringify(tokenPayload, null, 2)}</pre>`;
+                resultElement.className = 'test-result success';
+                
+                // Aktualizace stavu testů
+                updateTestStatus('test-4', true);
+            } catch (error) {
+                const resultElement = document.getElementById('token-result');
+                resultElement.textContent = `Chyba při získávání tokenu: ${error.message}`;
+                resultElement.className = 'test-result error';
+                console.error('Chyba při získávání tokenu:', error);
+                
+                // Aktualizace stavu testů
+                updateTestStatus('test-4', false, error.message);
+            }
+        }
+
+        // Spuštění všech testů
+        async function runAllTests() {
+            try {
+                document.getElementById('all-tests-result').textContent = 'Spouštím všechny testy...';
+                document.getElementById('all-tests-result').className = 'test-result info';
+
+                // Inicializace Auth0 klienta
+                const auth0Client = await initAuth0();
+                if (!auth0Client) {
+                    document.getElementById('all-tests-result').textContent = 'Testy selhaly, Auth0 klient není inicializován';
+                    document.getElementById('all-tests-result').className = 'test-result error';
+                    return;
+                }
+
+                // Zpracování callbacku
+                await handleCallback();
+
+                // Kontrola, zda je uživatel přihlášen
+                const isAuthenticated = await auth0Client.isAuthenticated();
+                if (isAuthenticated) {
+                    // Získání informací o uživateli
+                    await getUser();
+
+                    // Získání tokenu
+                    await getToken();
+                } else {
+                    document.getElementById('all-tests-result').textContent = 'Některé testy byly přeskočeny, uživatel není přihlášen';
+                    document.getElementById('all-tests-result').className = 'test-result warning';
+                }
+            } catch (error) {
+                document.getElementById('all-tests-result').textContent = `Chyba při spouštění testů: ${error.message}`;
+                document.getElementById('all-tests-result').className = 'test-result error';
+                console.error('Chyba při spouštění testů:', error);
+            }
+        }
+
+        // Aktualizace stavu testu
+        function updateTestStatus(testId, success, errorMessage = '') {
+            const testElement = document.getElementById(testId);
+            if (!testElement) return;
+
+            if (success) {
+                testElement.className = 'test-item success';
+                testElement.innerHTML = `✅ ${testElement.getAttribute('data-name')}`;
+            } else {
+                testElement.className = 'test-item error';
+                testElement.innerHTML = `❌ ${testElement.getAttribute('data-name')}: ${errorMessage}`;
+            }
+        }
+
+        // Spuštění po načtení stránky
+        window.addEventListener('DOMContentLoaded', function() {
+            // Kontrola, zda je v URL autorizační kód
+            const query = window.location.search;
+            if (query.includes('code=') && query.includes('state=')) {
+                // Automatické zpracování callbacku
+                handleCallback();
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Auth0 Test - AIMapa</h1>
+    <p>Tato stránka slouží k testování Auth0 přihlašování v aplikaci AIMapa.</p>
+
+    <div class="test-container">
+        <h2>Manuální testy</h2>
+        <div class="test-buttons">
+            <button onclick="initAuth0()">Inicializace Auth0</button>
+            <button onclick="login()">Přihlásit se</button>
+            <button onclick="logout()">Odhlásit se</button>
+            <button onclick="getUser()">Získat uživatele</button>
+            <button onclick="getToken()">Získat token</button>
+        </div>
+
+        <div id="auth0-status" class="test-result info">Kontroluji stav Auth0 SDK...</div>
+        <div id="init-result" class="test-result"></div>
+        <div id="login-result" class="test-result"></div>
+        <div id="logout-result" class="test-result"></div>
+        <div id="callback-result" class="test-result"></div>
+        <div id="user-result" class="test-result"></div>
+        <div id="token-result" class="test-result"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Automatické testy</h2>
+        <div class="test-buttons">
+            <button onclick="runAllTests()">Spustit všechny testy</button>
+        </div>
+        <div id="all-tests-result" class="test-result"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Výsledky testů</h2>
+        <div class="test-list">
+            <div id="test-1" class="test-item" data-name="Test 1: Inicializace Auth0">❓ Test 1: Inicializace Auth0</div>
+            <div id="test-2" class="test-item" data-name="Test 2: Kontrola callbacku">❓ Test 2: Kontrola callbacku</div>
+            <div id="test-3" class="test-item" data-name="Test 3: Kontrola přihlášení">❓ Test 3: Kontrola přihlášení</div>
+            <div id="test-4" class="test-item" data-name="Test 4: Získání tokenu">❓ Test 4: Získání tokenu</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1857,20 +1857,35 @@ function sendFloatingChatMessage() {
 
 // Funkce pro přidání možnosti přesouvat chat
 function makeChatDraggable(element, handle) {
+    console.log('Inicializace přesouvání pro element:', element.id || 'bez ID');
+
+    // Zajistíme, že element má správné CSS vlastnosti pro přesouvání
+    if (element.style.position !== 'absolute' && element.style.position !== 'fixed') {
+        console.log('Nastavuji position: absolute pro element');
+        element.style.position = 'absolute';
+    }
+
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     let isDragging = false;
 
+    // Přidání event listeneru pro zahájení přesouvání
     handle.onmousedown = dragMouseDown;
     handle.style.cursor = 'move'; // Nastavení kurzoru pro indikaci přesouvatelnosti
 
     function dragMouseDown(e) {
         e.preventDefault();
+        e.stopPropagation();
+
+        console.log('Zahájení přesouvání elementu');
+
         // Získání pozice kurzoru při spuštění
         pos3 = e.clientX;
         pos4 = e.clientY;
+
+        // Přidání event listenerů pro pohyb a ukončení
         document.onmouseup = closeDragElement;
-        // Volat funkci při pohybu myši
         document.onmousemove = elementDrag;
+
         isDragging = true;
         element.classList.add('dragging'); // Přidání třídy pro indikaci přesouvatelnosti
     }
@@ -1879,6 +1894,7 @@ function makeChatDraggable(element, handle) {
         if (!isDragging) return;
 
         e.preventDefault();
+
         // Výpočet nové pozice
         pos1 = pos3 - e.clientX;
         pos2 = pos4 - e.clientY;
@@ -1886,8 +1902,11 @@ function makeChatDraggable(element, handle) {
         pos4 = e.clientY;
 
         // Nastavení nové pozice elementu
-        element.style.top = (element.offsetTop - pos2) + "px";
-        element.style.left = (element.offsetLeft - pos1) + "px";
+        const newTop = element.offsetTop - pos2;
+        const newLeft = element.offsetLeft - pos1;
+
+        element.style.top = newTop + "px";
+        element.style.left = newLeft + "px";
 
         // Odstranění tříd pro pozici, pokud jsou přítomny
         element.classList.remove('chat-left', 'chat-right');
@@ -1903,9 +1922,29 @@ function makeChatDraggable(element, handle) {
         isDragging = false;
         element.classList.remove('dragging');
 
+        console.log('Ukončení přesouvání elementu, nová pozice:', {
+            top: element.style.top,
+            left: element.style.left
+        });
+
         // Uložení pozice, pokud je dostupný modul DraggableElements
         if (typeof DraggableElements !== 'undefined' && element.id) {
             DraggableElements.saveElementPosition(element.id, element);
+        }
+
+        // Uložení pozice do localStorage
+        if (element.id) {
+            try {
+                const positions = JSON.parse(localStorage.getItem('elementPositions') || '{}');
+                positions[element.id] = {
+                    top: element.style.top,
+                    left: element.style.left
+                };
+                localStorage.setItem('elementPositions', JSON.stringify(positions));
+                console.log('Pozice elementu byla uložena do localStorage');
+            } catch (error) {
+                console.error('Chyba při ukládání pozice elementu:', error);
+            }
         }
     }
 
@@ -1928,30 +1967,95 @@ function makeChatDraggable(element, handle) {
             el.style.top = (windowHeight - 50) + 'px';
         }
     }
+
+    // Načtení uložené pozice z localStorage
+    if (element.id) {
+        try {
+            const positions = JSON.parse(localStorage.getItem('elementPositions') || '{}');
+            if (positions[element.id]) {
+                element.style.top = positions[element.id].top;
+                element.style.left = positions[element.id].left;
+                console.log('Načtena uložená pozice elementu z localStorage:', positions[element.id]);
+            }
+        } catch (error) {
+            console.error('Chyba při načítání pozice elementu:', error);
+        }
+    }
 }
 
 // Funkce pro nastavení přesouvatelnosti hlavního chatu
 function setupMainChatDraggable(draggable = true) { // Změněno na výchozí hodnotu true
     const aiAssistant = document.getElementById('aiAssistant');
+    if (!aiAssistant) {
+        console.error('AI Asistent element nebyl nalezen!');
+        return;
+    }
+
     const chatHeader = aiAssistant.querySelector('.chat-header');
+    if (!chatHeader) {
+        console.error('Chat header element nebyl nalezen!');
+        return;
+    }
+
     const minimizeBtn = document.getElementById('minimizeMainChat');
+    const profileBtn = document.getElementById('userProfileButton');
+
+    // Zajistíme, že AI chat má správné CSS vlastnosti pro přesouvání
+    aiAssistant.style.position = 'absolute';
 
     // Přidání možnosti přesouvat chat pomocí DraggableElements modulu
     if (typeof DraggableElements !== 'undefined') {
+        console.log('Používám DraggableElements modul pro přesouvání AI chatu');
+
         // Nejprve vytvoříme prvek jako přesunutelný
         DraggableElements.makeDraggable(aiAssistant, chatHeader, 'aiAssistant');
 
         // Nastavíme chat jako vždy přesunutelný
         DraggableElements.setElementDraggable(aiAssistant, true);
     } else {
+        console.log('Používám základní implementaci pro přesouvání AI chatu');
+
         // Fallback na základní implementaci - vždy přesunutelný
         makeChatDraggable(aiAssistant, chatHeader);
+    }
+
+    // Přidání event listeneru pro tlačítko profilu
+    if (profileBtn) {
+        profileBtn.addEventListener('click', function() {
+            // Pokud existuje UserProfile modul, použijeme ho pro zobrazení profilu
+            if (typeof UserProfile !== 'undefined' && typeof UserProfile.toggleProfileModal === 'function') {
+                UserProfile.toggleProfileModal();
+            } else {
+                // Fallback - pokud není dostupný UserProfile modul, zkusíme použít Auth0Auth
+                if (typeof Auth0Auth !== 'undefined') {
+                    // Kontrola, zda je uživatel přihlášen
+                    const isLoggedIn = Auth0Auth.state.isLoggedIn;
+
+                    if (isLoggedIn) {
+                        // Zobrazení informací o přihlášeném uživateli
+                        const user = Auth0Auth.state.currentUser;
+                        addMessage(`Jste přihlášen jako: ${user.email || 'Neznámý uživatel'}`, false);
+                    } else {
+                        // Pokud uživatel není přihlášen, přesměrujeme ho na přihlašovací stránku
+                        Auth0Auth.login();
+                    }
+                } else {
+                    // Pokud není dostupný ani Auth0Auth, zobrazíme zprávu
+                    addMessage('Modul pro správu uživatelského profilu není dostupný.', false);
+                }
+            }
+        });
+
+        // Aktualizace stavu tlačítka profilu podle přihlášení
+        updateProfileButton();
     }
 
     // Přidání event listeneru pro minimalizaci chatu
     if (minimizeBtn) {
         minimizeBtn.addEventListener('click', toggleMainChatMinimize);
     }
+
+    console.log('AI chat byl nastaven jako přesouvatelný');
 }
 
 // Funkce pro přepnutí minimalizace hlavního chatu
@@ -4725,6 +4829,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Uživatel je přihlášen, inicializujeme mapu a další moduly
             initializeAppAfterLogin();
         }
+
+        // Aktualizace stavu tlačítka profilu
+        updateProfileButton();
     });
 
     // Kontrola, zda je uživatel již přihlášen
@@ -4738,6 +4845,25 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeAppAfterLogin();
     }
 });
+
+// Funkce pro aktualizaci stavu tlačítka profilu
+function updateProfileButton() {
+    const profileBtn = document.getElementById('userProfileButton');
+    if (!profileBtn) return;
+
+    // Kontrola, zda je uživatel přihlášen
+    const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+
+    if (isLoggedIn) {
+        // Uživatel je přihlášen - změna vzhledu tlačítka
+        profileBtn.classList.add('logged-in');
+        profileBtn.title = 'Zobrazit profil přihlášeného uživatele';
+    } else {
+        // Uživatel není přihlášen
+        profileBtn.classList.remove('logged-in');
+        profileBtn.title = 'Přihlásit se';
+    }
+}
 
 // Funkce pro inicializaci aplikace po přihlášení
 function initializeAppAfterLogin() {
@@ -4754,6 +4880,20 @@ function initializeAppAfterLogin() {
         console.log('MapManager není dostupný, používám standardní inicializaci mapy...');
         initializeMap();
     }
+
+    // Inicializace chat elementů
+    initChatElements();
+
+    // Inicializace přesouvatelnosti AI chatu
+    setupMainChatDraggable(true);
+
+    // Inicializace modulu pro přesouvání prvků
+    if (typeof DraggableElements !== 'undefined') {
+        DraggableElements.init();
+    }
+
+    // Aktualizace stavu tlačítka profilu
+    updateProfileButton();
 
     // Inicializace modulu pro novinky
     if (typeof UpdatesNotification !== 'undefined') {

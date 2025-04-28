@@ -324,7 +324,7 @@ body[data-theme="dark"] .btn:hover {
     height: auto;
     max-height: 500px;
     overflow: hidden;
-    position: fixed;
+    position: absolute; /* Změněno z fixed na absolute pro správné přesouvání */
     top: 20px;
     right: 20px;
     z-index: 1000;
@@ -367,17 +367,35 @@ body[data-theme="dark"] .btn:hover {
     color: white;
     font-size: 14px;
     cursor: pointer;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 3px;
     transition: background-color 0.2s;
+    margin-left: 5px;
 }
 
 .chat-control-btn:hover {
     background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-control-btn.profile-btn {
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.chat-control-btn.profile-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.chat-control-btn.profile-btn.logged-in {
+    background-color: rgba(76, 175, 80, 0.3);
+}
+
+.chat-control-btn.profile-btn.logged-in:hover {
+    background-color: rgba(76, 175, 80, 0.5);
 }
 
 .chat-content {

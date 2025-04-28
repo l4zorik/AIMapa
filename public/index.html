@@ -32,7 +32,6 @@
     <link rel="stylesheet" href="app/virtual-work.css">
     <link rel="stylesheet" href="app/work-history-icons.css">
     <link rel="stylesheet" href="app/task-definition.css">
-    <link rel="stylesheet" href="app/money-indicator-enhanced.css">
     <link rel="stylesheet" href="app/housing-services.css">
     <link rel="stylesheet" href="app/achievements.css">
     <link rel="stylesheet" href="app/idle-detection.css">
@@ -40,17 +39,19 @@
     <link rel="stylesheet" href="app/user-accounts.css">
     <link rel="stylesheet" href="app/simple-work-dialog.css">
     <!-- Supabase integrace -->
-    <link rel="stylesheet" href="app/supabase-auth.css">
+    <link rel="stylesheet" href="app/services/supabase-auth.css">
     <!-- Přihlašovací obrazovka -->
     <link rel="stylesheet" href="app/auth-screen.css">
     <!-- Bezpečnostní utility -->
     <link rel="stylesheet" href="app/security-utils.css">
     <!-- Auth0 integrace -->
     <link rel="stylesheet" href="app/auth0-auth.css">
+    <!-- Jednotný autentizační modul -->
+    <link rel="stylesheet" href="app/auth/auth-service.css">
     <!-- Uživatelský profil -->
     <link rel="stylesheet" href="app/user-profile.css">
     <!-- Předplatné -->
-    <link rel="stylesheet" href="app/subscription-service.css">
+    <link rel="stylesheet" href="app/services/subscription-service.css">
     <!-- Font Awesome pro ikony -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase klient -->
@@ -64,9 +65,14 @@
     <div class="container">
         <header>
             <h1>AI Map - Into the known</h1>
-            <button id="settingsButton" class="settings-button" aria-label="Nastavení">
-                <i class="icon">⚙️</i>
-            </button>
+            <div class="header-buttons">
+                <button id="loginButton" class="login-button" aria-label="Přihlásit se">
+                    <i class="icon">👤</i> Přihlásit
+                </button>
+                <button id="settingsButton" class="settings-button" aria-label="Nastavení">
+                    <i class="icon">⚙️</i>
+                </button>
+            </div>
         </header>
 
         <main>
@@ -120,6 +126,7 @@
                     <div class="chat-drag-handle">⋮⋮</div>
                     <h2>AI Asistent</h2>
                     <div class="chat-controls">
+                        <button id="userProfileButton" class="chat-control-btn profile-btn" title="Profil uživatele">👤</button>
                         <button id="minimizeMainChat" class="chat-control-btn minimize-btn" title="Minimalizovat chat">−</button>
                     </div>
                 </div>
@@ -358,6 +365,78 @@
 
     <!-- Auth0 SPA SDK - načtení před ostatními skripty bez defer -->
     <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script>
+        // Ignorování chyb souvisejících s ethereum
+        try {
+            // Vytvoření proxy objektu pro window.ethereum, aby se zabránilo chybám
+            Object.defineProperty(window, 'ethereum', {
+                configurable: true,
+                get: function() {
+                    return window._ethereum || {};
+                },
+                set: function(value) {
+                    window._ethereum = value;
+                }
+            });
+        } catch (e) {
+            console.warn('Nepodařilo se vytvořit proxy pro ethereum:', e);
+        }
+
+        // Kontrola, zda je Auth0 SDK správně načten
+        window.addEventListener('load', function() {
+            if (typeof createAuth0Client === 'undefined') {
+                console.error('Auth0 SDK nebyl správně načten, pokouším se ho načíst znovu...');
+
+                // Pokus o opětovné načtení Auth0 SDK
+                const script = document.createElement('script');
+                script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
+                script.async = false;
+
+                script.onload = function() {
+                    console.log('Auth0 SDK byl úspěšně načten');
+
+                    // Kontrola, zda je createAuth0Client definováno
+                    if (typeof createAuth0Client !== 'undefined') {
+                        console.log('createAuth0Client je nyní definováno');
+
+                        // Pokus o inicializaci Auth0Auth
+                        if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.init === 'function') {
+                            console.log('Pokouším se inicializovat Auth0Auth...');
+                            Auth0Auth.init().catch(function(error) {
+                                console.error('Chyba při inicializaci Auth0Auth:', error);
+                            });
+                        }
+                    } else {
+                        console.error('createAuth0Client stále není definováno po opětovném načtení Auth0 SDK');
+                    }
+                };
+
+                script.onerror = function(error) {
+                    console.error('Chyba při opětovném načítání Auth0 SDK:', error);
+                };
+
+                document.head.appendChild(script);
+            } else {
+                console.log('Auth0 SDK je správně načten, createAuth0Client je definováno');
+
+                // Inicializace Auth0Auth a automatické přihlášení
+                if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.init === 'function') {
+                    console.log('Inicializuji Auth0Auth a automaticky přihlašuji uživatele...');
+                    Auth0Auth.init().then(function() {
+                        // Kontrola, zda je uživatel přihlášen
+                        if (!Auth0Auth.state.isLoggedIn) {
+                            console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
+                            setTimeout(function() {
+                                Auth0Auth.login();
+                            }, 500);
+                        }
+                    }).catch(function(error) {
+                        console.error('Chyba při inicializaci Auth0Auth:', error);
+                    });
+                }
+            }
+        });
+    </script>
 
     <!-- Leaflet JS pro mapu -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
@@ -404,7 +483,7 @@
     <script src="app/fix-menu.js"></script>
     <script src="app/business-markers.js" defer></script>
     <script src="app/business-data-loader.js" defer></script>
-    <script src="app/money-indicator-enhanced.js"></script>
+    <script src="app/money-indicator.js"></script>
     <script src="app/triple-click-handler.js"></script>
     <script src="app/bug-reporter.js"></script>
     <script src="app/housing-services.js"></script>
@@ -419,15 +498,22 @@
     <!-- Auth0 autentizace - načtení před ostatními autentizačními moduly -->
     <script src="app/auth0-auth.js"></script>
 
-    <!-- Supabase a Netlify integrace -->
-    <script src="app/supabase-client.js"></script>
-    <script src="app/supabase-auth.js"></script>
-    <script src="app/netlify-integration.js"></script>
-    <script src="app/local-auth.js"></script>
-    <script src="app/hybrid-auth.js"></script>
-    <script src="app/auth-screen.js"></script>
+    <!-- Supabase klient -->
+    <script src="app/services/supabase-client.js"></script>
+
+    <!-- Uživatelský profil -->
     <script src="app/user-profile.js"></script>
-    <script src="app/subscription-service.js"></script>
+
+    <!-- Předplatné -->
+    <script src="app/services/subscription-service.js"></script>
+
+    <!-- Autentizační služba -->
+    <script src="app/auth/auth-service.js"></script>
+    <script src="app/auth/user-profile-service.js"></script>
+    <script src="app/services/subscription-service-stripe.js"></script>
+
+    <!-- Zachování zpětné kompatibility -->
+    <script src="app/netlify-integration.js"></script>
     <!-- Debugovací skript pro mapu -->
     <script src="app/map-debug.js" defer></script>
 

@@ -2,36 +2,40 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
-## [0.3.8.5] - 2025-07-12 - LOKÁLNÍ NODE.JS SERVER S PŘIHLAŠOVACÍM SYSTÉMEM
+## [0.3.8.5] - 2025-07-12 - REORGANIZACE KÓDU A INTEGRACE AUTH0, SUPABASE A STRIPE
 
 ### Nové funkce
-- Přidána podpora pro lokální Node.js server s funkčním přihlašovacím systémem
-- Implementována hybridní autentizace fungující jak lokálně, tak na Netlify
-- Přidána detekce prostředí (lokální/Netlify) s automatickým přepínáním
-- Vylepšena inicializace mapy pro spolehlivější načítání na všech platformách
-- Přidán debugovací modul pro diagnostiku a opravu problémů s mapou
+- Kompletní reorganizace kódu do logických modulů pro lepší přehlednost a údržbu
+- Implementován jednotný autentizační modul propojující Auth0 a Supabase
+- Přidán modul pro správu uživatelského profilu s podporou statistik a nastavení
+- Implementován systém předplatného s integrací Stripe platební brány
+- Vytvořeny SQL migrace pro Supabase s Row Level Security (RLS) politikami
+- Přidána serverová část pro Stripe API s webhooky pro zpracování událostí
+- Implementována synchronizace uživatelských dat mezi Auth0 a Supabase
 
 ### Vylepšení
+- Vytvořena nová adresářová struktura s logickým rozdělením modulů
 - Optimalizován proces přihlašování pro plynulejší uživatelský zážitek
 - Vylepšena bezpečnost aplikace s lepší správou autentizačních tokenů
-- Přidána podpora pro offline přihlášení s lokálním ukládáním uživatelských dat
-- Optimalizováno načítání Leaflet.js a dalších externích knihoven
+- Přidána podpora pro různé úrovně předplatného s odlišnými funkcemi
+- Vylepšena dokumentace projektu s detailním popisem nové struktury
+- Optimalizováno načítání modulů s lepší závislostní strukturou
 - Vylepšena kompatibilita s různými prohlížeči a zařízeními
 - Přidána podpora pro vývojovou verzi na Netlify s automatickou detekcí prostředí
-- Vylepšena inicializace Auth0 autentizace s automatickým přesměrováním na přihlašovací stránku
-- Optimalizováno načítání skriptů s atributem defer pro lepší výkon a spolehlivost
+- Vylepšeno zobrazení stavu přihlášení s jasnou indikací Auth0 autentizace
+- Přidána vizuální zpětná vazba pro přihlášeného uživatele (pulzující tlačítko profilu)
+- Vylepšeno zobrazení uživatelského profilu s detailními informacemi o přihlášení
 
 ### Opravy
-- Opraveny problémy s načítáním mapy na různých platformách
-- Vyřešeny konflikty mezi lokálním a cloudovým přihlašováním
+- Vyřešeny konflikty mezi Auth0 a Supabase autentizací
+- Opraveny problémy s načítáním externích knihoven
+- Vylepšena inicializace modulů s robustnější detekcí chyb
 - Opraveny problémy s Content Security Policy pro správné načítání externích zdrojů
-- Vylepšena inicializace chatových elementů pro prevenci chyb při načítání
-- Opraveny problémy s přidáváním bodů na mapu před úplnou inicializací Leaflet.js
-- Vyřešeny problémy s načítáním Leaflet.js na vývojové verzi na Netlify
-- Opravena inicializace mapy s robustnější detekcí a opravou chyb
-- Vylepšena spolehlivost zobrazování firem na mapě s opakovanými pokusy o inicializaci
 - Přidána lepší diagnostika a logování pro snadnější identifikaci problémů
-- Implementováno automatické opakování inicializace mapy při selhání
+- Implementováno automatické zotavení při selhání inicializace modulů
+- Opravena funkčnost tlačítka profilu pro zobrazení uživatelských informací
+- Vyřešeny problémy s Auth0 přihlášením a zobrazením stavu autentizace
+- Opraveno zobrazení uživatelského profilu po přihlášení přes Auth0
 
 ## [0.3.8.4] - 2025-07-10 - INTEGRACE SUPABASE A NETLIFY
 

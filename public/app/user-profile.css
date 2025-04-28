@@ -21,6 +21,7 @@
     align-items: center;
     z-index: 900;
     transition: transform 0.2s, background-color 0.2s;
+    font-size: 18px;
 }
 
 .user-profile-button:hover {
@@ -30,10 +31,27 @@
 
 .user-profile-button.logged-in {
     background-color: #4CAF50;
+    /* Přidání animace pulzování pro zvýraznění přihlášeného stavu */
+    animation: pulse-green 2s infinite;
+    border: 2px solid #fff;
 }
 
 .user-profile-button.logged-in:hover {
     background-color: #45a049;
+    animation: none;
+}
+
+/* Animace pulzování pro zvýraznění přihlášeného stavu */
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+    }
 }
 
 /* Modální okno profilu */
@@ -139,6 +157,39 @@
     font-weight: bold;
     margin-right: 10px;
     min-width: 120px;
+}
+
+/* Styly pro zobrazení stavu autentizace */
+.auth-provider-info {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    border-left: 4px solid #ff4f1f; /* Auth0 oranžová barva */
+}
+
+.auth-status-active {
+    color: #4CAF50;
+    font-weight: bold;
+    position: relative;
+    padding-left: 20px;
+}
+
+.auth-status-active::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: #4CAF50;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
 }
 
 /* Předplatné uživatele */

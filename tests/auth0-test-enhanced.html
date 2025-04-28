@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth0 Test - AIMapa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007bff;
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #6c757d;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background-color: #0069d9;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        .info {
+            color: #17a2b8;
+        }
+    </style>
+
+    <!-- Auth0 SPA SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Auth0 Test - AIMapa</h1>
+
+        <p>Tato stránka slouží k testování Auth0 přihlašování v aplikaci AIMapa.</p>
+
+        <h2>Manuální testy</h2>
+
+        <button id="testInitButton" class="btn">Inicializovat Auth0</button>
+        <button id="testLoginButton" class="btn">Přihlásit se</button>
+        <button id="testLogoutButton" class="btn">Odhlásit se</button>
+        <button id="testUserButton" class="btn">Získat uživatele</button>
+        <button id="testTokenButton" class="btn">Získat token</button>
+
+        <div id="result" class="result">
+            <p>Výsledky testů se zobrazí zde.</p>
+        </div>
+
+        <h2>Automatické testy</h2>
+
+        <button id="runAllTestsButton" class="btn btn-success">Spustit všechny testy</button>
+        <button id="clearResultsButton" class="btn btn-danger">Vymazat výsledky</button>
+
+        <div id="autoTestResults" class="result">
+            <p>Výsledky automatických testů se zobrazí zde.</p>
+        </div>
+    </div>
+
+    <script>
+        // Globální proměnné
+        let auth0Client = null;
+        const resultElement = document.getElementById('result');
+        const autoTestResultsElement = document.getElementById('autoTestResults');
+
+        // Konfigurace Auth0
+        const auth0Config = {
+            domain: 'dev-zxj8pir0moo4pdk7.us.auth0.com',
+            clientId: 'TKzCgYPmkETVCBjC3418MgKDJY60rppl',
+            authorizationParams: {
+                redirect_uri: window.location.origin + '/tests/auth0-test-enhanced.html',
+                audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
+                scope: 'openid profile email read:users read:user_idp_tokens'
+            }
+        };
+
+        // Funkce pro zobrazení výsledku
+        function showResult(title, data) {
+            resultElement.innerHTML = `<strong>${title}</strong><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        // Funkce pro zobrazení chyby
+        function showError(title, error) {
+            resultElement.innerHTML = `<strong class="error">${title}</strong><pre class="error">${error.message || error}</pre>`;
+            console.error(error);
+        }
+
+        // Funkce pro zobrazení informace
+        function showInfo(title, info) {
+            resultElement.innerHTML = `<strong class="info">${title}</strong><pre class="info">${info}</pre>`;
+        }
+
+        // Funkce pro zobrazení úspěchu
+        function showSuccess(title, data) {
+            resultElement.innerHTML = `<strong class="success">${title}</strong><pre class="success">${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        // Inicializace Auth0
+        async function initAuth0() {
+            try {
+                showInfo('Inicializace Auth0...', 'Probíhá inicializace Auth0 klienta.');
+
+                auth0Client = await createAuth0Client(auth0Config);
+
+                showSuccess('Auth0 inicializován', { status: 'success' });
+                return auth0Client;
+            } catch (error) {
+                showError('Chyba při inicializaci Auth0', error);
+                throw error;
+            }
+        }
+
+        // Přihlášení uživatele
+        async function login() {
+            try {
+                if (!auth0Client) {
+                    auth0Client = await initAuth0();
+                }
+
+                showInfo('Přihlašování...', 'Probíhá přesměrování na Auth0 přihlašovací stránku.');
+
+                await auth0Client.loginWithRedirect();
+            } catch (error) {
+                showError('Chyba při přihlašování', error);
+            }
+        }
+
+        // Odhlášení uživatele
+        async function logout() {
+            try {
+                if (!auth0Client) {
+                    showError('Chyba při odhlašování', 'Auth0 klient není inicializován.');
+                    return;
+                }
+
+                showInfo('Odhlašování...', 'Probíhá odhlašování uživatele.');
+
+                await auth0Client.logout({
+                    logoutParams: {
+                        returnTo: window.location.origin + '/tests/auth0-test-enhanced.html'
+                    }
+                });
+
+                showSuccess('Uživatel odhlášen', { status: 'success' });
+            } catch (error) {
+                showError('Chyba při odhlašování', error);
+            }
+        }
+
+        // Získání uživatele
+        async function getUser() {
+            try {
+                if (!auth0Client) {
+                    auth0Client = await initAuth0();
+                }
+
+                showInfo('Získávání uživatele...', 'Probíhá získávání informací o uživateli.');
+
+                const isAuthenticated = await auth0Client.isAuthenticated();
+
+                if (isAuthenticated) {
+                    const user = await auth0Client.getUser();
+                    showSuccess('Uživatel získán', user);
+                    return user;
+                } else {
+                    showInfo('Uživatel není přihlášen', 'Pro získání uživatele se nejprve přihlaste.');
+                    return null;
+                }
+            } catch (error) {
+                showError('Chyba při získávání uživatele', error);
+                return null;
+            }
+        }
+
+        // Získání tokenu
+        async function getToken() {
+            try {
+                if (!auth0Client) {
+                    auth0Client = await initAuth0();
+                }
+
+                showInfo('Získávání tokenu...', 'Probíhá získávání přístupového tokenu.');
+
+                const isAuthenticated = await auth0Client.isAuthenticated();
+
+                if (isAuthenticated) {
+                    const token = await auth0Client.getTokenSilently();
+
+                    // Zobrazení pouze části tokenu pro bezpečnost
+                    const tokenPreview = token.substring(0, 10) + '...' + token.substring(token.length - 10);
+
+                    showSuccess('Token získán', { token: tokenPreview });
+                    return token;
+                } else {
+                    showInfo('Uživatel není přihlášen', 'Pro získání tokenu se nejprve přihlaste.');
+                    return null;
+                }
+            } catch (error) {
+                showError('Chyba při získávání tokenu', error);
+                return null;
+            }
+        }
+
+        // Zpracování callbacku
+        async function handleCallback() {
+            try {
+                if (!auth0Client) {
+                    auth0Client = await initAuth0();
+                }
+
+                // Kontrola, zda je v URL kód pro autorizaci
+                const query = window.location.search;
+                if (query.includes('code=') && query.includes('state=')) {
+                    showInfo('Zpracování callbacku...', 'Probíhá zpracování autorizačního kódu.');
+
+                    // Zpracování callbacku
+                    await auth0Client.handleRedirectCallback();
+
+                    // Odstranění parametrů z URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+
+                    // Získání uživatele
+                    const user = await auth0Client.getUser();
+
+                    showSuccess('Callback zpracován', user);
+                    return user;
+                }
+            } catch (error) {
+                showError('Chyba při zpracování callbacku', error);
+            }
+        }
+
+        // Spuštění všech testů
+        async function runAllTests() {
+            try {
+                autoTestResultsElement.innerHTML = '<p class="info">Spouštění testů...</p>';
+
+                let results = '<h3>Výsledky testů</h3>';
+
+                // Test 1: Inicializace Auth0
+                results += '<h4>Test 1: Inicializace Auth0</h4>';
+                try {
+                    if (!auth0Client) {
+                        auth0Client = await initAuth0();
+                    }
+                    results += '<p class="success">✓ Auth0 klient byl úspěšně inicializován</p>';
+                } catch (error) {
+                    results += `<p class="error">✗ Chyba při inicializaci Auth0: ${error.message}</p>`;
+                }
+
+                // Test 2: Kontrola callbacku
+                results += '<h4>Test 2: Kontrola callbacku</h4>';
+                const query = window.location.search;
+                if (query.includes('code=') && query.includes('state=')) {
+                    try {
+                        await handleCallback();
+                        results += '<p class="success">✓ Callback byl úspěšně zpracován</p>';
+                    } catch (error) {
+                        results += `<p class="error">✗ Chyba při zpracování callbacku: ${error.message}</p>`;
+                    }
+                } else {
+                    results += '<p class="info">ℹ V URL není autorizační kód, test přeskočen</p>';
+                }
+
+                // Test 3: Kontrola přihlášení
+                results += '<h4>Test 3: Kontrola přihlášení</h4>';
+                try {
+                    const isAuthenticated = await auth0Client.isAuthenticated();
+                    if (isAuthenticated) {
+                        const user = await auth0Client.getUser();
+                        results += `<p class="success">✓ Uživatel je přihlášen: ${user.email || user.name || 'auth0user'}</p>`;
+                    } else {
+                        results += '<p class="info">ℹ Uživatel není přihlášen</p>';
+                        results += '<p><button id="loginFromTestsButton" class="btn">Přihlásit se</button></p>';
+                    }
+                } catch (error) {
+                    results += `<p class="error">✗ Chyba při kontrole přihlášení: ${error.message}</p>`;
+                }
+
+                // Test 4: Získání tokenu
+                results += '<h4>Test 4: Získání tokenu</h4>';
+                try {
+                    const isAuthenticated = await auth0Client.isAuthenticated();
+                    if (isAuthenticated) {
+                        const token = await auth0Client.getTokenSilently();
+                        const tokenPreview = token.substring(0, 10) + '...' + token.substring(token.length - 10);
+                        results += `<p class="success">✓ Token byl úspěšně získán: ${tokenPreview}</p>`;
+                    } else {
+                        results += '<p class="info">ℹ Uživatel není přihlášen, token nelze získat</p>';
+                    }
+                } catch (error) {
+                    results += `<p class="error">✗ Chyba při získávání tokenu: ${error.message}</p>`;
+                }
+
+                autoTestResultsElement.innerHTML = results;
+
+                // Přidání posluchače události pro tlačítko přihlášení
+                const loginFromTestsButton = document.getElementById('loginFromTestsButton');
+                if (loginFromTestsButton) {
+                    loginFromTestsButton.addEventListener('click', login);
+                }
+            } catch (error) {
+                autoTestResultsElement.innerHTML = `<p class="error">Chyba při spouštění testů: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+
+        // Vymazání výsledků
+        function clearResults() {
+            resultElement.innerHTML = '<p>Výsledky testů se zobrazí zde.</p>';
+            autoTestResultsElement.innerHTML = '<p>Výsledky automatických testů se zobrazí zde.</p>';
+        }
+
+        // Nastavení posluchačů událostí
+        document.getElementById('testInitButton').addEventListener('click', initAuth0);
+        document.getElementById('testLoginButton').addEventListener('click', login);
+        document.getElementById('testLogoutButton').addEventListener('click', logout);
+        document.getElementById('testUserButton').addEventListener('click', getUser);
+        document.getElementById('testTokenButton').addEventListener('click', getToken);
+        document.getElementById('runAllTestsButton').addEventListener('click', runAllTests);
+        document.getElementById('clearResultsButton').addEventListener('click', clearResults);
+
+        // Zpracování callbacku při načtení stránky
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await handleCallback();
+
+                // Automatické spuštění testů
+                await runAllTests();
+            } catch (error) {
+                console.error('Chyba při zpracování callbacku:', error);
+            }
+        });
+    </script>
+
+    <!-- Načtení Auth0 modulu z aplikace -->
+    <script src="/app/auth0-auth.js"></script>
+
+    <!-- Načtení testovacích skriptů -->
+    <script src="/tests/auth0-test-enhanced.js"></script>
+    <script src="/tests/auth0-config-test.js"></script>
+    <script src="/tests/auth0-integration-test.js"></script>
+</body>
+</html>
