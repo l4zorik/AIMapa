@@ -11,7 +11,8 @@ const Auth0Auth = {
         isLoggedIn: false,
         currentUser: null,
         auth0Client: null,
-        authButtonShown: false
+        authButtonShown: false,
+        authCheckInterval: null
     },
 
     // Metoda pro inicializaci modulu
@@ -22,6 +23,24 @@ const Auth0Auth = {
             // Logování konfigurace pro debugování
             this.logConfig();
 
+            // Kontrola, zda je uživatel již přihlášen podle localStorage
+            const isLoggedInFromStorage = localStorage.getItem('aiMapaLoggedIn') === 'true';
+            console.log('Stav přihlášení z localStorage:', isLoggedInFromStorage ? 'Přihlášen' : 'Nepřihlášen');
+
+            // Pokud je uživatel přihlášen podle localStorage, načteme jeho profil
+            if (isLoggedInFromStorage) {
+                const savedProfile = localStorage.getItem('aiMapaUserProfile');
+                if (savedProfile) {
+                    try {
+                        this.state.currentUser = JSON.parse(savedProfile);
+                        this.state.isLoggedIn = true;
+                        console.log('Načten uživatelský profil z localStorage při inicializaci:', this.state.currentUser);
+                    } catch (e) {
+                        console.error('Chyba při parsování uloženého profilu při inicializaci:', e);
+                    }
+                }
+            }
+
             // Načtení Auth0 klienta
             await this.loadAuth0Client();
 
@@ -29,20 +48,30 @@ const Auth0Auth = {
             this.addAuthButton();
 
             // Kontrola, zda je uživatel přihlášen
-            await this.checkCurrentUser();
+            const isLoggedIn = await this.checkCurrentUser();
+
+            // Pokud je uživatel přihlášen, zobrazíme jeho profil
+            if (isLoggedIn || this.state.isLoggedIn) {
+                this.displayUserProfile();
+            }
 
             // Nastavení posluchačů událostí pro změny autentizace
             this.setupAuthListeners();
+
+            // Nastavení časovače pro pravidelnou kontrolu přihlášení
+            this.setupAuthCheckInterval();
 
             this.state.isInitialized = true;
             console.log('Modul Auth0 autentizace byl inicializován');
 
             // Automatické přihlášení, pokud uživatel není přihlášen
-            if (!this.state.isLoggedIn) {
+            if (!this.state.isLoggedIn && !isLoggedInFromStorage) {
                 console.log('Uživatel není přihlášen, automaticky přesměrovávám na Auth0 přihlášení...');
                 setTimeout(() => {
                     this.login();
                 }, 1000);
+            } else {
+                console.log('Uživatel je již přihlášen, nepřesměrovávám na Auth0 přihlášení');
             }
 
             return true;
@@ -65,9 +94,13 @@ const Auth0Auth = {
                 console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
                 redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
             }
-            // Kontrola, zda jsme na localhost:3000
+            // Kontrola, zda jsme na localhost (3000 nebo 3001)
+            else if (window.location.href.includes('localhost:3001')) {
+                console.log('Jsme na lokálním vývojovém prostředí (port 3001), používám localhost URL pro přesměrování');
+                redirectUri = 'http://localhost:3001';
+            }
             else if (window.location.href.includes('localhost:3000')) {
-                console.log('Jsme na lokálním vývojovém prostředí, používám localhost URL pro přesměrování');
+                console.log('Jsme na lokálním vývojovém prostředí (port 3000), používám localhost URL pro přesměrování');
                 redirectUri = 'http://localhost:3000';
             }
 
@@ -77,9 +110,8 @@ const Auth0Auth = {
             const authUrl = `https://${this.config.domain}/authorize?` +
                 `client_id=${this.config.clientId}&` +
                 `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-                `response_type=token id_token&` +
-                `nonce=${Math.random().toString(36).substring(2, 15)}&` +
-                `scope=openid profile email&` +
+                `response_type=code&` +
+                `scope=openid%20profile%20email&` +
                 `state=${Math.random().toString(36).substring(2, 15)}`;
 
             console.log('Kompletní Auth0 URL:', authUrl);
@@ -104,7 +136,10 @@ const Auth0Auth = {
                 if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
                     redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
                 }
-                // Kontrola, zda jsme na localhost:3000
+                // Kontrola, zda jsme na localhost (3000 nebo 3001)
+                else if (window.location.href.includes('localhost:3001')) {
+                    redirectUri = 'http://localhost:3001';
+                }
                 else if (window.location.href.includes('localhost:3000')) {
                     redirectUri = 'http://localhost:3000';
                 }
@@ -113,9 +148,8 @@ const Auth0Auth = {
                 const authUrl = `https://${this.config.domain}/authorize?` +
                     `client_id=${this.config.clientId}&` +
                     `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-                    `response_type=token id_token&` +
-                    `nonce=${Math.random().toString(36).substring(2, 15)}&` +
-                    `scope=openid profile email&` +
+                    `response_type=code&` +
+                    `scope=openid%20profile%20email&` +
                     `state=${Math.random().toString(36).substring(2, 15)}`;
 
                 console.log('Přímé přesměrování na Auth0 URL po chybě:', authUrl);
@@ -136,7 +170,7 @@ const Auth0Auth = {
         // Přidání podpory pro vývojovou verzi na Netlify
         netlifyDevRedirectUri: 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app',
         // Lokální vývojové prostředí
-        localDevRedirectUri: 'http://localhost:3000',
+        localDevRedirectUri: 'http://localhost:3001',
         audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
         scope: 'openid profile email read:users read:user_idp_tokens',
         // Nastavení pro SPA aplikaci
@@ -241,10 +275,14 @@ const Auth0Auth = {
                 console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
                 redirectUri = this.config.netlifyDevRedirectUri;
             }
-            // Kontrola, zda jsme na localhost:3000
+            // Kontrola, zda jsme na localhost (3000 nebo 3001)
+            else if (window.location.href.includes('localhost:3001')) {
+                console.log('Jsme na lokálním vývojovém prostředí (port 3001), používám localhost URL pro přesměrování');
+                redirectUri = 'http://localhost:3001';
+            }
             else if (window.location.href.includes('localhost:3000')) {
-                console.log('Jsme na lokálním vývojovém prostředí, používám localhost URL pro přesměrování');
-                redirectUri = this.config.localDevRedirectUri;
+                console.log('Jsme na lokálním vývojovém prostředí (port 3000), používám localhost URL pro přesměrování');
+                redirectUri = 'http://localhost:3000';
             }
 
             console.log('Inicializace Auth0 klienta s URL pro přesměrování:', redirectUri);
@@ -324,9 +362,12 @@ const Auth0Auth = {
         if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
             redirectUri = this.config.netlifyDevRedirectUri;
         }
-        // Kontrola, zda jsme na localhost:3000
+        // Kontrola, zda jsme na localhost (3000 nebo 3001)
+        else if (window.location.href.includes('localhost:3001')) {
+            redirectUri = 'http://localhost:3001';
+        }
         else if (window.location.href.includes('localhost:3000')) {
-            redirectUri = this.config.localDevRedirectUri;
+            redirectUri = 'http://localhost:3000';
         }
 
         // Vytvoření jednoduchého objektu pro simulaci Auth0 klienta
@@ -337,7 +378,8 @@ const Auth0Auth = {
                     `client_id=${this.config.clientId}&` +
                     `redirect_uri=${encodeURIComponent(redirectUri)}&` +
                     `response_type=code&` +
-                    `scope=${encodeURIComponent(this.config.scope)}`;
+                    `scope=openid%20profile%20email&` +
+                    `state=${Math.random().toString(36).substring(2, 15)}`;
 
                 console.log('Přímé přesměrování na Auth0 URL (simulovaný klient):', authUrl);
                 window.location.href = authUrl;
@@ -595,6 +637,118 @@ const Auth0Auth = {
             const hash = window.location.hash;
             const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
 
+            // Kontrola, zda je v URL autorizační kód z Auth0
+            const query = window.location.search;
+            const hasAuthCode = query.includes('code=') && query.includes('state=');
+
+            // Kontrola, zda je uživatel již přihlášen podle localStorage
+            const isLoggedInFromStorage = localStorage.getItem('aiMapaLoggedIn') === 'true';
+
+            if (isLoggedInFromStorage) {
+                console.log('Uživatel je již přihlášen podle localStorage');
+
+                // Pokus o načtení uživatelského profilu
+                const savedProfile = localStorage.getItem('aiMapaUserProfile');
+                if (savedProfile) {
+                    try {
+                        this.state.currentUser = JSON.parse(savedProfile);
+                        this.state.isLoggedIn = true;
+                        console.log('Načten uživatelský profil z localStorage při kontrole:', this.state.currentUser);
+
+                        // Aktualizace tlačítka autentizace
+                        this.updateAuthButton();
+
+                        // Zobrazení profilu uživatele
+                        this.displayUserProfile();
+
+                        // Nastavení časovače pro kontrolu přihlášení
+                        this.setupAuthCheckInterval();
+
+                        return true;
+                    } catch (e) {
+                        console.error('Chyba při parsování uloženého profilu při kontrole:', e);
+                    }
+                }
+            }
+
+            if (hasAuthCode) {
+                console.log('Detekován autorizační kód v URL, zpracovávám callback...');
+
+                try {
+                    // Parsování kódu z URL
+                    const urlParams = new URLSearchParams(query);
+                    const code = urlParams.get('code');
+                    const state = urlParams.get('state');
+
+                    if (code && state) {
+                        console.log('Autorizační kód byl úspěšně získán');
+
+                        // Nastavení stavu přihlášení
+                        this.state.isLoggedIn = true;
+
+                        // Pokus o získání uložených informací o uživateli
+                        let userInfo;
+                        const savedProfile = localStorage.getItem('aiMapaUserProfile');
+
+                        if (savedProfile) {
+                            try {
+                                userInfo = JSON.parse(savedProfile);
+                                console.log('Načteny uložené informace o uživateli:', userInfo);
+                            } catch (e) {
+                                console.error('Chyba při parsování uloženého profilu:', e);
+                            }
+                        }
+
+                        // Pokud nemáme uložené informace, vytvoříme základní
+                        if (!userInfo) {
+                            const userEmail = localStorage.getItem('aiMapaUserEmail') || 'auth0user@example.com';
+                            userInfo = {
+                                sub: 'auth0|' + Math.random().toString(36).substring(2, 15),
+                                nickname: userEmail.split('@')[0],
+                                name: userEmail,
+                                email: userEmail,
+                                picture: 'https://cdn.auth0.com/avatars/default.png',
+                                updated_at: new Date().toISOString()
+                            };
+                            console.log('Vytvořeny nové informace o uživateli:', userInfo);
+                        }
+
+                        this.state.currentUser = userInfo;
+
+                        // Uložení stavu přihlášení do localStorage
+                        localStorage.setItem('aiMapaLoggedIn', 'true');
+                        localStorage.setItem('aiMapaUserEmail', userInfo.email || userInfo.name);
+                        localStorage.setItem('aiMapaUserProfile', JSON.stringify(userInfo));
+
+                        // Aktualizace tlačítka autentizace
+                        this.updateAuthButton();
+
+                        // Zobrazení profilu uživatele
+                        this.displayUserProfile();
+
+                        // Vyvolání události o změně stavu přihlášení
+                        document.dispatchEvent(new CustomEvent('authStateChanged', {
+                            detail: { isLoggedIn: true, user: userInfo }
+                        }));
+
+                        // Odstranění parametrů z URL
+                        window.history.replaceState({}, document.title, window.location.pathname);
+
+                        console.log('Uživatel je přihlášen:', userInfo.email || userInfo.name);
+
+                        // Nastavení časovače pro kontrolu přihlášení
+                        this.setupAuthCheckInterval();
+
+                        return true;
+                    }
+                } catch (callbackError) {
+                    console.error('Chyba při zpracování autorizačního kódu:', callbackError);
+                }
+
+                // Odstranění parametrů z URL i v případě chyby
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             if (hasAuthTokens) {
                 console.log('Detekovány tokeny v URL hash, zpracovávám callback...');
 
@@ -617,18 +771,34 @@ const Auth0Auth = {
                         const userInfo = this.parseJwt(idToken);
                         console.log('Získány informace o uživateli z ID tokenu:', userInfo);
 
+                        // Zpracování uživatelských dat ve formátu Auth0
+                        const processedUserInfo = {
+                            sub: userInfo.sub,
+                            nickname: userInfo.nickname || userInfo.name?.split('@')[0] || 'uživatel',
+                            name: userInfo.name || userInfo.email || userInfo.sub,
+                            email: userInfo.email || (userInfo.name?.includes('@') ? userInfo.name : null),
+                            picture: userInfo.picture || 'https://cdn.auth0.com/avatars/default.png',
+                            updated_at: userInfo.updated_at || new Date().toISOString()
+                        };
+
+                        console.log('Zpracované informace o uživateli:', processedUserInfo);
+
                         // Nastavení stavu přihlášení
                         this.state.isLoggedIn = true;
-                        this.state.currentUser = userInfo;
+                        this.state.currentUser = processedUserInfo;
 
                         // Uložení tokenů do localStorage
                         localStorage.setItem('aiMapaAccessToken', accessToken);
                         localStorage.setItem('aiMapaIdToken', idToken);
                         localStorage.setItem('aiMapaLoggedIn', 'true');
-                        localStorage.setItem('aiMapaUserEmail', userInfo.email || userInfo.name || userInfo.sub || 'auth0user');
+                        localStorage.setItem('aiMapaUserEmail', processedUserInfo.email || processedUserInfo.name || processedUserInfo.sub);
+                        localStorage.setItem('aiMapaUserProfile', JSON.stringify(processedUserInfo));
 
                         // Aktualizace tlačítka autentizace
                         this.updateAuthButton();
+
+                        // Zobrazení profilu uživatele
+                        this.displayUserProfile();
 
                         // Vyvolání události o změně stavu přihlášení
                         document.dispatchEvent(new CustomEvent('authStateChanged', {
@@ -637,6 +807,9 @@ const Auth0Auth = {
 
                         // Odstranění hash z URL
                         window.history.replaceState({}, document.title, window.location.pathname);
+
+                        // Nastavení časovače pro kontrolu přihlášení
+                        this.setupAuthCheckInterval();
 
                         console.log('Uživatel je přihlášen:', userInfo.email || userInfo.name || userInfo.sub);
                         return true;
@@ -658,15 +831,50 @@ const Auth0Auth = {
                     // Dekódování ID tokenu pro získání informací o uživateli
                     const userInfo = this.parseJwt(idToken);
 
+                    // Pokus o získání uložených informací o uživateli
+                    let processedUserInfo;
+                    const savedProfile = localStorage.getItem('aiMapaUserProfile');
+
+                    if (savedProfile) {
+                        try {
+                            processedUserInfo = JSON.parse(savedProfile);
+                            console.log('Načteny uložené informace o uživateli z localStorage:', processedUserInfo);
+                        } catch (e) {
+                            console.error('Chyba při parsování uloženého profilu:', e);
+                        }
+                    }
+
+                    // Pokud nemáme uložené informace, zpracujeme data z tokenu
+                    if (!processedUserInfo) {
+                        processedUserInfo = {
+                            sub: userInfo.sub,
+                            nickname: userInfo.nickname || userInfo.name?.split('@')[0] || 'uživatel',
+                            name: userInfo.name || userInfo.email || userInfo.sub,
+                            email: userInfo.email || (userInfo.name?.includes('@') ? userInfo.name : null),
+                            picture: userInfo.picture || 'https://cdn.auth0.com/avatars/default.png',
+                            updated_at: userInfo.updated_at || new Date().toISOString()
+                        };
+                        console.log('Zpracované informace o uživateli z tokenu:', processedUserInfo);
+                    }
+
                     // Kontrola expirace tokenu
                     const currentTime = Math.floor(Date.now() / 1000);
                     if (userInfo.exp && userInfo.exp > currentTime) {
                         // Token je stále platný
                         this.state.isLoggedIn = true;
-                        this.state.currentUser = userInfo;
+                        this.state.currentUser = processedUserInfo;
+
+                        // Aktualizace uloženého profilu
+                        localStorage.setItem('aiMapaUserProfile', JSON.stringify(processedUserInfo));
 
                         // Aktualizace tlačítka autentizace
                         this.updateAuthButton();
+
+                        // Zobrazení profilu uživatele
+                        this.displayUserProfile();
+
+                        // Nastavení časovače pro pravidelnou kontrolu přihlášení
+                        this.setupAuthCheckInterval();
 
                         console.log('Uživatel je přihlášen (z localStorage):', userInfo.email || userInfo.name || userInfo.sub);
                         return true;
@@ -694,18 +902,37 @@ const Auth0Auth = {
                     if (isAuthenticated) {
                         const user = await this.state.auth0Client.getUser();
                         if (user) {
-                            console.log('Uživatel je přihlášen přes Auth0 klienta:', user.email || user.name || 'auth0user');
+                            console.log('Uživatel je přihlášen přes Auth0 klienta:', user);
+
+                            // Zpracování uživatelských dat ve formátu Auth0
+                            const processedUserInfo = {
+                                sub: user.sub,
+                                nickname: user.nickname || user.name?.split('@')[0] || 'uživatel',
+                                name: user.name || user.email || user.sub,
+                                email: user.email || (user.name?.includes('@') ? user.name : null),
+                                picture: user.picture || 'https://cdn.auth0.com/avatars/default.png',
+                                updated_at: user.updated_at || new Date().toISOString()
+                            };
+
+                            console.log('Zpracované informace o uživateli z Auth0 klienta:', processedUserInfo);
 
                             // Aktualizace stavu
                             this.state.isLoggedIn = true;
-                            this.state.currentUser = user;
+                            this.state.currentUser = processedUserInfo;
 
                             // Uložení stavu přihlášení
                             localStorage.setItem('aiMapaLoggedIn', 'true');
-                            localStorage.setItem('aiMapaUserEmail', user.email || user.name || 'auth0user');
+                            localStorage.setItem('aiMapaUserEmail', processedUserInfo.email || processedUserInfo.name);
+                            localStorage.setItem('aiMapaUserProfile', JSON.stringify(processedUserInfo));
 
                             // Aktualizace tlačítka autentizace
                             this.updateAuthButton();
+
+                            // Zobrazení profilu uživatele
+                            this.displayUserProfile();
+
+                            // Nastavení časovače pro pravidelnou kontrolu přihlášení
+                            this.setupAuthCheckInterval();
 
                             return true;
                         }
@@ -969,13 +1196,196 @@ const Auth0Auth = {
         // Posluchač pro změnu stavu přihlášení
         window.addEventListener('auth0:login', async () => {
             await this.checkCurrentUser();
+            // Zobrazení profilu uživatele po přihlášení
+            this.displayUserProfile();
         });
 
         window.addEventListener('auth0:logout', () => {
             this.state.isLoggedIn = false;
             this.state.currentUser = null;
             this.updateAuthButton();
+            // Odstranění profilu uživatele po odhlášení
+            this.hideUserProfile();
         });
+    },
+
+    // Zobrazení profilu uživatele
+    displayUserProfile() {
+        if (!this.state.isLoggedIn || !this.state.currentUser) {
+            console.log('Nelze zobrazit profil uživatele - uživatel není přihlášen');
+            return;
+        }
+
+        console.log('Zobrazuji profil uživatele:', this.state.currentUser);
+
+        // Kontrola, zda již existuje profil
+        let profileElement = document.getElementById('auth0-user-profile');
+
+        if (!profileElement) {
+            // Vytvoření nového elementu pro profil
+            profileElement = document.createElement('div');
+            profileElement.id = 'auth0-user-profile';
+            profileElement.className = 'auth0-user-profile';
+
+            // Styly pro profil
+            profileElement.style.position = 'fixed';
+            profileElement.style.top = '10px';
+            profileElement.style.right = '10px';
+            profileElement.style.backgroundColor = '#2c3e50';
+            profileElement.style.color = 'white';
+            profileElement.style.padding = '10px';
+            profileElement.style.borderRadius = '5px';
+            profileElement.style.zIndex = '9999';
+            profileElement.style.display = 'flex';
+            profileElement.style.alignItems = 'center';
+            profileElement.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            profileElement.style.cursor = 'pointer';
+
+            // Přidání do dokumentu
+            document.body.appendChild(profileElement);
+
+            // Přidání události pro zobrazení/skrytí detailů
+            profileElement.addEventListener('click', () => {
+                const details = document.getElementById('auth0-user-profile-details');
+                if (details) {
+                    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Získání informací o uživateli
+        const userName = this.state.currentUser.name || this.state.currentUser.email || 'Uživatel';
+        const userNickname = this.state.currentUser.nickname || userName.split('@')[0];
+        const userPicture = this.state.currentUser.picture || 'https://cdn.auth0.com/avatars/default.png';
+        const userEmail = this.state.currentUser.email || 'Není k dispozici';
+        const userId = this.state.currentUser.sub || 'Není k dispozici';
+        const userUpdated = this.state.currentUser.updated_at ? new Date(this.state.currentUser.updated_at).toLocaleString() : 'Neznámý čas';
+
+        console.log('Zobrazuji profil uživatele s daty:', {
+            name: userName,
+            nickname: userNickname,
+            picture: userPicture,
+            email: userEmail,
+            sub: userId,
+            updated_at: userUpdated
+        });
+
+        // Aktualizace obsahu profilu
+        profileElement.innerHTML = `
+            <img src="${userPicture}" alt="${userName}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
+            <span>${userNickname}</span>
+            <div id="auth0-user-profile-details" style="display: none; position: absolute; top: 100%; right: 0; background-color: #34495e; padding: 10px; border-radius: 5px; margin-top: 5px; width: 250px;">
+                <p style="margin: 5px 0;"><strong>Jméno:</strong> ${userName}</p>
+                <p style="margin: 5px 0;"><strong>Přezdívka:</strong> ${userNickname}</p>
+                <p style="margin: 5px 0;"><strong>Email:</strong> ${userEmail}</p>
+                <p style="margin: 5px 0;"><strong>ID:</strong> ${userId}</p>
+                <p style="margin: 5px 0;"><strong>Aktualizováno:</strong> ${userUpdated}</p>
+                <button id="auth0-logout-button" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-top: 10px; width: 100%;">Odhlásit se</button>
+            </div>
+        `;
+
+        // Přidání události pro odhlášení
+        setTimeout(() => {
+            const logoutButton = document.getElementById('auth0-logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Zastavení propagace události
+                    this.logout();
+                });
+            }
+        }, 100);
+
+        // Odstranění tlačítka pro přímé přihlášení, pokud existuje
+        const directLoginButton = document.getElementById('directAuth0LoginButton');
+        if (directLoginButton) {
+            directLoginButton.style.display = 'none';
+        }
+    },
+
+    // Skrytí profilu uživatele
+    hideUserProfile() {
+        const profileElement = document.getElementById('auth0-user-profile');
+        if (profileElement) {
+            profileElement.remove();
+        }
+
+        // Zobrazení tlačítka pro přímé přihlášení, pokud existuje
+        const directLoginButton = document.getElementById('directAuth0LoginButton');
+        if (directLoginButton) {
+            directLoginButton.style.display = 'block';
+        }
+    },
+
+    // Nastavení časovače pro pravidelnou kontrolu přihlášení
+    setupAuthCheckInterval() {
+        console.log('Nastavuji časovač pro pravidelnou kontrolu přihlášení');
+
+        // Zrušení existujícího časovače, pokud existuje
+        if (this.state.authCheckInterval) {
+            clearInterval(this.state.authCheckInterval);
+        }
+
+        // Okamžitá kontrola stavu přihlášení
+        this.checkAuthState();
+
+        // Nastavení nového časovače - kontrola každých 10 sekund
+        this.state.authCheckInterval = setInterval(() => {
+            this.checkAuthState();
+        }, 10000); // 10 sekund
+    },
+
+    // Kontrola stavu přihlášení
+    checkAuthState() {
+        console.log('Kontrola stavu přihlášení...');
+        console.log('Aktuální stav:', this.state.isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+        console.log('LocalStorage stav:', localStorage.getItem('aiMapaLoggedIn') === 'true' ? 'Přihlášen' : 'Nepřihlášen');
+
+        // Výpis všech relevantních hodnot z localStorage
+        console.log('LocalStorage hodnoty:');
+        console.log('- aiMapaLoggedIn:', localStorage.getItem('aiMapaLoggedIn'));
+        console.log('- aiMapaUserEmail:', localStorage.getItem('aiMapaUserEmail'));
+        console.log('- aiMapaAccessToken:', localStorage.getItem('aiMapaAccessToken') ? 'Existuje' : 'Neexistuje');
+        console.log('- aiMapaIdToken:', localStorage.getItem('aiMapaIdToken') ? 'Existuje' : 'Neexistuje');
+        console.log('- aiMapaUserProfile:', localStorage.getItem('aiMapaUserProfile'));
+
+        // Kontrola cookies
+        console.log('Cookies:', document.cookie);
+
+        // Kontrola, zda je uživatel stále přihlášen podle localStorage
+        const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+
+        if (isLoggedIn !== this.state.isLoggedIn) {
+            console.log('Stav přihlášení se změnil:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+            // Aktualizace stavu
+            this.state.isLoggedIn = isLoggedIn;
+
+            // Aktualizace tlačítka autentizace
+            this.updateAuthButton();
+
+            // Zobrazení nebo skrytí profilu uživatele
+            if (isLoggedIn) {
+                // Pokus o načtení uživatelského profilu
+                const savedProfile = localStorage.getItem('aiMapaUserProfile');
+                if (savedProfile) {
+                    try {
+                        this.state.currentUser = JSON.parse(savedProfile);
+                        console.log('Načten uživatelský profil z localStorage:', this.state.currentUser);
+                    } catch (e) {
+                        console.error('Chyba při parsování uloženého profilu:', e);
+                    }
+                }
+
+                this.displayUserProfile();
+            } else {
+                this.hideUserProfile();
+            }
+
+            // Vyvolání události o změně stavu přihlášení
+            document.dispatchEvent(new CustomEvent('authStateChanged', {
+                detail: { isLoggedIn: isLoggedIn, user: this.state.currentUser }
+            }));
+        }
     },
 
     // Přihlášení uživatele
@@ -1173,6 +1583,12 @@ const Auth0Auth = {
             // Aktualizace tlačítka autentizace
             this.updateAuthButton();
 
+            // Zrušení časovače pro kontrolu přihlášení
+            if (this.state.authCheckInterval) {
+                clearInterval(this.state.authCheckInterval);
+                this.state.authCheckInterval = null;
+            }
+
             // Vyvolání události o změně stavu přihlášení
             document.dispatchEvent(new CustomEvent('authStateChanged', {
                 detail: { isLoggedIn: false }
@@ -1206,6 +1622,12 @@ const Auth0Auth = {
 
                 // Aktualizace tlačítka autentizace
                 this.updateAuthButton();
+
+                // Zrušení časovače pro kontrolu přihlášení
+                if (this.state.authCheckInterval) {
+                    clearInterval(this.state.authCheckInterval);
+                    this.state.authCheckInterval = null;
+                }
 
                 // Vyvolání události o změně stavu přihlášení
                 document.dispatchEvent(new CustomEvent('authStateChanged', {
@@ -1457,9 +1879,84 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.dispatchEvent(new CustomEvent('authStateChanged', {
                         detail: { isLoggedIn: isLoggedIn, user: Auth0Auth.state.currentUser }
                     }));
+
+                    // Zobrazení profilu uživatele po přihlášení
+                    if (isLoggedIn) {
+                        Auth0Auth.displayUserProfile();
+                    }
                 });
             } else {
                 console.error('Nepodařilo se inicializovat Auth0 klienta pro zpracování callbacku');
+
+                // Pokus o zpracování autorizačního kódu bez Auth0 klienta
+                if (hasAuthCode) {
+                    console.log('Pokouším se zpracovat autorizační kód bez Auth0 klienta...');
+
+                    // Parsování kódu z URL
+                    const urlParams = new URLSearchParams(query);
+                    const code = urlParams.get('code');
+                    const state = urlParams.get('state');
+
+                    if (code && state) {
+                        console.log('Autorizační kód byl úspěšně získán');
+
+                        // Nastavení stavu přihlášení
+                        Auth0Auth.state.isLoggedIn = true;
+
+                        // Pokus o získání uložených informací o uživateli
+                        let userInfo;
+                        const savedProfile = localStorage.getItem('aiMapaUserProfile');
+
+                        if (savedProfile) {
+                            try {
+                                userInfo = JSON.parse(savedProfile);
+                                console.log('Načteny uložené informace o uživateli:', userInfo);
+                            } catch (e) {
+                                console.error('Chyba při parsování uloženého profilu:', e);
+                            }
+                        }
+
+                        // Pokud nemáme uložené informace, vytvoříme základní
+                        if (!userInfo) {
+                            const userEmail = localStorage.getItem('aiMapaUserEmail') || 'auth0user@example.com';
+                            userInfo = {
+                                sub: 'auth0|' + Math.random().toString(36).substring(2, 15),
+                                nickname: userEmail.split('@')[0],
+                                name: userEmail,
+                                email: userEmail,
+                                picture: 'https://cdn.auth0.com/avatars/default.png',
+                                updated_at: new Date().toISOString()
+                            };
+                            console.log('Vytvořeny nové informace o uživateli:', userInfo);
+                        }
+
+                        Auth0Auth.state.currentUser = userInfo;
+
+                        // Uložení stavu přihlášení do localStorage
+                        localStorage.setItem('aiMapaLoggedIn', 'true');
+                        localStorage.setItem('aiMapaUserEmail', userInfo.email || userInfo.name);
+                        localStorage.setItem('aiMapaUserProfile', JSON.stringify(userInfo));
+
+                        // Aktualizace tlačítka autentizace
+                        Auth0Auth.updateAuthButton();
+
+                        // Zobrazení profilu uživatele
+                        Auth0Auth.displayUserProfile();
+
+                        // Nastavení časovače pro pravidelnou kontrolu přihlášení
+                        Auth0Auth.setupAuthCheckInterval();
+
+                        // Vyvolání události o změně stavu přihlášení
+                        document.dispatchEvent(new CustomEvent('authStateChanged', {
+                            detail: { isLoggedIn: true, user: userInfo }
+                        }));
+
+                        // Odstranění parametrů z URL
+                        window.history.replaceState({}, document.title, window.location.pathname);
+
+                        console.log('Uživatel je přihlášen:', userInfo.name || userInfo.email);
+                    }
+                }
             }
         }).catch(error => {
             console.error('Chyba při inicializaci Auth0 klienta pro zpracování callbacku:', error);
