@@ -198,6 +198,8 @@ const AuthScreen = {
 
         // Kontrola, zda je dostupný Auth0Auth
         if (typeof Auth0Auth !== 'undefined') {
+            console.log('Auth0Auth je dostupný, pokusím se použít Auth0 přihlášení...');
+
             // Kontrola, zda je Auth0Auth inicializován
             if (!Auth0Auth.state.isInitialized) {
                 console.log('Auth0Auth není inicializován, inicializuji ho...');
@@ -209,12 +211,25 @@ const AuthScreen = {
             }
 
             if (Auth0Auth.state.isInitialized) {
-                console.log('Přesměrování na Auth0 přihlášení...');
+                console.log('Auth0Auth je inicializován, přesměrovávám na Auth0 přihlášení...');
 
                 // Přesměrování na Auth0 přihlášení
-                Auth0Auth.login();
+                try {
+                    const result = await Auth0Auth.login();
+                    console.log('Výsledek přihlášení přes Auth0:', result);
+
+                    if (result.error) {
+                        console.error('Chyba při přihlašování přes Auth0:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Chyba při volání Auth0Auth.login():', error);
+                }
                 return;
+            } else {
+                console.error('Auth0Auth se nepodařilo inicializovat!');
             }
+        } else {
+            console.error('Auth0Auth není dostupný!');
         }
 
         // Pokud Auth0Auth není dostupný, zobrazíme standardní přihlašovací obrazovku

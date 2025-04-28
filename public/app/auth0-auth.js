@@ -25,6 +25,21 @@ const Auth0Auth = {
         scope: 'openid profile email read:users read:user_idp_tokens'
     },
 
+    // Logování pro debugování
+    debug: true,
+
+    // Logování konfigurace
+    logConfig() {
+        console.log('Auth0 konfigurace:');
+        console.log('Domain:', this.config.domain);
+        console.log('ClientId:', this.config.clientId);
+        console.log('RedirectUri:', this.config.redirectUri);
+        console.log('NetlifyDevRedirectUri:', this.config.netlifyDevRedirectUri);
+        console.log('Audience:', this.config.audience);
+        console.log('Scope:', this.config.scope);
+        console.log('Window location:', window.location.href);
+    },
+
     // Načtení konfigurace ze serveru
     async loadConfig() {
         try {
@@ -55,6 +70,9 @@ const Auth0Auth = {
         console.log('Inicializace modulu Auth0 autentizace...');
 
         try {
+            // Logování konfigurace pro debugování
+            this.logConfig();
+
             // Načtení Auth0 klienta
             await this.loadAuth0Client();
 
@@ -69,6 +87,14 @@ const Auth0Auth = {
 
             this.state.isInitialized = true;
             console.log('Modul Auth0 autentizace byl inicializován');
+
+            // Automatické přihlášení, pokud uživatel není přihlášen
+            if (!this.state.isLoggedIn && this.debug) {
+                console.log('Uživatel není přihlášen, automaticky přesměrovávám na Auth0 přihlášení...');
+                setTimeout(() => {
+                    this.login();
+                }, 1000);
+            }
         } catch (error) {
             console.error('Chyba při inicializaci Auth0 autentizace:', error);
         }
@@ -231,9 +257,18 @@ const Auth0Auth = {
     // Přihlášení uživatele
     async login() {
         try {
+            console.log('Zahajuji přihlášení přes Auth0...');
+
             if (!this.state.auth0Client) {
                 console.error('Auth0 klient není inicializován');
-                return { error: 'Auth0 klient není inicializován' };
+
+                // Pokus o opětovnou inicializaci Auth0 klienta
+                console.log('Pokouším se znovu inicializovat Auth0 klienta...');
+                await this.loadAuth0Client();
+
+                if (!this.state.auth0Client) {
+                    return { error: 'Auth0 klient není inicializován ani po opětovném pokusu' };
+                }
             }
 
             // Určení správné URL pro přesměrování
@@ -247,7 +282,24 @@ const Auth0Auth = {
 
             console.log('Přesměrování na Auth0 přihlašovací stránku s URL:', redirectUri);
 
-            // Přesměrování na Auth0 přihlašovací stránku
+            // Vytvoření kompletní URL pro přesměrování (pro debugování)
+            const authUrl = `https://${this.config.domain}/authorize?` +
+                `client_id=${this.config.clientId}&` +
+                `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+                `response_type=code&` +
+                `scope=${encodeURIComponent(this.config.scope)}`;
+
+            console.log('Kompletní Auth0 URL:', authUrl);
+
+            // Možnost přímého přesměrování pro debugování
+            if (this.debug) {
+                console.log('Používám přímé přesměrování pro debugování...');
+                window.location.href = authUrl;
+                return { success: true };
+            }
+
+            // Standardní přesměrování přes Auth0 SDK
+            console.log('Používám Auth0 SDK pro přesměrování...');
             await this.state.auth0Client.loginWithRedirect({
                 authorizationParams: {
                     redirect_uri: redirectUri

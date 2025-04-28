@@ -469,6 +469,28 @@
             if (typeof Auth0Auth !== 'undefined') {
                 console.log('Inicializace Auth0 modulu...');
                 Auth0Auth.init();
+
+                // Přidání tlačítka pro přímé přihlášení přes Auth0 (pro testování)
+                const authButton = document.createElement('button');
+                authButton.id = 'directAuth0LoginButton';
+                authButton.textContent = 'Přihlásit přes Auth0';
+                authButton.style.position = 'fixed';
+                authButton.style.top = '10px';
+                authButton.style.right = '10px';
+                authButton.style.zIndex = '9999';
+                authButton.style.padding = '8px 16px';
+                authButton.style.backgroundColor = '#ff4081';
+                authButton.style.color = 'white';
+                authButton.style.border = 'none';
+                authButton.style.borderRadius = '4px';
+                authButton.style.cursor = 'pointer';
+
+                authButton.addEventListener('click', function() {
+                    console.log('Kliknutí na tlačítko přímého přihlášení přes Auth0');
+                    Auth0Auth.login();
+                });
+
+                document.body.appendChild(authButton);
             } else {
                 console.error('Auth0Auth modul nebyl nalezen!');
             }
