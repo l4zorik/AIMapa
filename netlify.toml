@@ -11,7 +11,7 @@
 
 # Proměnné prostředí pro produkci
 [build.environment]
-  NODE_VERSION = "16.x"
+  NODE_VERSION = "16.20.0"
 
 # Přesměrování pro SPA
 [[redirects]]
