@@ -1,6 +1,6 @@
 /**
  * Modul pro zpětnou vazbu a dotazník o používání aplikace
- * Verze 0.2.8.7.8
+ * Verze 0.3.8.4
  */
 
 const FeedbackSurvey = {
@@ -60,35 +60,35 @@ const FeedbackSurvey = {
 
                 <form id="feedbackForm">
                     <div class="feedback-question">
-                        <label>Jak často používáte tuto aplikaci?</label>
+                        <label for="usage_daily">Jak často používáte tuto aplikaci?</label>
                         <div class="feedback-options">
-                            <label><input type="radio" name="usage" value="daily"> Denně</label>
-                            <label><input type="radio" name="usage" value="weekly"> Několikrát týdně</label>
-                            <label><input type="radio" name="usage" value="monthly"> Několikrát měsíčně</label>
-                            <label><input type="radio" name="usage" value="rarely"> Zřídka</label>
-                            <label><input type="radio" name="usage" value="first"> Jsem zde poprvé</label>
+                            <label for="usage_daily"><input type="radio" id="usage_daily" name="usage" value="daily"> Denně</label>
+                            <label for="usage_weekly"><input type="radio" id="usage_weekly" name="usage" value="weekly"> Několikrát týdně</label>
+                            <label for="usage_monthly"><input type="radio" id="usage_monthly" name="usage" value="monthly"> Několikrát měsíčně</label>
+                            <label for="usage_rarely"><input type="radio" id="usage_rarely" name="usage" value="rarely"> Zřídka</label>
+                            <label for="usage_first"><input type="radio" id="usage_first" name="usage" value="first"> Jsem zde poprvé</label>
                         </div>
                     </div>
 
                     <div class="feedback-question">
-                        <label>Které funkce používáte nejčastěji?</label>
+                        <label for="feature_map">Které funkce používáte nejčastěji?</label>
                         <div class="feedback-options">
-                            <label><input type="checkbox" name="features" value="map"> Mapové funkce</label>
-                            <label><input type="checkbox" name="features" value="chat"> Chat s AI asistentem</label>
-                            <label><input type="checkbox" name="features" value="routes"> Plánování tras</label>
-                            <label><input type="checkbox" name="features" value="poi"> Vyhledávání bodů zájmu</label>
-                            <label><input type="checkbox" name="features" value="other"> Jiné</label>
+                            <label for="feature_map"><input type="checkbox" id="feature_map" name="features" value="map"> Mapové funkce</label>
+                            <label for="feature_chat"><input type="checkbox" id="feature_chat" name="features" value="chat"> Chat s AI asistentem</label>
+                            <label for="feature_routes"><input type="checkbox" id="feature_routes" name="features" value="routes"> Plánování tras</label>
+                            <label for="feature_poi"><input type="checkbox" id="feature_poi" name="features" value="poi"> Vyhledávání bodů zájmu</label>
+                            <label for="feature_other"><input type="checkbox" id="feature_other" name="features" value="other"> Jiné</label>
                         </div>
                     </div>
 
                     <div class="feedback-question">
-                        <label>Jak byste ohodnotili uživatelské rozhraní aplikace?</label>
+                        <label for="ui_rating_1">Jak byste ohodnotili uživatelské rozhraní aplikace?</label>
                         <div class="feedback-rating">
-                            <label><input type="radio" name="ui_rating" value="1"> 1</label>
-                            <label><input type="radio" name="ui_rating" value="2"> 2</label>
-                            <label><input type="radio" name="ui_rating" value="3"> 3</label>
-                            <label><input type="radio" name="ui_rating" value="4"> 4</label>
-                            <label><input type="radio" name="ui_rating" value="5"> 5</label>
+                            <label for="ui_rating_1"><input type="radio" id="ui_rating_1" name="ui_rating" value="1"> 1</label>
+                            <label for="ui_rating_2"><input type="radio" id="ui_rating_2" name="ui_rating" value="2"> 2</label>
+                            <label for="ui_rating_3"><input type="radio" id="ui_rating_3" name="ui_rating" value="3"> 3</label>
+                            <label for="ui_rating_4"><input type="radio" id="ui_rating_4" name="ui_rating" value="4"> 4</label>
+                            <label for="ui_rating_5"><input type="radio" id="ui_rating_5" name="ui_rating" value="5"> 5</label>
                         </div>
                         <div class="rating-labels">
                             <span>Velmi špatné</span>
@@ -97,8 +97,8 @@ const FeedbackSurvey = {
                     </div>
 
                     <div class="feedback-question">
-                        <label>Máte nějaké návrhy na zlepšení?</label>
-                        <textarea name="suggestions" rows="3" placeholder="Vaše návrhy..."></textarea>
+                        <label for="suggestions">Máte nějaké návrhy na zlepšení?</label>
+                        <textarea id="suggestions" name="suggestions" rows="3" placeholder="Vaše návrhy..."></textarea>
                     </div>
 
                     <div class="feedback-actions">
@@ -144,13 +144,13 @@ const FeedbackSurvey = {
                 <p>Rádi bychom znali váš názor, proč nechcete dotazník vyplnit:</p>
 
                 <div class="decline-options">
-                    <label><input type="radio" name="decline_reason" value="no_time"> Už to nepotřebuji vyplnit</label>
-                    <label><input type="radio" name="decline_reason" value="alternative"> Mám jinou alternativu</label>
-                    <label><input type="radio" name="decline_reason" value="expensive"> Je to moc drahé</label>
-                    <label><input type="radio" name="decline_reason" value="other"> Jiný důvod</label>
+                    <label for="decline_reason_no_time"><input type="radio" id="decline_reason_no_time" name="decline_reason" value="no_time"> Už to nepotřebuji vyplnit</label>
+                    <label for="decline_reason_alternative"><input type="radio" id="decline_reason_alternative" name="decline_reason" value="alternative"> Mám jinou alternativu</label>
+                    <label for="decline_reason_expensive"><input type="radio" id="decline_reason_expensive" name="decline_reason" value="expensive"> Je to moc drahé</label>
+                    <label for="decline_reason_other"><input type="radio" id="decline_reason_other" name="decline_reason" value="other"> Jiný důvod</label>
                 </div>
 
-                <textarea id="declineComment" placeholder="Můžete přidat upřesnění důvodu..."></textarea>
+                <textarea id="declineComment" name="decline_comment" placeholder="Můžete přidat upřesnění důvodu..."></textarea>
 
                 <div class="decline-actions">
                     <button id="declineSubmit" class="decline-submit">Odeslat</button>
