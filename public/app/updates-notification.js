@@ -1,14 +1,30 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.8.3
+ * Verze 0.3.8.4
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.8.3',
+    currentVersion: '0.3.8.4',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.8.4',
+            date: '2025-07-15',
+            title: 'Oprava Content Security Policy a povinné přihlašování',
+            description: 'Oprava problémů s načítáním externích knihoven a implementace povinného přihlašování',
+            changes: [
+                'Opraveny problémy s Content Security Policy (CSP) na Netlify',
+                'Přidány chybějící domény do CSP pro načítání externích skriptů a stylů',
+                'Opraveno načítání knihoven z cdn.jsdelivr.net a cesium.com',
+                'Implementováno povinné přihlašování pro přístup k aplikaci',
+                'Přidána registrace nových uživatelů s ověřením emailu',
+                'Implementováno odhlašování uživatelů',
+                'Přidána ochrana proti neoprávněnému přístupu k funkcím aplikace',
+                'Vylepšena integrace s Supabase pro správu uživatelských účtů'
+            ]
+        },
         {
             version: '0.3.8.3',
             date: '2025-07-10',

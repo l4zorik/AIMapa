@@ -1,8 +1,8 @@
 /**
  * AIMapa - Server
- * Verze 0.3.8.3
+ * Verze 0.3.8.4
  *
- * Server s podporou Supabase integrace a opravou glóbus režimu
+ * Server s podporou Supabase integrace, opravou glóbus režimu a povinným přihlašováním
  */
 
 // Načtení modulů

@@ -1,6 +1,6 @@
 /**
  * Modul pro správu uživatelských účtů ve stylu PocketOption.com
- * Verze 0.3.8.0
+ * Verze 0.3.8.4
  */
 
 const UserAccounts = {
@@ -27,16 +27,39 @@ const UserAccounts = {
     init() {
         console.log('Inicializace modulu uživatelských účtů...');
 
+        // Kontrola, zda je uživatel přihlášen
+        if (!this.checkLogin()) {
+            console.log('Uživatel není přihlášen, přesměrování na přihlašovací stránku');
+            window.location.href = 'login.html';
+            return;
+        }
+
         // Načtení uživatelských dat z localStorage
         this.loadUserData();
 
         // Přidání tlačítka pro zobrazení účtu
         this.addAccountButton();
 
+        // Přidání tlačítka pro odhlášení
+        this.addLogoutButton();
+
         // Kontrola denního přihlášení
         this.checkDailyLogin();
 
         console.log('Modul uživatelských účtů byl inicializován');
+    },
+
+    // Kontrola, zda je uživatel přihlášen
+    checkLogin() {
+        const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+        const userEmail = localStorage.getItem('aiMapaUserEmail');
+
+        if (isLoggedIn && userEmail) {
+            this.state.isLoggedIn = true;
+            return true;
+        }
+
+        return false;
     },
 
     // Načtení uživatelských dat z localStorage
@@ -62,10 +85,27 @@ const UserAccounts = {
 
     // Vytvoření výchozího uživatele
     createDefaultUser() {
+        // Získání e-mailu z localStorage
+        const userEmail = localStorage.getItem('aiMapaUserEmail') || '';
+        const isGuest = localStorage.getItem('aiMapaIsGuest') === 'true';
+
+        // Vytvoření uživatelského jména z e-mailu
+        let username = 'Uživatel';
+        if (userEmail && userEmail.includes('@')) {
+            username = userEmail.split('@')[0];
+            // První písmeno velké
+            username = username.charAt(0).toUpperCase() + username.slice(1);
+        }
+
+        // Pokud je to host, přidáme k uživatelskému jménu "Host"
+        if (isGuest) {
+            username = 'Host';
+        }
+
         const defaultUser = {
             id: 'user_' + Date.now(),
-            username: 'Uživatel',
-            email: '',
+            username: username,
+            email: userEmail,
             avatar: this.config.defaultAvatar,
             balance: this.config.defaultBalance,
             currency: this.config.defaultCurrency,
@@ -83,7 +123,7 @@ const UserAccounts = {
             },
             settings: {
                 notifications: true,
-                darkMode: true,
+                darkMode: localStorage.getItem('aiMapaDarkMode') === 'true',
                 language: 'cs'
             }
         };
@@ -91,7 +131,7 @@ const UserAccounts = {
         this.state.currentUser = defaultUser;
         this.state.isLoggedIn = true;
         this.saveUserData();
-        console.log('Vytvořen výchozí uživatel');
+        console.log('Vytvořen výchozí uživatel:', username);
     },
 
     // Uložení uživatelských dat do localStorage
@@ -117,12 +157,50 @@ const UserAccounts = {
             accountButton.id = 'accountButton';
             accountButton.className = 'account-button';
             accountButton.innerHTML = '<span class="account-button-icon">👤</span>';
+            accountButton.title = 'Váš účet';
             document.body.appendChild(accountButton);
 
             // Přidání event listeneru
             accountButton.addEventListener('click', () => {
                 this.toggleAccountWindow();
             });
+        }
+    },
+
+    // Přidání tlačítka pro odhlášení
+    addLogoutButton() {
+        // Kontrola, zda již tlačítko existuje
+        let logoutButton = document.getElementById('logoutButton');
+
+        // Pokud tlačítko neexistuje, vytvoříme ho
+        if (!logoutButton) {
+            logoutButton = document.createElement('button');
+            logoutButton.id = 'logoutButton';
+            logoutButton.className = 'logout-button';
+            logoutButton.innerHTML = '<span class="logout-button-icon">🚪</span>';
+            logoutButton.title = 'Odhlásit se';
+            document.body.appendChild(logoutButton);
+
+            // Přidání event listeneru
+            logoutButton.addEventListener('click', () => {
+                this.logout();
+            });
+        }
+    },
+
+    // Odhlášení uživatele
+    logout() {
+        // Zobrazení potvrzovacího dialogu
+        if (confirm('Opravdu se chcete odhlásit?')) {
+            // Odstranění informací o přihlášení
+            localStorage.removeItem('aiMapaLoggedIn');
+            localStorage.removeItem('aiMapaIsGuest');
+
+            // Zachování e-mailu pro příští přihlášení
+            // localStorage.removeItem('aiMapaUserEmail');
+
+            // Přesměrování na přihlašovací stránku
+            window.location.href = 'login.html';
         }
     },
 
@@ -178,13 +256,13 @@ const UserAccounts = {
                         <div class="account-balance">${this.state.currentUser.balance} ${this.state.currentUser.currency}</div>
                     </div>
                 </div>
-                
+
                 <div class="account-tabs">
                     <button class="account-tab active" data-tab="stats">Statistiky</button>
                     <button class="account-tab" data-tab="achievements">Achievementy</button>
                     <button class="account-tab" data-tab="settings">Nastavení</button>
                 </div>
-                
+
                 <div class="account-tab-content active" data-tab-content="stats">
                     <div class="account-stats">
                         <div class="account-stat-item">
@@ -223,7 +301,7 @@ const UserAccounts = {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="account-activity">
                         <h3>Poslední aktivita</h3>
                         <div class="account-activity-date">
@@ -231,13 +309,13 @@ const UserAccounts = {
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="account-tab-content" data-tab-content="achievements">
                     <div class="account-achievements">
                         ${this.renderAchievements()}
                     </div>
                 </div>
-                
+
                 <div class="account-tab-content" data-tab-content="settings">
                     <div class="account-settings">
                         <div class="account-setting-item">
@@ -305,14 +383,14 @@ const UserAccounts = {
             tab.addEventListener('click', () => {
                 // Odstranění aktivní třídy ze všech záložek
                 tabs.forEach(t => t.classList.remove('active'));
-                
+
                 // Přidání aktivní třídy na kliknutou záložku
                 tab.classList.add('active');
-                
+
                 // Zobrazení odpovídajícího obsahu
                 const tabName = tab.getAttribute('data-tab');
                 const tabContents = accountWindow.querySelectorAll('.account-tab-content');
-                
+
                 tabContents.forEach(content => {
                     if (content.getAttribute('data-tab-content') === tabName) {
                         content.classList.add('active');
@@ -389,11 +467,11 @@ const UserAccounts = {
         function dragMouseDown(e) {
             e = e || window.event;
             e.preventDefault();
-            
+
             // Získání počáteční pozice kurzoru
             pos3 = e.clientX;
             pos4 = e.clientY;
-            
+
             document.onmouseup = closeDragElement;
             document.onmousemove = elementDrag;
         }
@@ -401,13 +479,13 @@ const UserAccounts = {
         function elementDrag(e) {
             e = e || window.event;
             e.preventDefault();
-            
+
             // Výpočet nové pozice
             pos1 = pos3 - e.clientX;
             pos2 = pos4 - e.clientY;
             pos3 = e.clientX;
             pos4 = e.clientY;
-            
+
             // Nastavení nové pozice elementu
             element.style.top = (element.offsetTop - pos2) + "px";
             element.style.left = (element.offsetLeft - pos1) + "px";
@@ -423,43 +501,43 @@ const UserAccounts = {
     // Kontrola denního přihlášení
     checkDailyLogin() {
         const today = new Date().toDateString();
-        
+
         if (this.state.lastLoginDate !== today) {
             // Aktualizace data posledního přihlášení
             this.state.lastLoginDate = today;
-            
+
             // Zvýšení počtu přihlášení
             this.state.currentUser.stats.totalLogins++;
-            
+
             // Kontrola přihlašovacího streaku
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
             const yesterdayString = yesterday.toDateString();
-            
+
             if (this.state.lastLoginDate === yesterdayString) {
                 // Pokračování streaku
                 this.state.loginStreak++;
-                
+
                 // Přidání XP za pokračování streaku
                 if (typeof UserProgress !== 'undefined') {
                     UserProgress.addExperience(this.config.loginBonusXP * this.state.loginStreak, 'Přihlašovací streak', 'login');
                 }
-                
+
                 // Zobrazení oznámení o streaku
                 this.showNotification(`Přihlašovací streak: ${this.state.loginStreak} dní! +${this.config.loginBonusXP * this.state.loginStreak} XP`, 'success');
             } else {
                 // Resetování streaku
                 this.state.loginStreak = 1;
-                
+
                 // Přidání XP za přihlášení
                 if (typeof UserProgress !== 'undefined') {
                     UserProgress.addExperience(this.config.loginBonusXP, 'Denní přihlášení', 'login');
                 }
-                
+
                 // Zobrazení oznámení o přihlášení
                 this.showNotification(`Vítejte zpět! +${this.config.loginBonusXP} XP za denní přihlášení`, 'info');
             }
-            
+
             // Uložení dat
             this.saveUserData();
         }
@@ -468,18 +546,18 @@ const UserAccounts = {
     // Přidání XP uživateli
     addExperience(amount, reason) {
         if (!this.state.currentUser) return;
-        
+
         // Přidání XP
         this.state.currentUser.xp += amount;
-        
+
         // Kontrola, zda uživatel dosáhl nové úrovně
         if (this.state.currentUser.xp >= this.state.currentUser.xpToNextLevel) {
             this.levelUp();
         }
-        
+
         // Uložení dat
         this.saveUserData();
-        
+
         // Zobrazení oznámení
         this.showNotification(`+${amount} XP: ${reason}`, 'success');
     },
@@ -488,15 +566,15 @@ const UserAccounts = {
     levelUp() {
         // Zvýšení úrovně
         this.state.currentUser.level++;
-        
+
         // Výpočet XP pro další úroveň (exponenciální růst)
         const xpOverflow = this.state.currentUser.xp - this.state.currentUser.xpToNextLevel;
         this.state.currentUser.xpToNextLevel = Math.floor(this.state.currentUser.xpToNextLevel * 1.5);
         this.state.currentUser.xp = xpOverflow;
-        
+
         // Zobrazení oznámení o nové úrovni
         this.showNotification(`Gratulujeme! Dosáhli jste úrovně ${this.state.currentUser.level}`, 'success');
-        
+
         // Přidání achievementu za dosažení úrovně
         if (this.state.currentUser.level === 5) {
             this.addAchievement('level-5', 'Pokročilý', 'Dosáhli jste úrovně 5');
@@ -512,16 +590,16 @@ const UserAccounts = {
     // Přidání peněz uživateli
     addMoney(amount, reason) {
         if (!this.state.currentUser) return;
-        
+
         // Přidání peněz
         this.state.currentUser.balance += amount;
-        
+
         // Aktualizace statistik
         this.state.currentUser.stats.totalEarnings += amount;
-        
+
         // Uložení dat
         this.saveUserData();
-        
+
         // Zobrazení oznámení
         this.showNotification(`+${amount} ${this.state.currentUser.currency}: ${reason}`, 'success');
     },
@@ -529,12 +607,12 @@ const UserAccounts = {
     // Přidání achievementu
     addAchievement(id, name, description) {
         if (!this.state.currentUser) return;
-        
+
         // Kontrola, zda uživatel již má tento achievement
         if (this.state.currentUser.achievements.some(a => a.id === id)) {
             return;
         }
-        
+
         // Přidání achievementu
         this.state.currentUser.achievements.push({
             id,
@@ -542,13 +620,13 @@ const UserAccounts = {
             description,
             date: new Date().toISOString()
         });
-        
+
         // Přidání XP za achievement
         this.addExperience(this.config.achievementXP, `Achievement: ${name}`);
-        
+
         // Uložení dat
         this.saveUserData();
-        
+
         // Zobrazení oznámení
         this.showNotification(`Nový achievement: ${name}`, 'achievement');
     },
@@ -558,7 +636,7 @@ const UserAccounts = {
         if (!this.state.currentUser || !this.state.currentUser.achievements.length) {
             return '<div class="account-no-achievements">Zatím nemáte žádné achievementy</div>';
         }
-        
+
         return this.state.currentUser.achievements.map(achievement => `
             <div class="account-achievement">
                 <div class="account-achievement-icon">🏆</div>
@@ -576,47 +654,47 @@ const UserAccounts = {
         // Vytvoření elementu pro oznámení
         const notification = document.createElement('div');
         notification.className = `account-notification account-notification-${type}`;
-        
+
         // Nastavení ikony podle typu
         let icon = '💬';
         if (type === 'success') icon = '✅';
         if (type === 'error') icon = '❌';
         if (type === 'warning') icon = '⚠️';
         if (type === 'achievement') icon = '🏆';
-        
+
         // Nastavení obsahu oznámení
         notification.innerHTML = `
             <div class="account-notification-icon">${icon}</div>
             <div class="account-notification-message">${message}</div>
             <button class="account-notification-close">&times;</button>
         `;
-        
+
         // Přidání oznámení do dokumentu
         document.body.appendChild(notification);
-        
+
         // Animace zobrazení
         setTimeout(() => {
             notification.classList.add('show');
         }, 100);
-        
+
         // Přidání event listeneru pro zavření
         const closeButton = notification.querySelector('.account-notification-close');
         if (closeButton) {
             closeButton.addEventListener('click', () => {
                 notification.classList.remove('show');
-                
+
                 // Odstranění elementu po dokončení animace
                 setTimeout(() => {
                     notification.remove();
                 }, 300);
             });
         }
-        
+
         // Automatické zavření po 5 sekundách
         setTimeout(() => {
             if (document.body.contains(notification)) {
                 notification.classList.remove('show');
-                
+
                 // Odstranění elementu po dokončení animace
                 setTimeout(() => {
                     if (document.body.contains(notification)) {
@@ -643,7 +721,7 @@ const UserAccounts = {
     formatTime(minutes) {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
-        
+
         if (hours === 0) {
             return `${mins} min`;
         } else {

@@ -1,5 +1,5 @@
 # Konfigurace pro nasazení na Netlify
-# AIMapa verze 0.3.8.2
+# AIMapa verze 0.3.8.4
 
 [build]
   # Příkaz pro sestavení aplikace
@@ -70,4 +70,4 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' https://njjhhamwixjbfibywreo.supabase.co https://unpkg.com https://cdn.osmbuildings.org; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.osmbuildings.org; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https://*.tile.openstreetmap.org https://*.tile.osm.org https://*.tile.thunderforest.com; connect-src 'self' https://njjhhamwixjbfibywreo.supabase.co https://api.openrouteservice.org;"
+    Content-Security-Policy = "default-src 'self' https://njjhhamwixjbfibywreo.supabase.co https://unpkg.com https://cdn.osmbuildings.org https://cdn.jsdelivr.net https://cesium.com; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.osmbuildings.org https://cdn.jsdelivr.net https://cesium.com https://code.jquery.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.osmbuildings.org https://cesium.com; img-src 'self' data: https://*.tile.openstreetmap.org https://*.tile.osm.org https://*.tile.thunderforest.com https://upload.wikimedia.org; connect-src 'self' https://njjhhamwixjbfibywreo.supabase.co https://api.openrouteservice.org https://db.njjhhamwixjbfibywreo.supabase.co;"

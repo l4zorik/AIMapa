@@ -1,0 +1,11 @@
+# Hlavičky pro Netlify
+# Verze 0.3.8.4
+
+# Hlavičky pro všechny stránky
+/*
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self' https://njjhhamwixjbfibywreo.supabase.co https://unpkg.com https://cdn.osmbuildings.org https://cdn.jsdelivr.net https://cesium.com; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.osmbuildings.org https://cdn.jsdelivr.net https://cesium.com https://code.jquery.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.osmbuildings.org https://cesium.com; img-src 'self' data: https://*.tile.openstreetmap.org https://*.tile.osm.org https://*.tile.thunderforest.com https://upload.wikimedia.org; connect-src 'self' https://njjhhamwixjbfibywreo.supabase.co https://api.openrouteservice.org https://db.njjhhamwixjbfibywreo.supabase.co;

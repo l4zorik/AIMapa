@@ -3,6 +3,35 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.8.4] - 2025-07-15 - OPRAVA CONTENT SECURITY POLICY A POVINNÉ PŘIHLAŠOVÁNÍ
+
+### Opravy
+- Opraveny problémy s Content Security Policy (CSP) na Netlify
+- Přidány chybějící domény do CSP pro načítání externích skriptů a stylů
+- Opraveno načítání knihoven z cdn.jsdelivr.net a cesium.com
+- Vyřešeny chyby při načítání Three.js a jeho komponent
+- Opraveno načítání Cesium.js a jeho stylů
+- Odstraněny chyby v konzoli prohlížeče
+
+### Nové funkce
+- Implementováno povinné přihlašování pro přístup k aplikaci
+- Přidána registrace nových uživatelů s ověřením emailu
+- Implementováno odhlašování uživatelů
+- Přidána ochrana proti neoprávněnému přístupu k funkcím aplikace
+- Vylepšena integrace s Supabase pro správu uživatelských účtů
+
+### Vylepšení
+- Optimalizováno načítání externích knihoven
+- Přidána podpora pro lokální kopie knihoven pro lepší výkon
+- Vylepšena stabilita aplikace při načítání
+- Aktualizovány verze ve všech souborech pro konzistenci
+- Příprava pro monetizaci aplikace
+
+### Poznámky
+- Tato verze je zaměřena na stabilitu a bezpečnost aplikace
+- Všechny kritické funkce byly otestovány a fungují správně
+- Aplikace je nyní připravena pro monetizaci
+
 ## [0.3.8.3] - 2025-07-10 - OPRAVA GLÓBUS REŽIMU A INTEGRACE SUPABASE
 
 ### Opravy
