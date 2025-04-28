@@ -1,6 +1,8 @@
 /**
  * AIMapa - Server
- * Verze 0.3.7.0
+ * Verze 0.3.8.2
+ *
+ * Server s podporou Supabase integrace
  */
 
 // Načtení modulů
@@ -9,6 +11,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
+
+// Konfigurace Supabase
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://njjhhamwixjbfibywreo.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
+const POSTGRES_CONNECTION = process.env.POSTGRES_CONNECTION || 'postgresql://postgres:[YOUR-PASSWORD]@db.njjhhamwixjbfibywreo.supabase.co:5432/postgres';
 
 // Vytvoření Express aplikace
 const app = express();
@@ -23,6 +30,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.use('/api', require('./routes/api'));
+
+// Endpoint pro Supabase konfiguraci
+app.get('/api/supabase-config', (req, res) => {
+    // Vrátíme pouze URL, ne klíč (ten se zadává v UI)
+    res.json({
+        url: SUPABASE_URL,
+        // Maskujeme connection string pro bezpečnost
+        connectionString: POSTGRES_CONNECTION.replace(/postgres:.*@/, 'postgres:[PASSWORD]@')
+    });
+});
 
 // Hlavní route pro aplikaci
 app.get('/', (req, res) => {

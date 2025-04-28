@@ -2,6 +2,24 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.8.2] - 2025-07-08 - OPRAVA INICIALIZACE LEAFLET.JS A PŘÍPRAVA PRO NASAZENÍ
+
+### Opravy
+- Opravena inicializace Leaflet.js pro spolehlivé načítání mapy
+- Vyřešen problém s chybějícím souborem leaflet_js.js
+- Vylepšeno pořadí načítání skriptů pro zajištění správné funkčnosti
+- Přidána robustnější detekce a ošetření chyb při inicializaci mapy
+- Optimalizováno načítání externích knihoven
+
+### Vylepšení
+- Aktualizovány verze ve všech souborech pro konzistenci
+- Vylepšena stabilita aplikace pro nasazení na Netlify
+- Příprava pro integraci s Supabase
+
+### Poznámky
+- Tato verze je určena pro produkční nasazení
+- Všechny kritické funkce byly otestovány a fungují správně
+
 ## [0.3.8.1] - 2025-07-06 - STABILNÍ VERZE S FUNKČNÍ MAPOU A NODE.JS SERVEREM
 
 ### Stabilní funkce

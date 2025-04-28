@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Mapy - AIMapa v0.3.8.5</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #map {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status h3 {
+            margin-top: 0;
+        }
+        .status pre {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Mapy - AIMapa v0.3.8.5</h1>
+        
+        <div id="map"></div>
+        
+        <div class="controls">
+            <button id="addMarker">Přidat marker</button>
+            <button id="clearMap">Vyčistit mapu</button>
+            <button id="checkStatus">Zkontrolovat stav</button>
+        </div>
+        
+        <div class="status">
+            <h3>Stav mapy</h3>
+            <pre id="statusOutput">Čekám na inicializaci mapy...</pre>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        // Globální proměnné
+        let map;
+        let markers = [];
+        
+        // Funkce pro inicializaci mapy
+        function initMap() {
+            console.log('Inicializace mapy...');
+            
+            try {
+                // Inicializace mapy
+                map = L.map('map').setView([50.0755, 14.4378], 13);
+                
+                // Přidání OpenStreetMap podkladu
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                
+                // Přidání výchozího markeru
+                addMarker(50.0755, 14.4378, 'Praha', 'Hlavní město České republiky');
+                
+                // Aktualizace stavu
+                updateStatus('Mapa byla úspěšně inicializována');
+                
+                // Nastavení event listenerů
+                setupEventListeners();
+            } catch (error) {
+                console.error('Chyba při inicializaci mapy:', error);
+                updateStatus('Chyba při inicializaci mapy: ' + error.message, true);
+            }
+        }
+        
+        // Funkce pro přidání markeru
+        function addMarker(lat, lng, title, description) {
+            if (!map) return;
+            
+            const marker = L.marker([lat, lng])
+                .addTo(map)
+                .bindPopup(`<b>${title || 'Marker'}</b><br>${description || 'Popis'}`);
+            
+            markers.push(marker);
+            
+            updateStatus(`Přidán marker na souřadnicích [${lat}, ${lng}]`);
+            
+            return marker;
+        }
+        
+        // Funkce pro vyčištění mapy
+        function clearMap() {
+            if (!map) return;
+            
+            markers.forEach(marker => {
+                map.removeLayer(marker);
+            });
+            
+            markers = [];
+            
+            updateStatus('Mapa byla vyčištěna');
+        }
+        
+        // Funkce pro kontrolu stavu mapy
+        function checkMapStatus() {
+            if (!map) {
+                updateStatus('Mapa není inicializována!', true);
+                return;
+            }
+            
+            const mapElement = document.getElementById('map');
+            const mapWidth = mapElement.offsetWidth;
+            const mapHeight = mapElement.offsetHeight;
+            
+            const center = map.getCenter();
+            const zoom = map.getZoom();
+            
+            const tiles = document.querySelectorAll('.leaflet-tile').length;
+            
+            const status = {
+                initialized: !!map,
+                center: [center.lat, center.lng],
+                zoom: zoom,
+                dimensions: {
+                    width: mapWidth,
+                    height: mapHeight
+                },
+                markers: markers.length,
+                tiles: tiles,
+                leafletVersion: L.version
+            };
+            
+            updateStatus(JSON.stringify(status, null, 2));
+        }
+        
+        // Funkce pro aktualizaci stavu
+        function updateStatus(message, isError = false) {
+            const statusOutput = document.getElementById('statusOutput');
+            
+            if (isError) {
+                statusOutput.style.color = 'red';
+                console.error(message);
+            } else {
+                statusOutput.style.color = 'black';
+                console.log(message);
+            }
+            
+            statusOutput.textContent = message;
+        }
+        
+        // Funkce pro nastavení event listenerů
+        function setupEventListeners() {
+            document.getElementById('addMarker').addEventListener('click', function() {
+                // Přidání náhodného markeru v okolí Prahy
+                const lat = 50.0755 + (Math.random() - 0.5) * 0.05;
+                const lng = 14.4378 + (Math.random() - 0.5) * 0.05;
+                
+                addMarker(lat, lng, 'Náhodný bod', 'Vytvořeno kliknutím na tlačítko');
+            });
+            
+            document.getElementById('clearMap').addEventListener('click', clearMap);
+            
+            document.getElementById('checkStatus').addEventListener('click', checkMapStatus);
+            
+            // Přidání markeru kliknutím na mapu
+            map.on('click', function(e) {
+                addMarker(e.latlng.lat, e.latlng.lng, 'Kliknutí', `Souřadnice: [${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}]`);
+            });
+        }
+        
+        // Inicializace po načtení stránky
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Stránka načtena, inicializuji mapu...');
+            initMap();
+        });
+    </script>
+</body>
+</html>
