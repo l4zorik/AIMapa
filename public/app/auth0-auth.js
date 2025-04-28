@@ -89,10 +89,16 @@ const Auth0Auth = {
             // Určení správné URL pro přesměrování
             let redirectUri = window.location.origin;
 
-            // Kontrola, zda jsme na vývojové verzi na Netlify
-            if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
-                console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
-                redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+            // Kontrola, zda jsme na produkční verzi na Netlify
+            if (window.location.href.includes('remarkable-cajeta-76cfd9.netlify.app')) {
+                // Kontrola, zda jsme na vývojové verzi na Netlify
+                if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
+                    console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
+                    redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+                } else {
+                    console.log('Jsme na produkční verzi na Netlify, používám produkční URL pro přesměrování');
+                    redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app';
+                }
             }
             // Kontrola, zda jsme na localhost (3000 nebo 3001)
             else if (window.location.href.includes('localhost:3001')) {
@@ -132,9 +138,16 @@ const Auth0Auth = {
                 // Určení správné URL pro přesměrování
                 let redirectUri = window.location.origin;
 
-                // Kontrola, zda jsme na vývojové verzi na Netlify
-                if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
-                    redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+                // Kontrola, zda jsme na produkční verzi na Netlify
+                if (window.location.href.includes('remarkable-cajeta-76cfd9.netlify.app')) {
+                    // Kontrola, zda jsme na vývojové verzi na Netlify
+                    if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
+                        console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
+                        redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+                    } else {
+                        console.log('Jsme na produkční verzi na Netlify, používám produkční URL pro přesměrování');
+                        redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app';
+                    }
                 }
                 // Kontrola, zda jsme na localhost (3000 nebo 3001)
                 else if (window.location.href.includes('localhost:3001')) {
@@ -169,6 +182,8 @@ const Auth0Auth = {
         redirectUri: window.location.origin,
         // Přidání podpory pro vývojovou verzi na Netlify
         netlifyDevRedirectUri: 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app',
+        // Přidání podpory pro produkční verzi na Netlify
+        netlifyProdRedirectUri: 'https://remarkable-cajeta-76cfd9.netlify.app',
         // Lokální vývojové prostředí
         localDevRedirectUri: 'http://localhost:3001',
         audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
@@ -190,6 +205,7 @@ const Auth0Auth = {
         console.log('ClientId:', this.config.clientId);
         console.log('RedirectUri:', this.config.redirectUri);
         console.log('NetlifyDevRedirectUri:', this.config.netlifyDevRedirectUri);
+        console.log('NetlifyProdRedirectUri:', this.config.netlifyProdRedirectUri);
         console.log('Audience:', this.config.audience);
         console.log('Scope:', this.config.scope);
         console.log('Window location:', window.location.href);
@@ -270,10 +286,16 @@ const Auth0Auth = {
             // Určení správné URL pro přesměrování
             let redirectUri = this.config.redirectUri;
 
-            // Kontrola, zda jsme na vývojové verzi na Netlify
-            if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
-                console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
-                redirectUri = this.config.netlifyDevRedirectUri;
+            // Kontrola, zda jsme na produkční verzi na Netlify
+            if (window.location.href.includes('remarkable-cajeta-76cfd9.netlify.app')) {
+                // Kontrola, zda jsme na vývojové verzi na Netlify
+                if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
+                    console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
+                    redirectUri = this.config.netlifyDevRedirectUri;
+                } else {
+                    console.log('Jsme na produkční verzi na Netlify, používám produkční URL pro přesměrování');
+                    redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app';
+                }
             }
             // Kontrola, zda jsme na localhost (3000 nebo 3001)
             else if (window.location.href.includes('localhost:3001')) {
@@ -358,9 +380,14 @@ const Auth0Auth = {
         // Určení správné URL pro přesměrování
         let redirectUri = this.config.redirectUri;
 
-        // Kontrola, zda jsme na vývojové verzi na Netlify
-        if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
-            redirectUri = this.config.netlifyDevRedirectUri;
+        // Kontrola, zda jsme na produkční verzi na Netlify
+        if (window.location.href.includes('remarkable-cajeta-76cfd9.netlify.app')) {
+            // Kontrola, zda jsme na vývojové verzi na Netlify
+            if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
+                redirectUri = this.config.netlifyDevRedirectUri;
+            } else {
+                redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app';
+            }
         }
         // Kontrola, zda jsme na localhost (3000 nebo 3001)
         else if (window.location.href.includes('localhost:3001')) {
