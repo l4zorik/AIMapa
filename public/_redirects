@@ -1,5 +1,5 @@
 # Přesměrování pro Netlify
-# Verze 0.3.8.4
+# Verze 0.3.8.5
 
 # Přesměrování všech požadavků na index.html
 /*    /index.html   200

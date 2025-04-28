@@ -1,6 +1,6 @@
 /**
  * Modul pro reportování bugů
- * Verze 0.3.8.4
+ * Verze 0.3.8.5
  */
 
 const BugReporter = {

@@ -1,14 +1,30 @@
 /**
  * Modul pro zobrazení novinek a aktualizací
- * Verze 0.3.8.4
+ * Verze 0.3.8.5
  */
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.8.4',
+    currentVersion: '0.3.8.5',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.8.5',
+            date: '2025-07-20',
+            title: 'Oprava formulářů a vylepšení zabezpečení',
+            description: 'Oprava problémů s formuláři a vylepšení zabezpečení aplikace',
+            changes: [
+                'Opraveny chybějící ID a NAME atributy ve formulářích',
+                'Přidány chybějící LABEL elementy k formulářovým polím',
+                'Vylepšena Content Security Policy (CSP) pro lepší zabezpečení',
+                'Přidána podpora pro unsafe-eval v CSP pro správné fungování JavaScriptu',
+                'Opraveny problémy s načítáním externích zdrojů',
+                'Vylepšena přihlašovací obrazovka a registrace uživatelů',
+                'Optimalizace výkonu a opravy drobných chyb',
+                'Aktualizace dokumentace a komentářů v kódu'
+            ]
+        },
         {
             version: '0.3.8.4',
             date: '2025-07-15',

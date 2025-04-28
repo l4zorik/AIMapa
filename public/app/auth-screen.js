@@ -1,6 +1,6 @@
 /**
  * Přihlašovací obrazovka pro AIMapa
- * Verze 0.3.8.4
+ * Verze 0.3.8.5
  *
  * Tento modul zobrazí přihlašovací obrazovku před přístupem k aplikaci
  * a zajistí, že uživatel je přihlášen před použitím aplikace.

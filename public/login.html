@@ -385,7 +385,7 @@
         </form>
 
         <div class="login-footer">
-            <p>© 2025 AI Map - Into the known v0.3.8.4</p>
+            <p>© 2025 AI Map - Into the known v0.3.8.5</p>
             <p>Vytvořeno s <span style="color: #EF4444;">❤️</span> pro lepší produktivitu</p>
         </div>
     </div>
@@ -449,13 +449,13 @@
                 e.preventDefault();
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
-                
+
                 // Simulace přihlášení
                 if (email && password) {
                     // Uložení informace o přihlášení
                     localStorage.setItem('aiMapaLoggedIn', 'true');
                     localStorage.setItem('aiMapaUserEmail', email);
-                    
+
                     // Přesměrování na hlavní stránku
                     window.location.href = 'index.html';
                 } else {
@@ -470,23 +470,23 @@
                 const email = document.getElementById('registerEmail').value;
                 const password = document.getElementById('registerPassword').value;
                 const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-                
+
                 // Validace
                 if (!username || !email || !password || !passwordConfirm) {
                     showError('Vyplňte všechna pole');
                     return;
                 }
-                
+
                 if (password.length < 8) {
                     showError('Heslo musí mít alespoň 8 znaků');
                     return;
                 }
-                
+
                 if (password !== passwordConfirm) {
                     showError('Hesla se neshodují');
                     return;
                 }
-                
+
                 // Simulace registrace
                 showSuccess('Registrace byla úspěšná! Nyní se můžete přihlásit.');
                 registerForm.reset();
@@ -508,7 +508,7 @@
                 const errorMessage = document.getElementById('errorMessage');
                 errorMessage.textContent = message;
                 errorMessage.style.display = 'block';
-                
+
                 // Skrytí zprávy po 5 sekundách
                 setTimeout(() => {
                     errorMessage.style.display = 'none';
@@ -520,7 +520,7 @@
                 const successMessage = document.getElementById('successMessage');
                 successMessage.textContent = message;
                 successMessage.style.display = 'block';
-                
+
                 // Skrytí zprávy po 5 sekundách
                 setTimeout(() => {
                     successMessage.style.display = 'none';

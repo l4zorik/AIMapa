@@ -1,6 +1,6 @@
 /**
  * Jednoduchý modul pro zobrazení dialogu práce
- * Verze 0.3.8.4
+ * Verze 0.3.8.5
  */
 
 const SimpleWorkDialog = {

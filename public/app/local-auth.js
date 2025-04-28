@@ -1,6 +1,6 @@
 /**
  * Lokální autentizační modul pro AIMapa
- * Verze 0.3.8.4
+ * Verze 0.3.8.5
  *
  * Tento modul poskytuje lokální autentizaci pro AIMapa při spuštění na lokálním Node.js serveru.
  * Funguje jako alternativa k Supabase autentizaci, když aplikace běží lokálně.

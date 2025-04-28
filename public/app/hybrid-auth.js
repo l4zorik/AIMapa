@@ -1,6 +1,6 @@
 /**
  * Hybridní autentizační modul pro AIMapa
- * Verze 0.3.8.4
+ * Verze 0.3.8.5
  *
  * Tento modul poskytuje hybridní autentizaci pro AIMapa, která automaticky přepíná
  * mezi lokální autentizací a Supabase autentizací podle prostředí, ve kterém aplikace běží.
