@@ -67,11 +67,35 @@ const Auth0Auth = {
             // Automatické přihlášení, pokud uživatel není přihlášen
             if (!this.state.isLoggedIn && !isLoggedInFromStorage) {
                 console.log('Uživatel není přihlášen, automaticky přesměrovávám na Auth0 přihlášení...');
-                setTimeout(() => {
-                    this.login();
-                }, 1000);
+
+                // Kontrola, zda jsme se právě vrátili z Auth0 přihlášení
+                const query = window.location.search;
+                const hasAuthCode = query.includes('code=') && query.includes('state=');
+                const hash = window.location.hash;
+                const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                if (!hasAuthCode && !hasAuthTokens) {
+                    // Pouze pokud nejsme v procesu přihlašování, přesměrujeme na Auth0
+                    setTimeout(() => {
+                        this.login();
+                    }, 1000);
+                } else {
+                    console.log('Detekován autorizační kód nebo tokeny v URL, nepřesměrovávám znovu na Auth0');
+                }
             } else {
                 console.log('Uživatel je již přihlášen, nepřesměrovávám na Auth0 přihlášení');
+
+                // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
+                const authOverlay = document.getElementById('auth-overlay');
+                if (authOverlay) {
+                    console.log('Odstraňuji překryvnou vrstvu pro přihlášení (init)...');
+                    authOverlay.style.opacity = '0';
+                    authOverlay.style.transition = 'opacity 0.8s ease';
+                    setTimeout(() => {
+                        authOverlay.remove();
+                        console.log('Překryvná vrstva byla odstraněna (init)');
+                    }, 800);
+                }
             }
 
             return true;
@@ -691,6 +715,23 @@ const Auth0Auth = {
                         // Nastavení časovače pro kontrolu přihlášení
                         this.setupAuthCheckInterval();
 
+                        // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
+                        const authOverlay = document.getElementById('auth-overlay');
+                        if (authOverlay) {
+                            console.log('Odstraňuji překryvnou vrstvu pro přihlášení (z localStorage)...');
+                            authOverlay.style.opacity = '0';
+                            authOverlay.style.transition = 'opacity 0.8s ease';
+                            setTimeout(() => {
+                                authOverlay.remove();
+                                console.log('Překryvná vrstva byla odstraněna (z localStorage)');
+                            }, 800);
+                        }
+
+                        // Vyvolání události o změně stavu přihlášení
+                        document.dispatchEvent(new CustomEvent('authStateChanged', {
+                            detail: { isLoggedIn: true, user: this.state.currentUser }
+                        }));
+
                         return true;
                     } catch (e) {
                         console.error('Chyba při parsování uloženého profilu při kontrole:', e);
@@ -764,7 +805,14 @@ const Auth0Auth = {
                                         authOverlay.style.transition = 'opacity 0.8s ease';
                                         setTimeout(() => {
                                             authOverlay.remove();
+                                            console.log('Překryvná vrstva byla odstraněna po zpracování callbacku');
+
+                                            // Odstranění parametrů z URL po odstranění překryvné vrstvy
+                                            window.history.replaceState({}, document.title, window.location.pathname);
                                         }, 800);
+                                    } else {
+                                        // Odstranění parametrů z URL i když překryvná vrstva neexistuje
+                                        window.history.replaceState({}, document.title, window.location.pathname);
                                     }
 
                                     // Nastavení časovače pro kontrolu přihlášení
@@ -837,12 +885,19 @@ const Auth0Auth = {
                         // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
                         const authOverlay = document.getElementById('auth-overlay');
                         if (authOverlay) {
-                            console.log('Odstraňuji překryvnou vrstvu pro přihlášení...');
+                            console.log('Odstraňuji překryvnou vrstvu pro přihlášení (manuální callback)...');
                             authOverlay.style.opacity = '0';
                             authOverlay.style.transition = 'opacity 0.8s ease';
                             setTimeout(() => {
                                 authOverlay.remove();
+                                console.log('Překryvná vrstva byla odstraněna (manuální callback)');
+
+                                // Odstranění parametrů z URL po odstranění překryvné vrstvy
+                                window.history.replaceState({}, document.title, window.location.pathname);
                             }, 800);
+                        } else {
+                            // Odstranění parametrů z URL i když překryvná vrstva neexistuje
+                            window.history.replaceState({}, document.title, window.location.pathname);
                         }
 
                         // Nastavení časovače pro kontrolu přihlášení
@@ -916,6 +971,18 @@ const Auth0Auth = {
 
                         // Odstranění hash z URL
                         window.history.replaceState({}, document.title, window.location.pathname);
+
+                        // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
+                        const authOverlay = document.getElementById('auth-overlay');
+                        if (authOverlay) {
+                            console.log('Odstraňuji překryvnou vrstvu pro přihlášení (token callback)...');
+                            authOverlay.style.opacity = '0';
+                            authOverlay.style.transition = 'opacity 0.8s ease';
+                            setTimeout(() => {
+                                authOverlay.remove();
+                                console.log('Překryvná vrstva byla odstraněna (token callback)');
+                            }, 800);
+                        }
 
                         // Nastavení časovače pro kontrolu přihlášení
                         this.setupAuthCheckInterval();

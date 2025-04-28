@@ -419,6 +419,22 @@
 
         // Skrytí obsahu aplikace dokud není uživatel přihlášen
         document.addEventListener('DOMContentLoaded', function() {
+            // Kontrola, zda je uživatel již přihlášen
+            const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+            const overlayRemoved = localStorage.getItem('aiMapaAuthOverlayRemoved') === 'true';
+
+            // Kontrola, zda jsme v procesu přihlašování
+            const query = window.location.search;
+            const hasAuthCode = query.includes('code=') && query.includes('state=');
+            const hash = window.location.hash;
+            const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+            // Pokud je uživatel již přihlášen nebo jsme v procesu přihlašování, nezobrazujeme překryvnou vrstvu
+            if (isLoggedIn || overlayRemoved || hasAuthCode || hasAuthTokens) {
+                console.log('Uživatel je již přihlášen nebo v procesu přihlašování, nezobrazuji překryvnou vrstvu');
+                return;
+            }
+
             // Vytvoření překryvné vrstvy pro blokování přístupu
             const authOverlay = document.createElement('div');
             authOverlay.id = 'auth-overlay';
@@ -492,6 +508,14 @@
 
                         // Vyvolání události o odstranění překryvné vrstvy
                         document.dispatchEvent(new CustomEvent('authOverlayRemoved'));
+
+                        // Odstranění parametrů z URL
+                        if (window.location.search.includes('code=') || window.location.hash.includes('access_token=')) {
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+
+                        // Zajištění, že se překryvná vrstva znovu nezobrazí
+                        localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
                     }, 800);
                 }
             }
@@ -501,6 +525,14 @@
                 if (event.detail.isLoggedIn) {
                     console.log('Uživatel je přihlášen, odstraňuji překryvnou vrstvu...');
                     removeAuthOverlay();
+
+                    // Vyvolání události o odstranění překryvné vrstvy
+                    document.dispatchEvent(new CustomEvent('authOverlayRemoved'));
+
+                    // Odstranění parametrů z URL
+                    if (window.location.search.includes('code=') || window.location.hash.includes('access_token=')) {
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
                 } else {
                     console.log('Uživatel není přihlášen, ponechávám překryvnou vrstvu...');
                 }
@@ -520,11 +552,22 @@
 
                         // Kontrola, zda je uživatel přihlášen
                         if (!Auth0Auth.state.isLoggedIn) {
-                            console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
-                            updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
-                            setTimeout(function() {
-                                Auth0Auth.login();
-                            }, 1000);
+                            // Kontrola, zda jsme v procesu přihlašování
+                            const query = window.location.search;
+                            const hasAuthCode = query.includes('code=') && query.includes('state=');
+                            const hash = window.location.hash;
+                            const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                            if (!hasAuthCode && !hasAuthTokens) {
+                                console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
+                                updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
+                                setTimeout(function() {
+                                    Auth0Auth.login();
+                                }, 1000);
+                            } else {
+                                console.log('Detekován autorizační kód nebo tokeny v URL, čekám na zpracování callbacku...');
+                                updateAuthStatus('Zpracovávám přihlášení...');
+                            }
                         } else {
                             console.log('Uživatel je již přihlášen, odstraňuji překryvnou vrstvu...');
                             removeAuthOverlay();
@@ -556,11 +599,22 @@
 
                                     // Kontrola, zda je uživatel přihlášen
                                     if (!Auth0Auth.state.isLoggedIn) {
-                                        console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
-                                        updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
-                                        setTimeout(function() {
-                                            Auth0Auth.login();
-                                        }, 1000);
+                                        // Kontrola, zda jsme v procesu přihlašování
+                                        const query = window.location.search;
+                                        const hasAuthCode = query.includes('code=') && query.includes('state=');
+                                        const hash = window.location.hash;
+                                        const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                                        if (!hasAuthCode && !hasAuthTokens) {
+                                            console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
+                                            updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
+                                            setTimeout(function() {
+                                                Auth0Auth.login();
+                                            }, 1000);
+                                        } else {
+                                            console.log('Detekován autorizační kód nebo tokeny v URL, čekám na zpracování callbacku...');
+                                            updateAuthStatus('Zpracovávám přihlášení...');
+                                        }
                                     } else {
                                         console.log('Uživatel je již přihlášen, odstraňuji překryvnou vrstvu...');
                                         removeAuthOverlay();
@@ -788,9 +842,24 @@
                         console.log('Kontrola přihlášení uživatele:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
 
                         if (!isLoggedIn) {
-                            console.log('Uživatel není přihlášen, přesměrovávám na Auth0...');
-                            // Přímé přesměrování na Auth0
-                            directAuth0Login();
+                            // Kontrola, zda jsme v procesu přihlašování
+                            const query = window.location.search;
+                            const hasAuthCode = query.includes('code=') && query.includes('state=');
+                            const hash = window.location.hash;
+                            const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                            if (!hasAuthCode && !hasAuthTokens) {
+                                console.log('Uživatel není přihlášen, přesměrovávám na Auth0...');
+                                // Přímé přesměrování na Auth0
+                                directAuth0Login();
+                            } else {
+                                console.log('Detekován autorizační kód nebo tokeny v URL, čekám na zpracování callbacku...');
+                                // Aktualizace stavu překryvné vrstvy
+                                const statusElement = document.getElementById('auth-overlay-status');
+                                if (statusElement) {
+                                    statusElement.textContent = 'Zpracovávám přihlášení...';
+                                }
+                            }
                         } else {
                             console.log('Uživatel je přihlášen, zobrazuji aplikaci...');
                             // Odstranění překryvné vrstvy, pokud existuje
@@ -802,14 +871,35 @@
                             if (typeof Auth0Auth.displayUserProfile === 'function') {
                                 Auth0Auth.displayUserProfile();
                             }
+
+                            // Zajištění, že se překryvná vrstva znovu nezobrazí
+                            localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
                         }
                     }).catch(error => {
                         console.error('Chyba při kontrole přihlášení:', error);
-                        directAuth0Login();
+
+                        // Kontrola, zda jsme v procesu přihlašování
+                        const query = window.location.search;
+                        const hasAuthCode = query.includes('code=') && query.includes('state=');
+                        const hash = window.location.hash;
+                        const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                        if (!hasAuthCode && !hasAuthTokens) {
+                            directAuth0Login();
+                        }
                     });
                 } else {
                     console.error('Auth0Auth modul není dostupný, používám přímé přihlášení...');
-                    directAuth0Login();
+
+                    // Kontrola, zda jsme v procesu přihlašování
+                    const query = window.location.search;
+                    const hasAuthCode = query.includes('code=') && query.includes('state=');
+                    const hash = window.location.hash;
+                    const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                    if (!hasAuthCode && !hasAuthTokens) {
+                        directAuth0Login();
+                    }
                 }
             }
 
