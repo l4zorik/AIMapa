@@ -69,7 +69,7 @@ const UserProfile = {
         modal.innerHTML = `
             <div class="user-profile-content">
                 <div class="user-profile-header">
-                    <h2>Uživatelský profil</h2>
+                    <h2>Uživatelský profil Auth0</h2>
                     <button class="close-button" id="closeProfileModal">&times;</button>
                 </div>
                 <div class="user-profile-body">
@@ -80,6 +80,22 @@ const UserProfile = {
                         <div class="user-profile-details">
                             <h3 id="userProfileName">Jméno uživatele</h3>
                             <p id="userProfileEmail">email@example.com</p>
+                            <p id="userProfileId" class="user-profile-id">ID: -</p>
+                        </div>
+                    </div>
+                    <div class="user-profile-auth-info">
+                        <h4>Informace o autentizaci</h4>
+                        <div class="auth-provider">
+                            <span class="auth-provider-label">Poskytovatel:</span>
+                            <span class="auth-provider-value">Auth0</span>
+                        </div>
+                        <div class="auth-status">
+                            <span class="auth-status-label">Stav:</span>
+                            <span class="auth-status-value auth-status-active">Aktivní</span>
+                        </div>
+                        <div class="auth-last-login">
+                            <span class="auth-last-login-label">Poslední přihlášení:</span>
+                            <span id="userProfileLastLogin" class="auth-last-login-value">-</span>
                         </div>
                     </div>
                     <div class="user-profile-metadata">
@@ -324,6 +340,8 @@ const UserProfile = {
         const nameElement = document.getElementById('userProfileName');
         const emailElement = document.getElementById('userProfileEmail');
         const avatarElement = document.getElementById('userProfileAvatar');
+        const idElement = document.getElementById('userProfileId');
+        const lastLoginElement = document.getElementById('userProfileLastLogin');
 
         if (nameElement) {
             nameElement.textContent = this.state.currentUser.name || this.state.currentUser.nickname || 'Uživatel';
@@ -331,6 +349,17 @@ const UserProfile = {
 
         if (emailElement) {
             emailElement.textContent = this.state.currentUser.email || '';
+        }
+
+        // Aktualizace ID uživatele
+        if (idElement && this.state.currentUser.sub) {
+            idElement.textContent = `ID: ${this.state.currentUser.sub}`;
+        }
+
+        // Aktualizace času posledního přihlášení
+        if (lastLoginElement && this.state.currentUser.updated_at) {
+            const lastLoginDate = new Date(this.state.currentUser.updated_at);
+            lastLoginElement.textContent = lastLoginDate.toLocaleString('cs-CZ');
         }
 
         // Aktualizace avataru
@@ -341,61 +370,69 @@ const UserProfile = {
         // Přidání informace o poskytovateli autentizace
         const metadataContainer = document.getElementById('userProfileMetadata');
         if (metadataContainer) {
-            metadataContainer.innerHTML = '<p>Načítání dat...</p>';
+            // Zobrazení všech dostupných informací o uživateli
+            let metadataHtml = '<div class="metadata-list">';
 
-            // Základní informace o autentizaci
-            let authProviderInfo = '<div class="metadata-item auth-provider-info">';
-            authProviderInfo += '<span class="metadata-key">Poskytovatel autentizace:</span>';
-            authProviderInfo += '<span class="metadata-value">Auth0</span>';
-            authProviderInfo += '</div>';
+            // Procházení všech vlastností uživatelského objektu
+            for (const [key, value] of Object.entries(this.state.currentUser)) {
+                // Přeskočení již zobrazených vlastností
+                if (['name', 'email', 'picture', 'sub', 'updated_at'].includes(key)) continue;
 
-            authProviderInfo += '<div class="metadata-item">';
-            authProviderInfo += '<span class="metadata-key">Stav přihlášení:</span>';
-            authProviderInfo += '<span class="metadata-value auth-status-active">Aktivní</span>';
-            authProviderInfo += '</div>';
+                // Přeskočení prázdných hodnot
+                if (value === null || value === undefined || value === '') continue;
 
-            // Přidání ID uživatele, pokud je k dispozici
-            if (this.state.currentUser.sub) {
-                authProviderInfo += '<div class="metadata-item">';
-                authProviderInfo += '<span class="metadata-key">ID uživatele:</span>';
-                authProviderInfo += `<span class="metadata-value">${this.state.currentUser.sub}</span>`;
-                authProviderInfo += '</div>';
+                // Formátování hodnoty
+                let formattedValue = value;
+                if (typeof value === 'object') {
+                    formattedValue = JSON.stringify(value);
+                } else if (key.includes('date') || key.includes('time') || key.includes('at')) {
+                    // Pokus o formátování data
+                    try {
+                        formattedValue = new Date(value).toLocaleString('cs-CZ');
+                    } catch (e) {
+                        // Ponecháme původní hodnotu
+                    }
+                }
+
+                metadataHtml += `<div class="metadata-item">
+                    <span class="metadata-key">${key}:</span>
+                    <span class="metadata-value">${formattedValue}</span>
+                </div>`;
             }
 
-            metadataContainer.innerHTML = authProviderInfo;
+            metadataHtml += '</div>';
+            metadataContainer.innerHTML = metadataHtml;
 
             // Načtení uživatelských metadat z Auth0
-            if (typeof Auth0Auth !== 'undefined') {
+            if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.getUserInfo === 'function') {
                 try {
                     console.log('Načítání rozšířených dat z Auth0');
 
                     // Získání informací o uživateli z Auth0 API
                     const result = await Auth0Auth.getUserInfo();
 
-                    if (result.error) {
-                        console.error('Chyba při načítání uživatelských metadat:', result.error);
-                        // Ponecháme základní informace o autentizaci
-                    } else {
+                    if (result && !result.error) {
                         console.log('Úspěšně načtena rozšířená data z Auth0:', result.data);
 
                         // Uložení metadat
-                        this.state.userMetadata = result.data.user_metadata || {};
+                        this.state.userMetadata = result.data?.user_metadata || {};
 
                         // Zobrazení metadat
                         if (Object.keys(this.state.userMetadata).length > 0) {
-                            let metadataHtml = authProviderInfo + '<h5>Uživatelská metadata:</h5>';
+                            let userMetadataHtml = '<h5>Uživatelská metadata:</h5><div class="metadata-list">';
 
                             for (const [key, value] of Object.entries(this.state.userMetadata)) {
                                 // Přeskočení předplatného, které zobrazujeme zvlášť
                                 if (key === 'subscription') continue;
 
-                                metadataHtml += `<div class="metadata-item">
+                                userMetadataHtml += `<div class="metadata-item">
                                     <span class="metadata-key">${key}:</span>
                                     <span class="metadata-value">${typeof value === 'object' ? JSON.stringify(value) : value}</span>
                                 </div>`;
                             }
 
-                            metadataContainer.innerHTML = metadataHtml;
+                            userMetadataHtml += '</div>';
+                            metadataContainer.innerHTML += userMetadataHtml;
                         }
 
                         // Načtení informací o předplatném
@@ -403,7 +440,6 @@ const UserProfile = {
                     }
                 } catch (error) {
                     console.error('Chyba při načítání uživatelských metadat:', error);
-                    // Ponecháme základní informace o autentizaci
                 }
             }
         } else {

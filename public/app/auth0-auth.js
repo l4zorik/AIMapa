@@ -118,20 +118,20 @@ const Auth0Auth = {
                 // Kontrola, zda jsme na vývojové verzi na Netlify
                 if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
                     console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
-                    redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+                    redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app/callback';
                 } else {
                     console.log('Jsme na produkční verzi na Netlify, používám produkční URL pro přesměrování');
-                    redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app';
+                    redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app/callback';
                 }
             }
             // Kontrola, zda jsme na localhost (3000 nebo 3001)
             else if (window.location.href.includes('localhost:3001')) {
                 console.log('Jsme na lokálním vývojovém prostředí (port 3001), používám localhost URL pro přesměrování');
-                redirectUri = 'http://localhost:3001';
+                redirectUri = 'http://localhost:3001/callback';
             }
             else if (window.location.href.includes('localhost:3000')) {
                 console.log('Jsme na lokálním vývojovém prostředí (port 3000), používám localhost URL pro přesměrování');
-                redirectUri = 'http://localhost:3000';
+                redirectUri = 'http://localhost:3000/callback';
             }
 
             console.log('Přesměrování na Auth0 přihlašovací stránku s URL:', redirectUri);
@@ -167,18 +167,18 @@ const Auth0Auth = {
                     // Kontrola, zda jsme na vývojové verzi na Netlify
                     if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
                         console.log('Jsme na vývojové verzi na Netlify, používám speciální URL pro přesměrování');
-                        redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+                        redirectUri = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app/callback';
                     } else {
                         console.log('Jsme na produkční verzi na Netlify, používám produkční URL pro přesměrování');
-                        redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app';
+                        redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app/callback';
                     }
                 }
                 // Kontrola, zda jsme na localhost (3000 nebo 3001)
                 else if (window.location.href.includes('localhost:3001')) {
-                    redirectUri = 'http://localhost:3001';
+                    redirectUri = 'http://localhost:3001/callback';
                 }
                 else if (window.location.href.includes('localhost:3000')) {
-                    redirectUri = 'http://localhost:3000';
+                    redirectUri = 'http://localhost:3000/callback';
                 }
 
                 // Použití Auth0 Universal Login
@@ -199,23 +199,31 @@ const Auth0Auth = {
         }
     },
 
-    // Konfigurace
+    // Konfigurace - načítání z proměnných prostředí nebo použití výchozích hodnot
     config: {
-        domain: 'dev-zxj8pir0moo4pdk7.us.auth0.com',
-        clientId: 'TKzCgYPmkETVCBjC3418MgKDJY60rppl',
+        // Základní Auth0 konfigurace
+        domain: window.ENV?.AUTH0_DOMAIN || 'dev-zxj8pir0moo4pdk7.us.auth0.com',
+        clientId: window.ENV?.AUTH0_CLIENT_ID || 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
+        clientSecret: window.ENV?.AUTH0_CLIENT_SECRET,
         redirectUri: window.location.origin,
-        // Přidání podpory pro vývojovou verzi na Netlify
+
+        // Podporované URL pro přesměrování
         netlifyDevRedirectUri: 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app',
-        // Přidání podpory pro produkční verzi na Netlify
         netlifyProdRedirectUri: 'https://remarkable-cajeta-76cfd9.netlify.app',
-        // Lokální vývojové prostředí
         localDevRedirectUri: 'http://localhost:3001',
-        audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
-        scope: 'openid profile email read:users read:user_idp_tokens',
+
+        // Audience a scope
+        audience: window.ENV?.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
+        scope: window.ENV?.AUTH0_SCOPE || 'openid profile email read:users read:user_idp_tokens',
+
+        // Callback a logout URL
+        callbackUrl: window.ENV?.AUTH0_CALLBACK_URL,
+        logoutUrl: window.ENV?.AUTH0_LOGOUT_URL,
+
         // Nastavení pro SPA aplikaci
         authorizationParams: {
             response_type: 'code',
-            audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/'
+            audience: window.ENV?.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/'
         }
     },
 
@@ -318,17 +326,17 @@ const Auth0Auth = {
                     redirectUri = this.config.netlifyDevRedirectUri;
                 } else {
                     console.log('Jsme na produkční verzi na Netlify, používám produkční URL pro přesměrování');
-                    redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app';
+                    redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app/callback';
                 }
             }
             // Kontrola, zda jsme na localhost (3000 nebo 3001)
             else if (window.location.href.includes('localhost:3001')) {
                 console.log('Jsme na lokálním vývojovém prostředí (port 3001), používám localhost URL pro přesměrování');
-                redirectUri = 'http://localhost:3001';
+                redirectUri = 'http://localhost:3001/callback';
             }
             else if (window.location.href.includes('localhost:3000')) {
                 console.log('Jsme na lokálním vývojovém prostředí (port 3000), používám localhost URL pro přesměrování');
-                redirectUri = 'http://localhost:3000';
+                redirectUri = 'http://localhost:3000/callback';
             }
 
             console.log('Inicializace Auth0 klienta s URL pro přesměrování:', redirectUri);
@@ -1489,6 +1497,53 @@ const Auth0Auth = {
         const directLoginButton = document.getElementById('directAuth0LoginButton');
         if (directLoginButton) {
             directLoginButton.style.display = 'block';
+        }
+    },
+
+    // Získání rozšířených informací o uživateli z Auth0
+    async getUserInfo() {
+        try {
+            console.log('Získávání rozšířených informací o uživateli z Auth0...');
+
+            // Kontrola, zda je uživatel přihlášen
+            if (!this.state.isLoggedIn || !this.state.currentUser) {
+                console.error('Nelze získat informace o uživateli - uživatel není přihlášen');
+                return { error: 'Uživatel není přihlášen' };
+            }
+
+            // Pokud máme Auth0 klienta, použijeme ho pro získání informací
+            if (this.state.auth0Client) {
+                try {
+                    // Získání tokenu
+                    const token = await this.state.auth0Client.getTokenSilently();
+
+                    // Získání informací o uživateli z Auth0 Management API
+                    const response = await fetch(`/profile-api`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const userData = await response.json();
+                        console.log('Získány rozšířené informace o uživateli z Auth0:', userData);
+                        return { data: userData };
+                    } else {
+                        console.error('Chyba při získávání informací o uživateli z Auth0:', response.statusText);
+                        return { error: 'Nepodařilo se získat informace o uživateli' };
+                    }
+                } catch (error) {
+                    console.error('Chyba při získávání tokenu nebo informací o uživateli:', error);
+                    return { error: error.message || 'Nepodařilo se získat informace o uživateli' };
+                }
+            }
+
+            // Pokud nemáme Auth0 klienta, vrátíme základní informace
+            console.log('Auth0 klient není dostupný, vracím základní informace o uživateli');
+            return { data: this.state.currentUser };
+        } catch (error) {
+            console.error('Chyba při získávání informací o uživateli:', error);
+            return { error: error.message || 'Nepodařilo se získat informace o uživateli' };
         }
     },
 

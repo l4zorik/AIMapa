@@ -13,6 +13,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const request = require('request');
+const { auth } = require('express-openid-connect');
 
 // Načtení proměnných prostředí z .env souboru
 require('dotenv').config();
@@ -152,6 +153,24 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Konfigurace Auth0
+const config = {
+  authRequired: process.env.AUTH0_AUTH_REQUIRED === 'true', // Autentizace je vyžadována pro všechny routy
+  auth0Logout: true,
+  secret: process.env.AUTH0_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
+  baseURL: process.env.PORT ? `http://localhost:${process.env.PORT}` : 'http://localhost:3000',
+  clientID: process.env.AUTH0_CLIENT_ID || 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
+  clientSecret: process.env.AUTH0_CLIENT_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
+  authorizationParams: {
+    response_type: 'code',
+    scope: process.env.AUTH0_SCOPE || 'openid profile email'
+  }
+};
+
+// Auth router přidává /login, /logout a /callback routy k baseURL
+app.use(auth(config));
+
 // Statické soubory
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -265,6 +284,62 @@ app.get('/auth/config', (_req, res) => {
         callbackUrl: callbackUrl,
         logoutUrl: logoutUrl
     });
+});
+
+// Endpoint pro získání konfigurace prostředí pro klienta
+app.get('/env-config.json', (_req, res) => {
+    // Určení správné URL pro přesměrování na základě prostředí
+    let callbackUrl = '';
+    let logoutUrl = '';
+
+    // Kontrola, zda jsme na Netlify
+    const host = _req.headers.host || '';
+    const isNetlify = host.includes('netlify.app');
+    const isDevServer = host.includes('devserver-v0-3-8-5');
+
+    if (isNetlify) {
+        if (isDevServer) {
+            // Jsme na vývojové verzi na Netlify
+            callbackUrl = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+            logoutUrl = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+            console.log('Detekováno vývojové Netlify prostředí, používám URL:', callbackUrl);
+        } else {
+            // Jsme na produkční verzi na Netlify
+            callbackUrl = 'https://remarkable-cajeta-76cfd9.netlify.app';
+            logoutUrl = 'https://remarkable-cajeta-76cfd9.netlify.app';
+            console.log('Detekováno produkční Netlify prostředí, používám URL:', callbackUrl);
+        }
+    } else {
+        // Jsme na lokálním prostředí, použijeme localhost URL
+        callbackUrl = `http://${host}`;
+        logoutUrl = `http://${host}`;
+        console.log('Detekováno lokální prostředí, používám URL:', callbackUrl);
+    }
+
+    // Vytvoření konfigurace pro klienta
+    const clientConfig = {
+        // Auth0 konfigurace
+        AUTH0_DOMAIN: auth0Config.domain,
+        AUTH0_CLIENT_ID: auth0Config.clientId,
+        AUTH0_AUDIENCE: auth0Config.audience[0], // Použijeme první URL z pole
+        AUTH0_SCOPE: auth0Config.scope,
+        AUTH0_CALLBACK_URL: callbackUrl,
+        AUTH0_LOGOUT_URL: logoutUrl,
+
+        // Supabase konfigurace
+        SUPABASE_URL: process.env.SUPABASE_URL,
+        SUPABASE_KEY: process.env.SUPABASE_KEY,
+
+        // Stripe konfigurace (pouze veřejný klíč)
+        STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
+
+        // Aplikační konfigurace
+        APP_VERSION: '0.3.8.5',
+        APP_ENV: isNetlify ? (isDevServer ? 'development' : 'production') : 'local',
+        APP_URL: callbackUrl
+    };
+
+    res.json(clientConfig);
 });
 
 // Endpoint pro získání Auth0 Management API tokenu (pouze pro autorizované požadavky)
@@ -384,8 +459,37 @@ app.post('/auth/register', (req, res) => {
 });
 
 // Hlavní route pro aplikaci
-app.get('/', (_req, res) => {
+app.get('/', (req, res) => {
+    // req.oidc.isAuthenticated je poskytováno z auth routeru
+    const isAuthenticated = req.oidc.isAuthenticated();
+
+    // Pokud chceme pouze zobrazit stav přihlášení pro testování
+    if (req.query.auth_status === 'check') {
+        return res.send(isAuthenticated ? 'Přihlášen' : 'Nepřihlášen');
+    }
+
+    // Jinak zobrazíme normální aplikaci
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Přidání middleware pro vyžadování autentizace
+const { requiresAuth } = require('express-openid-connect');
+
+// Přidání endpointu pro zobrazení informací o uživateli s vyžadovanou autentizací
+app.get('/profile', requiresAuth(), (req, res) => {
+    // Zobrazení informací o uživateli
+    res.send(`
+        <h1>Profil uživatele</h1>
+        <p>Přihlášen jako: ${req.oidc.user.name}</p>
+        <p>Email: ${req.oidc.user.email}</p>
+        <pre>${JSON.stringify(req.oidc.user, null, 2)}</pre>
+        <a href="/">Zpět na hlavní stránku</a> |
+        <a href="/logout">Odhlásit se</a>
+    `);
+});
+
+app.get('/profile-api', requiresAuth(), (req, res) => {
+  res.send(JSON.stringify(req.oidc.user));
 });
 
 // Zpracování argumentů příkazové řádky
@@ -406,7 +510,7 @@ for (let i = 0; i < args.length; i++) {
 }
 
 // Nastavení portu
-const PORT = portArg || process.env.PORT || 3001;
+const PORT = portArg || process.env.PORT || 3000;
 console.log(`Použití portu: ${PORT}`);
 
 // Funkce pro kontrolu dostupnosti mapy
