@@ -518,9 +518,9 @@ const UserProfile = {
             // Pokud uživatel není přihlášen, zobrazíme přihlašovací obrazovku
             if (typeof AuthScreen !== 'undefined') {
                 AuthScreen.showAuthScreen();
-            } else if (typeof Auth0Auth !== 'undefined') {
-                // Pokud není dostupný AuthScreen, použijeme přímé přihlášení přes Auth0
-                Auth0Auth.login();
+            } else {
+                // Pokud není dostupný AuthScreen, použijeme přímé přihlášení
+                this.login();
             }
             return;
         }
@@ -983,23 +983,51 @@ const UserProfile = {
         }
     },
 
+    // Přihlášení uživatele
+    login() {
+        console.log('Zahájení přihlášení uživatele...');
+
+        try {
+            // Kontrola, zda je dostupný Auth0Auth
+            if (typeof Auth0Auth !== 'undefined' && Auth0Auth.login) {
+                console.log('Používám Auth0Auth.login()');
+                Auth0Auth.login();
+                return;
+            } else if (typeof HybridAuth !== 'undefined' && HybridAuth.login) {
+                console.log('Používám HybridAuth.login()');
+                HybridAuth.login();
+                return;
+            } else if (typeof SupabaseAuth !== 'undefined' && SupabaseAuth.login) {
+                console.log('Používám SupabaseAuth.login()');
+                SupabaseAuth.login();
+                return;
+            } else if (typeof LocalAuth !== 'undefined' && LocalAuth.login) {
+                console.log('Používám LocalAuth.login()');
+                LocalAuth.login();
+                return;
+            } else if (typeof UserAccounts !== 'undefined' && UserAccounts.login) {
+                console.log('Používám UserAccounts.login()');
+                UserAccounts.login();
+                return;
+            }
+
+            console.log('Žádný autentizační modul není dostupný, používám základní přihlášení');
+
+            // Přesměrování na přihlašovací stránku
+            console.log('Přesměrování na /login');
+            window.location.href = '/login';
+        } catch (error) {
+            console.error('Chyba při přihlašování:', error);
+
+            // Záložní řešení - přímé přesměrování na přihlašovací stránku
+            console.log('Záložní řešení - přímé přesměrování na /login');
+            window.location.href = '/login';
+        }
+    },
+
     // Odhlášení uživatele
     async logout() {
-        // Kontrola, zda je dostupný Auth0Auth
-        if (typeof Auth0Auth !== 'undefined') {
-            await Auth0Auth.logout();
-        } else if (typeof HybridAuth !== 'undefined') {
-            await HybridAuth.logout();
-        } else if (typeof SupabaseAuth !== 'undefined') {
-            await SupabaseAuth.logout();
-        } else if (typeof LocalAuth !== 'undefined') {
-            await LocalAuth.logout();
-        } else if (typeof UserAccounts !== 'undefined') {
-            await UserAccounts.logout();
-        } else {
-            // Pokud není dostupný žádný autentizační modul, přesměrujeme na Auth0 odhlašovací stránku
-            window.location.href = '/logout';
-        }
+        console.log('Zahájení odhlášení uživatele...');
 
         // Skrytí modálního okna
         this.hideProfileModal();
@@ -1007,6 +1035,56 @@ const UserProfile = {
         // Aktualizace stavu připojení
         this.state.auth0Status = 'disconnected';
         this.updateAuth0StatusUI();
+
+        try {
+            // Kontrola, zda je dostupný Auth0Auth
+            if (typeof Auth0Auth !== 'undefined' && Auth0Auth.logout) {
+                console.log('Používám Auth0Auth.logout()');
+                await Auth0Auth.logout();
+                return;
+            } else if (typeof HybridAuth !== 'undefined' && HybridAuth.logout) {
+                console.log('Používám HybridAuth.logout()');
+                await HybridAuth.logout();
+                return;
+            } else if (typeof SupabaseAuth !== 'undefined' && SupabaseAuth.logout) {
+                console.log('Používám SupabaseAuth.logout()');
+                await SupabaseAuth.logout();
+                return;
+            } else if (typeof LocalAuth !== 'undefined' && LocalAuth.logout) {
+                console.log('Používám LocalAuth.logout()');
+                await LocalAuth.logout();
+                return;
+            } else if (typeof UserAccounts !== 'undefined' && UserAccounts.logout) {
+                console.log('Používám UserAccounts.logout()');
+                await UserAccounts.logout();
+                return;
+            }
+
+            console.log('Žádný autentizační modul není dostupný, používám základní odhlášení');
+
+            // Odstranění tokenů a stavu přihlášení z localStorage
+            localStorage.removeItem('aiMapaAccessToken');
+            localStorage.removeItem('aiMapaIdToken');
+            localStorage.removeItem('aiMapaLoggedIn');
+            localStorage.removeItem('aiMapaUserEmail');
+            localStorage.removeItem('aiMapaUserProfile');
+            localStorage.removeItem('aiMapaAuthOverlayRemoved');
+
+            // Vyvolání události o změně stavu přihlášení
+            document.dispatchEvent(new CustomEvent('authStateChanged', {
+                detail: { isLoggedIn: false }
+            }));
+
+            // Přesměrování na odhlašovací stránku
+            console.log('Přesměrování na /logout');
+            window.location.href = '/logout';
+        } catch (error) {
+            console.error('Chyba při odhlašování:', error);
+
+            // Záložní řešení - přímé přesměrování na odhlašovací stránku
+            console.log('Záložní řešení - přímé přesměrování na /logout');
+            window.location.href = '/logout';
+        }
     }
 };
 

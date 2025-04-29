@@ -163,7 +163,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Konfigurace Auth0
 const config = {
-  authRequired: process.env.AUTH0_AUTH_REQUIRED === 'true', // Autentizace je vyžadována pro všechny routy
+  authRequired: true, // Autentizace je vždy vyžadována pro všechny routy
   auth0Logout: true,
   secret: process.env.AUTH0_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
   baseURL: process.env.AUTH0_BASE_URL || (process.env.PORT ? `http://localhost:${process.env.PORT}` : 'http://localhost:3000'),
