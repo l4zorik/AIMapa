@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Přihlášení úspěšné - AI Mapa</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .success-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .success-icon {
+            color: #2ecc71;
+            font-size: 64px;
+            margin: 20px 0;
+        }
+
+        p {
+            margin: 15px 0;
+            line-height: 1.5;
+            font-size: 16px;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+        }
+
+        .user-info {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .user-info p {
+            margin: 8px 0;
+        }
+
+        .dark-mode {
+            background-color: #222;
+            color: #f5f5f5;
+        }
+
+        .dark-mode .success-container {
+            background-color: #333;
+            color: #f5f5f5;
+        }
+
+        .dark-mode h1 {
+            color: #3498db;
+        }
+
+        .dark-mode .user-info {
+            background-color: #444;
+        }
+
+        .dark-mode .button {
+            background-color: #3498db;
+        }
+
+        .dark-mode .button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <h1>Přihlášení úspěšné</h1>
+        <div class="success-icon">✓</div>
+        <p>Byli jste úspěšně přihlášeni do aplikace AI Mapa.</p>
+        <p>Nyní můžete používat všechny funkce aplikace.</p>
+        
+        <div class="user-info" id="user-info">
+            <p><strong>Načítání informací o uživateli...</strong></p>
+        </div>
+        
+        <a href="/" class="button">Přejít do aplikace</a>
+    </div>
+
+    <script>
+        // Kontrola, zda má být použit tmavý režim
+        function checkDarkMode() {
+            const isDarkMode = localStorage.getItem('aiMapaDarkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // Kontrola tmavého režimu při načtení stránky
+        checkDarkMode();
+
+        // Funkce pro získání informací o uživateli
+        async function getUserInfo() {
+            try {
+                // Kontrola, zda je uživatel přihlášen
+                const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+                
+                if (!isLoggedIn) {
+                    document.getElementById('user-info').innerHTML = `
+                        <p><strong>Upozornění:</strong> Nejste přihlášeni. <a href="/">Přejděte na hlavní stránku</a> pro přihlášení.</p>
+                    `;
+                    return;
+                }
+
+                // Pokus o získání informací o uživateli z Auth0
+                const response = await fetch('/auth/status');
+                const data = await response.json();
+
+                if (data.isAuthenticated && data.user) {
+                    // Uložení informací o uživateli do localStorage
+                    localStorage.setItem('aiMapaUserProfile', JSON.stringify(data.user));
+                    
+                    // Zobrazení informací o uživateli
+                    document.getElementById('user-info').innerHTML = `
+                        <p><strong>Jméno:</strong> ${data.user.name || 'Neuvedeno'}</p>
+                        <p><strong>Email:</strong> ${data.user.email || 'Neuvedeno'}</p>
+                        <p><strong>ID:</strong> ${data.user.sub || 'Neuvedeno'}</p>
+                    `;
+                } else {
+                    // Pokud se nepodařilo získat informace o uživateli, zobrazíme základní informace
+                    document.getElementById('user-info').innerHTML = `
+                        <p><strong>Stav:</strong> Přihlášen</p>
+                        <p><strong>Poznámka:</strong> Nepodařilo se načíst podrobné informace o uživateli.</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Chyba při získávání informací o uživateli:', error);
+                
+                // Zobrazení chybové zprávy
+                document.getElementById('user-info').innerHTML = `
+                    <p><strong>Chyba:</strong> Nepodařilo se načíst informace o uživateli.</p>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        // Načtení informací o uživateli při načtení stránky
+        window.addEventListener('DOMContentLoaded', getUserInfo);
+
+        // Nastavení stavu přihlášení v localStorage
+        localStorage.setItem('aiMapaLoggedIn', 'true');
+        
+        // Vyvolání události o změně stavu autentizace
+        document.dispatchEvent(new CustomEvent('authStateChanged', {
+            detail: {
+                isLoggedIn: true
+            }
+        }));
+    </script>
+</body>
+</html>

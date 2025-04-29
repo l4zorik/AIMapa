@@ -74,13 +74,16 @@ const Auth0Auth = {
                 const hash = window.location.hash;
                 const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
 
-                if (!hasAuthCode && !hasAuthTokens) {
-                    // Pouze pokud nejsme v procesu přihlašování, přesměrujeme na Auth0
+                // Kontrola, zda jsme na stránce /overeno
+                const isOnVerifiedPage = window.location.pathname === '/overeno';
+
+                if (!hasAuthCode && !hasAuthTokens && !isOnVerifiedPage) {
+                    // Pouze pokud nejsme v procesu přihlašování nebo na stránce /overeno, přesměrujeme na Auth0
                     setTimeout(() => {
                         this.login();
                     }, 1000);
                 } else {
-                    console.log('Detekován autorizační kód nebo tokeny v URL, nepřesměrovávám znovu na Auth0');
+                    console.log('Detekován autorizační kód, tokeny v URL nebo jsme na stránce /overeno, nepřesměrovávám znovu na Auth0');
                 }
             } else {
                 console.log('Uživatel je již přihlášen, nepřesměrovávám na Auth0 přihlášení');

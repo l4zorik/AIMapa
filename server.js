@@ -492,6 +492,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Route pro stránku po úspěšném přihlášení
+app.get('/overeno', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'overeno.html'));
+});
+
 // Endpoint pro kontrolu stavu přihlášení
 app.get('/auth/status', (req, res) => {
     const isAuthenticated = req.oidc.isAuthenticated();

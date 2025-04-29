@@ -88,10 +88,56 @@
         // Kontrola tmavého režimu při načtení stránky
         checkDarkMode();
 
-        // Přesměrování zpět na hlavní stránku po krátké prodlevě
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 2000);
+        // Funkce pro získání parametru z URL
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Kontrola, zda máme autentizační kód
+        const code = getParameterByName('code');
+        const state = getParameterByName('state');
+        const error = getParameterByName('error');
+        const errorDescription = getParameterByName('error_description');
+
+        // Logování pro debugování
+        console.log('Callback parametry:');
+        console.log('Code:', code ? 'Přítomen' : 'Chybí');
+        console.log('State:', state ? 'Přítomen' : 'Chybí');
+        console.log('Error:', error || 'Žádná chyba');
+
+        // Kontrola, zda došlo k chybě
+        if (error) {
+            console.error('Chyba při přihlašování:', error, errorDescription);
+            document.querySelector('.loader').style.display = 'none';
+            document.querySelector('p').innerHTML = 'Došlo k chybě při přihlašování: ' + errorDescription;
+
+            // Přesměrování na /overeno po delší prodlevě
+            setTimeout(() => {
+                window.location.href = '/overeno';
+            }, 5000);
+        } else if (code && state) {
+            // Máme autentizační kód, uložíme informaci o přihlášení
+            localStorage.setItem('aiMapaLoggedIn', 'true');
+            console.log('Autentizační kód byl úspěšně přijat, přesměrovávám na /overeno...');
+
+            // Přesměrování na /overeno po krátké prodlevě
+            setTimeout(() => {
+                // Odstranění parametrů z URL při přesměrování
+                window.location.href = '/overeno';
+            }, 2000);
+        } else {
+            console.warn('Chybí autentizační kód nebo state, přesměrovávám na /overeno...');
+
+            // Přesměrování na /overeno po krátké prodlevě
+            setTimeout(() => {
+                window.location.href = '/overeno';
+            }, 2000);
+        }
     </script>
 </body>
 </html>
