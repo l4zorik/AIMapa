@@ -69,7 +69,7 @@ const UserProfile = {
         modal.innerHTML = `
             <div class="user-profile-content">
                 <div class="user-profile-header">
-                    <h2>Uživatelský profil Auth0</h2>
+                    <h2>Uživatelský profil</h2>
                     <button class="close-button" id="closeProfileModal">&times;</button>
                 </div>
                 <div class="user-profile-body">
@@ -323,139 +323,241 @@ const UserProfile = {
     async loadUserProfile() {
         console.log('Načítání dat uživatelského profilu');
 
-        // Kontrola, zda je uživatel přihlášen přes Auth0
-        if (typeof Auth0Auth !== 'undefined' && Auth0Auth.state.isLoggedIn) {
-            console.log('Uživatel je přihlášen přes Auth0, používám Auth0 data');
-            this.state.currentUser = Auth0Auth.state.currentUser;
-        }
-
-        if (!this.state.currentUser) {
-            console.error('Nelze načíst profil: Uživatel není přihlášen');
-            return;
-        }
-
-        console.log('Aktualizace základních informací profilu pro uživatele:', this.state.currentUser);
-
-        // Aktualizace základních informací
-        const nameElement = document.getElementById('userProfileName');
-        const emailElement = document.getElementById('userProfileEmail');
-        const avatarElement = document.getElementById('userProfileAvatar');
-        const idElement = document.getElementById('userProfileId');
-        const lastLoginElement = document.getElementById('userProfileLastLogin');
-
-        if (nameElement) {
-            nameElement.textContent = this.state.currentUser.name || this.state.currentUser.nickname || 'Uživatel';
-        }
-
-        if (emailElement) {
-            emailElement.textContent = this.state.currentUser.email || '';
-        }
-
-        // Aktualizace ID uživatele
-        if (idElement && this.state.currentUser.sub) {
-            idElement.textContent = `ID: ${this.state.currentUser.sub}`;
-        }
-
-        // Aktualizace času posledního přihlášení
-        if (lastLoginElement && this.state.currentUser.updated_at) {
-            const lastLoginDate = new Date(this.state.currentUser.updated_at);
-            lastLoginElement.textContent = lastLoginDate.toLocaleString('cs-CZ');
-        }
-
-        // Aktualizace avataru
-        if (avatarElement && this.state.currentUser.picture) {
-            avatarElement.src = this.state.currentUser.picture;
-        }
-
-        // Přidání informace o poskytovateli autentizace
-        const metadataContainer = document.getElementById('userProfileMetadata');
-        if (metadataContainer) {
-            // Zobrazení všech dostupných informací o uživateli
-            let metadataHtml = '<div class="metadata-list">';
-
-            // Procházení všech vlastností uživatelského objektu
-            for (const [key, value] of Object.entries(this.state.currentUser)) {
-                // Přeskočení již zobrazených vlastností
-                if (['name', 'email', 'picture', 'sub', 'updated_at'].includes(key)) continue;
-
-                // Přeskočení prázdných hodnot
-                if (value === null || value === undefined || value === '') continue;
-
-                // Formátování hodnoty
-                let formattedValue = value;
-                if (typeof value === 'object') {
-                    formattedValue = JSON.stringify(value);
-                } else if (key.includes('date') || key.includes('time') || key.includes('at')) {
-                    // Pokus o formátování data
-                    try {
-                        formattedValue = new Date(value).toLocaleString('cs-CZ');
-                    } catch (e) {
-                        // Ponecháme původní hodnotu
-                    }
-                }
-
-                metadataHtml += `<div class="metadata-item">
-                    <span class="metadata-key">${key}:</span>
-                    <span class="metadata-value">${formattedValue}</span>
-                </div>`;
+        try {
+            // Kontrola, zda je uživatel přihlášen přes Auth0
+            if (typeof Auth0Auth !== 'undefined' && Auth0Auth.state.isLoggedIn) {
+                console.log('Uživatel je přihlášen přes Auth0, používám Auth0 data');
+                this.state.currentUser = Auth0Auth.state.currentUser;
             }
 
-            metadataHtml += '</div>';
-            metadataContainer.innerHTML = metadataHtml;
+            if (!this.state.currentUser) {
+                console.error('Nelze načíst profil: Uživatel není přihlášen');
+                return;
+            }
 
-            // Načtení uživatelských metadat z Auth0
-            if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.getUserInfo === 'function') {
-                try {
-                    console.log('Načítání rozšířených dat z Auth0');
+            console.log('Aktualizace základních informací profilu pro uživatele:', this.state.currentUser);
 
-                    // Získání informací o uživateli z Auth0 API
-                    const result = await Auth0Auth.getUserInfo();
+            // Získání kompletních dat profilu z API
+            const profileData = await this.fetchProfileData();
 
-                    if (result && !result.error) {
-                        console.log('Úspěšně načtena rozšířená data z Auth0:', result.data);
+            if (!profileData) {
+                console.error('Nepodařilo se načíst data profilu z API');
+                // Pokračujeme s lokálními daty
+            } else {
+                console.log('Úspěšně načtena data profilu z API:', profileData);
+                // Aktualizace lokálních dat
+                this.state.currentUser = profileData.auth0;
+                this.state.supabaseUser = profileData.supabase;
+                this.state.userPreferences = profileData.preferences;
+            }
 
-                        // Uložení metadat
-                        this.state.userMetadata = result.data?.user_metadata || {};
+            // Aktualizace základních informací
+            const nameElement = document.getElementById('userProfileName');
+            const emailElement = document.getElementById('userProfileEmail');
+            const avatarElement = document.getElementById('userProfileAvatar');
+            const idElement = document.getElementById('userProfileId');
+            const lastLoginElement = document.getElementById('userProfileLastLogin');
 
-                        // Zobrazení metadat
-                        if (Object.keys(this.state.userMetadata).length > 0) {
-                            let userMetadataHtml = '<h5>Uživatelská metadata:</h5><div class="metadata-list">';
+            if (nameElement) {
+                nameElement.textContent = this.state.currentUser.name || this.state.currentUser.nickname || 'Uživatel';
+            }
 
-                            for (const [key, value] of Object.entries(this.state.userMetadata)) {
-                                // Přeskočení předplatného, které zobrazujeme zvlášť
-                                if (key === 'subscription') continue;
+            if (emailElement) {
+                emailElement.textContent = this.state.currentUser.email || '';
+            }
 
-                                userMetadataHtml += `<div class="metadata-item">
-                                    <span class="metadata-key">${key}:</span>
-                                    <span class="metadata-value">${typeof value === 'object' ? JSON.stringify(value) : value}</span>
-                                </div>`;
+            // Aktualizace ID uživatele
+            if (idElement && this.state.currentUser.sub) {
+                idElement.textContent = `ID: ${this.state.currentUser.sub}`;
+            }
+
+            // Aktualizace času posledního přihlášení
+            if (lastLoginElement && this.state.currentUser.updated_at) {
+                const lastLoginDate = new Date(this.state.currentUser.updated_at);
+                lastLoginElement.textContent = lastLoginDate.toLocaleString('cs-CZ');
+            }
+
+            // Aktualizace avataru
+            if (avatarElement && this.state.currentUser.picture) {
+                avatarElement.src = this.state.currentUser.picture;
+            }
+
+            // Přidání informace o poskytovateli autentizace
+            const metadataContainer = document.getElementById('userProfileMetadata');
+            if (metadataContainer) {
+                // Zobrazení všech dostupných informací o uživateli
+                let metadataHtml = '<div class="metadata-list">';
+
+                // Procházení všech vlastností uživatelského objektu
+                for (const [key, value] of Object.entries(this.state.currentUser)) {
+                    // Přeskočení již zobrazených vlastností
+                    if (['name', 'email', 'picture', 'sub', 'updated_at'].includes(key)) continue;
+
+                    // Přeskočení prázdných hodnot
+                    if (value === null || value === undefined || value === '') continue;
+
+                    // Formátování hodnoty
+                    let formattedValue = value;
+                    if (typeof value === 'object') {
+                        formattedValue = JSON.stringify(value);
+                    } else if (key.includes('date') || key.includes('time') || key.includes('at')) {
+                        // Pokus o formátování data
+                        try {
+                            formattedValue = new Date(value).toLocaleString('cs-CZ');
+                        } catch (e) {
+                            // Ponecháme původní hodnotu
+                        }
+                    }
+
+                    metadataHtml += `<div class="metadata-item">
+                        <span class="metadata-key">${key}:</span>
+                        <span class="metadata-value">${formattedValue}</span>
+                    </div>`;
+                }
+
+                metadataHtml += '</div>';
+
+                // Přidání dat ze Supabase, pokud jsou dostupná
+                if (this.state.supabaseUser) {
+                    metadataHtml += '<h5>Supabase data:</h5><div class="metadata-list">';
+
+                    for (const [key, value] of Object.entries(this.state.supabaseUser)) {
+                        // Přeskočení již zobrazených vlastností
+                        if (['auth0_id', 'email', 'name', 'avatar_url'].includes(key)) continue;
+
+                        // Přeskočení prázdných hodnot
+                        if (value === null || value === undefined || value === '') continue;
+
+                        // Formátování hodnoty
+                        let formattedValue = value;
+                        if (typeof value === 'object') {
+                            formattedValue = JSON.stringify(value);
+                        } else if (key.includes('date') || key.includes('time') || key.includes('at')) {
+                            // Pokus o formátování data
+                            try {
+                                formattedValue = new Date(value).toLocaleString('cs-CZ');
+                            } catch (e) {
+                                // Ponecháme původní hodnotu
                             }
-
-                            userMetadataHtml += '</div>';
-                            metadataContainer.innerHTML += userMetadataHtml;
                         }
 
-                        // Načtení informací o předplatném
-                        this.loadSubscriptionInfo(result.data);
+                        metadataHtml += `<div class="metadata-item">
+                            <span class="metadata-key">${key}:</span>
+                            <span class="metadata-value">${formattedValue}</span>
+                        </div>`;
                     }
-                } catch (error) {
-                    console.error('Chyba při načítání uživatelských metadat:', error);
-                }
-            }
-        } else {
-            console.error('Kontejner pro metadata nebyl nalezen');
-        }
 
-        // Aktualizace informací o předplatném
-        const subscriptionContainer = document.getElementById('userProfileSubscription');
-        if (subscriptionContainer) {
-            // Základní informace o předplatném
-            subscriptionContainer.innerHTML = `
-                <div class="subscription-info">
-                    <p>Používáte základní verzi aplikace.</p>
-                    <p>Přihlášeni přes Auth0.</p>
-                </div>
-            `;
+                    metadataHtml += '</div>';
+                }
+
+                // Přidání uživatelských preferencí, pokud jsou dostupné
+                if (this.state.userPreferences) {
+                    metadataHtml += '<h5>Uživatelské preference:</h5><div class="metadata-list">';
+
+                    for (const [key, value] of Object.entries(this.state.userPreferences)) {
+                        // Přeskočení prázdných hodnot
+                        if (value === null || value === undefined || value === '') continue;
+
+                        // Formátování hodnoty
+                        let formattedValue = value;
+                        if (typeof value === 'object') {
+                            formattedValue = JSON.stringify(value);
+                        } else if (key.includes('date') || key.includes('time') || key.includes('at')) {
+                            // Pokus o formátování data
+                            try {
+                                formattedValue = new Date(value).toLocaleString('cs-CZ');
+                            } catch (e) {
+                                // Ponecháme původní hodnotu
+                            }
+                        }
+
+                        metadataHtml += `<div class="metadata-item">
+                            <span class="metadata-key">${key}:</span>
+                            <span class="metadata-value">${formattedValue}</span>
+                        </div>`;
+                    }
+
+                    metadataHtml += '</div>';
+                }
+
+                metadataContainer.innerHTML = metadataHtml;
+
+                // Načtení uživatelských metadat z Auth0
+                if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.getUserInfo === 'function') {
+                    try {
+                        console.log('Načítání rozšířených dat z Auth0');
+
+                        // Získání informací o uživateli z Auth0 API
+                        const result = await Auth0Auth.getUserInfo();
+
+                        if (result && !result.error) {
+                            console.log('Úspěšně načtena rozšířená data z Auth0:', result.data);
+
+                            // Uložení metadat
+                            this.state.userMetadata = result.data?.user_metadata || {};
+
+                            // Zobrazení metadat
+                            if (Object.keys(this.state.userMetadata).length > 0) {
+                                let userMetadataHtml = '<h5>Auth0 metadata:</h5><div class="metadata-list">';
+
+                                for (const [key, value] of Object.entries(this.state.userMetadata)) {
+                                    // Přeskočení předplatného, které zobrazujeme zvlášť
+                                    if (key === 'subscription') continue;
+
+                                    userMetadataHtml += `<div class="metadata-item">
+                                        <span class="metadata-key">${key}:</span>
+                                        <span class="metadata-value">${typeof value === 'object' ? JSON.stringify(value) : value}</span>
+                                    </div>`;
+                                }
+
+                                userMetadataHtml += '</div>';
+                                metadataContainer.innerHTML += userMetadataHtml;
+                            }
+
+                            // Načtení informací o předplatném
+                            this.loadSubscriptionInfo(result.data);
+                        }
+                    } catch (error) {
+                        console.error('Chyba při načítání uživatelských metadat:', error);
+                    }
+                }
+            } else {
+                console.error('Kontejner pro metadata nebyl nalezen');
+            }
+
+            // Aktualizace informací o předplatném
+            const subscriptionContainer = document.getElementById('userProfileSubscription');
+            if (subscriptionContainer) {
+                // Základní informace o předplatném
+                subscriptionContainer.innerHTML = `
+                    <div class="subscription-info">
+                        <p>Používáte základní verzi aplikace.</p>
+                        <p>Přihlášeni přes Auth0 a data uložena v Supabase.</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Chyba při načítání dat uživatelského profilu:', error);
+        }
+    },
+
+    // Získání dat profilu z API
+    async fetchProfileData() {
+        try {
+            console.log('Získávání dat profilu z API');
+
+            const response = await fetch('/api/profile');
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Nepodařilo se získat data profilu');
+            }
+
+            const profileData = await response.json();
+            return profileData;
+        } catch (error) {
+            console.error('Chyba při získávání dat profilu:', error);
+            return null;
         }
     },
 

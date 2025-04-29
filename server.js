@@ -14,6 +14,7 @@ const path = require('path');
 const fs = require('fs');
 const request = require('request');
 const { auth } = require('express-openid-connect');
+const supabaseService = require('./supabase-service');
 
 // Načtení proměnných prostředí z .env souboru
 require('dotenv').config();
@@ -502,6 +503,126 @@ app.get('/profile', requiresAuth(), (req, res) => {
 
 app.get('/profile-api', requiresAuth(), (req, res) => {
   res.send(JSON.stringify(req.oidc.user));
+});
+
+// Endpoint pro získání kompletních informací o profilu (Auth0 + Supabase)
+app.get('/api/profile', requiresAuth(), async (req, res) => {
+  try {
+    // Získání uživatele z Auth0
+    const auth0User = req.oidc.user;
+
+    if (!auth0User || !auth0User.sub) {
+      return res.status(400).json({ error: 'Chybí uživatelské informace' });
+    }
+
+    // Získání uživatele ze Supabase
+    let supabaseUser = await supabaseService.getUserFromSupabase(auth0User.sub);
+
+    // Pokud uživatel neexistuje v Supabase, pokusíme se ho synchronizovat
+    if (!supabaseUser) {
+      supabaseUser = await supabaseService.syncUserToSupabase(auth0User);
+    }
+
+    // Získání uživatelských preferencí ze Supabase
+    const userPreferences = await supabaseService.getUserPreferences(auth0User.sub);
+
+    // Vrácení kombinovaných dat
+    res.json({
+      auth0: auth0User,
+      supabase: supabaseUser,
+      preferences: userPreferences,
+      isComplete: !!supabaseUser
+    });
+  } catch (error) {
+    console.error('Chyba při získávání informací o profilu:', error);
+    res.status(500).json({ error: 'Interní chyba serveru' });
+  }
+});
+
+// Endpoint pro synchronizaci uživatele s Supabase
+app.get('/auth/sync-user', requiresAuth(), async (req, res) => {
+  try {
+    // Získání uživatele z Auth0
+    const auth0User = req.oidc.user;
+
+    if (!auth0User || !auth0User.sub) {
+      return res.status(400).json({ error: 'Chybí uživatelské informace' });
+    }
+
+    // Synchronizace uživatele do Supabase
+    const supabaseUser = await supabaseService.syncUserToSupabase(auth0User);
+
+    if (!supabaseUser) {
+      return res.status(500).json({ error: 'Nepodařilo se synchronizovat uživatele do Supabase' });
+    }
+
+    // Vrácení kombinovaných dat
+    res.json({
+      auth0: auth0User,
+      supabase: supabaseUser
+    });
+  } catch (error) {
+    console.error('Chyba při synchronizaci uživatele:', error);
+    res.status(500).json({ error: 'Interní chyba serveru' });
+  }
+});
+
+// Endpoint pro získání uživatelských dat ze Supabase
+app.get('/api/user-data', requiresAuth(), async (req, res) => {
+  try {
+    const auth0User = req.oidc.user;
+
+    if (!auth0User || !auth0User.sub) {
+      return res.status(400).json({ error: 'Chybí uživatelské informace' });
+    }
+
+    // Získání uživatele ze Supabase
+    const supabaseUser = await supabaseService.getUserFromSupabase(auth0User.sub);
+
+    if (!supabaseUser) {
+      // Pokud uživatel neexistuje v Supabase, pokusíme se ho synchronizovat
+      const syncedUser = await supabaseService.syncUserToSupabase(auth0User);
+
+      if (!syncedUser) {
+        return res.status(500).json({ error: 'Nepodařilo se získat ani synchronizovat uživatele' });
+      }
+
+      return res.json(syncedUser);
+    }
+
+    res.json(supabaseUser);
+  } catch (error) {
+    console.error('Chyba při získávání uživatelských dat:', error);
+    res.status(500).json({ error: 'Interní chyba serveru' });
+  }
+});
+
+// Endpoint pro uložení uživatelských dat do Supabase
+app.post('/api/user-data', requiresAuth(), async (req, res) => {
+  try {
+    const auth0User = req.oidc.user;
+    const userData = req.body;
+
+    if (!auth0User || !auth0User.sub) {
+      return res.status(400).json({ error: 'Chybí uživatelské informace' });
+    }
+
+    if (!userData) {
+      return res.status(400).json({ error: 'Chybí data k uložení' });
+    }
+
+    // Uložení dat do Supabase
+    const success = await supabaseService.saveUserData(auth0User.sub, userData);
+
+    if (!success) {
+      return res.status(500).json({ error: 'Nepodařilo se uložit uživatelská data' });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Chyba při ukládání uživatelských dat:', error);
+    res.status(500).json({ error: 'Interní chyba serveru' });
+  }
 });
 
 // Zpracování argumentů příkazové řádky

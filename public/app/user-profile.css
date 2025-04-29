@@ -185,10 +185,19 @@
     font-size: 1rem;
 }
 
+.user-profile-metadata h5 {
+    margin: 15px 0 10px 0;
+    font-size: 0.9rem;
+    color: #0066cc;
+    border-bottom: 1px solid #0066cc;
+    padding-bottom: 5px;
+}
+
 .metadata-list {
     max-height: 200px;
     overflow-y: auto;
     padding-right: 10px;
+    margin-bottom: 15px;
 }
 
 .metadata-item {
@@ -202,6 +211,18 @@
     font-weight: bold;
     margin-right: 10px;
     min-width: 120px;
+}
+
+/* Styly pro Supabase data */
+.user-profile-metadata h5:nth-of-type(1) {
+    color: #3ECF8E; /* Supabase zelená */
+    border-bottom-color: #3ECF8E;
+}
+
+/* Styly pro Auth0 metadata */
+.user-profile-metadata h5:nth-of-type(3) {
+    color: #ff4f1f; /* Auth0 oranžová */
+    border-bottom-color: #ff4f1f;
 }
 
 /* Styly pro zobrazení stavu autentizace */
