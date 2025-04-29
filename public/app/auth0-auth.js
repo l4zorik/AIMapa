@@ -695,6 +695,46 @@ const Auth0Auth = {
         try {
             console.log('Kontrola přihlášení uživatele...');
 
+            // Nejprve zkontrolujeme localStorage
+            const isLoggedInFromStorage = localStorage.getItem('aiMapaLoggedIn') === 'true';
+            const authOverlayRemoved = localStorage.getItem('aiMapaAuthOverlayRemoved') === 'true';
+
+            if (isLoggedInFromStorage && authOverlayRemoved) {
+                console.log('Uživatel je přihlášen podle localStorage (rychlá kontrola)');
+
+                // Pokus o načtení uživatelského profilu
+                const savedProfile = localStorage.getItem('aiMapaUserProfile');
+                if (savedProfile) {
+                    try {
+                        this.state.currentUser = JSON.parse(savedProfile);
+                        this.state.isLoggedIn = true;
+                        console.log('Načten uživatelský profil z localStorage (rychlá kontrola):', this.state.currentUser);
+
+                        // Aktualizace tlačítka autentizace
+                        this.updateAuthButton();
+
+                        // Zobrazení profilu uživatele
+                        this.displayUserProfile();
+
+                        // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
+                        const authOverlay = document.getElementById('auth-overlay');
+                        if (authOverlay) {
+                            console.log('Odstraňuji překryvnou vrstvu pro přihlášení (rychlá kontrola)...');
+                            authOverlay.style.opacity = '0';
+                            authOverlay.style.transition = 'opacity 0.8s ease';
+                            setTimeout(() => {
+                                authOverlay.remove();
+                                console.log('Překryvná vrstva byla odstraněna (rychlá kontrola)');
+                            }, 800);
+                        }
+
+                        return true;
+                    } catch (e) {
+                        console.error('Chyba při parsování uloženého profilu (rychlá kontrola):', e);
+                    }
+                }
+            }
+
             // Nejprve zkusíme získat stav přihlášení ze serveru pomocí /auth/status
             try {
                 console.log('Kontrola stavu přihlášení pomocí /auth/status...');
@@ -859,6 +899,10 @@ const Auth0Auth = {
                                     // Odstranění parametrů z URL
                                     window.history.replaceState({}, document.title, window.location.pathname);
 
+                                    // Nastavení příznaku, že uživatel je přihlášen
+                                    localStorage.setItem('aiMapaLoggedIn', 'true');
+                                    localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+
                                     console.log('Uživatel je přihlášen:', processedUserInfo.email || processedUserInfo.name);
 
                                     // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
@@ -951,6 +995,10 @@ const Auth0Auth = {
 
                         // Odstranění parametrů z URL
                         window.history.replaceState({}, document.title, window.location.pathname);
+
+                        // Nastavení příznaku, že uživatel je přihlášen
+                        localStorage.setItem('aiMapaLoggedIn', 'true');
+                        localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
 
                         console.log('Uživatel je přihlášen:', userInfo.email || userInfo.name);
 

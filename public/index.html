@@ -833,6 +833,24 @@
             const query = window.location.search;
             const hasAuthCode = query.includes('code=') && query.includes('state=');
 
+            // Kontrola, zda je uživatel již přihlášen podle localStorage
+            const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+            const authOverlayRemoved = localStorage.getItem('aiMapaAuthOverlayRemoved') === 'true';
+
+            if (isLoggedIn && authOverlayRemoved) {
+                console.log('Uživatel je již přihlášen podle localStorage, odstraňuji překryvnou vrstvu...');
+                // Odstranění překryvné vrstvy, pokud existuje
+                const authOverlay = document.getElementById('auth-overlay');
+                if (authOverlay) {
+                    authOverlay.style.opacity = '0';
+                    authOverlay.style.transition = 'opacity 0.8s ease';
+                    setTimeout(() => {
+                        authOverlay.remove();
+                        console.log('Překryvná vrstva byla odstraněna (rychlá kontrola při načtení)');
+                    }, 800);
+                }
+            }
+
             if (hasAuthCode) {
                 console.log('Detekován autorizační kód v URL, prioritně inicializuji Auth0...');
             }
@@ -874,7 +892,9 @@
                                 Auth0Auth.displayUserProfile();
                             }
 
-                            // Nezapisujeme aiMapaAuthOverlayRemoved, aby se překryvná vrstva zobrazila při každém načtení, pokud uživatel není přihlášen
+                            // Nastavení příznaku, že uživatel je přihlášen a překryvná vrstva byla odstraněna
+                            localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+                            localStorage.setItem('aiMapaLoggedIn', 'true');
                         }
                     }).catch(error => {
                         console.error('Chyba při kontrole přihlášení:', error);
