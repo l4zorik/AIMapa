@@ -519,7 +519,14 @@ const { requiresAuth } = require('express-openid-connect');
 
 // Přidání endpointu pro zobrazení informací o uživateli s vyžadovanou autentizací
 app.get('/profile', requiresAuth(), (req, res) => {
-    // Zobrazení informací o uživateli
+    // Kontrola, zda požadavek chce JSON data
+    const acceptHeader = req.headers.accept || '';
+    if (acceptHeader.includes('application/json')) {
+        // Vrácení JSON dat
+        return res.json(req.oidc.user);
+    }
+
+    // Zobrazení informací o uživateli jako HTML stránka
     res.send(`
         <h1>Profil uživatele</h1>
         <p>Přihlášen jako: ${req.oidc.user.name}</p>

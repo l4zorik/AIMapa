@@ -812,6 +812,55 @@ const UserProfile = {
         try {
             console.log('Získávání dat profilu z API');
 
+            // Nejprve zkusíme získat data z /profile endpointu (chráněný requiresAuth middleware)
+            try {
+                const profileResponse = await fetch('/profile', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (profileResponse.ok) {
+                    const profileData = await profileResponse.json();
+                    console.log('Úspěšně načtena data z /profile:', profileData);
+
+                    // Vrátíme data ve formátu kompatibilním s očekávaným formátem
+                    return {
+                        auth0: profileData,
+                        supabase: null,
+                        preferences: null,
+                        isComplete: true
+                    };
+                } else {
+                    console.warn('Nepodařilo se získat data z /profile, zkouším /profile-api');
+                }
+            } catch (profileError) {
+                console.warn('Chyba při získávání dat z /profile:', profileError);
+            }
+
+            // Pokud se nepodařilo získat data z /profile, zkusíme /profile-api
+            try {
+                const profileApiResponse = await fetch('/profile-api');
+
+                if (profileApiResponse.ok) {
+                    const profileApiData = await profileApiResponse.json();
+                    console.log('Úspěšně načtena data z /profile-api:', profileApiData);
+
+                    // Vrátíme data ve formátu kompatibilním s očekávaným formátem
+                    return {
+                        auth0: profileApiData,
+                        supabase: null,
+                        preferences: null,
+                        isComplete: true
+                    };
+                } else {
+                    console.warn('Nepodařilo se získat data z /profile-api, zkouším /api/profile');
+                }
+            } catch (profileApiError) {
+                console.warn('Chyba při získávání dat z /profile-api:', profileApiError);
+            }
+
+            // Pokud se nepodařilo získat data z /profile-api, zkusíme /api/profile
             const response = await fetch('/api/profile');
 
             if (!response.ok) {
@@ -820,6 +869,7 @@ const UserProfile = {
             }
 
             const profileData = await response.json();
+            console.log('Úspěšně načtena data z /api/profile:', profileData);
             return profileData;
         } catch (error) {
             console.error('Chyba při získávání dat profilu:', error);
