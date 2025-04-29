@@ -9,7 +9,10 @@ const UserProfile = {
         isInitialized: false,
         isVisible: false,
         currentUser: null,
-        userMetadata: null
+        userMetadata: null,
+        auth0Status: 'unknown', // 'connected', 'disconnected', 'unknown'
+        supabaseStatus: 'unknown', // 'connected', 'disconnected', 'unknown'
+        hostingStatus: 'unknown' // 'connected', 'disconnected', 'unknown'
     },
 
     // Inicializace modulu
@@ -21,6 +24,12 @@ const UserProfile = {
 
         // Vytvoření modálního okna pro profil
         this.createProfileModal();
+
+        // Přidání indikátorů stavu připojení
+        this.addStatusIndicators();
+
+        // Kontrola stavu připojení
+        this.checkConnectionStatus();
 
         // Nastavení posluchačů událostí
         this.setupEventListeners();
@@ -36,6 +45,11 @@ const UserProfile = {
             return;
         }
 
+        // Vytvoření kontejneru pro tlačítko
+        const profileContainer = document.createElement('div');
+        profileContainer.id = 'userProfileContainer';
+        profileContainer.className = 'user-profile-container';
+
         // Vytvoření tlačítka
         const profileButton = document.createElement('button');
         profileButton.id = 'userProfileButton';
@@ -48,8 +62,60 @@ const UserProfile = {
             this.toggleProfileModal();
         });
 
-        // Přidání tlačítka do dokumentu
-        document.body.appendChild(profileButton);
+        // Přidání tlačítka do kontejneru
+        profileContainer.appendChild(profileButton);
+
+        // Přidání kontejneru do dokumentu
+        document.body.appendChild(profileContainer);
+
+        // Přidání CSS stylů pro tlačítko
+        this.addProfileButtonStyles();
+    },
+
+    // Přidání CSS stylů pro tlačítko profilu
+    addProfileButtonStyles() {
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            .user-profile-container {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+
+            .user-profile-button {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #8B5CF6;
+                color: white;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s ease;
+            }
+
+            .user-profile-button:hover {
+                transform: scale(1.1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            .user-profile-button.logged-in {
+                background-color: #10B981;
+            }
+
+            body[data-theme="dark"] .user-profile-button {
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            }
+        `;
+        document.head.appendChild(styleElement);
     },
 
     // Vytvoření modálního okna pro profil
@@ -196,6 +262,198 @@ const UserProfile = {
         }
     },
 
+    // Přidání indikátorů stavu připojení
+    addStatusIndicators() {
+        // Kontrola, zda již indikátory existují
+        if (document.getElementById('connection-status-indicators')) {
+            return;
+        }
+
+        // Vytvoření kontejneru pro indikátory
+        const indicatorsContainer = document.createElement('div');
+        indicatorsContainer.id = 'connection-status-indicators';
+        indicatorsContainer.className = 'connection-status-indicators';
+
+        // Vytvoření indikátorů
+        indicatorsContainer.innerHTML = `
+            <div class="status-indicator auth0" title="Auth0 status">
+                <span class="indicator-dot unknown"></span>
+                <span class="indicator-label">Auth0</span>
+            </div>
+            <div class="status-indicator supabase" title="Supabase status">
+                <span class="indicator-dot unknown"></span>
+                <span class="indicator-label">Supabase</span>
+            </div>
+            <div class="status-indicator hosting" title="Hosting status">
+                <span class="indicator-dot unknown"></span>
+                <span class="indicator-label">Hosting</span>
+            </div>
+        `;
+
+        // Přidání indikátorů do kontejneru profilu
+        const profileContainer = document.getElementById('userProfileContainer');
+        if (profileContainer) {
+            profileContainer.appendChild(indicatorsContainer);
+        } else {
+            // Pokud kontejner profilu neexistuje, přidáme indikátory přímo do dokumentu
+            document.body.appendChild(indicatorsContainer);
+        }
+
+        // Přidání CSS stylů pro indikátory
+        this.addStatusIndicatorsStyles();
+    },
+
+    // Přidání CSS stylů pro indikátory stavu připojení
+    addStatusIndicatorsStyles() {
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            .connection-status-indicators {
+                display: flex;
+                margin-top: 10px;
+                background-color: rgba(0, 0, 0, 0.7);
+                border-radius: 20px;
+                padding: 5px 10px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            .status-indicator {
+                display: flex;
+                align-items: center;
+                margin: 0 5px;
+                color: white;
+                font-size: 12px;
+            }
+
+            .indicator-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                margin-right: 5px;
+            }
+
+            .indicator-dot.connected {
+                background-color: #10B981;
+                box-shadow: 0 0 5px #10B981;
+            }
+
+            .indicator-dot.disconnected {
+                background-color: #EF4444;
+                box-shadow: 0 0 5px #EF4444;
+            }
+
+            .indicator-dot.unknown {
+                background-color: #F59E0B;
+                box-shadow: 0 0 5px #F59E0B;
+            }
+
+            body[data-theme="dark"] .connection-status-indicators {
+                background-color: rgba(0, 0, 0, 0.8);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            }
+        `;
+        document.head.appendChild(styleElement);
+    },
+
+    // Kontrola stavu připojení
+    async checkConnectionStatus() {
+        // Kontrola stavu Auth0
+        await this.checkAuth0Status();
+
+        // Kontrola stavu Supabase
+        await this.checkSupabaseStatus();
+
+        // Kontrola stavu hostingu
+        this.checkHostingStatus();
+    },
+
+    // Kontrola stavu Auth0
+    async checkAuth0Status() {
+        try {
+            // Kontrola, zda je k dispozici Auth0 modul
+            if (typeof Auth0Auth !== 'undefined' && Auth0Auth.state) {
+                this.state.auth0Status = Auth0Auth.state.isLoggedIn ? 'connected' : 'disconnected';
+            } else {
+                // Pokus o získání stavu přihlášení z API
+                const response = await fetch('/auth/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    this.state.auth0Status = data.isAuthenticated ? 'connected' : 'disconnected';
+                } else {
+                    this.state.auth0Status = 'disconnected';
+                }
+            }
+
+            // Aktualizace UI
+            this.updateAuth0StatusUI();
+        } catch (error) {
+            console.error('Chyba při kontrole stavu Auth0:', error);
+            this.state.auth0Status = 'disconnected';
+            this.updateAuth0StatusUI();
+        }
+    },
+
+    // Kontrola stavu Supabase
+    async checkSupabaseStatus() {
+        try {
+            // Pokus o získání konfigurace prostředí
+            const envResponse = await fetch('/env-config.json');
+            if (envResponse.ok) {
+                const envData = await envResponse.json();
+                this.state.supabaseStatus = envData.SUPABASE_URL ? 'connected' : 'disconnected';
+            } else {
+                this.state.supabaseStatus = 'unknown';
+            }
+
+            // Aktualizace UI
+            this.updateSupabaseStatusUI();
+        } catch (error) {
+            console.error('Chyba při kontrole stavu Supabase:', error);
+            this.state.supabaseStatus = 'unknown';
+            this.updateSupabaseStatusUI();
+        }
+    },
+
+    // Kontrola stavu hostingu
+    checkHostingStatus() {
+        // Kontrola, zda jsme na Netlify
+        const isNetlify = window.location.href.includes('netlify.app');
+
+        if (isNetlify) {
+            this.state.hostingStatus = 'connected';
+        } else {
+            // Kontrola, zda jsme na localhost
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            this.state.hostingStatus = isLocalhost ? 'connected' : 'unknown';
+        }
+
+        // Aktualizace UI
+        this.updateHostingStatusUI();
+    },
+
+    // Aktualizace UI pro stav Auth0
+    updateAuth0StatusUI() {
+        const auth0Indicator = document.querySelector('.status-indicator.auth0 .indicator-dot');
+        if (auth0Indicator) {
+            auth0Indicator.className = 'indicator-dot ' + this.state.auth0Status;
+        }
+    },
+
+    // Aktualizace UI pro stav Supabase
+    updateSupabaseStatusUI() {
+        const supabaseIndicator = document.querySelector('.status-indicator.supabase .indicator-dot');
+        if (supabaseIndicator) {
+            supabaseIndicator.className = 'indicator-dot ' + this.state.supabaseStatus;
+        }
+    },
+
+    // Aktualizace UI pro stav hostingu
+    updateHostingStatusUI() {
+        const hostingIndicator = document.querySelector('.status-indicator.hosting .indicator-dot');
+        if (hostingIndicator) {
+            hostingIndicator.className = 'indicator-dot ' + this.state.hostingStatus;
+        }
+    },
+
     // Aktualizace tlačítka profilu
     updateProfileButton(isLoggedIn) {
         console.log('Aktualizace tlačítka profilu, stav přihlášení:', isLoggedIn);
@@ -211,45 +469,17 @@ const UserProfile = {
             profileButton.title = 'Zobrazit uživatelský profil (přihlášen přes Auth0)';
             profileButton.innerHTML = '<i class="fas fa-user-check"></i>';
 
-            // Přidání textu "Přihlášen" vedle tlačítka
-            if (!document.getElementById('profile-login-status')) {
-                const statusIndicator = document.createElement('div');
-                statusIndicator.id = 'profile-login-status';
-                statusIndicator.className = 'profile-login-status';
-                statusIndicator.textContent = 'Přihlášen';
-
-                // Vložení indikátoru vedle tlačítka
-                profileButton.parentNode.insertBefore(statusIndicator, profileButton.nextSibling);
-
-                // Přidání stylu pro indikátor
-                const style = document.createElement('style');
-                style.textContent = `
-                    .profile-login-status {
-                        position: fixed;
-                        top: 65px;
-                        right: 170px;
-                        background-color: #4CAF50;
-                        color: white;
-                        padding: 3px 8px;
-                        border-radius: 10px;
-                        font-size: 12px;
-                        font-weight: bold;
-                        z-index: 899;
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                    }
-                `;
-                document.head.appendChild(style);
-            }
+            // Aktualizace stavu Auth0
+            this.state.auth0Status = 'connected';
+            this.updateAuth0StatusUI();
         } else {
             profileButton.classList.remove('logged-in');
             profileButton.title = 'Přihlaste se pro zobrazení profilu';
             profileButton.innerHTML = '<i class="fas fa-user"></i>';
 
-            // Odstranění textu "Přihlášen" pokud existuje
-            const statusIndicator = document.getElementById('profile-login-status');
-            if (statusIndicator) {
-                statusIndicator.remove();
-            }
+            // Aktualizace stavu Auth0
+            this.state.auth0Status = 'disconnected';
+            this.updateAuth0StatusUI();
         }
     },
 
@@ -716,10 +946,17 @@ const UserProfile = {
             await LocalAuth.logout();
         } else if (typeof UserAccounts !== 'undefined') {
             await UserAccounts.logout();
+        } else {
+            // Pokud není dostupný žádný autentizační modul, přesměrujeme na Auth0 odhlašovací stránku
+            window.location.href = '/logout';
         }
 
         // Skrytí modálního okna
         this.hideProfileModal();
+
+        // Aktualizace stavu připojení
+        this.state.auth0Status = 'disconnected';
+        this.updateAuth0StatusUI();
     }
 };
 
