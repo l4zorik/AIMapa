@@ -655,12 +655,13 @@
                 updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
 
                 // Okamžité přesměrování bez čekání
-                const redirectUri = window.location.origin;
+                const redirectUri = window.location.origin + '/callback';
                 const authUrl = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?' +
-                    'client_id=TKzCgYPmkETVCBjC3418MgKDJY60rppl&' +
+                    'client_id=H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ&' +
                     'redirect_uri=' + encodeURIComponent(redirectUri) + '&' +
                     'response_type=code&' +
-                    'scope=openid%20profile%20email&' +
+                    'scope=openid%20profile%20email%20read%3Ausers%20read%3Auser_idp_tokens&' +
+                    'audience=https%3A%2F%2Fdev-zxj8pir0moo4pdk7.us.auth0.com%2Fapi%2Fv2%2F&' +
                     'connection=Username-Password-Authentication&' + // Specifikace připojení
                     'prompt=login'; // Vždy zobrazit přihlašovací obrazovku
 

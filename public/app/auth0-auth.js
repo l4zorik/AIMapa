@@ -421,14 +421,14 @@ const Auth0Auth = {
             if (window.location.href.includes('devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app')) {
                 redirectUri = this.config.netlifyDevRedirectUri;
             } else {
-                redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app';
+                redirectUri = 'https://remarkable-cajeta-76cfd9.netlify.app/callback';
             }
         }
         // Kontrola, zda jsme na localhost (3000 nebo 3001)
         else if (window.location.href.includes('localhost:3001') || window.location.href.includes('localhost:3000')) {
             console.log('Jsme na lokálním vývojovém prostředí, používám localhost:3000 URL pro přesměrování');
             // Vždy používáme port 3000, protože je to povoleno v Auth0 dashboardu
-            redirectUri = 'http://localhost:3000';
+            redirectUri = 'http://localhost:3000/callback';
         }
 
         // Vytvoření jednoduchého objektu pro simulaci Auth0 klienta
@@ -439,7 +439,8 @@ const Auth0Auth = {
                     `client_id=${this.config.clientId}&` +
                     `redirect_uri=${encodeURIComponent(redirectUri)}&` +
                     `response_type=code&` +
-                    `scope=openid%20profile%20email&` +
+                    `scope=openid%20profile%20email%20read%3Ausers%20read%3Auser_idp_tokens&` +
+                    `audience=${encodeURIComponent(this.config.audience)}&` +
                     `state=${Math.random().toString(36).substring(2, 15)}`;
 
                 console.log('Přímé přesměrování na Auth0 URL (simulovaný klient):', authUrl);
