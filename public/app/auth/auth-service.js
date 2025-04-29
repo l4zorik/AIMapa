@@ -24,7 +24,7 @@ const AuthService = {
         // Auth0 konfigurace
         auth0: {
             domain: 'dev-zxj8pir0moo4pdk7.us.auth0.com',
-            clientId: 'TKzCgYPmkETVCBjC3418MgKDJY60rppl',
+            clientId: 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
             redirectUri: window.location.origin,
             // Přidání podpory pro vývojovou verzi na Netlify
             netlifyDevRedirectUri: 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app',

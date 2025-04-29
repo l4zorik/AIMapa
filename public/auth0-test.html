@@ -87,15 +87,15 @@
         window.addEventListener('load', function() {
             if (typeof createAuth0Client === 'undefined') {
                 console.error('Auth0 SDK nebyl správně načten, pokouším se ho načíst znovu...');
-                
+
                 // Pokus o opětovné načtení Auth0 SDK
                 const script = document.createElement('script');
                 script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
                 script.async = false;
-                
+
                 script.onload = function() {
                     console.log('Auth0 SDK byl úspěšně načten');
-                    
+
                     // Kontrola, zda je createAuth0Client definováno
                     if (typeof createAuth0Client !== 'undefined') {
                         console.log('createAuth0Client je nyní definováno');
@@ -107,13 +107,13 @@
                         document.getElementById('auth0-status').className = 'test-result error';
                     }
                 };
-                
+
                 script.onerror = function(error) {
                     console.error('Chyba při opětovném načítání Auth0 SDK:', error);
                     document.getElementById('auth0-status').textContent = 'Chyba při načítání Auth0 SDK';
                     document.getElementById('auth0-status').className = 'test-result error';
                 };
-                
+
                 document.head.appendChild(script);
             } else {
                 console.log('Auth0 SDK je správně načten, createAuth0Client je definováno');
@@ -125,7 +125,7 @@
         // Konfigurace Auth0
         const auth0Config = {
             domain: 'dev-zxj8pir0moo4pdk7.us.auth0.com',
-            clientId: 'TKzCgYPmkETVCBjC3418MgKDJY60rppl',
+            clientId: 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
             redirectUri: window.location.origin + '/auth0-test.html',
             audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
             scope: 'openid profile email'
@@ -160,20 +160,20 @@
 
                 resultElement.textContent = 'Auth0 klient byl úspěšně inicializován';
                 resultElement.className = 'test-result success';
-                
+
                 // Aktualizace stavu testů
                 updateTestStatus('test-1', true);
-                
+
                 return auth0Client;
             } catch (error) {
                 const resultElement = document.getElementById('init-result');
                 resultElement.textContent = `Chyba při inicializaci Auth0: ${error.message}`;
                 resultElement.className = 'test-result error';
                 console.error('Chyba při inicializaci Auth0:', error);
-                
+
                 // Aktualizace stavu testů
                 updateTestStatus('test-1', false, error.message);
-                
+
                 return null;
             }
         }
@@ -261,7 +261,7 @@
                 const user = await auth0Client.getUser();
                 resultElement.innerHTML = `Uživatel je přihlášen:<pre>${JSON.stringify(user, null, 2)}</pre>`;
                 resultElement.className = 'test-result success';
-                
+
                 // Aktualizace stavu testů
                 updateTestStatus('test-3', true);
             } catch (error) {
@@ -269,7 +269,7 @@
                 resultElement.textContent = `Chyba při získávání uživatele: ${error.message}`;
                 resultElement.className = 'test-result error';
                 console.error('Chyba při získávání uživatele:', error);
-                
+
                 // Aktualizace stavu testů
                 updateTestStatus('test-3', false, error.message);
             }
@@ -279,7 +279,7 @@
         async function handleCallback() {
             try {
                 const resultElement = document.getElementById('callback-result');
-                
+
                 // Kontrola, zda je v URL autorizační kód
                 const query = window.location.search;
                 if (!query.includes('code=') || !query.includes('state=')) {
@@ -302,7 +302,7 @@
                 const result = await auth0Client.handleRedirectCallback();
                 resultElement.innerHTML = `Callback byl úspěšně zpracován:<pre>${JSON.stringify(result, null, 2)}</pre>`;
                 resultElement.className = 'test-result success';
-                
+
                 // Aktualizace stavu testů
                 updateTestStatus('test-2', true);
 
@@ -316,7 +316,7 @@
                 resultElement.textContent = `Chyba při zpracování callbacku: ${error.message}`;
                 resultElement.className = 'test-result error';
                 console.error('Chyba při zpracování callbacku:', error);
-                
+
                 // Aktualizace stavu testů
                 updateTestStatus('test-2', false, error.message);
             }
@@ -352,7 +352,7 @@
 
                 resultElement.innerHTML = `Token byl úspěšně získán:<pre>Header: ${JSON.stringify(tokenHeader, null, 2)}\n\nPayload: ${JSON.stringify(tokenPayload, null, 2)}</pre>`;
                 resultElement.className = 'test-result success';
-                
+
                 // Aktualizace stavu testů
                 updateTestStatus('test-4', true);
             } catch (error) {
@@ -360,7 +360,7 @@
                 resultElement.textContent = `Chyba při získávání tokenu: ${error.message}`;
                 resultElement.className = 'test-result error';
                 console.error('Chyba při získávání tokenu:', error);
-                
+
                 // Aktualizace stavu testů
                 updateTestStatus('test-4', false, error.message);
             }

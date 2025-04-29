@@ -96,6 +96,9 @@ const Auth0Auth = {
                         console.log('Překryvná vrstva byla odstraněna (init)');
                     }, 800);
                 }
+
+                // Nastavení stavu přihlášení v localStorage
+                localStorage.setItem('aiMapaLoggedIn', 'true');
             }
 
             return true;
@@ -690,6 +693,58 @@ const Auth0Auth = {
     async checkCurrentUser() {
         try {
             console.log('Kontrola přihlášení uživatele...');
+
+            // Nejprve zkusíme získat stav přihlášení ze serveru pomocí /auth/status
+            try {
+                console.log('Kontrola stavu přihlášení pomocí /auth/status...');
+                const response = await fetch('/auth/status');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Získán stav přihlášení z /auth/status:', data);
+
+                    if (data.isAuthenticated && data.user) {
+                        // Uživatel je přihlášen podle serveru
+                        this.state.currentUser = data.user;
+                        this.state.isLoggedIn = true;
+
+                        // Uložení stavu přihlášení do localStorage
+                        localStorage.setItem('aiMapaLoggedIn', 'true');
+                        localStorage.setItem('aiMapaUserProfile', JSON.stringify(data.user));
+
+                        // Aktualizace tlačítka autentizace
+                        this.updateAuthButton();
+
+                        // Zobrazení profilu uživatele
+                        this.displayUserProfile();
+
+                        // Vyvolání události o změně stavu přihlášení
+                        document.dispatchEvent(new CustomEvent('authStateChanged', {
+                            detail: {
+                                isLoggedIn: true,
+                                user: data.user
+                            }
+                        }));
+
+                        // Odstranění překryvné vrstvy pro přihlášení, pokud existuje
+                        const authOverlay = document.getElementById('auth-overlay');
+                        if (authOverlay) {
+                            console.log('Odstraňuji překryvnou vrstvu pro přihlášení (server auth)...');
+                            authOverlay.style.opacity = '0';
+                            authOverlay.style.transition = 'opacity 0.8s ease';
+                            setTimeout(() => {
+                                authOverlay.remove();
+                                console.log('Překryvná vrstva byla odstraněna (server auth)');
+                            }, 800);
+                        }
+
+                        return true;
+                    }
+                }
+            } catch (statusError) {
+                console.warn('Chyba při kontrole stavu přihlášení pomocí /auth/status:', statusError);
+                console.log('Pokračuji s klientskou kontrolou přihlášení');
+            }
 
             // Kontrola, zda je v URL hash s tokeny z Auth0
             const hash = window.location.hash;
@@ -1805,6 +1860,8 @@ const Auth0Auth = {
             localStorage.removeItem('aiMapaIdToken');
             localStorage.removeItem('aiMapaLoggedIn');
             localStorage.removeItem('aiMapaUserEmail');
+            localStorage.removeItem('aiMapaUserProfile');
+            localStorage.removeItem('aiMapaAuthOverlayRemoved');
 
             // Aktualizace stavu
             this.state.isLoggedIn = false;
@@ -1845,6 +1902,8 @@ const Auth0Auth = {
                 localStorage.removeItem('aiMapaIdToken');
                 localStorage.removeItem('aiMapaLoggedIn');
                 localStorage.removeItem('aiMapaUserEmail');
+                localStorage.removeItem('aiMapaUserProfile');
+                localStorage.removeItem('aiMapaAuthOverlayRemoved');
 
                 // Aktualizace stavu
                 this.state.isLoggedIn = false;

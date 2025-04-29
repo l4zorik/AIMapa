@@ -54,16 +54,61 @@ header h1 {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.settings-button {
+.header-buttons {
     position: absolute;
     top: 15px;
     right: 15px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.settings-button {
     background: none;
     border: none;
     color: white;
     font-size: 24px;
     cursor: pointer;
-    z-index: 10;
+}
+
+.login-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 4px;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.login-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.login-button.logged-in {
+    background: rgba(76, 175, 80, 0.3);
+}
+
+.login-button.logged-in:hover {
+    background: rgba(76, 175, 80, 0.5);
+}
+
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-avatar-small {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 main {

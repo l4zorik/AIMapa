@@ -31,6 +31,75 @@ function initializeMap() {
     }
 }
 
+// Funkce pro aktualizaci UI podle stavu přihlášení
+function updateUIBasedOnAuthState(isLoggedIn, user) {
+    console.log('Aktualizace UI podle stavu přihlášení:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+    // Získání reference na tlačítko pro přihlášení
+    const loginButton = document.getElementById('loginButton');
+    const userProfileButton = document.getElementById('userProfileButton');
+
+    if (loginButton) {
+        if (isLoggedIn && user) {
+            // Uživatel je přihlášen - zobrazíme jeho jméno a profilový obrázek
+            loginButton.innerHTML = `
+                <img src="${user.picture || 'app/icons/user-default.png'}" alt="${user.name}" class="user-avatar">
+                <span>${user.nickname || user.name?.split('@')[0] || 'Uživatel'}</span>
+            `;
+            loginButton.classList.add('logged-in');
+            loginButton.title = 'Přejít na profil';
+
+            // Změna akce tlačítka na přechod na profil
+            loginButton.onclick = function() {
+                window.location.href = '/profile';
+            };
+        } else {
+            // Uživatel není přihlášen - zobrazíme výchozí text
+            loginButton.innerHTML = '<i class="icon">👤</i> Přihlásit';
+            loginButton.classList.remove('logged-in');
+            loginButton.title = 'Přihlásit se';
+
+            // Změna akce tlačítka na přihlášení
+            loginButton.onclick = function() {
+                if (typeof Auth0Auth !== 'undefined') {
+                    Auth0Auth.login();
+                } else {
+                    console.error('Auth0Auth není definován!');
+                    window.location.href = '/login';
+                }
+            };
+        }
+    }
+
+    // Aktualizace tlačítka profilu v chatu
+    if (userProfileButton) {
+        if (isLoggedIn && user) {
+            // Uživatel je přihlášen - zobrazíme jeho profilový obrázek
+            userProfileButton.innerHTML = `<img src="${user.picture || 'app/icons/user-default.png'}" alt="${user.name}" class="user-avatar-small">`;
+            userProfileButton.title = `${user.name} - Přejít na profil`;
+
+            // Změna akce tlačítka na přechod na profil
+            userProfileButton.onclick = function() {
+                window.location.href = '/profile';
+            };
+        } else {
+            // Uživatel není přihlášen - zobrazíme výchozí ikonu
+            userProfileButton.innerHTML = '👤';
+            userProfileButton.title = 'Přihlásit se';
+
+            // Změna akce tlačítka na přihlášení
+            userProfileButton.onclick = function() {
+                if (typeof Auth0Auth !== 'undefined') {
+                    Auth0Auth.login();
+                } else {
+                    console.error('Auth0Auth není definován!');
+                    window.location.href = '/login';
+                }
+            };
+        }
+    }
+}
+
 // Globální proměnné pro mapu
 let map = null;
 
@@ -4806,6 +4875,51 @@ document.addEventListener('DOMContentLoaded', function() {
         SupabaseAuth.init();
     }
 
+    // Inicializace Auth0 autentizace
+    if (typeof Auth0Auth !== 'undefined') {
+        console.log('Inicializace Auth0 autentizace...');
+        Auth0Auth.init().then(() => {
+            console.log('Auth0 autentizace byla inicializována');
+
+            // Kontrola stavu přihlášení pomocí Auth0
+            Auth0Auth.checkCurrentUser().then(isLoggedIn => {
+                console.log('Stav přihlášení podle Auth0:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+                // Aktualizace UI podle stavu přihlášení
+                updateProfileButton();
+            }).catch(error => {
+                console.error('Chyba při kontrole stavu přihlášení pomocí Auth0:', error);
+            });
+        }).catch(error => {
+            console.error('Chyba při inicializaci Auth0 autentizace:', error);
+        });
+    } else {
+        console.log('Auth0Auth není definován, kontroluji stav přihlášení pomocí /auth/status...');
+
+        // Kontrola stavu přihlášení pomocí /auth/status
+        fetch('/auth/status')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Stav přihlášení podle /auth/status:', data);
+
+                if (data.isAuthenticated && data.user) {
+                    // Uložení stavu přihlášení do localStorage
+                    localStorage.setItem('aiMapaLoggedIn', 'true');
+                    localStorage.setItem('aiMapaUserProfile', JSON.stringify(data.user));
+                } else {
+                    // Odstranění stavu přihlášení z localStorage
+                    localStorage.removeItem('aiMapaLoggedIn');
+                    localStorage.removeItem('aiMapaUserProfile');
+                }
+
+                // Aktualizace UI podle stavu přihlášení
+                updateProfileButton();
+            })
+            .catch(error => {
+                console.error('Chyba při kontrole stavu přihlášení pomocí /auth/status:', error);
+            });
+    }
+
     // Inicializace Netlify integrace
     if (typeof NetlifyIntegration !== 'undefined') {
         NetlifyIntegration.init();
@@ -4849,19 +4963,91 @@ document.addEventListener('DOMContentLoaded', function() {
 // Funkce pro aktualizaci stavu tlačítka profilu
 function updateProfileButton() {
     const profileBtn = document.getElementById('userProfileButton');
-    if (!profileBtn) return;
+    const loginBtn = document.getElementById('loginButton');
+
+    if (!profileBtn && !loginBtn) return;
 
     // Kontrola, zda je uživatel přihlášen
     const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
 
-    if (isLoggedIn) {
-        // Uživatel je přihlášen - změna vzhledu tlačítka
-        profileBtn.classList.add('logged-in');
-        profileBtn.title = 'Zobrazit profil přihlášeného uživatele';
-    } else {
-        // Uživatel není přihlášen
-        profileBtn.classList.remove('logged-in');
-        profileBtn.title = 'Přihlásit se';
+    // Získání uživatelského profilu
+    let user = null;
+    const savedProfile = localStorage.getItem('aiMapaUserProfile');
+    if (savedProfile) {
+        try {
+            user = JSON.parse(savedProfile);
+        } catch (e) {
+            console.error('Chyba při parsování uloženého profilu:', e);
+        }
+    }
+
+    // Aktualizace tlačítka profilu v chatu
+    if (profileBtn) {
+        if (isLoggedIn && user) {
+            // Uživatel je přihlášen - změna vzhledu tlačítka
+            profileBtn.classList.add('logged-in');
+            profileBtn.title = `${user.name || 'Uživatel'} - Zobrazit profil`;
+
+            // Přidání profilového obrázku, pokud existuje
+            if (user.picture) {
+                profileBtn.innerHTML = `<img src="${user.picture}" alt="${user.name || 'Uživatel'}" class="user-avatar-small">`;
+            } else {
+                profileBtn.innerHTML = '👤';
+            }
+
+            // Změna akce tlačítka na přechod na profil
+            profileBtn.onclick = function() {
+                window.location.href = '/profile';
+            };
+        } else {
+            // Uživatel není přihlášen
+            profileBtn.classList.remove('logged-in');
+            profileBtn.title = 'Přihlásit se';
+            profileBtn.innerHTML = '👤';
+
+            // Změna akce tlačítka na přihlášení
+            profileBtn.onclick = function() {
+                if (typeof Auth0Auth !== 'undefined') {
+                    Auth0Auth.login();
+                } else {
+                    console.error('Auth0Auth není definován!');
+                    window.location.href = '/login';
+                }
+            };
+        }
+    }
+
+    // Aktualizace hlavního přihlašovacího tlačítka
+    if (loginBtn) {
+        if (isLoggedIn && user) {
+            // Uživatel je přihlášen - zobrazíme jeho jméno a profilový obrázek
+            loginBtn.innerHTML = `
+                <img src="${user.picture || 'app/icons/user-default.png'}" alt="${user.name || 'Uživatel'}" class="user-avatar">
+                <span>${user.nickname || user.name?.split('@')[0] || 'Uživatel'}</span>
+            `;
+            loginBtn.classList.add('logged-in');
+            loginBtn.title = 'Přejít na profil';
+
+            // Změna akce tlačítka na přechod na profil
+            loginBtn.onclick = function() {
+                window.location.href = '/profile';
+            };
+        } else {
+            // Uživatel není přihlášen - zobrazíme výchozí text
+            loginBtn.innerHTML = '<i class="icon">👤</i> Přihlásit';
+            loginBtn.classList.remove('logged-in');
+            loginBtn.title = 'Přihlásit se';
+
+            // Změna akce tlačítka na přihlášení
+            loginBtn.onclick = function() {
+                if (typeof Auth0Auth !== 'undefined') {
+                    Auth0Auth.login();
+                } else {
+                    console.error('Auth0Auth není definován!');
+                    window.location.href = '/login';
+                }
+            };
+        }
     }
 }
 

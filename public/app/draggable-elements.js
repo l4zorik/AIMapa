@@ -33,7 +33,7 @@ const DraggableElements = {
         const resetVersion = localStorage.getItem('aiChatPositionResetVersion');
 
         // Pokud již byla pozice resetována v této verzi, nebudeme ji resetovat znovu
-        if (resetVersion === '0.2.9.4') {
+        if (resetVersion === '0.3.8.2') {
             console.log('Pozice AI chatu již byla resetována v této verzi, zachovávám uživatelské nastavení.');
             return;
         }
@@ -42,9 +42,9 @@ const DraggableElements = {
         const aiAssistant = document.getElementById('aiAssistant');
         if (aiAssistant) {
             // Nastavení pozice a velikosti
-            aiAssistant.style.top = '20px';
-            aiAssistant.style.right = '20px';
-            aiAssistant.style.left = '';
+            aiAssistant.style.top = '100px';  // Změněno z 20px na 100px
+            aiAssistant.style.right = '';     // Odstraněno nastavení right
+            aiAssistant.style.left = '20px';  // Přidáno nastavení left
             aiAssistant.style.width = '320px';
             aiAssistant.style.maxHeight = '500px';
 
@@ -55,7 +55,7 @@ const DraggableElements = {
         }
 
         // Uložení informace o resetování pozice v této verzi
-        localStorage.setItem('aiChatPositionResetVersion', '0.2.9.4');
+        localStorage.setItem('aiChatPositionResetVersion', '0.3.8.2');
     },
 
     // Povolení/zakázání přesouvání prvku

@@ -485,6 +485,23 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Endpoint pro kontrolu stavu přihlášení
+app.get('/auth/status', (req, res) => {
+    const isAuthenticated = req.oidc.isAuthenticated();
+
+    if (isAuthenticated) {
+        res.json({
+            isAuthenticated: true,
+            user: req.oidc.user
+        });
+    } else {
+        res.json({
+            isAuthenticated: false,
+            user: null
+        });
+    }
+});
+
 // Přidání middleware pro vyžadování autentizace
 const { requiresAuth } = require('express-openid-connect');
 
