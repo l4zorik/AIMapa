@@ -835,9 +835,8 @@
 
             // Kontrola, zda je uživatel již přihlášen podle localStorage
             const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
-            const authOverlayRemoved = localStorage.getItem('aiMapaAuthOverlayRemoved') === 'true';
 
-            if (isLoggedIn && authOverlayRemoved) {
+            if (isLoggedIn) {
                 console.log('Uživatel je již přihlášen podle localStorage, odstraňuji překryvnou vrstvu...');
                 // Odstranění překryvné vrstvy, pokud existuje
                 const authOverlay = document.getElementById('auth-overlay');
@@ -847,7 +846,23 @@
                     setTimeout(() => {
                         authOverlay.remove();
                         console.log('Překryvná vrstva byla odstraněna (rychlá kontrola při načtení)');
+
+                        // Nastavení příznaku, že překryvná vrstva byla odstraněna
+                        localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+
+                        // Zobrazení profilu uživatele, pokud je k dispozici Auth0Auth
+                        if (typeof Auth0Auth !== 'undefined') {
+                            Auth0Auth.displayUserProfile();
+                        }
                     }, 800);
+                } else {
+                    // Nastavení příznaku, že překryvná vrstva byla odstraněna
+                    localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+
+                    // Zobrazení profilu uživatele, pokud je k dispozici Auth0Auth
+                    if (typeof Auth0Auth !== 'undefined') {
+                        Auth0Auth.displayUserProfile();
+                    }
                 }
             }
 

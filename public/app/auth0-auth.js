@@ -699,7 +699,7 @@ const Auth0Auth = {
             const isLoggedInFromStorage = localStorage.getItem('aiMapaLoggedIn') === 'true';
             const authOverlayRemoved = localStorage.getItem('aiMapaAuthOverlayRemoved') === 'true';
 
-            if (isLoggedInFromStorage && authOverlayRemoved) {
+            if (isLoggedInFromStorage) {
                 console.log('Uživatel je přihlášen podle localStorage (rychlá kontrola)');
 
                 // Pokus o načtení uživatelského profilu
@@ -725,7 +725,13 @@ const Auth0Auth = {
                             setTimeout(() => {
                                 authOverlay.remove();
                                 console.log('Překryvná vrstva byla odstraněna (rychlá kontrola)');
+
+                                // Nastavení příznaku, že překryvná vrstva byla odstraněna
+                                localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
                             }, 800);
+                        } else {
+                            // Nastavení příznaku, že překryvná vrstva byla odstraněna
+                            localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
                         }
 
                         return true;
@@ -1532,6 +1538,8 @@ const Auth0Auth = {
 
     // Zobrazení profilu uživatele
     displayUserProfile() {
+        console.log('Zobrazuji profil uživatele - začátek funkce');
+
         // Kontrola, zda je uživatel přihlášen podle localStorage
         const isLoggedInFromStorage = localStorage.getItem('aiMapaLoggedIn') === 'true';
         const savedProfile = localStorage.getItem('aiMapaUserProfile');
@@ -1549,10 +1557,20 @@ const Auth0Auth = {
 
         if (!this.state.isLoggedIn || !this.state.currentUser) {
             console.log('Nelze zobrazit profil uživatele - uživatel není přihlášen');
+
+            // Pokud uživatel není přihlášen, ale máme příznak přihlášení v localStorage, pokusíme se ho přihlásit
+            if (isLoggedInFromStorage) {
+                console.log('Uživatel je označen jako přihlášený v localStorage, ale nemáme data profilu. Pokusím se o přihlášení...');
+                this.login();
+            }
+
             return;
         }
 
         console.log('Zobrazuji profil uživatele:', this.state.currentUser);
+
+        // Aktualizace tlačítka autentizace
+        this.updateAuthButton();
 
         // Kontrola, zda již existuje profil
         let profileElement = document.getElementById('auth0-user-profile');
