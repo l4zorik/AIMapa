@@ -257,10 +257,32 @@ const UserProfile = {
     toggleProfileModal() {
         console.log('Přepínání modálního okna profilu');
 
+        // Kontrola, zda je uživatel přihlášen podle localStorage
+        const isLoggedInFromStorage = localStorage.getItem('aiMapaLoggedIn') === 'true';
+        const savedProfile = localStorage.getItem('aiMapaUserProfile');
+
+        // Pokud máme uložený profil v localStorage, použijeme ho
+        if (isLoggedInFromStorage && savedProfile && !this.state.currentUser) {
+            try {
+                this.state.currentUser = JSON.parse(savedProfile);
+                console.log('Načten uživatelský profil z localStorage pro zobrazení modálního okna:', this.state.currentUser);
+            } catch (e) {
+                console.error('Chyba při parsování uloženého profilu:', e);
+            }
+        }
+
         // Kontrola, zda je uživatel přihlášen přes Auth0
         if (typeof Auth0Auth !== 'undefined' && Auth0Auth.state.isLoggedIn) {
             console.log('Uživatel je přihlášen přes Auth0, zobrazuji profil');
             this.state.currentUser = Auth0Auth.state.currentUser;
+        } else if (!this.state.currentUser && isLoggedInFromStorage && savedProfile) {
+            // Pokud máme uložený profil v localStorage, ale nepodařilo se ho načíst, zkusíme to znovu
+            try {
+                this.state.currentUser = JSON.parse(savedProfile);
+                console.log('Načten uživatelský profil z localStorage (druhý pokus):', this.state.currentUser);
+            } catch (e) {
+                console.error('Chyba při parsování uloženého profilu (druhý pokus):', e);
+            }
         } else if (!this.state.currentUser) {
             console.log('Uživatel není přihlášen, zobrazuji přihlašovací obrazovku');
             // Pokud uživatel není přihlášen, zobrazíme přihlašovací obrazovku
@@ -324,6 +346,20 @@ const UserProfile = {
         console.log('Načítání dat uživatelského profilu');
 
         try {
+            // Kontrola, zda je uživatel přihlášen podle localStorage
+            const isLoggedInFromStorage = localStorage.getItem('aiMapaLoggedIn') === 'true';
+            const savedProfile = localStorage.getItem('aiMapaUserProfile');
+
+            // Pokud máme uložený profil v localStorage, použijeme ho
+            if (isLoggedInFromStorage && savedProfile && !this.state.currentUser) {
+                try {
+                    this.state.currentUser = JSON.parse(savedProfile);
+                    console.log('Načten uživatelský profil z localStorage pro načtení profilu:', this.state.currentUser);
+                } catch (e) {
+                    console.error('Chyba při parsování uloženého profilu:', e);
+                }
+            }
+
             // Kontrola, zda je uživatel přihlášen přes Auth0
             if (typeof Auth0Auth !== 'undefined' && Auth0Auth.state.isLoggedIn) {
                 console.log('Uživatel je přihlášen přes Auth0, používám Auth0 data');
