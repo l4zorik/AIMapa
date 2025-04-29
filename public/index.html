@@ -421,6 +421,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Kontrola, zda je uživatel již přihlášen
             const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+            const authOverlayRemoved = localStorage.getItem('aiMapaAuthOverlayRemoved') === 'true';
 
             // Kontrola, zda jsme v procesu přihlašování
             const query = window.location.search;
@@ -429,13 +430,10 @@
             const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
 
             // Pokud je uživatel již přihlášen nebo jsme v procesu přihlašování, nezobrazujeme překryvnou vrstvu
-            if (isLoggedIn || hasAuthCode || hasAuthTokens) {
+            if (isLoggedIn || hasAuthCode || hasAuthTokens || authOverlayRemoved) {
                 console.log('Uživatel je již přihlášen nebo v procesu přihlašování, nezobrazuji překryvnou vrstvu');
                 return;
             }
-
-            // Vždy odstraníme flag pro odstranění překryvné vrstvy, aby se zobrazila při každém načtení, pokud uživatel není přihlášen
-            localStorage.removeItem('aiMapaAuthOverlayRemoved');
 
             // Vytvoření překryvné vrstvy pro blokování přístupu
             const authOverlay = document.createElement('div');
@@ -516,7 +514,9 @@
                             window.history.replaceState({}, document.title, window.location.pathname);
                         }
 
-                        // Nezapisujeme aiMapaAuthOverlayRemoved, aby se překryvná vrstva zobrazila při každém načtení, pokud uživatel není přihlášen
+                        // Nastavení příznaku, že uživatel je přihlášen a překryvná vrstva byla odstraněna
+                        localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+                        localStorage.setItem('aiMapaLoggedIn', 'true');
                     }, 800);
                 }
             }

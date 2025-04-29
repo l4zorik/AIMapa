@@ -711,6 +711,7 @@ const Auth0Auth = {
 
                         // Uložení stavu přihlášení do localStorage
                         localStorage.setItem('aiMapaLoggedIn', 'true');
+                        localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
                         localStorage.setItem('aiMapaUserProfile', JSON.stringify(data.user));
 
                         // Aktualizace tlačítka autentizace
@@ -870,10 +871,18 @@ const Auth0Auth = {
                                             authOverlay.remove();
                                             console.log('Překryvná vrstva byla odstraněna po zpracování callbacku');
 
+                                            // Nastavení příznaku, že uživatel je přihlášen a překryvná vrstva byla odstraněna
+                                            localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+                                            localStorage.setItem('aiMapaLoggedIn', 'true');
+
                                             // Odstranění parametrů z URL po odstranění překryvné vrstvy
                                             window.history.replaceState({}, document.title, window.location.pathname);
                                         }, 800);
                                     } else {
+                                        // Nastavení příznaku, že uživatel je přihlášen
+                                        localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+                                        localStorage.setItem('aiMapaLoggedIn', 'true');
+
                                         // Odstranění parametrů z URL i když překryvná vrstva neexistuje
                                         window.history.replaceState({}, document.title, window.location.pathname);
                                     }
@@ -1044,6 +1053,10 @@ const Auth0Auth = {
                             setTimeout(() => {
                                 authOverlay.remove();
                                 console.log('Překryvná vrstva byla odstraněna (token callback)');
+
+                                // Nastavení příznaku, že uživatel je přihlášen a překryvná vrstva byla odstraněna
+                                localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+                                localStorage.setItem('aiMapaLoggedIn', 'true');
                             }, 800);
                         }
 
