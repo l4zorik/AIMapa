@@ -17,7 +17,14 @@ const { auth } = require('express-openid-connect');
 const supabaseService = require('./supabase-service');
 
 // Načtení proměnných prostředí z .env souboru
-require('dotenv').config();
+// Pokud jsme v produkčním prostředí, načteme .env.production, jinak .env
+if (process.env.NODE_ENV === 'production') {
+    require('dotenv').config({ path: '.env.production' });
+    console.log('Načteny produkční proměnné prostředí z .env.production');
+} else {
+    require('dotenv').config();
+    console.log('Načteny vývojové proměnné prostředí z .env');
+}
 
 // Kontrola načtení proměnných prostředí
 console.log('Kontrola načtení proměnných prostředí:');

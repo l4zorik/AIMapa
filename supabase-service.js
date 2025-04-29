@@ -1,12 +1,12 @@
 /**
  * Supabase Service pro AIMapa
  * Verze 0.3.8.2
- * 
+ *
  * Služba pro integraci Supabase s Auth0 autentizací
  */
 
 const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+// Načtení proměnných prostředí již proběhlo v server.js
 
 // Načtení proměnných prostředí
 const supabaseUrl = process.env.SUPABASE_URL || 'https://njjhhamwixjbfibywreo.supabase.co';
@@ -62,7 +62,7 @@ async function syncUserToSupabase(auth0User) {
         // Aktualizace nebo vytvoření uživatele
         if (existingUser) {
             console.log('Aktualizace existujícího uživatele v Supabase:', existingUser.id);
-            
+
             const { data, error } = await supabaseAdmin
                 .from('users')
                 .update(userData)
@@ -78,10 +78,10 @@ async function syncUserToSupabase(auth0User) {
             result = data;
         } else {
             console.log('Vytváření nového uživatele v Supabase');
-            
+
             // Přidání data vytvoření pro nového uživatele
             userData.created_at = new Date().toISOString();
-            
+
             const { data, error } = await supabaseAdmin
                 .from('users')
                 .insert([userData])
@@ -258,7 +258,7 @@ async function saveUserPreferences(auth0Id, preferences) {
         } else {
             // Vytvoření nových preferencí
             preferences.created_at = new Date().toISOString();
-            
+
             const { error } = await supabase
                 .from('user_preferences')
                 .insert([preferences]);
