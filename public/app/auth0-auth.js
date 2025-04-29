@@ -125,12 +125,9 @@ const Auth0Auth = {
                 }
             }
             // Kontrola, zda jsme na localhost (3000 nebo 3001)
-            else if (window.location.href.includes('localhost:3001')) {
-                console.log('Jsme na lokálním vývojovém prostředí (port 3001), používám localhost URL pro přesměrování');
-                redirectUri = 'http://localhost:3001/callback';
-            }
-            else if (window.location.href.includes('localhost:3000')) {
-                console.log('Jsme na lokálním vývojovém prostředí (port 3000), používám localhost URL pro přesměrování');
+            else if (window.location.href.includes('localhost:3001') || window.location.href.includes('localhost:3000')) {
+                console.log('Jsme na lokálním vývojovém prostředí, používám localhost:3000 URL pro přesměrování');
+                // Vždy používáme port 3000 pro callback, protože je to povoleno v Auth0 dashboardu
                 redirectUri = 'http://localhost:3000/callback';
             }
 
@@ -140,8 +137,9 @@ const Auth0Auth = {
             const authUrl = `https://${this.config.domain}/authorize?` +
                 `client_id=${this.config.clientId}&` +
                 `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-                `response_type=code&` +
-                `scope=openid%20profile%20email&` +
+                `response_type=code%20id_token&` +
+                `scope=openid%20profile%20email%20read:users%20read:user_idp_tokens&` +
+                `audience=${encodeURIComponent(this.config.audience)}&` +
                 `state=${Math.random().toString(36).substring(2, 15)}`;
 
             console.log('Kompletní Auth0 URL:', authUrl);
@@ -174,10 +172,9 @@ const Auth0Auth = {
                     }
                 }
                 // Kontrola, zda jsme na localhost (3000 nebo 3001)
-                else if (window.location.href.includes('localhost:3001')) {
-                    redirectUri = 'http://localhost:3001/callback';
-                }
-                else if (window.location.href.includes('localhost:3000')) {
+                else if (window.location.href.includes('localhost:3001') || window.location.href.includes('localhost:3000')) {
+                    console.log('Jsme na lokálním vývojovém prostředí, používám localhost:3000 URL pro přesměrování');
+                    // Vždy používáme port 3000 pro callback, protože je to povoleno v Auth0 dashboardu
                     redirectUri = 'http://localhost:3000/callback';
                 }
 
@@ -185,8 +182,9 @@ const Auth0Auth = {
                 const authUrl = `https://${this.config.domain}/authorize?` +
                     `client_id=${this.config.clientId}&` +
                     `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-                    `response_type=code&` +
-                    `scope=openid%20profile%20email&` +
+                    `response_type=code%20id_token&` +
+                    `scope=openid%20profile%20email%20read:users%20read:user_idp_tokens&` +
+                    `audience=${encodeURIComponent(this.config.audience)}&` +
                     `state=${Math.random().toString(36).substring(2, 15)}`;
 
                 console.log('Přímé přesměrování na Auth0 URL po chybě:', authUrl);
@@ -210,7 +208,7 @@ const Auth0Auth = {
         // Podporované URL pro přesměrování
         netlifyDevRedirectUri: 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app',
         netlifyProdRedirectUri: 'https://remarkable-cajeta-76cfd9.netlify.app',
-        localDevRedirectUri: 'http://localhost:3001',
+        localDevRedirectUri: 'http://localhost:3000',
 
         // Audience a scope
         audience: window.ENV?.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
@@ -222,8 +220,10 @@ const Auth0Auth = {
 
         // Nastavení pro SPA aplikaci
         authorizationParams: {
-            response_type: 'code',
-            audience: window.ENV?.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/'
+            response_type: 'code id_token',
+            response_mode: 'form_post',
+            audience: window.ENV?.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
+            scope: window.ENV?.AUTH0_SCOPE || 'openid profile email read:users read:user_idp_tokens'
         }
     },
 
@@ -330,12 +330,9 @@ const Auth0Auth = {
                 }
             }
             // Kontrola, zda jsme na localhost (3000 nebo 3001)
-            else if (window.location.href.includes('localhost:3001')) {
-                console.log('Jsme na lokálním vývojovém prostředí (port 3001), používám localhost URL pro přesměrování');
-                redirectUri = 'http://localhost:3001/callback';
-            }
-            else if (window.location.href.includes('localhost:3000')) {
-                console.log('Jsme na lokálním vývojovém prostředí (port 3000), používám localhost URL pro přesměrování');
+            else if (window.location.href.includes('localhost:3001') || window.location.href.includes('localhost:3000')) {
+                console.log('Jsme na lokálním vývojovém prostředí, používám localhost:3000 URL pro přesměrování');
+                // Vždy používáme port 3000 pro callback, protože je to povoleno v Auth0 dashboardu
                 redirectUri = 'http://localhost:3000/callback';
             }
 
@@ -355,7 +352,8 @@ const Auth0Auth = {
                         redirect_uri: redirectUri,
                         audience: this.config.audience,
                         scope: this.config.scope,
-                        response_type: 'code'
+                        response_type: 'code id_token',
+                        response_mode: 'form_post'
                     },
                     useRefreshTokens: true,
                     cacheLocation: 'localstorage'
@@ -378,7 +376,9 @@ const Auth0Auth = {
                         domain: this.config.domain,
                         clientId: this.config.clientId,
                         authorizationParams: {
-                            redirect_uri: redirectUri
+                            redirect_uri: redirectUri,
+                            response_type: 'code id_token',
+                            response_mode: 'form_post'
                         }
                     });
 
@@ -422,10 +422,9 @@ const Auth0Auth = {
             }
         }
         // Kontrola, zda jsme na localhost (3000 nebo 3001)
-        else if (window.location.href.includes('localhost:3001')) {
-            redirectUri = 'http://localhost:3001';
-        }
-        else if (window.location.href.includes('localhost:3000')) {
+        else if (window.location.href.includes('localhost:3001') || window.location.href.includes('localhost:3000')) {
+            console.log('Jsme na lokálním vývojovém prostředí, používám localhost:3000 URL pro přesměrování');
+            // Vždy používáme port 3000, protože je to povoleno v Auth0 dashboardu
             redirectUri = 'http://localhost:3000';
         }
 

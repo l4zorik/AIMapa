@@ -158,13 +158,25 @@ const config = {
   authRequired: process.env.AUTH0_AUTH_REQUIRED === 'true', // Autentizace je vyžadována pro všechny routy
   auth0Logout: true,
   secret: process.env.AUTH0_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
-  baseURL: process.env.PORT ? `http://localhost:${process.env.PORT}` : 'http://localhost:3000',
+  baseURL: process.env.AUTH0_BASE_URL || (process.env.PORT ? `http://localhost:${process.env.PORT}` : 'http://localhost:3000'),
   clientID: process.env.AUTH0_CLIENT_ID || 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
   clientSecret: process.env.AUTH0_CLIENT_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
   authorizationParams: {
-    response_type: 'code',
-    scope: process.env.AUTH0_SCOPE || 'openid profile email'
+    response_type: 'code id_token',
+    scope: process.env.AUTH0_SCOPE || 'openid profile email read:users read:user_idp_tokens',
+    response_mode: 'form_post',
+    audience: process.env.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/'
+  },
+  idpLogout: true,
+  routes: {
+    callback: '/callback',
+    login: '/login',
+    logout: '/logout'
+  },
+  session: {
+    rollingDuration: 60 * 60 * 24, // 24 hodin
+    absoluteDuration: 60 * 60 * 24 * 7 // 7 dní
   }
 };
 
@@ -188,7 +200,7 @@ const auth0Config = {
     domain: process.env.AUTH0_DOMAIN,
     clientId: process.env.AUTH0_CLIENT_ID,
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
-    audience: process.env.AUTH0_AUDIENCE ? process.env.AUTH0_AUDIENCE.split(',') : [],
+    audience: process.env.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
     callbackUrl: process.env.AUTH0_CALLBACK_URL ? process.env.AUTH0_CALLBACK_URL.split(',') : [],
     logoutUrl: process.env.AUTH0_LOGOUT_URL ? process.env.AUTH0_LOGOUT_URL.split(',') : [],
     scope: process.env.AUTH0_SCOPE
@@ -266,12 +278,12 @@ app.get('/auth/config', (_req, res) => {
 
     if (isNetlify) {
         // Jsme na Netlify, použijeme URL pro Netlify
-        callbackUrl = 'https://remarkable-cajeta-76cfd9.netlify.app';
+        callbackUrl = 'https://remarkable-cajeta-76cfd9.netlify.app/callback';
         logoutUrl = 'https://remarkable-cajeta-76cfd9.netlify.app';
         console.log('Detekováno Netlify prostředí, používám URL:', callbackUrl);
     } else {
         // Jsme na lokálním prostředí, použijeme localhost URL
-        callbackUrl = `http://${host}`;
+        callbackUrl = `http://${host}/callback`;
         logoutUrl = `http://${host}`;
         console.log('Detekováno lokální prostředí, používám URL:', callbackUrl);
     }
@@ -279,7 +291,7 @@ app.get('/auth/config', (_req, res) => {
     res.json({
         domain: auth0Config.domain,
         clientId: auth0Config.clientId,
-        audience: auth0Config.audience[0], // Použijeme první URL z pole
+        audience: auth0Config.audience, // Použijeme audience string
         scope: auth0Config.scope,
         callbackUrl: callbackUrl,
         logoutUrl: logoutUrl
@@ -300,18 +312,18 @@ app.get('/env-config.json', (_req, res) => {
     if (isNetlify) {
         if (isDevServer) {
             // Jsme na vývojové verzi na Netlify
-            callbackUrl = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
+            callbackUrl = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app/callback';
             logoutUrl = 'https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app';
             console.log('Detekováno vývojové Netlify prostředí, používám URL:', callbackUrl);
         } else {
             // Jsme na produkční verzi na Netlify
-            callbackUrl = 'https://remarkable-cajeta-76cfd9.netlify.app';
+            callbackUrl = 'https://remarkable-cajeta-76cfd9.netlify.app/callback';
             logoutUrl = 'https://remarkable-cajeta-76cfd9.netlify.app';
             console.log('Detekováno produkční Netlify prostředí, používám URL:', callbackUrl);
         }
     } else {
         // Jsme na lokálním prostředí, použijeme localhost URL
-        callbackUrl = `http://${host}`;
+        callbackUrl = `http://${host}/callback`;
         logoutUrl = `http://${host}`;
         console.log('Detekováno lokální prostředí, používám URL:', callbackUrl);
     }
@@ -321,7 +333,7 @@ app.get('/env-config.json', (_req, res) => {
         // Auth0 konfigurace
         AUTH0_DOMAIN: auth0Config.domain,
         AUTH0_CLIENT_ID: auth0Config.clientId,
-        AUTH0_AUDIENCE: auth0Config.audience[0], // Použijeme první URL z pole
+        AUTH0_AUDIENCE: auth0Config.audience, // Použijeme audience string
         AUTH0_SCOPE: auth0Config.scope,
         AUTH0_CALLBACK_URL: callbackUrl,
         AUTH0_LOGOUT_URL: logoutUrl,
@@ -509,8 +521,8 @@ for (let i = 0; i < args.length; i++) {
     }
 }
 
-// Nastavení portu
-const PORT = portArg || process.env.PORT || 3000;
+// Nastavení portu - vždy používáme port 3000, protože je to povoleno v Auth0 dashboardu
+const PORT = 3000;
 console.log(`Použití portu: ${PORT}`);
 
 // Funkce pro kontrolu dostupnosti mapy
