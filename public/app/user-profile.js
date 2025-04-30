@@ -467,7 +467,13 @@ const UserProfile = {
         if (isLoggedIn) {
             profileButton.classList.add('logged-in');
             profileButton.title = 'Zobrazit uživatelský profil (přihlášen přes Auth0)';
-            profileButton.innerHTML = '<i class="fas fa-user-check"></i>';
+
+            // Přidání profilového obrázku, pokud existuje
+            if (this.state.currentUser && this.state.currentUser.picture) {
+                profileButton.innerHTML = `<img src="${this.state.currentUser.picture}" alt="${this.state.currentUser.name || 'Uživatel'}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                profileButton.innerHTML = '<i class="fas fa-user-check"></i>';
+            }
 
             // Aktualizace stavu Auth0
             this.state.auth0Status = 'connected';
@@ -1029,8 +1035,66 @@ const UserProfile = {
     async logout() {
         console.log('Zahájení odhlášení uživatele...');
 
+        // Zobrazení potvrzovacího dialogu
+        if (!confirm('Opravdu se chcete odhlásit z aplikace?')) {
+            console.log('Odhlášení zrušeno uživatelem');
+            return;
+        }
+
         // Skrytí modálního okna
         this.hideProfileModal();
+
+        // Zobrazení informace o odhlašování
+        const logoutNotification = document.createElement('div');
+        logoutNotification.className = 'logout-notification';
+        logoutNotification.innerHTML = `
+            <div class="logout-notification-content">
+                <div class="logout-spinner"></div>
+                <p>Probíhá odhlašování...</p>
+            </div>
+        `;
+        document.body.appendChild(logoutNotification);
+
+        // Přidání stylů pro notifikaci
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            .logout-notification {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+            .logout-notification-content {
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .logout-spinner {
+                width: 40px;
+                height: 40px;
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #3498db;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 15px;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(styleElement);
 
         // Aktualizace stavu připojení
         this.state.auth0Status = 'disconnected';

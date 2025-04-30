@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Přihlášení - AI Mapa</title>
+    <link rel="stylesheet" href="app/styles.css">
+    <link rel="stylesheet" href="app/auth0-auth.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .login-container {
+            background-color: rgba(26, 32, 44, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-logo {
+            margin-bottom: 30px;
+        }
+
+        .login-logo img {
+            width: 120px;
+            height: auto;
+        }
+
+        .login-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .login-subtitle {
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: #cbd5e0;
+        }
+
+        .login-button {
+            background-color: #ff4f1f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .login-button:hover {
+            background-color: #e64a19;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 74, 25, 0.4);
+        }
+
+        .login-footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #a0aec0;
+        }
+
+        .login-footer a {
+            color: #63b3ed;
+            text-decoration: none;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .login-features {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .feature {
+            background-color: rgba(45, 55, 72, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            width: 120px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            background-color: rgba(45, 55, 72, 0.8);
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ff4f1f;
+        }
+
+        .feature-text {
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .login-spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-button.loading .login-spinner {
+            display: inline-block;
+        }
+
+        .login-button.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="app/images/logo.png" alt="AI Mapa Logo" onerror="this.src='app/images/default-logo.png'; this.onerror='';">
+        </div>
+        <h1 class="login-title">Vítejte v AI Mapě</h1>
+        <p class="login-subtitle">Pro pokračování se prosím přihlaste pomocí Auth0</p>
+        
+        <div class="login-features">
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-map-marked-alt"></i></div>
+                <div class="feature-text">Interaktivní mapa</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                <div class="feature-text">AI Asistent</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-route"></i></div>
+                <div class="feature-text">Plánování tras</div>
+            </div>
+        </div>
+        
+        <button id="loginButton" class="login-button">
+            <div class="login-spinner"></div>
+            <i class="fas fa-lock"></i> Přihlásit se
+        </button>
+        
+        <div class="login-footer">
+            <p>Nemáte účet? Registrace proběhne automaticky při prvním přihlášení.</p>
+            <p>Návrat na <a href="index.html">hlavní stránku</a></p>
+        </div>
+    </div>
+
+    <script src="app/auth0-auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializace Auth0
+            if (typeof Auth0Auth !== 'undefined') {
+                Auth0Auth.init().then(() => {
+                    console.log('Auth0 inicializován na přihlašovací stránce');
+                    
+                    // Kontrola, zda je uživatel již přihlášen
+                    if (Auth0Auth.state.isLoggedIn) {
+                        console.log('Uživatel je již přihlášen, přesměrovávám na hlavní stránku');
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
+            
+            // Přidání posluchače události pro tlačítko přihlášení
+            const loginButton = document.getElementById('loginButton');
+            if (loginButton) {
+                loginButton.addEventListener('click', function() {
+                    // Zobrazení načítacího indikátoru
+                    this.classList.add('loading');
+                    
+                    // Přihlášení přes Auth0
+                    if (typeof Auth0Auth !== 'undefined') {
+                        Auth0Auth.login();
+                    } else {
+                        console.error('Auth0Auth modul není dostupný');
+                        alert('Chyba při inicializaci přihlašování. Zkuste to prosím znovu.');
+                        this.classList.remove('loading');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

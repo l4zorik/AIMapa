@@ -1,7 +1,7 @@
 /**
  * Modul pro správu předplatného v AIMapa
  * Verze 0.3.8.5
- * 
+ *
  * Tento modul poskytuje funkce pro správu předplatného uživatelů
  * s integrací Stripe jako platební brány.
  */
@@ -113,7 +113,7 @@ const SubscriptionService = {
 
         // Nastavení Stripe
         stripe: {
-            publishableKey: 'pk_test_51OXYZabcdefghijklmnopqrs',
+            publishableKey: window.ENV?.STRIPE_PUBLISHABLE_KEY || 'pk_test_51OXYZabcdefghijklmnopqrs',
             apiUrl: '/api/stripe',
             elementsOptions: {
                 locale: 'cs',
@@ -166,24 +166,38 @@ const SubscriptionService = {
             // Kontrola, zda je Stripe dostupný
             if (typeof Stripe === 'undefined') {
                 console.log('Stripe není dostupný, načítám skript...');
-                await this.loadStripeScript();
+                try {
+                    await this.loadStripeScript();
+                } catch (loadError) {
+                    console.error('Chyba při načítání Stripe skriptu:', loadError);
+                    // Pokračujeme i bez Stripe - uživatel může používat aplikaci s free plánem
+                    return false;
+                }
             }
 
             // Kontrola, zda je Stripe dostupný po načtení skriptu
             if (typeof Stripe === 'undefined') {
                 console.error('Stripe není dostupný ani po načtení skriptu');
+                // Pokračujeme i bez Stripe - uživatel může používat aplikaci s free plánem
                 return false;
             }
 
             // Inicializace Stripe
-            const stripe = Stripe(this.config.stripe.publishableKey);
-            this.state.stripe = stripe;
+            try {
+                const stripe = Stripe(this.config.stripe.publishableKey);
+                this.state.stripe = stripe;
 
-            console.log('Stripe byl úspěšně inicializován');
-            this.state.stripeInitialized = true;
-            return true;
+                console.log('Stripe byl úspěšně inicializován');
+                this.state.stripeInitialized = true;
+                return true;
+            } catch (stripeError) {
+                console.error('Chyba při inicializaci Stripe objektu:', stripeError);
+                // Pokračujeme i bez Stripe - uživatel může používat aplikaci s free plánem
+                return false;
+            }
         } catch (error) {
             console.error('Chyba při inicializaci Stripe:', error);
+            // Pokračujeme i bez Stripe - uživatel může používat aplikaci s free plánem
             return false;
         }
     },
@@ -193,20 +207,54 @@ const SubscriptionService = {
      */
     loadStripeScript() {
         return new Promise((resolve, reject) => {
+            // Kontrola, zda skript již není načten
+            if (document.querySelector('script[src="https://js.stripe.com/v3/"]')) {
+                console.log('Stripe skript je již načten');
+                resolve();
+                return;
+            }
+
+            // Nastavení timeoutu pro načítání skriptu
+            const timeoutId = setTimeout(() => {
+                console.error('Timeout při načítání Stripe skriptu');
+                reject(new Error('Timeout při načítání Stripe skriptu'));
+            }, 10000); // 10 sekund timeout
+
             const script = document.createElement('script');
             script.src = 'https://js.stripe.com/v3/';
             script.async = true;
-            
+            script.crossOrigin = 'anonymous'; // Přidání crossOrigin atributu
+
             script.onload = () => {
+                clearTimeout(timeoutId);
                 console.log('Stripe skript byl úspěšně načten');
                 resolve();
             };
-            
+
             script.onerror = (error) => {
+                clearTimeout(timeoutId);
                 console.error('Chyba při načítání Stripe skriptu:', error);
-                reject(error);
+
+                // Pokus o načtení alternativního CDN
+                console.log('Pokus o načtení Stripe skriptu z alternativního CDN...');
+                const alternativeScript = document.createElement('script');
+                alternativeScript.src = 'https://cdn.jsdelivr.net/npm/@stripe/stripe-js@1.54.1/dist/stripe.min.js';
+                alternativeScript.async = true;
+                alternativeScript.crossOrigin = 'anonymous';
+
+                alternativeScript.onload = () => {
+                    console.log('Stripe skript byl úspěšně načten z alternativního CDN');
+                    resolve();
+                };
+
+                alternativeScript.onerror = (altError) => {
+                    console.error('Chyba při načítání Stripe skriptu z alternativního CDN:', altError);
+                    reject(altError);
+                };
+
+                document.head.appendChild(alternativeScript);
             };
-            
+
             document.head.appendChild(script);
         });
     },
@@ -399,11 +447,11 @@ const SubscriptionService = {
 
                 if (data && data.length > 0) {
                     const subscription = data[0];
-                    
+
                     // Kontrola, zda je předplatné aktivní
                     const now = new Date();
                     const endDate = new Date(subscription.end_date);
-                    
+
                     if (endDate > now && subscription.status === 'active') {
                         // Aktualizace stavu předplatného
                         this.state.currentPlan = subscription.plan_id;
@@ -415,7 +463,7 @@ const SubscriptionService = {
                             stripeSubscriptionId: subscription.stripe_subscription_id,
                             autoRenew: subscription.auto_renew
                         };
-                        
+
                         console.log('Načteno aktivní předplatné uživatele:', this.state.currentPlan);
                     } else {
                         console.log('Předplatné uživatele vypršelo nebo není aktivní');
@@ -427,13 +475,13 @@ const SubscriptionService = {
                     this.state.currentPlan = 'free';
                     this.state.subscriptionData = null;
                 }
-                
+
                 // Uložení stavu předplatného
                 this.saveSubscriptionState();
-                
+
                 // Aktualizace UI
                 this.updateSubscriptionButton();
-                
+
                 // Vyvolání události o změně předplatného
                 this.notifySubscriptionChanged();
             }
@@ -454,12 +502,12 @@ const SubscriptionService = {
             if (profile.subscription_plan) {
                 // Aktualizace stavu předplatného
                 this.state.currentPlan = profile.subscription_plan;
-                
+
                 // Pokud jsou k dispozici další informace o předplatném
                 if (profile.subscription_end_date) {
                     const endDate = new Date(profile.subscription_end_date);
                     const now = new Date();
-                    
+
                     if (endDate > now) {
                         this.state.subscriptionData = {
                             startDate: profile.subscription_start_date,
@@ -467,7 +515,7 @@ const SubscriptionService = {
                             status: 'active',
                             autoRenew: profile.subscription_auto_renew
                         };
-                        
+
                         console.log('Načteno aktivní předplatné z profilu uživatele:', this.state.currentPlan);
                     } else {
                         console.log('Předplatné z profilu uživatele vypršelo');
@@ -475,13 +523,13 @@ const SubscriptionService = {
                         this.state.subscriptionData = null;
                     }
                 }
-                
+
                 // Uložení stavu předplatného
                 this.saveSubscriptionState();
-                
+
                 // Aktualizace UI
                 this.updateSubscriptionButton();
-                
+
                 // Vyvolání události o změně předplatného
                 this.notifySubscriptionChanged();
             }

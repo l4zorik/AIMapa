@@ -14,7 +14,8 @@ const path = require('path');
 const fs = require('fs');
 const request = require('request');
 const { auth } = require('express-openid-connect');
-const supabaseService = require('./supabase-service');
+// Temporarily comment out Supabase for testing Auth0
+// const supabaseService = require('./supabase-service');
 
 // Načtení proměnných prostředí z .env souboru
 // Pokud jsme v produkčním prostředí, načteme .env.production, jinak .env
@@ -166,7 +167,7 @@ const config = {
   authRequired: true, // Autentizace je vždy vyžadována pro všechny routy
   auth0Logout: true,
   secret: process.env.AUTH0_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
-  baseURL: process.env.AUTH0_BASE_URL || (process.env.PORT ? `http://localhost:${process.env.PORT}` : 'http://localhost:3000'),
+  baseURL: 'http://localhost:3000', // Force localhost:3000 for testing
   clientID: process.env.AUTH0_CLIENT_ID || 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
   clientSecret: process.env.AUTH0_CLIENT_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
@@ -346,12 +347,12 @@ app.get('/env-config.json', (_req, res) => {
         AUTH0_CALLBACK_URL: callbackUrl,
         AUTH0_LOGOUT_URL: logoutUrl,
 
-        // Supabase konfigurace
-        SUPABASE_URL: process.env.SUPABASE_URL,
-        SUPABASE_KEY: process.env.SUPABASE_KEY,
+        // Supabase konfigurace - using dummy values for testing
+        SUPABASE_URL: 'https://njjhhamwixjbfibywreo.supabase.co',
+        SUPABASE_KEY: 'dummy_key_for_testing',
 
         // Stripe konfigurace (pouze veřejný klíč)
-        STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
+        STRIPE_PUBLISHABLE_KEY: 'pk_test_dummy_key_for_testing',
 
         // Aplikační konfigurace
         APP_VERSION: '0.3.8.5',
@@ -551,6 +552,8 @@ app.get('/api/profile', requiresAuth(), async (req, res) => {
       return res.status(400).json({ error: 'Chybí uživatelské informace' });
     }
 
+    // Temporarily disabled Supabase integration for testing
+    /*
     // Získání uživatele ze Supabase
     let supabaseUser = await supabaseService.getUserFromSupabase(auth0User.sub);
 
@@ -561,13 +564,14 @@ app.get('/api/profile', requiresAuth(), async (req, res) => {
 
     // Získání uživatelských preferencí ze Supabase
     const userPreferences = await supabaseService.getUserPreferences(auth0User.sub);
+    */
 
-    // Vrácení kombinovaných dat
+    // Vrácení pouze Auth0 dat pro testování
     res.json({
       auth0: auth0User,
-      supabase: supabaseUser,
-      preferences: userPreferences,
-      isComplete: !!supabaseUser
+      supabase: null,
+      preferences: null,
+      isComplete: true
     });
   } catch (error) {
     console.error('Chyba při získávání informací o profilu:', error);
@@ -585,17 +589,20 @@ app.get('/auth/sync-user', requiresAuth(), async (req, res) => {
       return res.status(400).json({ error: 'Chybí uživatelské informace' });
     }
 
+    // Temporarily disabled Supabase integration for testing
+    /*
     // Synchronizace uživatele do Supabase
     const supabaseUser = await supabaseService.syncUserToSupabase(auth0User);
 
     if (!supabaseUser) {
       return res.status(500).json({ error: 'Nepodařilo se synchronizovat uživatele do Supabase' });
     }
+    */
 
-    // Vrácení kombinovaných dat
+    // Vrácení pouze Auth0 dat pro testování
     res.json({
       auth0: auth0User,
-      supabase: supabaseUser
+      supabase: null
     });
   } catch (error) {
     console.error('Chyba při synchronizaci uživatele:', error);
@@ -612,6 +619,8 @@ app.get('/api/user-data', requiresAuth(), async (req, res) => {
       return res.status(400).json({ error: 'Chybí uživatelské informace' });
     }
 
+    // Temporarily disabled Supabase integration for testing
+    /*
     // Získání uživatele ze Supabase
     const supabaseUser = await supabaseService.getUserFromSupabase(auth0User.sub);
 
@@ -627,6 +636,16 @@ app.get('/api/user-data', requiresAuth(), async (req, res) => {
     }
 
     res.json(supabaseUser);
+    */
+
+    // Return Auth0 user data for testing
+    res.json({
+      id: auth0User.sub,
+      email: auth0User.email,
+      name: auth0User.name || auth0User.nickname,
+      avatar_url: auth0User.picture,
+      auth0_id: auth0User.sub
+    });
   } catch (error) {
     console.error('Chyba při získávání uživatelských dat:', error);
     res.status(500).json({ error: 'Interní chyba serveru' });
@@ -647,13 +666,17 @@ app.post('/api/user-data', requiresAuth(), async (req, res) => {
       return res.status(400).json({ error: 'Chybí data k uložení' });
     }
 
+    // Temporarily disabled Supabase integration for testing
+    /*
     // Uložení dat do Supabase
     const success = await supabaseService.saveUserData(auth0User.sub, userData);
 
     if (!success) {
       return res.status(500).json({ error: 'Nepodařilo se uložit uživatelská data' });
     }
+    */
 
+    // For testing, just return success
     res.json({ success: true });
   } catch (error) {
     console.error('Chyba při ukládání uživatelských dat:', error);
@@ -661,7 +684,9 @@ app.post('/api/user-data', requiresAuth(), async (req, res) => {
   }
 });
 
-// Zpracování argumentů příkazové řádky
+// Zpracování argumentů příkazové řádky - disabled for testing
+// We're using fixed port 3000 for testing
+/*
 const args = process.argv.slice(2);
 let portArg = null;
 
@@ -677,6 +702,7 @@ for (let i = 0; i < args.length; i++) {
         }
     }
 }
+*/
 
 // Nastavení portu - vždy používáme port 3000, protože je to povoleno v Auth0 dashboardu
 const PORT = 3000;

@@ -52,6 +52,12 @@
     <link rel="stylesheet" href="app/user-profile.css">
     <!-- Předplatné -->
     <link rel="stylesheet" href="app/services/subscription-service.css">
+    <!-- Odhlašovací tlačítko -->
+    <link rel="stylesheet" href="app/logout-button.css">
+    <!-- Denní odměna -->
+    <link rel="stylesheet" href="app/daily-reward.css">
+    <!-- Vyhledávání -->
+    <link rel="stylesheet" href="app/search.css">
     <!-- Font Awesome pro ikony -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <!-- Supabase klient -->
@@ -76,7 +82,7 @@
         </header>
 
         <main>
-            <div class="map-container">
+            <div class="map-container" id="map-container">
                 <div class="status-bar">
                     <span class="status-icon">✓</span>
                     Všechno je funkční
@@ -91,6 +97,17 @@
                         <i class="icon">⛶</i>
                     </button>
                     <div id="coordinates" class="coordinates-display"></div>
+
+                    <!-- Vyhledávací pole -->
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Vyhledat místo...">
+                        <button id="searchButton" class="search-btn">
+                            <i class="icon">🔍</i>
+                        </button>
+                    </div>
+
+                    <!-- Výsledky vyhledávání -->
+                    <div id="searchResults" class="search-results"></div>
                 </div>
                 <div class="fullscreen-overlay"></div>
 
@@ -126,18 +143,17 @@
                     <div class="chat-drag-handle">⋮⋮</div>
                     <h2>AI Asistent</h2>
                     <div class="chat-controls">
-                        <button id="userProfileButton" class="chat-control-btn profile-btn" title="Profil uživatele">👤</button>
                         <button id="minimizeMainChat" class="chat-control-btn minimize-btn" title="Minimalizovat chat">−</button>
                     </div>
                 </div>
                 <div class="chat-content">
                     <div class="chat-messages" id="chatMessages">
                         <div class="message ai">
-                            Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
+                            Vítejte v AI Mapě! Jak vám mohu pomoci? Můžete se mě zeptat na vyhledání trasy, místa nebo informace o dopravě.
                         </div>
                     </div>
                     <div class="chat-input">
-                        <input type="text" id="messageInput" placeholder="Napište zprávu...">
+                        <input type="text" id="aiInput" placeholder="Napište zprávu...">
                         <button class="send-btn" id="sendMessage">➤</button>
                     </div>
                 </div>
@@ -1015,6 +1031,12 @@
     <script src="app/auth0-auth.js" defer></script>
     <script src="app/supabase-client.js" defer></script>
     <script src="app/user-profile.js" defer></script>
+    <script src="app/logout-button.js" defer></script>
+    <script src="app/logout-button-v2.js" defer></script>
+    <script src="app/daily-reward.js" defer></script>
+    <script src="app/route-search.js" defer></script>
+    <script src="app/map-controls.js" defer></script>
+    <script src="app/ai-assistant.js" defer></script>
     <script src="app/script.js" defer></script>
 </body>
 </html>

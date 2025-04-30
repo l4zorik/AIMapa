@@ -97,67 +97,111 @@
         <p>Tato stránka slouží k testování různých funkcí aplikace AIMapa verze 0.3.8.5.</p>
 
         <div class="nav-links">
-            <a href="http://localhost:3000" target="_blank">Otevřít aplikaci</a>
-            <a href="http://localhost:3000/login.html" target="_blank">Otevřít přihlašovací stránku</a>
+            <a href="/" target="_blank">Otevřít aplikaci</a>
+            <a href="/browser-test-runner.html">Spustit testy v prohlížeči</a>
+            <a href="https://github.com/l4zorik/AIMapa" target="_blank">GitHub repozitář</a>
         </div>
 
         <div class="test-section">
-            <h2>Testování autentizace</h2>
-            <p>Testy pro ověření funkčnosti přihlášení, registrace a odhlášení.</p>
+            <h2>Unit testy</h2>
+            <p>Testy pro ověření jednotlivých komponent a funkcí.</p>
 
             <div class="test-buttons">
-                <button onclick="runAuthTest('registration')">Test registrace</button>
-                <button onclick="runAuthTest('login')">Test přihlášení</button>
-                <button onclick="runAuthTest('logout')">Test odhlášení</button>
-                <button onclick="runAuthTest('all')">Spustit všechny testy</button>
+                <button onclick="window.location.href='/browser-test-runner.html#unit'">Spustit unit testy</button>
             </div>
 
-            <div id="auth-results" class="results">Výsledky testů se zobrazí zde...</div>
+            <div class="results">
+                <p>Unit testy ověřují správnou funkčnost jednotlivých komponent aplikace:</p>
+                <ul>
+                    <li>Výpočet vzdálenosti mezi body</li>
+                    <li>Parsování souřadnic</li>
+                    <li>Validace souřadnic</li>
+                </ul>
+                <p>Pro spuštění testů z příkazové řádky použijte:</p>
+                <pre>npm run test:unit</pre>
+            </div>
         </div>
 
         <div class="test-section">
-            <h2>Testování Supabase integrace</h2>
-            <p>Testy pro ověření funkčnosti integrace se Supabase.</p>
+            <h2>Integrační testy</h2>
+            <p>Testy pro ověření interakce mezi moduly a externími API.</p>
 
             <div class="test-buttons">
-                <button onclick="runSupabaseTest('connection')">Test připojení</button>
-                <button onclick="runSupabaseTest('saving')">Test ukládání dat</button>
-                <button onclick="runSupabaseTest('loading')">Test načítání dat</button>
-                <button onclick="runSupabaseTest('updating')">Test aktualizace dat</button>
-                <button onclick="runSupabaseTest('deleting')">Test mazání dat</button>
-                <button onclick="runSupabaseTest('all')">Spustit všechny testy</button>
+                <button onclick="window.location.href='/browser-test-runner.html#integration'">Spustit integrační testy</button>
             </div>
 
-            <div id="supabase-results" class="results">Výsledky testů se zobrazí zde...</div>
+            <div class="results">
+                <p>Integrační testy ověřují správnou interakci s externími API:</p>
+                <ul>
+                    <li>OpenStreetMap API</li>
+                    <li>Google Maps API</li>
+                    <li>Vyhledávání tras</li>
+                    <li>Multimodální vyhledávání</li>
+                </ul>
+                <p>Pro spuštění testů z příkazové řádky použijte:</p>
+                <pre>npm run test:integration</pre>
+            </div>
         </div>
 
         <div class="test-section">
-            <h2>Testování formulářů</h2>
-            <p>Testy pro ověření správnosti formulářů a jejich validace.</p>
+            <h2>End-to-end testy</h2>
+            <p>Testy pro ověření celého workflow aplikace.</p>
 
             <div class="test-buttons">
-                <button onclick="runFormTest('elements')">Test formulářových prvků</button>
-                <button onclick="runFormTest('accessibility')">Test přístupnosti</button>
-                <button onclick="runFormTest('validation')">Test validace</button>
-                <button onclick="runFormTest('all')">Spustit všechny testy</button>
+                <button onclick="window.location.href='/browser-test-runner.html#e2e'">Spustit end-to-end testy</button>
             </div>
 
-            <div id="form-results" class="results">Výsledky testů se zobrazí zde...</div>
+            <div class="results">
+                <p>End-to-end testy ověřují celý workflow aplikace:</p>
+                <ul>
+                    <li>Vyhledání trasy mezi dvěma body</li>
+                    <li>Vyhledání bodu zájmu a přidání do oblíbených</li>
+                    <li>Změna mapového podkladu a přepnutí do glóbus režimu</li>
+                    <li>Interakce s AI asistentem pro doporučení trasy</li>
+                </ul>
+                <p>Pro spuštění testů z příkazové řádky použijte:</p>
+                <pre>npm run test:e2e</pre>
+            </div>
         </div>
 
         <div class="test-section">
-            <h2>Testování Content Security Policy</h2>
-            <p>Testy pro ověření správnosti nastavení Content Security Policy.</p>
+            <h2>AI model testy</h2>
+            <p>Testy pro ověření AI modelu a jeho výkonu.</p>
 
             <div class="test-buttons">
-                <button onclick="runCSPTest('resources')">Test externích zdrojů</button>
-                <button onclick="runCSPTest('eval')">Test eval</button>
-                <button onclick="runCSPTest('inline')">Test inline skriptů</button>
-                <button onclick="runCSPTest('fetch')">Test fetch požadavků</button>
-                <button onclick="runCSPTest('all')">Spustit všechny testy</button>
+                <button onclick="window.location.href='/browser-test-runner.html#ai'">Spustit AI model testy</button>
             </div>
 
-            <div id="csp-results" class="results">Výsledky testů se zobrazí zde...</div>
+            <div class="results">
+                <p>AI model testy ověřují výkon AI modelu:</p>
+                <ul>
+                    <li>Klasifikace míst (Accuracy, Precision, Recall, F1-score)</li>
+                    <li>Predikce času cesty (MAE, RMSE, R²)</li>
+                    <li>Doporučení míst (Precision@k, NDCG)</li>
+                    <li>Bias a fairness (Equal Opportunity, Statistical Parity)</li>
+                </ul>
+                <p>Pro spuštění testů z příkazové řádky použijte:</p>
+                <pre>npm run test:ai</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Všechny testy</h2>
+            <p>Spuštění všech testů najednou.</p>
+
+            <div class="test-buttons">
+                <button onclick="window.location.href='/browser-test-runner.html#all'">Spustit všechny testy</button>
+            </div>
+
+            <div class="results">
+                <p>Pro spuštění všech testů z příkazové řádky použijte:</p>
+                <pre>npm test</pre>
+                <p>Nebo použijte skripty:</p>
+                <ul>
+                    <li>Linux/macOS: <code>./tests/run-tests.sh --all</code></li>
+                    <li>Windows: <code>tests\run-tests.bat --all</code></li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -175,180 +219,25 @@
 
         // Načtení všech testovacích skriptů
         Promise.all([
-            loadScript('/tests/auth-test.js'),
-            loadScript('/tests/supabase-test.js'),
-            loadScript('/tests/form-test.js'),
-            loadScript('/tests/csp-test.js')
+            loadScript('/tests/unit/map-utils.test.js'),
+            loadScript('/tests/integration/map-api.test.js'),
+            loadScript('/tests/e2e/map-workflow.test.js'),
+            loadScript('/tests/ai/model-evaluation.test.js')
         ]).then(() => {
             console.log('Všechny testovací skripty byly načteny');
         }).catch(error => {
             console.error('Chyba při načítání testovacích skriptů:', error);
         });
 
-        // Funkce pro spuštění testů autentizace
-        async function runAuthTest(testType) {
-            const resultsElement = document.getElementById('auth-results');
-            resultsElement.textContent = 'Spouštění testů...';
-            resultsElement.className = 'results';
-
-            try {
-                if (!window.AuthTest) {
-                    throw new Error('Testovací skript pro autentizaci nebyl načten');
-                }
-
-                let result;
-
-                switch (testType) {
-                    case 'registration':
-                        result = await window.AuthTest.testRegistration(window.AuthTest.testUsers[0]);
-                        break;
-                    case 'login':
-                        result = await window.AuthTest.testLogin(window.AuthTest.testUsers[0]);
-                        break;
-                    case 'logout':
-                        result = await window.AuthTest.testLogout();
-                        break;
-                    case 'all':
-                        result = await window.AuthTest.runAllTests();
-                        break;
-                    default:
-                        throw new Error('Neznámý typ testu');
-                }
-
-                resultsElement.textContent = JSON.stringify(result, null, 2);
-                resultsElement.classList.add('success');
-            } catch (error) {
-                resultsElement.textContent = `Chyba: ${error.message}`;
-                resultsElement.classList.add('error');
-                console.error('Chyba při spouštění testů autentizace:', error);
+        // Kontrola, zda je uživatel na správné stránce
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kontrola, zda je uživatel na správné stránce
+            if (window.location.pathname === '/tests/index.html' || window.location.pathname === '/tests/') {
+                console.log('Testovací stránka byla načtena');
+            } else {
+                console.warn('Testovací stránka byla načtena z neočekávané cesty:', window.location.pathname);
             }
-        }
-
-        // Funkce pro spuštění testů Supabase integrace
-        async function runSupabaseTest(testType) {
-            const resultsElement = document.getElementById('supabase-results');
-            resultsElement.textContent = 'Spouštění testů...';
-            resultsElement.className = 'results';
-
-            try {
-                if (!window.SupabaseTest) {
-                    throw new Error('Testovací skript pro Supabase integraci nebyl načten');
-                }
-
-                let result;
-
-                switch (testType) {
-                    case 'connection':
-                        result = await window.SupabaseTest.testConnection();
-                        break;
-                    case 'saving':
-                        result = await window.SupabaseTest.testDataSaving();
-                        break;
-                    case 'loading':
-                        result = await window.SupabaseTest.testDataLoading();
-                        break;
-                    case 'updating':
-                        result = await window.SupabaseTest.testDataUpdating();
-                        break;
-                    case 'deleting':
-                        result = await window.SupabaseTest.testDataDeleting();
-                        break;
-                    case 'all':
-                        result = await window.SupabaseTest.runAllTests();
-                        break;
-                    default:
-                        throw new Error('Neznámý typ testu');
-                }
-
-                resultsElement.textContent = JSON.stringify(result, null, 2);
-                resultsElement.classList.add('success');
-            } catch (error) {
-                resultsElement.textContent = `Chyba: ${error.message}`;
-                resultsElement.classList.add('error');
-                console.error('Chyba při spouštění testů Supabase integrace:', error);
-            }
-        }
-
-        // Funkce pro spuštění testů formulářů
-        async function runFormTest(testType) {
-            const resultsElement = document.getElementById('form-results');
-            resultsElement.textContent = 'Spouštění testů...';
-            resultsElement.className = 'results';
-
-            try {
-                if (!window.FormTest) {
-                    throw new Error('Testovací skript pro formuláře nebyl načten');
-                }
-
-                let result;
-
-                switch (testType) {
-                    case 'elements':
-                        result = window.FormTest.testFormElements();
-                        break;
-                    case 'accessibility':
-                        result = window.FormTest.testFormAccessibility();
-                        break;
-                    case 'validation':
-                        result = window.FormTest.testFormValidation();
-                        break;
-                    case 'all':
-                        result = window.FormTest.runAllTests();
-                        break;
-                    default:
-                        throw new Error('Neznámý typ testu');
-                }
-
-                resultsElement.textContent = JSON.stringify(result, null, 2);
-                resultsElement.classList.add('success');
-            } catch (error) {
-                resultsElement.textContent = `Chyba: ${error.message}`;
-                resultsElement.classList.add('error');
-                console.error('Chyba při spouštění testů formulářů:', error);
-            }
-        }
-
-        // Funkce pro spuštění testů Content Security Policy
-        async function runCSPTest(testType) {
-            const resultsElement = document.getElementById('csp-results');
-            resultsElement.textContent = 'Spouštění testů...';
-            resultsElement.className = 'results';
-
-            try {
-                if (!window.CSPTest) {
-                    throw new Error('Testovací skript pro Content Security Policy nebyl načten');
-                }
-
-                let result;
-
-                switch (testType) {
-                    case 'resources':
-                        result = await window.CSPTest.testExternalResources();
-                        break;
-                    case 'eval':
-                        result = window.CSPTest.testEval();
-                        break;
-                    case 'inline':
-                        result = window.CSPTest.testInlineScript();
-                        break;
-                    case 'fetch':
-                        result = await window.CSPTest.testFetchRequests();
-                        break;
-                    case 'all':
-                        result = await window.CSPTest.runAllTests();
-                        break;
-                    default:
-                        throw new Error('Neznámý typ testu');
-                }
-
-                resultsElement.textContent = JSON.stringify(result, null, 2);
-                resultsElement.classList.add('success');
-            } catch (error) {
-                resultsElement.textContent = `Chyba: ${error.message}`;
-                resultsElement.classList.add('error');
-                console.error('Chyba při spouštění testů Content Security Policy:', error);
-            }
-        }
+        });
     </script>
 </body>
 </html>

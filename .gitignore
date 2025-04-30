@@ -41,6 +41,10 @@ logs/
 *.log
 npm-debug.log*
 
+# Výsledky testů
+tests/results/*
+!tests/results/.gitkeep
+
 # Soubory operačního systému
 .DS_Store
 Thumbs.db

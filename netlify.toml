@@ -30,6 +30,18 @@
   to = "/index.html"
   status = 200
 
+# Přesměrování pro Auth0 callback
+[[redirects]]
+  from = "/callback"
+  to = "/index.html"
+  status = 200
+
+# Přesměrování pro Auth0 logout
+[[redirects]]
+  from = "/logout"
+  to = "/index.html"
+  status = 200
+
 # Nastavení hlaviček pro bezpečnost
 [[headers]]
   # Hlavičky pro všechny stránky

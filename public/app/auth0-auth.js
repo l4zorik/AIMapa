@@ -763,6 +763,9 @@ const Auth0Auth = {
                         localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
                         localStorage.setItem('aiMapaUserProfile', JSON.stringify(data.user));
 
+                        // Nastavení příznaku, že uživatel se právě přihlásil
+                        sessionStorage.setItem('aiMapaJustLoggedIn', 'true');
+
                         // Aktualizace tlačítka autentizace
                         this.updateAuthButton();
 
@@ -900,6 +903,9 @@ const Auth0Auth = {
                                     localStorage.setItem('aiMapaUserEmail', processedUserInfo.email || processedUserInfo.name);
                                     localStorage.setItem('aiMapaUserProfile', JSON.stringify(processedUserInfo));
 
+                                    // Nastavení příznaku, že uživatel se právě přihlásil
+                                    sessionStorage.setItem('aiMapaJustLoggedIn', 'true');
+
                                     // Aktualizace tlačítka autentizace
                                     this.updateAuthButton();
 
@@ -1003,6 +1009,9 @@ const Auth0Auth = {
                         localStorage.setItem('aiMapaUserEmail', userInfo.email || userInfo.name);
                         localStorage.setItem('aiMapaUserProfile', JSON.stringify(userInfo));
 
+                        // Nastavení příznaku, že uživatel se právě přihlásil
+                        sessionStorage.setItem('aiMapaJustLoggedIn', 'true');
+
                         // Aktualizace tlačítka autentizace
                         this.updateAuthButton();
 
@@ -1104,6 +1113,9 @@ const Auth0Auth = {
                         localStorage.setItem('aiMapaLoggedIn', 'true');
                         localStorage.setItem('aiMapaUserEmail', processedUserInfo.email || processedUserInfo.name || processedUserInfo.sub);
                         localStorage.setItem('aiMapaUserProfile', JSON.stringify(processedUserInfo));
+
+                        // Nastavení příznaku, že uživatel se právě přihlásil
+                        sessionStorage.setItem('aiMapaJustLoggedIn', 'true');
 
                         // Aktualizace tlačítka autentizace
                         this.updateAuthButton();
@@ -1254,6 +1266,9 @@ const Auth0Auth = {
                             localStorage.setItem('aiMapaLoggedIn', 'true');
                             localStorage.setItem('aiMapaUserEmail', processedUserInfo.email || processedUserInfo.name);
                             localStorage.setItem('aiMapaUserProfile', JSON.stringify(processedUserInfo));
+
+                            // Nastavení příznaku, že uživatel se právě přihlásil
+                            sessionStorage.setItem('aiMapaJustLoggedIn', 'true');
 
                             // Aktualizace tlačítka autentizace
                             this.updateAuthButton();
@@ -1420,7 +1435,13 @@ const Auth0Auth = {
             if (this.state.isLoggedIn) {
                 authButton.classList.add('logged-in');
                 authButton.title = 'Klikněte pro zobrazení profilu (přihlášen přes Auth0)';
-                authButton.innerHTML = '<i class="fas fa-user-check"></i>';
+
+                // Přidání profilového obrázku, pokud existuje
+                if (this.state.currentUser && this.state.currentUser.picture) {
+                    authButton.innerHTML = `<img src="${this.state.currentUser.picture}" alt="${this.state.currentUser.name || 'Uživatel'}" class="user-avatar-small">`;
+                } else {
+                    authButton.innerHTML = '<i class="fas fa-user-check"></i>';
+                }
 
                 // Přidání textu "Auth0" vedle tlačítka
                 if (!document.getElementById('auth0-login-status')) {
@@ -1490,7 +1511,14 @@ const Auth0Auth = {
         if (loginButton) {
             if (this.state.isLoggedIn) {
                 loginButton.classList.add('logged-in');
-                loginButton.innerHTML = '<i class="icon">👤</i> Profil';
+
+                // Přidání profilového obrázku, pokud existuje
+                if (this.state.currentUser && this.state.currentUser.picture) {
+                    loginButton.innerHTML = `<img src="${this.state.currentUser.picture}" alt="${this.state.currentUser.name || 'Uživatel'}" class="user-avatar-small" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 5px;"> Profil`;
+                } else {
+                    loginButton.innerHTML = '<i class="icon">👤</i> Profil';
+                }
+
                 loginButton.title = 'Zobrazit profil (přihlášen přes Auth0)';
 
                 // Změna funkce tlačítka - při kliknutí zobrazit profil místo odhlášení

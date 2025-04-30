@@ -105,7 +105,7 @@ const SubscriptionService = {
         // Nastavení Auth0
         auth0: {
             domain: 'dev-zxj8pir0moo4pdk7.us.auth0.com',
-            clientId: 'Yd9Hn9RxJXQJcwRqPiXqZbCm5FNzYmJZ',
+            clientId: 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
             audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/'
         }
     },

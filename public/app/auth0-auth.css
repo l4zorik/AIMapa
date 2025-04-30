@@ -8,37 +8,48 @@
     position: fixed;
     top: 20px;
     right: 120px; /* Umístění vedle ostatních tlačítek */
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background-color: #ff4f1f; /* Auth0 oranžová barva */
     color: white;
-    border: none;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 900;
-    transition: transform 0.2s, background-color 0.2s;
+    transition: all 0.3s ease;
     font-size: 18px;
+    overflow: hidden;
 }
 
 .auth0-auth-button:hover {
-    transform: scale(1.1);
+    transform: scale(1.1) translateY(-2px);
     background-color: #eb5424; /* Tmavší Auth0 oranžová barva */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
 .auth0-auth-button.logged-in {
     background-color: #44c7f4; /* Auth0 modrá barva */
     /* Přidání animace pulzování pro zvýraznění přihlášeného stavu */
-    animation: pulse-blue 2s infinite;
-    border: 2px solid #fff;
+    animation: pulse-blue 3s infinite;
+    border: 2px solid rgba(255, 255, 255, 0.6);
 }
 
 .auth0-auth-button.logged-in:hover {
     background-color: #0d96c6; /* Tmavší Auth0 modrá barva */
     animation: none;
+    transform: scale(1.1) translateY(-2px);
+}
+
+/* Přidání podpory pro profilový obrázek v Auth0 tlačítku */
+.auth0-auth-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 /* Animace pulzování pro zvýraznění přihlášeného stavu */

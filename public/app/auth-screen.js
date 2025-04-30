@@ -141,7 +141,7 @@ const AuthScreen = {
             // Přímé přesměrování na Auth0 přihlašovací stránku
             const redirectUri = window.location.origin;
             const authUrl = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?' +
-                'client_id=TKzCgYPmkETVCBjC3418MgKDJY60rppl&' +
+                'client_id=H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ&' +
                 'redirect_uri=' + encodeURIComponent(redirectUri) + '&' +
                 'response_type=code&' +
                 'scope=openid%20profile%20email&' +

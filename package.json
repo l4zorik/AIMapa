@@ -7,7 +7,11 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "echo \"No build step required\" && exit 0",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/run-tests.js",
+    "test:unit": "node -e \"const MapUtilsTest = require('./tests/unit/map-utils.test'); const results = MapUtilsTest.runAllTests(); console.log(JSON.stringify(results, null, 2));\"",
+    "test:integration": "node -e \"const MapApiTest = require('./tests/integration/map-api.test'); MapApiTest.runAllTests().then(results => console.log(JSON.stringify(results, null, 2)));\"",
+    "test:e2e": "node -e \"const MapWorkflowTest = require('./tests/e2e/map-workflow.test'); MapWorkflowTest.runAllScenarios().then(results => console.log(JSON.stringify(results, null, 2)));\"",
+    "test:ai": "node -e \"const AIModelTest = require('./tests/ai/model-evaluation.test'); const results = AIModelTest.runAllTests(); console.log(JSON.stringify(results, null, 2));\""
   },
   "repository": {
     "type": "git",
