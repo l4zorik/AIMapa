@@ -18,7 +18,13 @@ const config = {
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
   routes: {
     login: false,
-    logout: false
+    logout: false,
+    callback: '/callback'
+  },
+  authorizationParams: {
+    response_type: 'code',
+    response_mode: 'query',
+    scope: 'openid profile email'
   },
   logoutParams: {
     returnTo: process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000'
@@ -60,6 +66,13 @@ app.get('/user', requiresAuth(), async (req, res) => {
     console.error('Chyba při získávání uživatelského profilu:', error);
     res.status(500).json({ error: 'Chyba při získávání uživatelského profilu' });
   }
+});
+
+// Callback route for Auth0
+app.get('/callback', (req, res) => {
+  // Tato cesta je automaticky zpracována Auth0 middleware
+  // Není potřeba zde nic dělat, middleware se postará o zpracování callbacku
+  console.log('Auth0 callback received');
 });
 
 // Callback route after authentication
