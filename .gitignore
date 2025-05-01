@@ -1,9 +1,6 @@
 # Node modules
 node_modules/
 
-# Environment variables
-.env
-
 # Logs
 logs
 *.log
@@ -40,10 +37,6 @@ jspm_packages/
 
 # Output of 'npm pack'
 *.tgz
-
-# dotenv environment variable files
-.env.*
-!.env.example
 
 # Mac files
 .DS_Store
