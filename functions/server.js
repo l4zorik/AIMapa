@@ -28,7 +28,7 @@ const app = express();
 
 // Auth0 configuration
 const config = {
-  authRequired: false,
+  authRequired: true, // Vyžadovat autentizaci pro všechny cesty
   auth0Logout: true,
   secret: process.env.AUTH0_SECRET || '0267c18740cb77fe1dbc2ec1353c905b64ec40282e3d48a330826a073e64f9ff',
   baseURL: process.env.AUTH0_BASE_URL || 'http://localhost:3000',
@@ -36,7 +36,7 @@ const config = {
   clientSecret: process.env.AUTH0_CLIENT_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
   routes: {
-    login: false,
+    login: true, // Povolit automatické přesměrování na přihlašovací stránku
     logout: false,
     callback: '/.netlify/functions/server/callback'
   },

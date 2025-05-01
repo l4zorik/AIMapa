@@ -95,6 +95,21 @@ html, body {
     background-color: #c82333;
 }
 
+.login-btn {
+    display: inline-block;
+    background-color: #17a2b8;
+    color: white;
+    text-align: center;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-btn:hover {
+    background-color: #138496;
+}
+
 .hidden {
     display: none;
 }

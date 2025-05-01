@@ -21,6 +21,12 @@ function setupNetlifyLinks() {
         if (logoutLink) {
             logoutLink.href = '/.netlify/functions/server/logout';
         }
+
+        // Update login link
+        const loginLink = document.getElementById('login-link');
+        if (loginLink) {
+            loginLink.href = '/.netlify/functions/server/login';
+        }
     }
 }
 
@@ -66,8 +72,20 @@ function loadUserProfile() {
         ? '/user'
         : '/.netlify/functions/server/user';
 
+    // Skryjeme přihlašovací tlačítko a zobrazíme profilové tlačítko (výchozí stav)
+    const loginLink = document.getElementById('login-link');
+    const profileBtn = document.getElementById('profile-btn');
+
+    if (loginLink) loginLink.style.display = 'none';
+    if (profileBtn) profileBtn.style.display = 'block';
+
     fetch(apiUrl)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Uživatel není přihlášen');
+            }
+            return response.json();
+        })
         .then(user => {
             const userDetails = document.getElementById('user-details');
 
@@ -94,5 +112,16 @@ function loadUserProfile() {
         .catch(error => {
             console.error('Chyba při načítání uživatelského profilu:', error);
             document.getElementById('user-details').innerHTML = 'Chyba při načítání dat profilu.';
+
+            // Pokud dojde k chybě, zobrazíme přihlašovací tlačítko a skryjeme profilové tlačítko
+            if (loginLink) loginLink.style.display = 'inline-block';
+            if (profileBtn) profileBtn.style.display = 'none';
+
+            // Přesměrujeme na přihlašovací stránku
+            const loginUrl = window.location.hostname === 'localhost'
+                ? '/login'
+                : '/.netlify/functions/server/login';
+
+            window.location.href = loginUrl;
         });
 }
