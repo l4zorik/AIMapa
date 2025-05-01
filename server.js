@@ -17,9 +17,10 @@ const config = {
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
   routes: {
     login: false,
-    logout: {
-      returnTo: process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000'
-    }
+    logout: false
+  },
+  logoutParams: {
+    returnTo: process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000'
   }
 };
 
@@ -86,9 +87,8 @@ app.get('/profile', requiresAuth(), (req, res) => {
 
 // Explicit logout route
 app.get('/logout', (req, res) => {
-  res.oidc.logout({
-    returnTo: process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000'
-  });
+  const returnTo = process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+  res.oidc.logout({ returnTo });
 });
 
 app.listen(port, () => {
