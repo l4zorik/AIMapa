@@ -124,7 +124,18 @@ app.get('/profile', requiresAuth(), (req, res) => {
 
 // Explicit logout route
 app.get('/logout', (req, res) => {
-  const returnTo = process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+  // Detekce produkčního prostředí a nastavení správné návratové URL
+  let returnTo;
+  if (process.env.NODE_ENV === 'production' || req.hostname !== 'localhost') {
+    // Pro produkční prostředí použijeme aktuální hostname
+    const protocol = req.headers['x-forwarded-proto'] || 'http';
+    returnTo = `${protocol}://${req.hostname}`;
+  } else {
+    // Pro lokální vývoj použijeme hodnotu z .env nebo výchozí localhost
+    returnTo = process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+  }
+
+  console.log('Logout - returnTo URL:', returnTo);
   res.oidc.logout({ returnTo });
 });
 

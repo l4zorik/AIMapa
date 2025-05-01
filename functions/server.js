@@ -223,7 +223,19 @@ app.get('/.netlify/functions/server/profile/json', requiresAuth(), (req, res) =>
 app.get('/.netlify/functions/server/logout', (req, res) => {
   // Pokud používáme express-openid-connect, můžeme použít req.oidc.logout()
   // Tato metoda přesměruje uživatele na Auth0 logout endpoint
-  const returnTo = process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+
+  // Detekce produkčního prostředí a nastavení správné návratové URL
+  let returnTo;
+  if (process.env.NODE_ENV === 'production' || req.hostname !== 'localhost') {
+    // Pro produkční prostředí použijeme aktuální hostname
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    returnTo = `${protocol}://${req.hostname}`;
+  } else {
+    // Pro lokální vývoj použijeme hodnotu z .env nebo výchozí localhost
+    returnTo = process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+  }
+
+  console.log('Logout - returnTo URL:', returnTo);
   res.oidc.logout({ returnTo });
 });
 
