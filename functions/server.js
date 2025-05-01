@@ -36,7 +36,7 @@ const config = {
   clientSecret: process.env.AUTH0_CLIENT_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
   routes: {
-    login: true, // Povolit automatické přesměrování na přihlašovací stránku
+    login: ['/login', false], // Vlastní přihlašovací cesta
     logout: false,
     callback: '/.netlify/functions/server/callback'
   },
@@ -145,6 +145,11 @@ async function getUserProfile(auth0Id) {
 // Routes
 app.get('/.netlify/functions/server', (req, res) => {
   res.json({ message: 'Server is running' });
+});
+
+// Explicit login route
+app.get('/.netlify/functions/server/login', (req, res) => {
+  res.oidc.login({ returnTo: '/map' });
 });
 
 // User profile information

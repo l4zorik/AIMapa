@@ -17,7 +17,7 @@ const config = {
   clientSecret: process.env.AUTH0_CLIENT_SECRET || 'e4uncVy8-5pqixbck29RKi1V61BT-B6G5L65dCkLR_pW_TIA8WRhVcfULycOibSW',
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
   routes: {
-    login: true, // Povolit automatické přesměrování na přihlašovací stránku
+    login: ['/login', false], // Vlastní přihlašovací cesta
     logout: false,
     callback: '/callback'
   },
@@ -38,6 +38,11 @@ app.use(auth(config));
 // Routes
 app.get('/', (req, res) => {
   res.redirect('/map');
+});
+
+// Explicit login route
+app.get('/login', (req, res) => {
+  res.oidc.login({ returnTo: '/map' });
 });
 
 // Map route - protected by authentication
