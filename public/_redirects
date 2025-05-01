@@ -13,7 +13,7 @@
 /user /.netlify/functions/server/user 200
 /profile/json /.netlify/functions/server/profile/json 200
 /overeno /.netlify/functions/server/overeno 200
-/logout /.netlify/functions/server/logout 302
+/logout /.netlify/functions/server/logout 307
 
 # Fallback
 /* /index.html 200

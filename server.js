@@ -14,7 +14,13 @@ const config = {
   secret: process.env.AUTH0_SECRET || 'a long, randomly-generated string stored in env',
   baseURL: process.env.AUTH0_BASE_URL || 'http://localhost:3000',
   clientID: process.env.AUTH0_CLIENT_ID || 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
-  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com'
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com',
+  routes: {
+    login: false,
+    logout: {
+      returnTo: process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000'
+    }
+  }
 };
 
 // Middleware
@@ -76,6 +82,13 @@ app.get('/profile/json', requiresAuth(), (req, res) => {
 // Profile HTML route - displays user profile page
 app.get('/profile', requiresAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
+// Explicit logout route
+app.get('/logout', (req, res) => {
+  res.oidc.logout({
+    returnTo: process.env.AUTH0_LOGOUT_URL || process.env.AUTH0_BASE_URL || 'http://localhost:3000'
+  });
 });
 
 app.listen(port, () => {

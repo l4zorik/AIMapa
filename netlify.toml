@@ -10,6 +10,26 @@
   autoLaunch = true
 
 [[redirects]]
+  from = "/logout"
+  to = "/.netlify/functions/server/logout"
+  status = 307
+
+[[redirects]]
+  from = "/user"
+  to = "/.netlify/functions/server/user"
+  status = 200
+
+[[redirects]]
+  from = "/profile/json"
+  to = "/.netlify/functions/server/profile/json"
+  status = 200
+
+[[redirects]]
+  from = "/overeno"
+  to = "/.netlify/functions/server/overeno"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
