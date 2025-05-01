@@ -1,0 +1,19 @@
+# Přesměrování pro Netlify
+
+# Přesměrování na index.html
+/ /index.html 200
+
+# Přesměrování na mapu
+/map /map.html 200
+
+# Přesměrování na profil
+/profile /profile.html 200
+
+# Přesměrování API požadavků na Netlify funkce
+/user /.netlify/functions/server/user 200
+/profile/json /.netlify/functions/server/profile/json 200
+/overeno /.netlify/functions/server/overeno 200
+/logout /.netlify/functions/server/logout 302
+
+# Fallback
+/* /index.html 200

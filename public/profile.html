@@ -115,24 +115,48 @@
         </div>
 
         <div class="button-container">
-            <a href="/map" class="button button-primary">Zpět na mapu</a>
-            <a href="/logout" class="button button-danger">Odhlásit se</a>
+            <a href="/map" class="button button-primary" id="map-link">Zpět na mapu</a>
+            <a href="/logout" class="button button-danger" id="logout-link">Odhlásit se</a>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             loadUserProfile();
+            setupNetlifyLinks();
         });
 
+        // Setup links for Netlify deployment
+        function setupNetlifyLinks() {
+            // Check if we're running on Netlify
+            if (window.location.hostname !== 'localhost') {
+                // Update map link
+                const mapLink = document.getElementById('map-link');
+                if (mapLink) {
+                    mapLink.href = '/map.html';
+                }
+
+                // Update logout link
+                const logoutLink = document.getElementById('logout-link');
+                if (logoutLink) {
+                    logoutLink.href = '/.netlify/functions/server/logout';
+                }
+            }
+        }
+
         function loadUserProfile() {
-            fetch('/user')
+            // Determine if we're running on Netlify or locally
+            const apiUrl = window.location.hostname === 'localhost'
+                ? '/user'
+                : '/.netlify/functions/server/user';
+
+            fetch(apiUrl)
                 .then(response => response.json())
                 .then(user => {
                     // Základní informace
                     document.getElementById('profile-name').textContent = user.name || 'Neznámé jméno';
                     document.getElementById('profile-email').textContent = user.email || 'Neznámý email';
-                    
+
                     if (user.picture) {
                         document.getElementById('profile-picture').src = user.picture;
                     }

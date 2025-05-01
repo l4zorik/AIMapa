@@ -3,7 +3,26 @@ document.addEventListener('DOMContentLoaded', () => {
     initMap();
     setupProfilePanel();
     loadUserProfile();
+    setupNetlifyLinks();
 });
+
+// Setup links for Netlify deployment
+function setupNetlifyLinks() {
+    // Check if we're running on Netlify
+    if (window.location.hostname !== 'localhost') {
+        // Update profile link
+        const profileLink = document.getElementById('profile-link');
+        if (profileLink) {
+            profileLink.href = '/profile.html';
+        }
+
+        // Update logout link
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) {
+            logoutLink.href = '/.netlify/functions/server/logout';
+        }
+    }
+}
 
 // Initialize Leaflet map
 function initMap() {
@@ -42,7 +61,12 @@ function setupProfilePanel() {
 
 // Load user profile information
 function loadUserProfile() {
-    fetch('/user')
+    // Determine if we're running on Netlify or locally
+    const apiUrl = window.location.hostname === 'localhost'
+        ? '/user'
+        : '/.netlify/functions/server/user';
+
+    fetch(apiUrl)
         .then(response => response.json())
         .then(user => {
             const userDetails = document.getElementById('user-details');
