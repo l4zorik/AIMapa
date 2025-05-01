@@ -63,7 +63,7 @@ BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Vytvoření triggeru pro automatickou aktualizaci updated_at
 CREATE TRIGGER update_user_profiles_updated_at
