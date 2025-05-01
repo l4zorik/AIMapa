@@ -1,70 +1,55 @@
-# AIMapa
+# AI Mapa
 
-Interaktivní mapa s integrací Auth0 a Supabase.
+A map application with Auth0 authentication and Supabase database integration.
 
-## Konfigurace prostředí
+## Features
 
-Aplikace používá následující soubory pro konfiguraci prostředí:
+- Interactive map using Leaflet
+- Authentication with Auth0
+- User profile information stored in Supabase
+- Synchronization between Auth0 and Supabase
 
-### `.env`
+## Setup
 
-Tento soubor obsahuje konfiguraci pro lokální vývojové prostředí. Obsahuje citlivé údaje a **není** součástí repozitáře (je v `.gitignore`).
+1. Clone the repository
+2. Install dependencies:
+   ```
+   npm install
+   ```
+3. Create a `.env` file based on `.env.example` and fill in your Auth0 and Supabase credentials
+4. Initialize your Supabase database using the SQL script in `supabase/init.sql`
+5. Start the development server:
+   ```
+   npm run dev
+   ```
 
-### `.env.example`
+## Authentication & Data Storage
 
-Tento soubor slouží jako šablona pro vytvoření `.env` souboru. Obsahuje všechny potřebné proměnné prostředí, ale s zástupnými hodnotami. Tento soubor **je** součástí repozitáře.
+This application uses Auth0 for authentication and Supabase for data storage. The authentication flow is as follows:
 
-### `.env.production`
+1. User visits the application
+2. User is redirected to Auth0 login page
+3. After successful authentication, user is redirected to `/overeno`
+4. User data is synchronized with Supabase database
+5. User is then redirected to the map page
 
-Tento soubor obsahuje konfiguraci pro produkční prostředí. Neobsahuje citlivé údaje, protože ty jsou nastaveny přímo v Netlify. Slouží jako dokumentace pro produkční nastavení. Tento soubor **je** součástí repozitáře.
+The application uses Supabase to store user profiles and other data. When a user logs in, their Auth0 profile is synchronized with Supabase to ensure data consistency.
 
-## Jak používat konfigurační soubory
+## Environment Variables
 
-1. Pro lokální vývoj zkopírujte `.env.example` do `.env` a vyplňte skutečné hodnoty.
-2. Pro nasazení do produkce nastavte proměnné prostředí přímo v Netlify.
-3. Při spuštění aplikace v produkčním prostředí (NODE_ENV=production) se automaticky načte `.env.production`.
+### Auth0 Configuration
+- `AUTH0_SECRET`: A long, randomly generated string for session encryption
+- `AUTH0_BASE_URL`: The base URL of your application (e.g., http://localhost:3000)
+- `AUTH0_CLIENT_ID`: Your Auth0 client ID
+- `AUTH0_ISSUER_BASE_URL`: Your Auth0 domain URL
 
-## Důležité proměnné prostředí
+### Supabase Configuration
+- `SUPABASE_URL`: Your Supabase project URL
+- `SUPABASE_ANON_KEY`: Your Supabase anonymous key
 
-### Supabase
+### Server Configuration
+- `PORT`: The port on which the server will run (default: 3000)
 
-- `SUPABASE_URL` - URL adresa Supabase projektu
-- `SUPABASE_KEY` - Veřejný API klíč pro Supabase
-- `SUPABASE_SERVICE_KEY` - Servisní klíč pro Supabase (pouze pro server)
+## License
 
-### Auth0
-
-- `AUTH0_DOMAIN` - Doména Auth0 aplikace
-- `AUTH0_CLIENT_ID` - ID klienta Auth0 aplikace
-- `AUTH0_CLIENT_SECRET` - Tajný klíč klienta Auth0 aplikace
-- `AUTH0_CALLBACK_URL` - URL pro přesměrování po přihlášení
-- `AUTH0_LOGOUT_URL` - URL pro přesměrování po odhlášení
-- `AUTH0_SCOPE` - Rozsah oprávnění pro Auth0
-- `AUTH0_AUDIENCE` - Cílová audience pro Auth0 tokeny
-- `AUTH0_AUTH_REQUIRED` - Zda je vyžadována autentizace pro všechny routy
-
-### Stripe
-
-- `STRIPE_SECRET_KEY` - Tajný klíč pro Stripe
-- `STRIPE_PUBLISHABLE_KEY` - Veřejný klíč pro Stripe
-- `STRIPE_WEBHOOK_SECRET` - Tajný klíč pro Stripe webhooky
-
-## Spuštění aplikace
-
-### Lokální vývoj
-
-```bash
-# Spuštění serveru
-node server.js
-```
-
-### Produkční prostředí
-
-```bash
-# Spuštění serveru v produkčním režimu
-NODE_ENV=production node server.js
-```
-
-## Nasazení
-
-Aplikace je nasazena na Netlify. Při nasazení je důležité nastavit všechny potřebné proměnné prostředí v Netlify dashboardu.
+MIT
