@@ -52,15 +52,26 @@ app.get('/user', requiresAuth(), async (req, res) => {
     const auth0User = req.oidc.user;
     const supabaseProfile = await getUserProfile(auth0User.sub);
 
+    // Vytvoříme objekt pouze s bezpečnými informacemi
+    const safeUserData = {
+      name: auth0User.name || auth0User.nickname || 'N/A',
+      email: auth0User.email || 'N/A',
+      email_verified: auth0User.email_verified || false,
+      picture: auth0User.picture || 'N/A',
+      updated_at: auth0User.updated_at || 'N/A',
+      nickname: auth0User.nickname || 'N/A',
+      sub: auth0User.sub // Potřebujeme ID pro propojení s databází
+    };
+
     // Pokud profil existuje v Supabase, vrátíme kombinovaná data
     if (supabaseProfile) {
       res.json({
-        ...auth0User,
+        ...safeUserData,
         profile: supabaseProfile
       });
     } else {
-      // Pokud profil neexistuje, vrátíme pouze Auth0 data
-      res.json(auth0User);
+      // Pokud profil neexistuje, vrátíme pouze bezpečná Auth0 data
+      res.json(safeUserData);
     }
   } catch (error) {
     console.error('Chyba při získávání uživatelského profilu:', error);
@@ -89,9 +100,21 @@ app.get('/overeno', requiresAuth(), async (req, res) => {
   }
 });
 
-// Profile JSON route - returns raw user profile from Auth0
+// Profile JSON route - returns safe user profile from Auth0
 app.get('/profile/json', requiresAuth(), (req, res) => {
-  res.send(JSON.stringify(req.oidc.user));
+  const auth0User = req.oidc.user;
+
+  // Vytvoříme objekt pouze s bezpečnými informacemi
+  const safeUserData = {
+    name: auth0User.name || auth0User.nickname || 'N/A',
+    email: auth0User.email || 'N/A',
+    email_verified: auth0User.email_verified || false,
+    picture: auth0User.picture || 'N/A',
+    updated_at: auth0User.updated_at || 'N/A',
+    nickname: auth0User.nickname || 'N/A'
+  };
+
+  res.send(JSON.stringify(safeUserData));
 });
 
 // Profile HTML route - displays user profile page

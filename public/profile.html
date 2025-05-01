@@ -161,11 +161,19 @@
                         document.getElementById('profile-picture').src = user.picture;
                     }
 
-                    // Auth0 data
-                    const auth0Data = { ...user };
-                    if (auth0Data.profile) {
-                        delete auth0Data.profile;
-                    }
+                    // Auth0 data - zobrazíme pouze bezpečné informace
+                    const auth0Data = {
+                        name: user.name || 'N/A',
+                        email: user.email || 'N/A',
+                        email_verified: user.email_verified || false,
+                        picture: user.picture || 'N/A',
+                        updated_at: user.updated_at || 'N/A',
+                        nickname: user.nickname || 'N/A'
+                    };
+
+                    // Přidáme informaci o přihlášení
+                    auth0Data.last_login = new Date(user.updated_at).toLocaleString();
+
                     document.getElementById('auth0-data').textContent = JSON.stringify(auth0Data, null, 2);
 
                     // Supabase data
