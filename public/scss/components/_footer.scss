@@ -1,0 +1,11 @@
+@import "../variables";
+@import "../mixins";
+
+/* Patička */
+footer {
+  background-color: $light-bg-color;
+  padding: 30px 0;
+  text-align: center;
+  color: $light-text-color;
+  margin-top: 80px;
+}

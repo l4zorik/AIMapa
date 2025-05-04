@@ -1,0 +1,249 @@
+/* Dashboard styly */
+@import 'variables.scss';
+@import 'mixins.scss';
+
+/* Dashboard header */
+.dashboard-header {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: var(--light-bg-color, #f5f5f5);
+  border-radius: var(--border-radius, 4px);
+  box-shadow: var(--shadow, 0 2px 5px rgba(0, 0, 0, 0.1));
+}
+
+.dashboard-header h1 {
+  margin-bottom: 10px;
+  color: var(--primary-color, #4285f4);
+}
+
+.dashboard-header p {
+  margin-bottom: 20px;
+  color: var(--light-text-color, #666);
+}
+
+/* Dashboard filtry */
+.dashboard-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group label {
+  font-weight: 500;
+  color: var(--text-color, #333);
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: var(--border-radius, 4px);
+  background-color: var(--bg-color, #fff);
+}
+
+.custom-date-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Dashboard souhrn */
+.dashboard-summary {
+  margin-bottom: 30px;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.summary-card {
+  padding: 20px;
+  background-color: var(--bg-color, #fff);
+  border-radius: var(--border-radius, 4px);
+  box-shadow: var(--shadow, 0 2px 5px rgba(0, 0, 0, 0.1));
+  text-align: center;
+}
+
+.summary-card h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--light-text-color, #666);
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-color, #4285f4);
+}
+
+/* Dashboard grafy */
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.chart-container {
+  padding: 20px;
+  background-color: var(--bg-color, #fff);
+  border-radius: var(--border-radius, 4px);
+  box-shadow: var(--shadow, 0 2px 5px rgba(0, 0, 0, 0.1));
+}
+
+.chart-container h2 {
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: var(--text-color, #333);
+}
+
+/* Dashboard tabulky */
+.dashboard-tables {
+  margin-bottom: 30px;
+}
+
+.dashboard-tables h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: var(--text-color, #333);
+}
+
+.table-container {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: var(--bg-color, #fff);
+  border-radius: var(--border-radius, 4px);
+  box-shadow: var(--shadow, 0 2px 5px rgba(0, 0, 0, 0.1));
+  overflow-x: auto;
+}
+
+.table-container h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: var(--text-color, #333);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, #ddd);
+}
+
+table th {
+  background-color: var(--light-bg-color, #f5f5f5);
+  font-weight: 600;
+  color: var(--text-color, #333);
+}
+
+table tr:hover {
+  background-color: var(--light-bg-color, #f5f5f5);
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .dashboard-charts {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .custom-date-range {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tmavý režim */
+body.dark-mode .dashboard-header {
+  background-color: var(--dark-light-bg-color, #333);
+}
+
+body.dark-mode .dashboard-header h1 {
+  color: var(--dark-primary-color, #5c9aff);
+}
+
+body.dark-mode .dashboard-header p {
+  color: var(--dark-light-text-color, #aaa);
+}
+
+body.dark-mode .filter-group label {
+  color: var(--dark-text-color, #f5f5f5);
+}
+
+body.dark-mode .filter-group select,
+body.dark-mode .filter-group input {
+  border-color: var(--dark-border-color, #444);
+  background-color: var(--dark-bg-color, #222);
+  color: var(--dark-text-color, #f5f5f5);
+}
+
+body.dark-mode .summary-card {
+  background-color: var(--dark-bg-color, #222);
+  box-shadow: var(--dark-shadow, 0 2px 5px rgba(0, 0, 0, 0.3));
+}
+
+body.dark-mode .summary-card h3 {
+  color: var(--dark-light-text-color, #aaa);
+}
+
+body.dark-mode .summary-value {
+  color: var(--dark-primary-color, #5c9aff);
+}
+
+body.dark-mode .chart-container {
+  background-color: var(--dark-bg-color, #222);
+  box-shadow: var(--dark-shadow, 0 2px 5px rgba(0, 0, 0, 0.3));
+}
+
+body.dark-mode .chart-container h2 {
+  color: var(--dark-text-color, #f5f5f5);
+}
+
+body.dark-mode .table-container {
+  background-color: var(--dark-bg-color, #222);
+  box-shadow: var(--dark-shadow, 0 2px 5px rgba(0, 0, 0, 0.3));
+}
+
+body.dark-mode .table-container h3 {
+  color: var(--dark-text-color, #f5f5f5);
+}
+
+body.dark-mode table th {
+  background-color: var(--dark-light-bg-color, #333);
+  color: var(--dark-text-color, #f5f5f5);
+}
+
+body.dark-mode table td {
+  border-bottom-color: var(--dark-border-color, #444);
+  color: var(--dark-text-color, #f5f5f5);
+}
+
+body.dark-mode table tr:hover {
+  background-color: var(--dark-light-bg-color, #333);
+}

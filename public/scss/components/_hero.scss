@@ -1,0 +1,29 @@
+@import "../variables";
+@import "../mixins";
+
+/* Hero sekce */
+.hero {
+  background-color: $light-bg-color;
+  padding: 80px 0;
+  text-align: center;
+
+  h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 18px;
+    color: $light-text-color;
+    margin-bottom: 30px;
+  }
+
+  .buttons {
+    @include flex(row, center, center, wrap);
+    gap: 20px;
+
+    @include respond-to(md) {
+      flex-direction: column;
+    }
+  }
+}

@@ -1,0 +1,47 @@
+@import "../variables";
+@import "../mixins";
+
+/* Autentizace */
+.auth-section {
+  padding: 80px 0;
+  background-color: $light-bg-color;
+}
+
+.auth-container {
+  max-width: 500px;
+  margin: 0 auto;
+  @include card(30px);
+}
+
+.auth-tabs {
+  @include flex(row, flex-start, center);
+  margin-bottom: 20px;
+  border-bottom: 1px solid $border-color;
+}
+
+.auth-tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: $light-text-color;
+  transition: $transition;
+
+  &.active {
+    color: $primary-color;
+    border-bottom: 2px solid $primary-color;
+  }
+}
+
+.auth-content {
+  h2 {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+}
+
+.social-login {
+  @include flex(row, center, center, wrap);
+  margin-top: 20px;
+}

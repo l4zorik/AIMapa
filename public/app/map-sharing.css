@@ -1,0 +1,225 @@
+/**
+ * Styly pro modul sdílení mapy
+ * Verze 0.2.8.6.2
+ */
+
+/* Tlačítko pro sdílení mapy */
+.share-button {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.share-button:hover {
+    background-color: #f4f4f4;
+}
+
+.share-button .icon {
+    font-size: 16px;
+}
+
+/* Modal pro sdílení */
+.share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.share-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.share-modal-content {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.share-modal.show .share-modal-content {
+    transform: scale(1);
+}
+
+.share-modal-header {
+    background-color: var(--primary-color);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.share-modal-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.share-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.share-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.share-modal-body p {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+/* Kontejner pro URL */
+.share-url-container {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.share-url-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+    outline: none;
+}
+
+.copy-share-url {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.copy-share-url:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.copy-share-url.copied {
+    background-color: #4CAF50;
+}
+
+/* Možnosti sdílení */
+.share-options {
+    margin-bottom: 20px;
+}
+
+.share-options h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.share-buttons a {
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.share-buttons a:hover {
+    opacity: 0.9;
+}
+
+.share-button-facebook {
+    background-color: #3b5998;
+}
+
+.share-button-twitter {
+    background-color: #1da1f2;
+}
+
+.share-button-email {
+    background-color: #ea4335;
+}
+
+.share-button-whatsapp {
+    background-color: #25d366;
+}
+
+/* QR kód */
+.share-qr-code {
+    text-align: center;
+}
+
+.share-qr-code h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.share-qr-code-image {
+    display: inline-block;
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.share-qr-code-image img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Tmavý režim */
+body[data-theme="dark"] .share-button {
+    background-color: #333;
+    color: white;
+}
+
+body[data-theme="dark"] .share-button:hover {
+    background-color: #444;
+}
+
+body[data-theme="dark"] .share-url-input {
+    background-color: #333;
+    color: white;
+    border-color: #444;
+}
+
+body[data-theme="dark"] .share-qr-code-image {
+    background-color: white;
+}

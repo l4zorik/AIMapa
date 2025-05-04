@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AIMapa - Mapa a Glóbus</title>
+    <link rel="stylesheet" href="app/map-init.css" />
+    <link rel="stylesheet" href="app/globe.css" />
+    <style>
+        body, html {
+            margin: 0; padding: 0; height: 100%; width: 100%; font-family: Arial, sans-serif;
+            display: flex; flex-direction: column;
+        }
+        #menu {
+            background: #333; color: white; padding: 10px; display: flex; align-items: center;
+        }
+        #menu button {
+            margin-right: 10px; padding: 8px 12px; background: #555; border: none; color: white; cursor: pointer;
+            border-radius: 4px;
+        }
+        #menu button.active {
+            background: #8B5CF6;
+        }
+        #mapContainer {
+            flex: 1; position: relative; overflow: hidden;
+        }
+        #map, #simpleGlobeContainer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+        #simpleGlobeContainer {
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <button id="btnMap" class="active">Mapa</button>
+        <button id="btnGlobe">Glóbus</button>
+        <button id="btnAddPoint">Přidat bod</button>
+        <button id="btnCreateRoute">Vytvořit trasu</button>
+        <button id="btnSearch">Hledat místo</button>
+        <button id="btnOffline">Offline režim</button>
+        <button id="btnFullscreen">Fullscreen</button>
+        <!-- Added search input and results container -->
+        <input type="text" id="searchInput" placeholder="Zadejte hledaný výraz..." style="margin-left: 10px; padding: 5px; border-radius: 4px; border: 1px solid #ccc; width: 200px;" />
+        <div id="searchResults" style="position: absolute; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; width: 220px; display: none; z-index: 10000; margin-top: 5px;"></div>
+    </div>
+    <div id="container">
+        <div id="mapContainer">
+            <div id="map"></div>
+            <div id="simpleGlobeContainer"></div>
+        </div>
+        <div id="chatPanel">
+            <div id="chatHeader">AI Chat</div>
+            <div id="chatMessages"></div>
+            <div id="chatInputContainer">
+                <input type="text" id="chatInput" placeholder="Napište zprávu..." />
+                <button id="chatSendBtn">Odeslat</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app/globe.gl.min.js"></script>
+    <script src="app/globe-simple.js"></script>
+    <script src="app/map-init.js"></script>
+    <script>
+        // Initialize map and globe
+        let currentView = 'map';
+
+        const btnMap = document.getElementById('btnMap');
+        const btnGlobe = document.getElementById('btnGlobe');
+        const mapDiv = document.getElementById('map');
+        const globeDiv = document.getElementById('simpleGlobeContainer');
+
+        btnMap.addEventListener('click', () => {
+            if (currentView !== 'map') {
+                globeDiv.style.display = 'none';
+                mapDiv.style.display = 'block';
+                btnMap.classList.add('active');
+                btnGlobe.classList.remove('active');
+                currentView = 'map';
+            }
+        });
+
+        btnGlobe.addEventListener('click', async () => {
+            if (currentView !== 'globe') {
+                mapDiv.style.display = 'none';
+                globeDiv.style.display = 'block';
+                btnGlobe.classList.add('active');
+                btnMap.classList.remove('active');
+                currentView = 'globe';
+
+                // Initialize globe if not already initialized
+                if (!window.globeInitialized) {
+                    const success = await window.initSimpleGlobe();
+                    if (success) {
+                        window.globeInitialized = true;
+                        // Example: add some points or routes here or fetch from backend
+                    }
+                }
+            }
+        });
+
+        // TODO: Implement handlers for add point, create route, search, offline mode buttons
+        document.getElementById('btnAddPoint').addEventListener('click', () => {
+            alert('Funkce přidání bodu bude implementována.');
+        });
+        document.getElementById('btnCreateRoute').addEventListener('click', () => {
+            alert('Funkce vytvoření trasy bude implementována.');
+        });
+        document.getElementById('btnSearch').addEventListener('click', () => {
+            alert('Funkce hledání místa bude implementována.');
+        });
+        document.getElementById('btnOffline').addEventListener('click', () => {
+            alert('Offline režim bude implementován.');
+        });
+        document.getElementById('btnFullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

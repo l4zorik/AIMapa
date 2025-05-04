@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Auth0 přihlášení</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Auth0 přihlášení</h1>
+
+    <div>
+        <h2>1. Přímé přihlášení přes Auth0</h2>
+        <button id="loginButton">Přihlásit se přes Auth0</button>
+    </div>
+
+    <div class="result">
+        <h3>Aktuální konfigurace:</h3>
+        <pre id="configOutput">Načítání...</pre>
+    </div>
+
+    <script>
+        // Konfigurace Auth0
+        const auth0Config = {
+            domain: 'dev-zxj8pir0moo4pdk7.us.auth0.com',
+            clientId: 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
+            // Použijeme URL, která je určitě povolena v Auth0 dashboardu
+            redirectUri: 'https://remarkable-cajeta-76cfd9.netlify.app/map.html/callback',
+            audience: 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
+            scope: 'openid profile email'
+        };
+
+        // Zobrazení konfigurace
+        document.getElementById('configOutput').textContent = JSON.stringify(auth0Config, null, 2);
+
+        // Přihlášení přes Auth0
+        document.getElementById('loginButton').addEventListener('click', function() {
+            const authUrl = `https://${auth0Config.domain}/authorize?` +
+                `client_id=${auth0Config.clientId}&` +
+                `redirect_uri=${encodeURIComponent(auth0Config.redirectUri)}&` +
+                `response_type=code&` +
+                `scope=${encodeURIComponent(auth0Config.scope)}&` +
+                `audience=${encodeURIComponent(auth0Config.audience)}&` +
+                `state=${Math.random().toString(36).substring(2, 15)}`;
+
+            console.log('Přesměrovávám na Auth0 URL:', authUrl);
+            window.location.href = authUrl;
+        });
+    </script>
+</body>
+</html>

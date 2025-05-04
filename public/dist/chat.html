@@ -1,0 +1,125 @@
+<!doctype html><html lang="cs"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AIMapa Chat - Interaktivní mapa s AI asistentem</title><link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#4285f4"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/chat.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css"><script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/highlight.min.js"></script><script defer="defer" src="js/main.b21208263df11332c6a7.min.js"></script><script defer="defer" src="js/auth.31d6cfe0d16ae931b73c.min.js"></script><script defer="defer" src="js/supabase.31d6cfe0d16ae931b73c.min.js"></script><script defer="defer" src="js/sync.31d6cfe0d16ae931b73c.min.js"></script><script defer="defer" src="js/chat.31d6cfe0d16ae931b73c.min.js"></script></head><body><header><div class="container"><div class="logo"><h1>AIMapa</h1></div><nav><ul><li><a href="index.html">Domů</a></li><li><a href="map.html">Mapa</a></li><li><a href="chat.html" class="active">Chat</a></li><li><a href="about.html">O projektu</a></li><li id="nav-profile" style="display: none;"><a href="profile.html">Profil</a></li><li id="nav-login"><a href="#" id="login-button">Přihlásit se</a></li><li id="nav-logout" style="display: none;"><a href="#" id="logout-button">Odhlásit se</a></li></ul></nav></div></header><main><section class="chat-section"><div class="container"><div class="chat-container"><div class="chat-header"><h2>AI Asistent</h2><div class="chat-actions"><button id="new-chat-button" class="btn btn-secondary">Nový chat</button> <button id="export-chat-button" class="btn btn-secondary">Exportovat</button> <select id="model-select" class="model-select"><option value="gpt-4">OpenAI GPT-4</option><option value="gpt-3.5-turbo">OpenAI GPT-3.5 Turbo</option><option value="claude-3-opus-20240229">Claude 3 Opus</option><option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option><option value="claude-3-haiku-20240307">Claude 3 Haiku</option><option value="deepseek-chat">DeepSeek Chat</option><option value="deepseek-coder">DeepSeek Coder</option></select></div></div><div class="chat-messages" id="chat-messages"><div class="message system"><div class="message-content"><p>Vítejte v AI Asistentovi! Jak vám mohu pomoci s mapou nebo navigací?</p></div></div></div><div class="chat-input"><form id="chat-form"><textarea id="chat-input-text" placeholder="Napište zprávu..." rows="1"></textarea> <button type="submit" class="btn btn-primary">Odeslat</button></form></div></div><div class="chat-sidebar"><div class="chat-history"><h3>Historie chatů</h3><ul id="chat-history-list"><li class="active">Aktuální chat</li></ul></div><div class="chat-context"><h3>Kontext</h3><div class="context-item"><label for="context-location">Aktuální lokace:</label> <input id="context-location" placeholder="Např. Praha"></div><div class="context-item"><label for="context-destination">Cílová destinace:</label> <input id="context-destination" placeholder="Např. Brno"></div><div class="context-item"><label for="context-transport">Způsob dopravy:</label> <select id="context-transport"><option value="car">Autem</option><option value="public">Veřejnou dopravou</option><option value="bike">Na kole</option><option value="walk">Pěšky</option></select></div><div class="context-item"><label for="context-preferences">Preference:</label> <textarea id="context-preferences" placeholder="Např. vyhýbat se dálnicím, preferovat rychlou cestu..."></textarea></div></div></div></div></section></main><footer><div class="container"><p>&copy; 2023 AIMapa. Všechna práva vyhrazena.</p><p>Verze 0.3.8.7</p></div></footer><script src="js/auth0-client.js"></script><script src="js/supabase-client.js"></script><script src="js/sync-manager.js"></script><script src="js/chat-client.js"></script><script>// Inicializace
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Inicializace Auth0 klienta
+        await Auth0Client.initAuth0Client();
+
+        // Inicializace Supabase klienta
+        await SupabaseClient.initSupabaseClient();
+
+        // Inicializace synchronizačního modulu
+        await SyncManager.initSyncManager();
+
+        // Inicializace chat klienta
+        await ChatClient.initChatClient();
+
+        // Kontrola, zda je uživatel přihlášen
+        const isAuthenticated = await Auth0Client.isAuthenticated();
+
+        // Aktualizace UI podle stavu přihlášení
+        updateUI(isAuthenticated);
+
+        // Přidání event listenerů
+        setupEventListeners();
+      } catch (error) {
+        console.error('Chyba při inicializaci aplikace:', error);
+      }
+    });
+
+    // Aktualizace UI podle stavu přihlášení
+    async function updateUI(isAuthenticated) {
+      const navLogin = document.getElementById('nav-login');
+      const navLogout = document.getElementById('nav-logout');
+      const navProfile = document.getElementById('nav-profile');
+
+      if (isAuthenticated) {
+        navLogin.style.display = 'none';
+        navLogout.style.display = 'block';
+        navProfile.style.display = 'block';
+
+        // Načtení profilu uživatele
+        try {
+          const userProfile = await Auth0Client.getUserProfile();
+          console.log('Přihlášený uživatel:', userProfile);
+        } catch (error) {
+          console.error('Chyba při načítání profilu uživatele:', error);
+        }
+      } else {
+        navLogin.style.display = 'block';
+        navLogout.style.display = 'none';
+        navProfile.style.display = 'none';
+      }
+    }
+
+    // Nastavení event listenerů
+    function setupEventListeners() {
+      // Přihlášení
+      document.getElementById('login-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        Auth0Client.login();
+      });
+
+      // Odhlášení
+      document.getElementById('logout-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        Auth0Client.logout();
+      });
+
+      // Automatické zvětšování textového pole
+      const chatInput = document.getElementById('chat-input-text');
+      chatInput.addEventListener('input', () => {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = (chatInput.scrollHeight) + 'px';
+      });
+
+      // Odeslání zprávy
+      document.getElementById('chat-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const chatInput = document.getElementById('chat-input-text');
+        const message = chatInput.value.trim();
+
+        if (message) {
+          // Resetování výšky textového pole
+          chatInput.value = '';
+          chatInput.style.height = 'auto';
+
+          // Získání kontextu
+          const context = {
+            location: document.getElementById('context-location').value,
+            destination: document.getElementById('context-destination').value,
+            transportMode: document.getElementById('context-transport').value,
+            preferences: document.getElementById('context-preferences').value
+          };
+
+          // Odeslání zprávy
+          await ChatClient.sendMessage(message, context);
+        }
+      });
+
+      // Nový chat
+      document.getElementById('new-chat-button').addEventListener('click', () => {
+        ChatClient.startNewChat();
+      });
+
+      // Export chatu
+      document.getElementById('export-chat-button').addEventListener('click', () => {
+        ChatClient.exportChat();
+      });
+
+      // Změna modelu
+      document.getElementById('model-select').addEventListener('change', (e) => {
+        const model = e.target.value;
+        ChatClient.setModel(model);
+      });
+    }</script><script>if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registrován:', registration);
+          })
+          .catch(error => {
+            console.error('Chyba při registraci Service Workeru:', error);
+          });
+      });
+    }</script></body></html>

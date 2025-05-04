@@ -1,0 +1,274 @@
+@import "../variables";
+@import "../mixins";
+
+/* Chat sekce */
+.chat-section {
+  padding: 40px 0;
+  min-height: calc(100vh - 200px);
+
+  .container {
+    @include flex(row, space-between, stretch);
+    gap: 30px;
+
+    @include respond-to(lg) {
+      flex-direction: column;
+    }
+  }
+}
+
+/* Chat kontejner */
+.chat-container {
+  flex: 1;
+  @include flex(column, flex-start, stretch);
+  height: 70vh;
+  @include card(0);
+  overflow: hidden;
+}
+
+/* Chat hlavička */
+.chat-header {
+  @include flex(row, space-between, center);
+  padding: 15px 20px;
+  background-color: $light-bg-color;
+  border-bottom: 1px solid $border-color;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .chat-actions {
+    @include flex(row, flex-end, center);
+    gap: 10px;
+  }
+
+  .model-select {
+    padding: 8px 12px;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    background-color: $bg-color;
+    color: $text-color;
+    font-size: 14px;
+  }
+
+  @include respond-to(md) {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+
+    .chat-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}
+
+/* Chat zprávy */
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  @include flex(column, flex-start, stretch);
+  gap: 15px;
+}
+
+.message {
+  @include flex(column, flex-start, stretch);
+  max-width: 80%;
+
+  &.user {
+    align-self: flex-end;
+  }
+
+  &.assistant, &.system {
+    align-self: flex-start;
+  }
+
+  .message-content {
+    padding: 12px 16px;
+    border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  &.user .message-content {
+    background-color: $primary-color;
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  &.assistant .message-content {
+    background-color: $light-bg-color;
+    color: $text-color;
+    border-bottom-left-radius: 4px;
+  }
+
+  &.system .message-content {
+    background-color: $secondary-color;
+    color: white;
+    border-radius: 8px;
+  }
+
+  .message-meta {
+    font-size: 12px;
+    color: $light-text-color;
+    margin-top: 4px;
+    align-self: flex-end;
+
+    .message.assistant & {
+      align-self: flex-start;
+    }
+  }
+
+  @include respond-to(md) {
+    max-width: 90%;
+  }
+}
+
+/* Chat vstup */
+.chat-input {
+  padding: 15px 20px;
+  background-color: $light-bg-color;
+  border-top: 1px solid $border-color;
+
+  form {
+    @include flex(row, space-between, flex-end);
+    gap: 10px;
+  }
+
+  textarea {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid $border-color;
+    border-radius: 20px;
+    resize: none;
+    max-height: 150px;
+    background-color: $bg-color;
+  }
+
+  button {
+    align-self: flex-end;
+    border-radius: 20px;
+    padding: 10px 20px;
+  }
+}
+
+/* Chat sidebar */
+.chat-sidebar {
+  width: 300px;
+  @include flex(column, flex-start, stretch);
+  gap: 20px;
+
+  @include respond-to(lg) {
+    width: 100%;
+    flex-direction: row;
+
+    .chat-history, .chat-context {
+      flex: 1;
+    }
+  }
+
+  @include respond-to(md) {
+    flex-direction: column;
+  }
+}
+
+.chat-history, .chat-context {
+  @include card(20px);
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: $primary-color;
+  }
+}
+
+.chat-history {
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    @include flex(column, flex-start, stretch);
+    gap: 8px;
+  }
+
+  li {
+    padding: 8px 12px;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: $transition;
+    font-size: 14px;
+    @include truncate;
+
+    &:hover {
+      background-color: $light-bg-color;
+    }
+
+    &.active {
+      background-color: $primary-color;
+      color: white;
+    }
+  }
+}
+
+.context-item {
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: 14px;
+    background-color: $bg-color;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+}
+
+/* Načítání */
+.loading {
+  @include flex(row, flex-start, center);
+  gap: 8px;
+  color: $light-text-color;
+  font-style: italic;
+}
+
+.loading-dots {
+  @include flex(row, flex-start, center);
+  gap: 4px;
+
+  span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: $light-text-color;
+    animation: loading 1.4s infinite ease-in-out both;
+
+    &:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    &:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+  }
+}
+
+@keyframes loading {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}

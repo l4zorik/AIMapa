@@ -1,0 +1,63 @@
+@import "../variables";
+@import "../mixins";
+
+/* Profil */
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+  @include card(30px);
+}
+
+.profile-info {
+  @include flex(row, flex-start, flex-start);
+  gap: 30px;
+  margin-bottom: 30px;
+
+  @include respond-to(md) {
+    flex-direction: column;
+  }
+}
+
+.profile-avatar {
+  text-align: center;
+
+  img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+}
+
+.profile-details {
+  flex: 1;
+}
+
+.profile-actions {
+  @include flex(row, flex-end, center);
+  gap: 15px;
+}
+
+/* Progress bar */
+.progress {
+  height: 10px;
+  background-color: $light-bg-color;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: $primary-color;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+/* Nastavení */
+.settings-container {
+  max-width: 800px;
+  margin: 0 auto;
+  @include card(30px);
+}

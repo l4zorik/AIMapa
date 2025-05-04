@@ -1,0 +1,112 @@
+/**
+ * Styly pro Role Manager
+ * Verze 0.3.8.5
+ */
+
+/* User menu */
+#user-menu {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Role badges */
+.role-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.role-badge.admin {
+    background-color: #dc3545;
+    color: white;
+}
+
+.role-badge.moderator {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.role-badge.user {
+    background-color: #28a745;
+    color: white;
+}
+
+.role-badge.guest {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Error message */
+.error-message {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #dc3545;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.3s ease-out;
+    z-index: 1001;
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    #user-menu {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        border-radius: 8px 8px 0 0;
+        padding: 1rem;
+    }
+
+    .user-roles {
+        justify-content: center;
+    }
+}

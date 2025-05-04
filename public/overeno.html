@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Přihlášení úspěšné - AI Mapa</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .success-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .success-icon {
+            color: #2ecc71;
+            font-size: 64px;
+            margin: 20px 0;
+        }
+
+        p {
+            margin: 15px 0;
+            line-height: 1.5;
+            font-size: 16px;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+        }
+
+        .user-info {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .user-info p {
+            margin: 8px 0;
+        }
+
+        .dark-mode {
+            background-color: #222;
+            color: #f5f5f5;
+        }
+
+        .dark-mode .success-container {
+            background-color: #333;
+            color: #f5f5f5;
+        }
+
+        .dark-mode h1 {
+            color: #3498db;
+        }
+
+        .dark-mode .user-info {
+            background-color: #444;
+        }
+
+        .dark-mode .button {
+            background-color: #3498db;
+        }
+
+        .dark-mode .button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Styly pro profil uživatele */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+            border: 3px solid #3498db;
+        }
+
+        .user-details {
+            flex: 1;
+            text-align: left;
+        }
+
+        .user-details p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .auth-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logout-button {
+            background-color: #e74c3c;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
+
+        .dark-mode .user-profile {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode .profile-image {
+            border-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <h1>Přihlášení úspěšné</h1>
+        <div class="success-icon">✓</div>
+        <p>Byli jste úspěšně přihlášeni do aplikace AI Mapa.</p>
+        <p>Nyní můžete používat všechny funkce aplikace.</p>
+
+        <div class="user-info" id="user-info">
+            <p><strong>Načítání informací o uživateli...</strong></p>
+        </div>
+
+        <a href="/" class="button">Přejít do aplikace</a>
+    </div>
+
+    <script>
+        // Kontrola, zda má být použit tmavý režim
+        function checkDarkMode() {
+            const isDarkMode = localStorage.getItem('aiMapaDarkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // Kontrola tmavého režimu při načtení stránky
+        checkDarkMode();
+
+        // Funkce pro získání informací o uživateli
+        async function getUserInfo() {
+            try {
+                // Kontrola, zda je uživatel přihlášen
+                const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+
+                if (!isLoggedIn) {
+                    document.getElementById('user-info').innerHTML = `
+                        <p><strong>Upozornění:</strong> Nejste přihlášeni. <a href="/">Přejděte na hlavní stránku</a> pro přihlášení.</p>
+                    `;
+                    return;
+                }
+
+                // Pokus o získání informací o uživateli z Auth0 pomocí /profile endpointu
+                const response = await fetch('/profile-api');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const user = await response.json();
+
+                if (user) {
+                    // Uložení informací o uživateli do localStorage
+                    localStorage.setItem('aiMapaUserProfile', JSON.stringify(user));
+
+                    // Formátování data poslední aktualizace
+                    let updatedDate = 'Neuvedeno';
+                    if (user.updated_at) {
+                        const date = new Date(user.updated_at);
+                        updatedDate = date.toLocaleString('cs-CZ');
+                    }
+
+                    // Zobrazení informací o uživateli
+                    document.getElementById('user-info').innerHTML = `
+                        <div class="user-profile">
+                            ${user.picture ? `<img src="${user.picture}" alt="Profilový obrázek" class="profile-image">` : ''}
+                            <div class="user-details">
+                                <p><strong>Jméno:</strong> ${user.name || 'Neuvedeno'}</p>
+                                <p><strong>Email:</strong> ${user.email || 'Neuvedeno'}</p>
+                                <p><strong>Přezdívka:</strong> ${user.nickname || 'Neuvedeno'}</p>
+                                <p><strong>ID:</strong> ${user.sub || 'Neuvedeno'}</p>
+                                <p><strong>Poslední aktualizace:</strong> ${updatedDate}</p>
+                            </div>
+                        </div>
+                        <div class="auth-actions">
+                            <button id="logout-button" class="button logout-button">Odhlásit se</button>
+                        </div>
+                    `;
+
+                    // Přidání posluchače události pro tlačítko odhlášení
+                    document.getElementById('logout-button').addEventListener('click', function() {
+                        // Odstranění informací o přihlášení z localStorage
+                        localStorage.removeItem('aiMapaLoggedIn');
+                        localStorage.removeItem('aiMapaUserProfile');
+
+                        // Přesměrování na odhlašovací stránku
+                        window.location.href = '/logout';
+                    });
+                } else {
+                    // Pokud se nepodařilo získat informace o uživateli, zobrazíme základní informace
+                    document.getElementById('user-info').innerHTML = `
+                        <p><strong>Stav:</strong> Přihlášen</p>
+                        <p><strong>Poznámka:</strong> Nepodařilo se načíst podrobné informace o uživateli.</p>
+                        <div class="auth-actions">
+                            <a href="/logout" class="button logout-button">Odhlásit se</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Chyba při získávání informací o uživateli:', error);
+
+                // Zobrazení chybové zprávy
+                document.getElementById('user-info').innerHTML = `
+                    <p><strong>Chyba:</strong> Nepodařilo se načíst informace o uživateli.</p>
+                    <p>${error.message}</p>
+                    <p>Zkusíme načíst základní informace o přihlášení...</p>
+                `;
+
+                // Záložní pokus o získání informací o přihlášení
+                try {
+                    const statusResponse = await fetch('/auth/status');
+                    const statusData = await statusResponse.json();
+
+                    if (statusData.isAuthenticated) {
+                        document.getElementById('user-info').innerHTML += `
+                            <p><strong>Stav přihlášení:</strong> Přihlášen</p>
+                            <div class="auth-actions">
+                                <a href="/logout" class="button logout-button">Odhlásit se</a>
+                            </div>
+                        `;
+                    }
+                } catch (backupError) {
+                    console.error('Chyba při získávání záložních informací:', backupError);
+                }
+            }
+        }
+
+        // Načtení informací o uživateli při načtení stránky
+        window.addEventListener('DOMContentLoaded', getUserInfo);
+
+        // Nastavení stavu přihlášení v localStorage
+        localStorage.setItem('aiMapaLoggedIn', 'true');
+
+        // Vyvolání události o změně stavu autentizace
+        document.dispatchEvent(new CustomEvent('authStateChanged', {
+            detail: {
+                isLoggedIn: true
+            }
+        }));
+    </script>
+</body>
+</html>

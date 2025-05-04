@@ -1,0 +1,554 @@
+/**
+ * Styly pro jednoduchý dialog práce
+ * Verze 0.3.8.0
+ */
+
+/* Dialog práce */
+.simple-work-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 500px;
+    max-width: 90vw;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+    z-index: 1001;
+    overflow: hidden;
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.simple-work-dialog.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+.simple-work-header {
+    background-color: var(--primary-color);
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.simple-work-title {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+}
+
+.simple-work-title .icon {
+    font-size: 1.3rem;
+}
+
+.simple-work-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.simple-work-content {
+    padding: 20px;
+}
+
+.simple-work-description {
+    margin-bottom: 15px;
+}
+
+.simple-work-description p {
+    margin: 0;
+    color: var(--text-color-dark);
+}
+
+.simple-work-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.simple-work-detail {
+    background-color: var(--bg-light);
+    padding: 8px 12px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+}
+
+.simple-work-detail .icon {
+    font-size: 1.1rem;
+}
+
+.simple-work-progress {
+    margin-bottom: 20px;
+}
+
+.simple-work-progress-bar {
+    height: 10px;
+    background-color: var(--bg-light);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.simple-work-progress-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 0;
+    transition: width 0.3s;
+}
+
+.simple-work-progress-text {
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+}
+
+.simple-work-task-selection {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.simple-work-task-selection label {
+    font-weight: bold;
+    color: var(--text-color);
+    margin-right: 5px;
+}
+
+.simple-work-task-selector {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    min-width: 200px;
+}
+
+.simple-work-show-task-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.simple-work-show-task-btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.simple-work-task-detail {
+    margin-bottom: 20px;
+    background-color: var(--bg-light);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.simple-work-task-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.simple-work-task-description {
+    margin-bottom: 15px;
+}
+
+.simple-work-task-description p {
+    margin: 0;
+    color: var(--text-color-dark);
+}
+
+.simple-work-task-steps {
+    margin-bottom: 20px;
+}
+
+.simple-work-task-step {
+    display: flex;
+    margin-bottom: 12px;
+    align-items: flex-start;
+}
+
+.simple-work-task-step-number {
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.simple-work-task-step-text {
+    flex: 1;
+    color: var(--text-color);
+}
+
+.simple-work-task-notes {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    border-left: 3px solid var(--primary-color);
+    padding: 10px 15px;
+    border-radius: 0 5px 5px 0;
+}
+
+.simple-work-task-notes h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.simple-work-task-notes p {
+    margin: 0;
+    color: var(--text-color-dark);
+    font-size: 0.9rem;
+}
+
+.simple-work-back-btn {
+    background-color: var(--bg-dark);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.simple-work-back-btn:hover {
+    background-color: var(--border-color);
+}
+
+.simple-work-tasks {
+    margin-bottom: 20px;
+}
+
+.simple-work-task {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: var(--bg-light);
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.simple-work-task:hover {
+    background-color: var(--bg-dark);
+}
+
+.simple-work-task-checkbox {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.simple-work-task label {
+    cursor: pointer;
+    color: var(--text-color);
+    flex: 1;
+}
+
+.simple-work-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.simple-work-complete {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.simple-work-complete:hover:not(:disabled) {
+    background-color: var(--primary-color-dark);
+}
+
+.simple-work-complete:disabled {
+    background-color: var(--bg-dark);
+    color: var(--text-color-dark);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Pulzující animace pro tlačítko dokončení */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.7);
+    }
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(var(--primary-color-rgb), 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0);
+    }
+}
+
+.simple-work-complete.pulse {
+    animation: pulse 1.5s infinite;
+}
+
+/* Oznámení o dokončení práce */
+.simple-work-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    overflow: hidden;
+    transform: translateX(120%);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.simple-work-notification.show {
+    transform: translateX(0);
+}
+
+.simple-work-notification-header {
+    background-color: #4CAF50; /* Zelená barva pro úspěch */
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.simple-work-notification-title {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.simple-work-notification-title .icon {
+    font-size: 1.2rem;
+}
+
+.simple-work-notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.simple-work-notification-content {
+    padding: 15px;
+}
+
+.simple-work-notification-content h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.simple-work-notification-content p {
+    margin-bottom: 15px;
+    color: var(--text-color-dark);
+}
+
+.simple-work-notification-rewards {
+    display: flex;
+    gap: 10px;
+}
+
+.simple-work-notification-reward {
+    background-color: var(--bg-light);
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    color: var(--text-color);
+    flex: 1;
+    justify-content: center;
+}
+
+.simple-work-notification-reward .icon {
+    font-size: 1.2rem;
+}
+
+/* Styly pro uložené práce */
+.simple-work-saved-work {
+    margin-bottom: 20px;
+}
+
+.simple-work-saved-work h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.simple-work-saved-work-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.simple-work-saved-work-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-light);
+    border-radius: 8px;
+    padding: 15px;
+    transition: background-color 0.2s;
+}
+
+.simple-work-saved-work-item:hover {
+    background-color: var(--bg-dark);
+}
+
+.simple-work-saved-work-info {
+    flex: 1;
+}
+
+.simple-work-saved-work-title {
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.simple-work-saved-work-description {
+    color: var(--text-color-dark);
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.simple-work-saved-work-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.simple-work-saved-work-reward,
+.simple-work-saved-work-xp,
+.simple-work-saved-work-duration {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.simple-work-saved-work-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.simple-work-saved-work-resume,
+.simple-work-saved-work-delete {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.simple-work-saved-work-resume:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.simple-work-saved-work-delete {
+    background-color: #e74c3c;
+}
+
+.simple-work-saved-work-delete:hover {
+    background-color: #c0392b;
+}
+
+.simple-work-new-work {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    margin-top: 20px;
+}
+
+.simple-work-new-work:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.simple-work-save {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    margin-right: 10px;
+}
+
+.simple-work-save:hover {
+    background-color: #2980b9;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+    .simple-work-dialog {
+        width: 95vw;
+    }
+
+    .simple-work-notification {
+        bottom: 10px;
+        right: 10px;
+        width: calc(100% - 20px);
+        max-width: 350px;
+    }
+}

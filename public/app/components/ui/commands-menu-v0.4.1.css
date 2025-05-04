@@ -1,0 +1,301 @@
+/**
+ * Styly pro menu příkazů AIMapa
+ * Verze 0.4.1
+ * 
+ * Tento soubor obsahuje styly pro menu příkazů s designem z verze 0.3.1
+ */
+
+/* Překrytí pro menu příkazů */
+.commands-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(3px);
+}
+
+.commands-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Menu příkazů */
+.commands-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(-10px);
+    width: 320px;
+    max-height: 500px;
+    background-color: rgba(31, 41, 55, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+}
+
+.commands-menu.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+
+.commands-menu.dragging {
+    transition: none;
+}
+
+/* Hlavička menu */
+.commands-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-color, #4285f4);
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    cursor: move;
+}
+
+.commands-menu-drag-handle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 10px;
+}
+
+.commands-menu-header h3 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 16px;
+    flex: 1;
+}
+
+.commands-menu-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.commands-menu-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Vyhledávací pole */
+.commands-menu-search {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.commands-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    font-size: 14px;
+}
+
+.commands-search-input:focus {
+    outline: none;
+    border-color: var(--primary-color, #4285f4);
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.3);
+}
+
+/* Tělo menu */
+.commands-menu-body {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.commands-menu-scroll-container {
+    height: 100%;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* Scrollbar */
+.commands-menu-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.commands-menu-scroll-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.commands-menu-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.commands-menu-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Kategorie */
+.commands-category {
+    margin-bottom: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: white;
+}
+
+.category-header:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.category-icon {
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.category-name {
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.category-toggle {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.category-body {
+    padding: 5px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Příkazy */
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    margin: 2px 5px;
+}
+
+.command-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.command-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-name {
+    font-size: 14px;
+    color: white;
+    margin-bottom: 2px;
+}
+
+.command-description {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Tlačítko pro menu příkazů */
+.commands-button {
+    background: none;
+    border: none;
+    color: var(--text-color, #333);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px;
+    margin-right: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.commands-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] .commands-button {
+    color: var(--light-text-color, #eee);
+}
+
+body[data-theme="dark"] .commands-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Animace pro menu */
+@keyframes slideIn {
+    from {
+        transform: translate(-50%, -50%) translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+}
+
+.commands-menu.show {
+    animation: slideIn 0.3s forwards;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+    .commands-menu {
+        width: 90%;
+        max-width: 350px;
+    }
+}
+
+@media (max-width: 480px) {
+    .commands-menu {
+        width: 95%;
+        max-height: 80vh;
+    }
+    
+    .commands-menu-scroll-container {
+        max-height: calc(80vh - 120px);
+    }
+}

@@ -1,0 +1,2196 @@
+{
+  "timestamp": "2025-05-03T18:49:48.589Z",
+  "version": "0.3.8.6",
+  "summary": {
+    "total": 145,
+    "passed": 142,
+    "failed": 3,
+    "successRate": 0.9793103448275862
+  },
+  "unitTests": {
+    "results": {
+      "distanceCalculation": {
+        "passed": 3,
+        "failed": 0,
+        "details": [
+          {
+            "from": 0,
+            "to": 1,
+            "expected": 186,
+            "calculated": 186,
+            "passed": true
+          },
+          {
+            "from": 0,
+            "to": 2,
+            "expected": 65,
+            "calculated": 65,
+            "passed": true
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "expected": 121,
+            "calculated": 121,
+            "passed": true
+          }
+        ]
+      },
+      "coordinateParsing": {
+        "passed": 6,
+        "failed": 0,
+        "details": [
+          {
+            "input": "50.0755, 14.4378",
+            "expected": {
+              "lat": 50.0755,
+              "lng": 14.4378
+            },
+            "parsed": {
+              "lat": 50.0755,
+              "lng": 14.4378
+            },
+            "passed": true
+          },
+          {
+            "input": "49.1951,16.6068",
+            "expected": {
+              "lat": 49.1951,
+              "lng": 16.6068
+            },
+            "parsed": {
+              "lat": 49.1951,
+              "lng": 16.6068
+            },
+            "passed": true
+          },
+          {
+            "input": "49.8175 15.4730",
+            "expected": {
+              "lat": 49.8175,
+              "lng": 15.473
+            },
+            "parsed": {
+              "lat": 49.8175,
+              "lng": 15.473
+            },
+            "passed": true
+          },
+          {
+            "input": "Praha",
+            "expected": null,
+            "parsed": null,
+            "passed": true
+          },
+          {
+            "input": "91.0000, 14.4378",
+            "expected": null,
+            "parsed": null,
+            "passed": true
+          },
+          {
+            "input": "50.0755, 181.0000",
+            "expected": null,
+            "parsed": null,
+            "passed": true
+          }
+        ]
+      },
+      "coordinateValidation": {
+        "passed": 12,
+        "failed": 0,
+        "details": [
+          {
+            "lat": 50.0755,
+            "lng": 14.4378,
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "lat": 0,
+            "lng": 0,
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "lat": 90,
+            "lng": 180,
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "lat": -90,
+            "lng": -180,
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "lat": 91,
+            "lng": 14.4378,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "lat": 50.0755,
+            "lng": 181,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "lat": -91,
+            "lng": 14.4378,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "lat": 50.0755,
+            "lng": -181,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "lat": null,
+            "lng": 14.4378,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "lat": 50.0755,
+            "lng": null,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "lat": null,
+            "lng": 14.4378,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "lat": 50.0755,
+            "lng": null,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          }
+        ]
+      }
+    },
+    "summary": {
+      "passed": 21,
+      "failed": 0,
+      "total": 21
+    }
+  },
+  "integrationTests": {
+    "results": {
+      "openStreetMapGeocoding": {
+        "passed": 4,
+        "failed": 0,
+        "details": [
+          {
+            "location": "Praha",
+            "expected": {
+              "lat": 50.0755,
+              "lng": 14.4378
+            },
+            "actual": {
+              "lat": 50.0755,
+              "lng": 14.4378
+            },
+            "passed": true
+          },
+          {
+            "location": "Brno",
+            "expected": {
+              "lat": 49.1951,
+              "lng": 16.6068
+            },
+            "actual": {
+              "lat": 49.1951,
+              "lng": 16.6068
+            },
+            "passed": true
+          },
+          {
+            "location": "Ostrava",
+            "expected": {
+              "lat": 49.8209,
+              "lng": 18.2625
+            },
+            "actual": {
+              "lat": 49.8209,
+              "lng": 18.2625
+            },
+            "passed": true
+          },
+          {
+            "location": "Plzeň",
+            "expected": {
+              "lat": 49.7384,
+              "lng": 13.3736
+            },
+            "actual": {
+              "lat": 49.7384,
+              "lng": 13.3736
+            },
+            "passed": true
+          }
+        ]
+      },
+      "googleMapsGeocoding": {
+        "passed": 4,
+        "failed": 0,
+        "details": [
+          {
+            "location": "Praha",
+            "expected": {
+              "lat": 50.0755,
+              "lng": 14.4378
+            },
+            "actual": {
+              "lat": 50.0755,
+              "lng": 14.4378
+            },
+            "passed": true
+          },
+          {
+            "location": "Brno",
+            "expected": {
+              "lat": 49.1951,
+              "lng": 16.6068
+            },
+            "actual": {
+              "lat": 49.1951,
+              "lng": 16.6068
+            },
+            "passed": true
+          },
+          {
+            "location": "Ostrava",
+            "expected": {
+              "lat": 49.8209,
+              "lng": 18.2625
+            },
+            "actual": {
+              "lat": 49.8209,
+              "lng": 18.2625
+            },
+            "passed": true
+          },
+          {
+            "location": "Plzeň",
+            "expected": {
+              "lat": 49.7384,
+              "lng": 13.3736
+            },
+            "actual": {
+              "lat": 49.7384,
+              "lng": 13.3736
+            },
+            "passed": true
+          }
+        ]
+      },
+      "googleMapsDirections": {
+        "passed": 4,
+        "failed": 0,
+        "details": [
+          {
+            "route": "Praha -> Brno",
+            "distance": 186,
+            "duration": 120,
+            "passed": true
+          },
+          {
+            "route": "Praha -> Ostrava",
+            "distance": 356,
+            "duration": 210,
+            "passed": true
+          },
+          {
+            "route": "Brno -> Ostrava",
+            "distance": 170,
+            "duration": 105,
+            "passed": true
+          },
+          {
+            "route": "Plzeň -> Praha",
+            "distance": 92,
+            "duration": 60,
+            "passed": true
+          }
+        ]
+      },
+      "multiModalDirections": {
+        "passed": 4,
+        "failed": 0,
+        "details": [
+          {
+            "route": "Praha -> Brno",
+            "mode": "driving",
+            "distance": 186,
+            "duration": 120,
+            "expectedDistance": 186,
+            "expectedDuration": 120,
+            "passed": true
+          },
+          {
+            "route": "Praha -> Brno",
+            "mode": "walking",
+            "distance": 149,
+            "duration": 1800,
+            "expectedDistance": 149,
+            "expectedDuration": 1800,
+            "passed": true
+          },
+          {
+            "route": "Praha -> Brno",
+            "mode": "transit",
+            "distance": 205,
+            "duration": 185,
+            "expectedDistance": 205,
+            "expectedDuration": 185,
+            "passed": true
+          },
+          {
+            "route": "Praha -> Brno",
+            "mode": "bicycling",
+            "distance": 167,
+            "duration": 668,
+            "expectedDistance": 167,
+            "expectedDuration": 668,
+            "passed": true
+          }
+        ]
+      }
+    },
+    "summary": {
+      "passed": 16,
+      "failed": 0,
+      "total": 16
+    }
+  },
+  "e2eTests": {
+    "scenarios": [
+      {
+        "name": "Vyhledání trasy mezi dvěma body",
+        "steps": [
+          {
+            "action": "openMap",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "setStartPoint",
+            "params": {
+              "location": "Praha"
+            },
+            "success": true
+          },
+          {
+            "action": "setEndPoint",
+            "params": {
+              "location": "Brno"
+            },
+            "success": true
+          },
+          {
+            "action": "calculateRoute",
+            "params": {
+              "mode": "driving"
+            },
+            "success": true
+          },
+          {
+            "action": "verifyRouteExists",
+            "params": {},
+            "success": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "Vyhledání bodu zájmu a přidání do oblíbených",
+        "steps": [
+          {
+            "action": "openMap",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "searchLocation",
+            "params": {
+              "query": "Karlův most, Praha"
+            },
+            "success": true
+          },
+          {
+            "action": "verifySearchResults",
+            "params": {
+              "minResults": 1
+            },
+            "success": true
+          },
+          {
+            "action": "selectFirstResult",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "addToFavorites",
+            "params": {
+              "name": "Karlův most"
+            },
+            "success": true
+          },
+          {
+            "action": "openFavorites",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "verifyFavoriteExists",
+            "params": {
+              "name": "Karlův most"
+            },
+            "success": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "Změna mapového podkladu a přepnutí do glóbus režimu",
+        "steps": [
+          {
+            "action": "openMap",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "changeMapType",
+            "params": {
+              "type": "satellite"
+            },
+            "success": true
+          },
+          {
+            "action": "verifyMapType",
+            "params": {
+              "type": "satellite"
+            },
+            "success": true
+          },
+          {
+            "action": "toggleGlobeMode",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "verifyGlobeMode",
+            "params": {
+              "active": true
+            },
+            "success": true
+          },
+          {
+            "action": "toggleGlobeMode",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "verifyGlobeMode",
+            "params": {
+              "active": false
+            },
+            "success": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "Interakce s AI asistentem pro doporučení trasy",
+        "steps": [
+          {
+            "action": "openMap",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "openAIAssistant",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "sendMessage",
+            "params": {
+              "message": "Doporuč mi trasu z Prahy do Brna"
+            },
+            "success": true
+          },
+          {
+            "action": "waitForResponse",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "verifyResponseContains",
+            "params": {
+              "text": "trasa",
+              "caseSensitive": false
+            },
+            "success": true
+          },
+          {
+            "action": "clickRouteInResponse",
+            "params": {},
+            "success": true
+          },
+          {
+            "action": "verifyRouteExists",
+            "params": {},
+            "success": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "summary": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    }
+  },
+  "aiModelTests": {
+    "placeClassification": {
+      "predictions": [
+        {
+          "input": "Karlův most, Praha",
+          "expected": "landmark",
+          "predicted": "landmark",
+          "correct": true
+        },
+        {
+          "input": "Hlavní nádraží, Praha",
+          "expected": "transport",
+          "predicted": "transport",
+          "correct": true
+        },
+        {
+          "input": "OC Palladium, Praha",
+          "expected": "shopping",
+          "predicted": "shopping",
+          "correct": true
+        },
+        {
+          "input": "Restaurace U Fleků, Praha",
+          "expected": "food",
+          "predicted": "food",
+          "correct": true
+        },
+        {
+          "input": "Petřínská rozhledna, Praha",
+          "expected": "landmark",
+          "predicted": "landmark",
+          "correct": true
+        },
+        {
+          "input": "Letiště Václava Havla, Praha",
+          "expected": "transport",
+          "predicted": "transport",
+          "correct": true
+        },
+        {
+          "input": "Národní muzeum, Praha",
+          "expected": "culture",
+          "predicted": "culture",
+          "correct": true
+        },
+        {
+          "input": "Náplavka, Praha",
+          "expected": "leisure",
+          "predicted": "leisure",
+          "correct": true
+        },
+        {
+          "input": "Pražský hrad, Praha",
+          "expected": "landmark",
+          "predicted": "landmark",
+          "correct": true
+        },
+        {
+          "input": "Staroměstské náměstí, Praha",
+          "expected": "landmark",
+          "predicted": "landmark",
+          "correct": true
+        }
+      ],
+      "metrics": {
+        "accuracy": 1,
+        "precision": {
+          "landmark": 1,
+          "transport": 1,
+          "shopping": 1,
+          "food": 1,
+          "culture": 1,
+          "leisure": 1
+        },
+        "recall": {
+          "landmark": 1,
+          "transport": 1,
+          "shopping": 1,
+          "food": 1,
+          "culture": 1,
+          "leisure": 1
+        },
+        "f1Score": {
+          "landmark": 1,
+          "transport": 1,
+          "shopping": 1,
+          "food": 1,
+          "culture": 1,
+          "leisure": 1
+        },
+        "avgPrecision": 1,
+        "avgRecall": 1,
+        "avgF1Score": 1
+      }
+    },
+    "travelTimePrediction": {
+      "predictions": [
+        {
+          "from": "Praha",
+          "to": "Brno",
+          "mode": "driving",
+          "features": {
+            "distance": 186,
+            "traffic": "low"
+          },
+          "expected": 120,
+          "predicted": 124,
+          "error": 4
+        },
+        {
+          "from": "Praha",
+          "to": "Brno",
+          "mode": "driving",
+          "features": {
+            "distance": 186,
+            "traffic": "medium"
+          },
+          "expected": 150,
+          "predicted": 155,
+          "error": 5
+        },
+        {
+          "from": "Praha",
+          "to": "Brno",
+          "mode": "driving",
+          "features": {
+            "distance": 186,
+            "traffic": "high"
+          },
+          "expected": 180,
+          "predicted": 186,
+          "error": 6
+        },
+        {
+          "from": "Praha",
+          "to": "Ostrava",
+          "mode": "driving",
+          "features": {
+            "distance": 356,
+            "traffic": "low"
+          },
+          "expected": 210,
+          "predicted": 237,
+          "error": 27
+        },
+        {
+          "from": "Praha",
+          "to": "Plzeň",
+          "mode": "driving",
+          "features": {
+            "distance": 92,
+            "traffic": "low"
+          },
+          "expected": 60,
+          "predicted": 61,
+          "error": 1
+        },
+        {
+          "from": "Praha",
+          "to": "Liberec",
+          "mode": "driving",
+          "features": {
+            "distance": 110,
+            "traffic": "low"
+          },
+          "expected": 75,
+          "predicted": 73,
+          "error": 2
+        },
+        {
+          "from": "Brno",
+          "to": "Ostrava",
+          "mode": "driving",
+          "features": {
+            "distance": 170,
+            "traffic": "low"
+          },
+          "expected": 105,
+          "predicted": 113,
+          "error": 8
+        },
+        {
+          "from": "Praha",
+          "to": "Brno",
+          "mode": "transit",
+          "features": {
+            "distance": 186,
+            "traffic": null
+          },
+          "expected": 150,
+          "predicted": 159,
+          "error": 9
+        },
+        {
+          "from": "Praha",
+          "to": "Ostrava",
+          "mode": "transit",
+          "features": {
+            "distance": 356,
+            "traffic": null
+          },
+          "expected": 240,
+          "predicted": 305,
+          "error": 65
+        },
+        {
+          "from": "Praha",
+          "to": "Plzeň",
+          "mode": "transit",
+          "features": {
+            "distance": 92,
+            "traffic": null
+          },
+          "expected": 90,
+          "predicted": 79,
+          "error": 11
+        }
+      ],
+      "metrics": {
+        "mae": 13.8,
+        "rmse": 23.026072179162473,
+        "r2": 0.8312002546959567
+      }
+    },
+    "placeRecommendation": {
+      "recommendations": [
+        {
+          "user": "user1",
+          "preferences": [
+            "history",
+            "culture"
+          ],
+          "location": "Praha",
+          "expected": [
+            "Pražský hrad",
+            "Národní muzeum"
+          ],
+          "recommended": [
+            "Pražský hrad",
+            "Národní muzeum",
+            "Karlův most"
+          ],
+          "precision": 0.6666666666666666,
+          "recall": 1,
+          "ndcg": 1
+        },
+        {
+          "user": "user2",
+          "preferences": [
+            "food",
+            "shopping"
+          ],
+          "location": "Praha",
+          "expected": [
+            "OC Palladium",
+            "Restaurace U Fleků"
+          ],
+          "recommended": [
+            "OC Palladium",
+            "Restaurace U Fleků",
+            "Pražský hrad"
+          ],
+          "precision": 0.6666666666666666,
+          "recall": 1,
+          "ndcg": 1
+        },
+        {
+          "user": "user3",
+          "preferences": [
+            "nature",
+            "leisure"
+          ],
+          "location": "Praha",
+          "expected": [
+            "Petřínská rozhledna",
+            "Náplavka"
+          ],
+          "recommended": [
+            "Náplavka",
+            "Petřínská rozhledna",
+            "Pražský hrad"
+          ],
+          "precision": 0.6666666666666666,
+          "recall": 1,
+          "ndcg": 1
+        },
+        {
+          "user": "user4",
+          "preferences": [
+            "transport",
+            "modern"
+          ],
+          "location": "Praha",
+          "expected": [
+            "Letiště Václava Havla",
+            "Hlavní nádraží"
+          ],
+          "recommended": [
+            "Letiště Václava Havla",
+            "Hlavní nádraží",
+            "OC Palladium"
+          ],
+          "precision": 0.6666666666666666,
+          "recall": 1,
+          "ndcg": 1
+        },
+        {
+          "user": "user5",
+          "preferences": [
+            "history",
+            "landmarks"
+          ],
+          "location": "Praha",
+          "expected": [
+            "Karlův most",
+            "Staroměstské náměstí"
+          ],
+          "recommended": [
+            "Karlův most",
+            "Staroměstské náměstí",
+            "Pražský hrad"
+          ],
+          "precision": 0.6666666666666666,
+          "recall": 1,
+          "ndcg": 1
+        }
+      ],
+      "metrics": {
+        "precision": [
+          0.6666666666666666,
+          0.6666666666666666,
+          0.6666666666666666,
+          0.6666666666666666,
+          0.6666666666666666
+        ],
+        "recall": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ndcg": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "avgPrecision": 0.6666666666666666,
+        "avgRecall": 1,
+        "avgNDCG": 1
+      }
+    },
+    "biasAndFairness": {
+      "biasAnalysis": {
+        "locationBias": {
+          "Praha": {
+            "totalRecommendations": 12,
+            "uniqueRecommendations": 9,
+            "diversity": 0.75
+          },
+          "Brno": {
+            "totalRecommendations": 12,
+            "uniqueRecommendations": 5,
+            "diversity": 0.4166666666666667
+          },
+          "Ostrava": {
+            "totalRecommendations": 0,
+            "uniqueRecommendations": 0,
+            "diversity": null
+          },
+          "Plzeň": {
+            "totalRecommendations": 0,
+            "uniqueRecommendations": 0,
+            "diversity": null
+          },
+          "Liberec": {
+            "totalRecommendations": 0,
+            "uniqueRecommendations": 0,
+            "diversity": null
+          }
+        },
+        "preferenceBias": {
+          "leisure": {
+            "groupsWithPreference": 2,
+            "groupsWithoutPreference": 2,
+            "uniqueRecommendationsWithPref": 8,
+            "uniqueRecommendationsWithoutPref": 8,
+            "jaccardSimilarity": 0.14285714285714285
+          },
+          "food": {
+            "groupsWithPreference": 2,
+            "groupsWithoutPreference": 2,
+            "uniqueRecommendationsWithPref": 8,
+            "uniqueRecommendationsWithoutPref": 8,
+            "jaccardSimilarity": 0.14285714285714285
+          },
+          "shopping": {
+            "groupsWithPreference": 1,
+            "groupsWithoutPreference": 3,
+            "uniqueRecommendationsWithPref": 6,
+            "uniqueRecommendationsWithoutPref": 12,
+            "jaccardSimilarity": 0.2857142857142857
+          },
+          "nature": {
+            "groupsWithPreference": 1,
+            "groupsWithoutPreference": 3,
+            "uniqueRecommendationsWithPref": 6,
+            "uniqueRecommendationsWithoutPref": 12,
+            "jaccardSimilarity": 0.2857142857142857
+          },
+          "culture": {
+            "groupsWithPreference": 2,
+            "groupsWithoutPreference": 2,
+            "uniqueRecommendationsWithPref": 8,
+            "uniqueRecommendationsWithoutPref": 8,
+            "jaccardSimilarity": 0.14285714285714285
+          },
+          "landmarks": {
+            "groupsWithPreference": 1,
+            "groupsWithoutPreference": 3,
+            "uniqueRecommendationsWithPref": 6,
+            "uniqueRecommendationsWithoutPref": 12,
+            "jaccardSimilarity": 0.2857142857142857
+          },
+          "history": {
+            "groupsWithPreference": 1,
+            "groupsWithoutPreference": 3,
+            "uniqueRecommendationsWithPref": 6,
+            "uniqueRecommendationsWithoutPref": 12,
+            "jaccardSimilarity": 0.2857142857142857
+          },
+          "transport": {
+            "groupsWithPreference": 2,
+            "groupsWithoutPreference": 2,
+            "uniqueRecommendationsWithPref": 10,
+            "uniqueRecommendationsWithoutPref": 10,
+            "jaccardSimilarity": 0.42857142857142855
+          }
+        },
+        "demographicBias": {
+          "group1": {
+            "name": "Mladí dospělí (18-30)",
+            "preferences": [
+              "leisure",
+              "food",
+              "shopping"
+            ],
+            "totalRecommendations": 6,
+            "uniqueRecommendations": 6,
+            "diversity": 1
+          },
+          "group2": {
+            "name": "Rodiny s dětmi",
+            "preferences": [
+              "nature",
+              "culture",
+              "landmarks"
+            ],
+            "totalRecommendations": 6,
+            "uniqueRecommendations": 6,
+            "diversity": 1
+          },
+          "group3": {
+            "name": "Senioři (65+)",
+            "preferences": [
+              "history",
+              "culture",
+              "transport"
+            ],
+            "totalRecommendations": 6,
+            "uniqueRecommendations": 6,
+            "diversity": 1
+          },
+          "group4": {
+            "name": "Studenti",
+            "preferences": [
+              "food",
+              "leisure",
+              "transport"
+            ],
+            "totalRecommendations": 6,
+            "uniqueRecommendations": 6,
+            "diversity": 1
+          }
+        }
+      },
+      "fairnessMetrics": {
+        "equalOpportunity": 0,
+        "statisticalParity": 0
+      }
+    }
+  },
+  "authTests": {
+    "results": {
+      "tokenValidation": {
+        "passed": 5,
+        "failed": 0,
+        "details": [
+          {
+            "token": "eyJhbGciOi...",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "token": "eyJhbGciOi...",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "token": "invalid.to...",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "token": null,
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "token": "",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          }
+        ]
+      },
+      "userProfile": {
+        "passed": 5,
+        "failed": 0,
+        "details": [
+          {
+            "userId": "auth0|123456789",
+            "expected": "Test User",
+            "actual": "Test User",
+            "passed": true
+          },
+          {
+            "userId": "auth0|987654321",
+            "expected": "Admin User",
+            "actual": "Admin User",
+            "passed": true
+          },
+          {
+            "userId": "auth0|nonexistent",
+            "expected": null,
+            "actual": null,
+            "passed": true
+          },
+          {
+            "userId": null,
+            "expected": null,
+            "actual": null,
+            "passed": true
+          },
+          {
+            "userId": "",
+            "expected": null,
+            "actual": null,
+            "passed": true
+          }
+        ]
+      },
+      "userPermissions": {
+        "passed": 8,
+        "failed": 0,
+        "details": [
+          {
+            "userId": "auth0|123456789",
+            "permission": "read:map",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "userId": "auth0|123456789",
+            "permission": "write:map",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "userId": "auth0|987654321",
+            "permission": "read:map",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "userId": "auth0|987654321",
+            "permission": "write:map",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "userId": "auth0|987654321",
+            "permission": "admin",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "userId": "auth0|123456789",
+            "permission": "admin",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "userId": "auth0|nonexistent",
+            "permission": "read:map",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "userId": null,
+            "permission": "read:map",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          }
+        ]
+      }
+    },
+    "summary": {
+      "passed": 18,
+      "failed": 0,
+      "total": 18
+    }
+  },
+  "monetizationTests": {
+    "results": {
+      "subscriptionVerification": {
+        "passed": 5,
+        "failed": 0,
+        "details": [
+          {
+            "userId": "user1",
+            "expected": {
+              "hasSubscription": false,
+              "type": null,
+              "isValid": false
+            },
+            "actual": {
+              "hasSubscription": false,
+              "type": null,
+              "isValid": false
+            },
+            "passed": true
+          },
+          {
+            "userId": "user2",
+            "expected": {
+              "hasSubscription": true,
+              "type": "basic",
+              "isValid": true
+            },
+            "actual": {
+              "hasSubscription": true,
+              "type": "basic",
+              "isValid": true
+            },
+            "passed": true
+          },
+          {
+            "userId": "user3",
+            "expected": {
+              "hasSubscription": true,
+              "type": "premium",
+              "isValid": true
+            },
+            "actual": {
+              "hasSubscription": true,
+              "type": "premium",
+              "isValid": true
+            },
+            "passed": true
+          },
+          {
+            "userId": "user4",
+            "expected": {
+              "hasSubscription": true,
+              "type": "pro",
+              "isValid": false
+            },
+            "actual": {
+              "hasSubscription": true,
+              "type": "pro",
+              "isValid": false
+            },
+            "passed": true
+          },
+          {
+            "userId": "nonexistent",
+            "expected": {
+              "hasSubscription": false,
+              "type": null,
+              "isValid": false
+            },
+            "actual": {
+              "hasSubscription": false,
+              "type": null,
+              "isValid": false
+            },
+            "passed": true
+          }
+        ]
+      },
+      "featureAccess": {
+        "passed": 10,
+        "failed": 0,
+        "details": [
+          {
+            "userId": "user1",
+            "feature": "map-view",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "userId": "user1",
+            "feature": "search-advanced",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "userId": "user1",
+            "feature": "offline-maps",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "userId": "user2",
+            "feature": "map-view",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "userId": "user2",
+            "feature": "search-basic",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "userId": "user2",
+            "feature": "offline-maps",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "userId": "user3",
+            "feature": "offline-maps",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          },
+          {
+            "userId": "user3",
+            "feature": "api-access",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "userId": "user4",
+            "feature": "api-access",
+            "expected": false,
+            "actual": false,
+            "passed": true
+          },
+          {
+            "userId": "nonexistent",
+            "feature": "map-view",
+            "expected": true,
+            "actual": true,
+            "passed": true
+          }
+        ]
+      },
+      "paymentProcessing": {
+        "passed": 5,
+        "failed": 0,
+        "details": [
+          {
+            "scenario": "Úspěšná platba a aktivace předplatného",
+            "payment": {
+              "userId": "user1",
+              "subscriptionId": "basic",
+              "amount": 99,
+              "currency": "CZK"
+            },
+            "expected": {
+              "success": true,
+              "status": "completed"
+            },
+            "actual": {
+              "success": true,
+              "status": "completed"
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Platba s neplatnou částkou",
+            "payment": {
+              "userId": "user1",
+              "subscriptionId": "basic",
+              "amount": 50,
+              "currency": "CZK"
+            },
+            "expected": {
+              "success": false,
+              "status": "failed",
+              "error": "invalid_amount"
+            },
+            "actual": {
+              "success": false,
+              "status": "failed",
+              "error": "invalid_amount"
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Platba s neplatnou měnou",
+            "payment": {
+              "userId": "user1",
+              "subscriptionId": "basic",
+              "amount": 99,
+              "currency": "USD"
+            },
+            "expected": {
+              "success": false,
+              "status": "failed",
+              "error": "invalid_currency"
+            },
+            "actual": {
+              "success": false,
+              "status": "failed",
+              "error": "invalid_currency"
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Platba s neexistujícím předplatným",
+            "payment": {
+              "userId": "user1",
+              "subscriptionId": "nonexistent",
+              "amount": 99,
+              "currency": "CZK"
+            },
+            "expected": {
+              "success": false,
+              "status": "failed",
+              "error": "invalid_subscription"
+            },
+            "actual": {
+              "success": false,
+              "status": "failed",
+              "error": "invalid_subscription"
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Platba s neexistujícím uživatelem",
+            "payment": {
+              "userId": "nonexistent",
+              "subscriptionId": "basic",
+              "amount": 99,
+              "currency": "CZK"
+            },
+            "expected": {
+              "success": false,
+              "status": "failed",
+              "error": "invalid_user"
+            },
+            "actual": {
+              "success": false,
+              "status": "failed",
+              "error": "invalid_user"
+            },
+            "passed": true
+          }
+        ]
+      },
+      "stripeIntegration": {
+        "passed": 4,
+        "failed": 0,
+        "details": [
+          {
+            "scenario": "Vytvoření Stripe Checkout Session",
+            "params": {
+              "userId": "user1",
+              "subscriptionId": "basic",
+              "successUrl": "https://example.com/success",
+              "cancelUrl": "https://example.com/cancel"
+            },
+            "expected": {
+              "success": true
+            },
+            "actual": {
+              "success": true,
+              "sessionId": "cs_test_drj2yozy4x",
+              "url": "https://checkout.stripe.com/pay/ain6wmta8at"
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Zpracování Stripe Webhook - úspěšná platba",
+            "params": {
+              "type": "checkout.session.completed",
+              "data": {
+                "object": {
+                  "client_reference_id": "user1",
+                  "metadata": {
+                    "subscriptionId": "basic"
+                  },
+                  "amount_total": 9900,
+                  "currency": "czk"
+                }
+              }
+            },
+            "expected": {
+              "success": true,
+              "status": "completed"
+            },
+            "actual": {
+              "success": true,
+              "status": "completed"
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Zpracování Stripe Webhook - selhání platby",
+            "params": {
+              "type": "charge.failed",
+              "data": {
+                "object": {
+                  "client_reference_id": "user1",
+                  "metadata": {
+                    "subscriptionId": "basic"
+                  }
+                }
+              }
+            },
+            "expected": {
+              "success": false,
+              "status": "failed"
+            },
+            "actual": {
+              "success": false,
+              "status": "failed"
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Zpracování Stripe Webhook - neznámá událost",
+            "params": {
+              "type": "unknown.event",
+              "data": {
+                "object": {}
+              }
+            },
+            "expected": {
+              "success": false,
+              "error": "unknown_event"
+            },
+            "actual": {
+              "success": false,
+              "error": "unknown_event"
+            },
+            "passed": true
+          }
+        ]
+      },
+      "supabaseMonetizationIntegration": {
+        "passed": 5,
+        "failed": 0,
+        "details": [
+          {
+            "scenario": "Uložení předplatného do Supabase",
+            "action": "saveSubscription",
+            "expected": {
+              "success": true
+            },
+            "actual": {
+              "success": true,
+              "data": {
+                "id": "basic",
+                "userId": "user1",
+                "startDate": "2025-05-03T18:49:48.512Z",
+                "endDate": "2025-06-02T18:49:48.512Z",
+                "status": "active"
+              }
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Získání předplatného ze Supabase",
+            "action": "getSubscription",
+            "expected": {
+              "success": true,
+              "data": {
+                "id": "basic",
+                "status": "active"
+              }
+            },
+            "actual": {
+              "success": true,
+              "data": {
+                "id": "basic",
+                "status": "active",
+                "validUntil": "2025-06-02T18:49:42.574Z"
+              }
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Aktualizace předplatného v Supabase",
+            "action": "updateSubscription",
+            "expected": {
+              "success": true
+            },
+            "actual": {
+              "success": true,
+              "data": {
+                "id": "basic",
+                "userId": "user2",
+                "status": "cancelled"
+              }
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Uložení platby do Supabase",
+            "action": "savePayment",
+            "expected": {
+              "success": true
+            },
+            "actual": {
+              "success": true,
+              "data": {
+                "id": "payment_wnyvweej",
+                "userId": "user1",
+                "subscriptionId": "basic",
+                "amount": 99,
+                "currency": "CZK",
+                "status": "completed",
+                "date": "2025-05-03T18:49:48.512Z"
+              }
+            },
+            "passed": true
+          },
+          {
+            "scenario": "Získání historie plateb ze Supabase",
+            "action": "getPaymentHistory",
+            "expected": {
+              "success": true,
+              "data": [
+                {
+                  "subscriptionId": "basic",
+                  "amount": 99,
+                  "currency": "CZK",
+                  "status": "completed"
+                }
+              ]
+            },
+            "actual": {
+              "success": true,
+              "data": [
+                {
+                  "subscriptionId": "basic",
+                  "amount": 99,
+                  "currency": "CZK",
+                  "status": "completed",
+                  "date": "2025-04-18T18:49:42.574Z"
+                }
+              ]
+            },
+            "passed": true
+          }
+        ]
+      }
+    },
+    "summary": {
+      "passed": 29,
+      "failed": 0,
+      "total": 29
+    }
+  },
+  "aiIntegrationTests": {
+    "results": {
+      "queryClassification": {
+        "passed": 8,
+        "failed": 0,
+        "details": [
+          {
+            "query": "Jak se dostanu z Prahy do Brna?",
+            "expected": "route",
+            "actual": "route",
+            "passed": true
+          },
+          {
+            "query": "Najdi restaurace v okolí",
+            "expected": "poi",
+            "actual": "poi",
+            "passed": true
+          },
+          {
+            "query": "Jaké je počasí v Praze?",
+            "expected": "weather",
+            "actual": "weather",
+            "passed": true
+          },
+          {
+            "query": "Ukaž mi nejbližší bankomaty",
+            "expected": "poi",
+            "actual": "poi",
+            "passed": true
+          },
+          {
+            "query": "Kolik je hodin?",
+            "expected": "general",
+            "actual": "general",
+            "passed": true
+          },
+          {
+            "query": "Jak daleko je to z Prahy do Ostravy?",
+            "expected": "route",
+            "actual": "route",
+            "passed": true
+          },
+          {
+            "query": "Kde najdu nejbližší lékárnu?",
+            "expected": "poi",
+            "actual": "poi",
+            "passed": true
+          },
+          {
+            "query": "Jaká je předpověď počasí na zítra?",
+            "expected": "weather",
+            "actual": "weather",
+            "passed": true
+          }
+        ]
+      },
+      "routeParameterExtraction": {
+        "passed": 3,
+        "failed": 0,
+        "details": [
+          {
+            "query": "Jak se dostanu z Prahy do Brna?",
+            "expected": {
+              "startPoint": "Praha",
+              "endPoint": "Brno",
+              "mode": "driving"
+            },
+            "actual": {
+              "startPoint": "Praha",
+              "endPoint": "Brno",
+              "mode": "driving"
+            },
+            "passed": true
+          },
+          {
+            "query": "Ukaž mi cestu z Ostravy do Plzně pěšky",
+            "expected": {
+              "startPoint": "Ostrava",
+              "endPoint": "Plzeň",
+              "mode": "walking"
+            },
+            "actual": {
+              "startPoint": "Ostrava",
+              "endPoint": "Plzeň",
+              "mode": "walking"
+            },
+            "passed": true
+          },
+          {
+            "query": "Potřebuji jet vlakem z Brna do Prahy",
+            "expected": {
+              "startPoint": "Brno",
+              "endPoint": "Praha",
+              "mode": "transit"
+            },
+            "actual": {
+              "startPoint": "Brno",
+              "endPoint": "Praha",
+              "mode": "transit"
+            },
+            "passed": true
+          }
+        ]
+      },
+      "poiParameterExtraction": {
+        "passed": 3,
+        "failed": 0,
+        "details": [
+          {
+            "query": "Najdi restaurace v okolí",
+            "expected": {
+              "category": "restaurant",
+              "location": "current",
+              "radius": 1000
+            },
+            "actual": {
+              "category": "restaurant",
+              "location": "current",
+              "radius": 1000
+            },
+            "passed": true
+          },
+          {
+            "query": "Kde jsou hotely v Praze?",
+            "expected": {
+              "category": "hotel",
+              "location": "Praha",
+              "radius": 5000
+            },
+            "actual": {
+              "category": "hotel",
+              "location": "Praha",
+              "radius": 5000
+            },
+            "passed": true
+          },
+          {
+            "query": "Ukaž mi nejbližší bankomaty",
+            "expected": {
+              "category": "atm",
+              "location": "current",
+              "radius": 500
+            },
+            "actual": {
+              "category": "atm",
+              "location": "current",
+              "radius": 500
+            },
+            "passed": true
+          }
+        ]
+      },
+      "aiModelSelection": {
+        "passed": 5,
+        "failed": 0,
+        "details": [
+          {
+            "task": "text_generation",
+            "expected": "gpt-4",
+            "actual": "gpt-4",
+            "passed": true
+          },
+          {
+            "task": "image_generation",
+            "expected": "dall-e-3",
+            "actual": "dall-e-3",
+            "passed": true
+          },
+          {
+            "task": "text_generation",
+            "provider": "Anthropic",
+            "expected": "claude-3",
+            "actual": "claude-3",
+            "passed": true
+          },
+          {
+            "task": "text_generation",
+            "provider": "Google",
+            "expected": "gemini-pro",
+            "actual": "gemini-pro",
+            "passed": true
+          },
+          {
+            "task": "text_generation",
+            "provider": "Unknown",
+            "expected": "gpt-4",
+            "actual": "gpt-4",
+            "passed": true
+          }
+        ]
+      }
+    },
+    "summary": {
+      "passed": 19,
+      "failed": 0,
+      "total": 19
+    }
+  },
+  "auth0NetlifyTests": {
+    "results": {
+      "auth0Configuration": {
+        "passed": 8,
+        "failed": 0,
+        "details": [
+          {
+            "scenario": "Ověření domény Auth0",
+            "expected": "dev-zxj8pir0moo4pdk7.us.auth0.com",
+            "actual": "dev-zxj8pir0moo4pdk7.us.auth0.com",
+            "passed": true,
+            "technicalDetails": "Doména Auth0 musí být správně nastavena pro autentizaci"
+          },
+          {
+            "scenario": "Ověření Client ID Auth0",
+            "expected": "H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ",
+            "actual": "H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ",
+            "passed": true,
+            "technicalDetails": "Client ID Auth0 musí být správně nastaveno pro autentizaci"
+          },
+          {
+            "scenario": "Ověření Callback URL pro localhost",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Callback URL pro localhost musí být nastavena pro lokální vývoj"
+          },
+          {
+            "scenario": "Ověření Callback URL pro produkci",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Callback URL pro produkci musí být nastavena pro produkční prostředí"
+          },
+          {
+            "scenario": "Ověření Logout URL pro localhost",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Logout URL pro localhost musí být nastavena pro lokální vývoj"
+          },
+          {
+            "scenario": "Ověření Logout URL pro produkci",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Logout URL pro produkci musí být nastavena pro produkční prostředí"
+          },
+          {
+            "scenario": "Ověření Web Origins pro localhost",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Web Origins pro localhost musí být nastaveny pro CORS"
+          },
+          {
+            "scenario": "Ověření Web Origins pro produkci",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Web Origins pro produkci musí být nastaveny pro CORS"
+          }
+        ]
+      },
+      "netlifyConfiguration": {
+        "passed": 9,
+        "failed": 0,
+        "details": [
+          {
+            "scenario": "Ověření produkční URL",
+            "expected": "https://remarkable-cajeta-76cfd9.netlify.app/",
+            "actual": "https://remarkable-cajeta-76cfd9.netlify.app/",
+            "passed": true,
+            "technicalDetails": "Produkční URL musí být správně nastavena pro přesměrování"
+          },
+          {
+            "scenario": "Ověření URL vývojového serveru",
+            "expected": "https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app/index.html",
+            "actual": "https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app/index.html",
+            "passed": true,
+            "technicalDetails": "URL vývojového serveru musí být správně nastavena pro testování"
+          },
+          {
+            "scenario": "Ověření proměnné prostředí AUTH0_SECRET",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Proměnná prostředí AUTH0_SECRET musí být nastavena v Netlify pro správnou funkci aplikace"
+          },
+          {
+            "scenario": "Ověření proměnné prostředí AUTH0_BASE_URL",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Proměnná prostředí AUTH0_BASE_URL musí být nastavena v Netlify pro správnou funkci aplikace"
+          },
+          {
+            "scenario": "Ověření proměnné prostředí AUTH0_ISSUER_BASE_URL",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Proměnná prostředí AUTH0_ISSUER_BASE_URL musí být nastavena v Netlify pro správnou funkci aplikace"
+          },
+          {
+            "scenario": "Ověření proměnné prostředí AUTH0_CLIENT_ID",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Proměnná prostředí AUTH0_CLIENT_ID musí být nastavena v Netlify pro správnou funkci aplikace"
+          },
+          {
+            "scenario": "Ověření proměnné prostředí AUTH0_CLIENT_SECRET",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Proměnná prostředí AUTH0_CLIENT_SECRET musí být nastavena v Netlify pro správnou funkci aplikace"
+          },
+          {
+            "scenario": "Ověření proměnné prostředí SUPABASE_URL",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Proměnná prostředí SUPABASE_URL musí být nastavena v Netlify pro správnou funkci aplikace"
+          },
+          {
+            "scenario": "Ověření proměnné prostředí SUPABASE_KEY",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Proměnná prostředí SUPABASE_KEY musí být nastavena v Netlify pro správnou funkci aplikace"
+          }
+        ]
+      },
+      "urlAvailability": {
+        "passed": 3,
+        "failed": 0,
+        "details": [
+          {
+            "scenario": "Ověření dostupnosti produkční URL",
+            "url": "https://remarkable-cajeta-76cfd9.netlify.app/",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Produkční URL musí být dostupná"
+          },
+          {
+            "scenario": "Ověření dostupnosti URL vývojového serveru",
+            "url": "https://devserver-v0-3-8-5--remarkable-cajeta-76cfd9.netlify.app/index.html",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "URL vývojového serveru musí být dostupná"
+          },
+          {
+            "scenario": "Ověření přesměrování na Auth0 při přístupu na chráněnou stránku",
+            "url": "https://remarkable-cajeta-76cfd9.netlify.app/profile",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Přístup na chráněnou stránku musí přesměrovat na Auth0 přihlášení"
+          }
+        ]
+      }
+    },
+    "summary": {
+      "passed": 20,
+      "failed": 0,
+      "total": 20
+    }
+  },
+  "deploymentTests": {
+    "results": {
+      "deploymentFiles": {
+        "passed": 13,
+        "failed": 1,
+        "details": [
+          {
+            "scenario": "Ověření existence souboru netlify.toml",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Soubor netlify.toml je vyžadován pro nasazení na Netlify"
+          },
+          {
+            "scenario": "Ověření existence souboru .env.production",
+            "expected": true,
+            "actual": false,
+            "passed": false,
+            "technicalDetails": "Soubor .env.production je vyžadován pro nasazení na Netlify"
+          },
+          {
+            "scenario": "Ověření existence souboru server.js",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Soubor server.js je vyžadován pro nasazení na Netlify"
+          },
+          {
+            "scenario": "Ověření existence souboru public/index.html",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Soubor public/index.html je vyžadován pro nasazení na Netlify"
+          },
+          {
+            "scenario": "Ověření existence souboru public/app/map.js",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Soubor public/app/map.js je vyžadován pro nasazení na Netlify"
+          },
+          {
+            "scenario": "Ověření existence souboru public/app/globe-simple.js",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Soubor public/app/globe-simple.js je vyžadován pro nasazení na Netlify"
+          },
+          {
+            "scenario": "Ověření existence souboru public/app/auth0-auth.js",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Soubor public/app/auth0-auth.js je vyžadován pro nasazení na Netlify"
+          },
+          {
+            "scenario": "Ověření požadavku v netlify.toml: publish = \"public\"",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Požadavek publish = \"public\" je vyžadován v netlify.toml"
+          },
+          {
+            "scenario": "Ověření požadavku v netlify.toml: functions = \"functions\"",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Požadavek functions = \"functions\" je vyžadován v netlify.toml"
+          },
+          {
+            "scenario": "Ověření požadavku v netlify.toml: from = \"/*\"",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Požadavek from = \"/*\" je vyžadován v netlify.toml"
+          },
+          {
+            "scenario": "Ověření požadavku v netlify.toml: to = \"/index.html\"",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Požadavek to = \"/index.html\" je vyžadován v netlify.toml"
+          },
+          {
+            "scenario": "Ověření požadavku v netlify.toml: X-Frame-Options = \"DENY\"",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Požadavek X-Frame-Options = \"DENY\" je vyžadován v netlify.toml"
+          },
+          {
+            "scenario": "Ověření požadavku v netlify.toml: Content-Security-Policy",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Požadavek Content-Security-Policy je vyžadován v netlify.toml"
+          },
+          {
+            "scenario": "Ověření požadavku v netlify.toml: auth0.com",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Požadavek auth0.com je vyžadován v netlify.toml"
+          }
+        ]
+      },
+      "environmentVariables": {
+        "passed": 0,
+        "failed": 1,
+        "details": [
+          {
+            "scenario": "Ověření existence souboru .env.production",
+            "expected": true,
+            "actual": false,
+            "passed": false,
+            "technicalDetails": "Soubor .env.production je vyžadován pro nasazení na Netlify"
+          }
+        ]
+      },
+      "urlConfiguration": {
+        "passed": 2,
+        "failed": 1,
+        "details": [
+          {
+            "scenario": "Ověření existence souboru .env.production pro kontrolu URL",
+            "expected": true,
+            "actual": false,
+            "passed": false,
+            "technicalDetails": "Soubor .env.production je vyžadován pro kontrolu URL adres"
+          },
+          {
+            "scenario": "Ověření přesměrování pro callback v netlify.toml",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Přesměrování pro /callback je vyžadováno v netlify.toml"
+          },
+          {
+            "scenario": "Ověření přesměrování pro SPA v netlify.toml",
+            "expected": true,
+            "actual": true,
+            "passed": true,
+            "technicalDetails": "Přesměrování pro /* na /index.html je vyžadováno v netlify.toml pro SPA"
+          }
+        ]
+      }
+    },
+    "summary": {
+      "passed": 15,
+      "failed": 3,
+      "total": 18
+    }
+  }
+}

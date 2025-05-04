@@ -1,0 +1,204 @@
+@import "../variables";
+@import "../mixins";
+
+/* Mapa */
+.map-container {
+  height: calc(100vh - 150px);
+  width: 100%;
+  position: relative;
+
+  .map {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+  }
+}
+
+.map-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  @include flex(column, flex-start, stretch);
+  gap: 10px;
+
+  .map-control-btn {
+    @include button($bg-color, $text-color, $light-bg-color);
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: $shadow;
+
+    i {
+      font-size: 18px;
+    }
+  }
+}
+
+.map-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 350px;
+  background-color: $bg-color;
+  box-shadow: $shadow;
+  z-index: 5;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+
+  &.open {
+    transform: translateX(0);
+  }
+
+  .map-sidebar-header {
+    @include flex(row, space-between, center);
+    padding: 15px;
+    border-bottom: 1px solid $border-color;
+
+    h3 {
+      margin: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      color: $light-text-color;
+
+      &:hover {
+        color: $accent-color;
+      }
+    }
+  }
+
+  .map-sidebar-content {
+    padding: 15px;
+    overflow-y: auto;
+    height: calc(100% - 60px);
+  }
+
+  @include respond-to(md) {
+    width: 100%;
+  }
+}
+
+.map-search {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  max-width: 500px;
+  z-index: 5;
+
+  .search-container {
+    position: relative;
+
+    input {
+      width: 100%;
+      padding: 10px 40px 10px 15px;
+      border: none;
+      border-radius: 20px;
+      box-shadow: $shadow;
+    }
+
+    button {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $light-text-color;
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .search-results {
+    margin-top: 10px;
+    background-color: $bg-color;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    max-height: 300px;
+    overflow-y: auto;
+
+    .search-result-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid $border-color;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background-color: $light-bg-color;
+      }
+
+      .result-title {
+        font-weight: 500;
+      }
+
+      .result-address {
+        font-size: 12px;
+        color: $light-text-color;
+      }
+    }
+  }
+
+  @include respond-to(md) {
+    width: 80%;
+  }
+}
+
+.map-marker-popup {
+  .leaflet-popup-content-wrapper {
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .popup-header {
+    background-color: $primary-color;
+    color: white;
+    padding: 10px 15px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+  }
+
+  .popup-content {
+    padding: 15px;
+
+    p {
+      margin: 0 0 10px 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .popup-actions {
+    @include flex(row, flex-end, center);
+    gap: 10px;
+    padding: 0 15px 15px;
+
+    .btn {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+  }
+}

@@ -1,0 +1,176 @@
+@import 'variables';
+@import 'mixins';
+
+/* Základní reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Základní styly */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: $text-color;
+  background-color: $bg-color;
+  transition: $transition;
+  
+  &.dark-mode {
+    color: $dark-text-color;
+    background-color: $dark-bg-color;
+    
+    a {
+      color: $dark-primary-color;
+      
+      &:hover {
+        color: $dark-secondary-color;
+      }
+    }
+    
+    input, select, textarea {
+      background-color: $dark-bg-color;
+      color: $dark-text-color;
+      border-color: $dark-border-color;
+    }
+    
+    .card, .feature-card, .auth-container, .profile-container, .settings-container {
+      background-color: $dark-bg-color;
+      box-shadow: $dark-shadow;
+    }
+    
+    header, footer {
+      background-color: $dark-bg-color;
+    }
+    
+    .hero, .auth-section {
+      background-color: $dark-light-bg-color;
+    }
+  }
+}
+
+.container {
+  max-width: $container-width;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+a {
+  color: $primary-color;
+  text-decoration: none;
+  transition: $transition;
+  
+  &:hover {
+    color: $secondary-color;
+  }
+}
+
+/* Tlačítka */
+.btn {
+  @include button;
+}
+
+.btn-primary {
+  @include button($primary-color, white, $secondary-color);
+}
+
+.btn-secondary {
+  @include button($secondary-color, white, $primary-color);
+}
+
+.btn-danger {
+  @include button($accent-color, white, darken($accent-color, 10%));
+}
+
+.btn-social {
+  @include button(#f5f5f5, $text-color, $light-bg-color);
+  border: 1px solid $border-color;
+  margin-right: 10px;
+}
+
+/* Formuláře */
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: $light-text-color;
+}
+
+input, select, textarea {
+  @include form-input;
+}
+
+/* Hlavička */
+header {
+  background-color: $bg-color;
+  box-shadow: $shadow;
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  .container {
+    @include flex(row, space-between, center);
+  }
+  
+  .logo h1 {
+    font-size: 24px;
+    color: $primary-color;
+  }
+  
+  nav ul {
+    @include flex;
+    list-style: none;
+    
+    li {
+      margin-left: 20px;
+      
+      a {
+        color: $text-color;
+        font-weight: 500;
+        
+        &.active, &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+}
+
+/* Responzivní design */
+@include respond-to(md) {
+  header {
+    nav ul {
+      @include flex(column);
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background-color: $bg-color;
+      box-shadow: $shadow;
+      padding: 20px;
+      border-radius: $border-radius;
+      display: none;
+      
+      &.show {
+        display: flex;
+      }
+      
+      li {
+        margin: 10px 0;
+      }
+    }
+  }
+}
+
+/* Import dalších modulů */
+@import 'components/hero';
+@import 'components/features';
+@import 'components/auth';
+@import 'components/profile';
+@import 'components/chat';
+@import 'components/map';
+@import 'components/footer';

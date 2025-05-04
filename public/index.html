@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMapa</title>
+
+    <!-- Core styles -->
+    <link rel="stylesheet" href="/app/styles/styles.css">
+    <link rel="stylesheet" href="/app/services/auth/auth-service.css">
+    <link rel="stylesheet" href="/app/role-manager.css">
+    <link rel="stylesheet" href="/app/admin-dashboard.css">
+    <link rel="stylesheet" href="/app/monetization.css">
+    <link rel="stylesheet" href="/app/advertisement-module.css">
+
+    <!-- External dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Core scripts -->
+    <script src="/app/services/auth/auth0-auth.js"></script>
+    <script src="/app/services/auth/auth-screen.js"></script>
+    <script src="/app/role-manager.js"></script>
+    <script src="/app/admin-dashboard.js"></script>
+    <script src="/app/core/app.js"></script>
+
+    <!-- Map providers -->
+    <script src="/app/services/map/map-providers.js"></script>
+    <script src="/app/services/map/mapycz-provider.js"></script>
+    <script src="/app/services/map/openrouteservice-provider.js"></script>
+    <script src="/app/services/map/windy-provider.js"></script>
+    <script src="/app/services/map/freemapsk-provider.js"></script>
+    <script src="/app/components/map/map-init-providers.js"></script>
+
+    <!-- Monetization -->
+    <script src="/app/advertisement-module.js"></script>
+
+    <!-- Inicializace komponent -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Inicializace Auth0
+                console.log('Inicializace Auth0...');
+                await Auth0Auth.init();
+
+                // Inicializace přihlašovací obrazovky
+                console.log('Inicializace přihlašovací obrazovky...');
+                await AuthScreen.init();
+
+                // Inicializace Role Manageru
+                console.log('Inicializace Role Manageru...');
+                if (typeof RoleManager !== 'undefined') {
+                    await RoleManager.init();
+
+                    // Inicializace Admin Dashboardu pouze pro adminy
+                    if (RoleManager.hasRole('admin')) {
+                        console.log('Inicializace Admin Dashboardu...');
+                        await AdminDashboard.init();
+                    }
+                }
+
+                console.log('Inicializace komponent dokončena');
+            } catch (error) {
+                console.error('Chyba při inicializaci komponent:', error);
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="app">
+        <!-- User menu container -->
+        <div id="user-menu"></div>
+
+        <!-- Main content -->
+        <main id="main-content">
+            <!-- Content will be dynamically inserted here -->
+        </main>
+    </div>
+</body>
+</html>

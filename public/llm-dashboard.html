@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIMapa LLM Dashboard</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4285f4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">
+        <h1>AIMapa</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Domů</a></li>
+          <li><a href="chat.html">Chat</a></li>
+          <li><a href="llm-dashboard.html" class="active">LLM Dashboard</a></li>
+          <li><a href="#" id="login-button">Přihlásit se</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="dashboard-header">
+        <h1>LLM Dashboard</h1>
+        <p>Přehled využití LLM modelů a nákladů</p>
+        
+        <div class="dashboard-filters">
+          <div class="filter-group">
+            <label for="date-range">Časové období:</label>
+            <select id="date-range">
+              <option value="7">Posledních 7 dní</option>
+              <option value="30" selected>Posledních 30 dní</option>
+              <option value="90">Posledních 90 dní</option>
+              <option value="365">Posledních 365 dní</option>
+              <option value="custom">Vlastní období</option>
+            </select>
+          </div>
+          
+          <div class="filter-group custom-date-range" style="display: none;">
+            <label for="start-date">Od:</label>
+            <input type="date" id="start-date">
+            
+            <label for="end-date">Do:</label>
+            <input type="date" id="end-date">
+          </div>
+          
+          <div class="filter-group">
+            <label for="provider-filter">Poskytovatel:</label>
+            <select id="provider-filter">
+              <option value="all" selected>Všichni</option>
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="deepseek">DeepSeek</option>
+            </select>
+          </div>
+          
+          <button id="apply-filters" class="btn btn-primary">Použít filtry</button>
+        </div>
+      </section>
+      
+      <section class="dashboard-summary">
+        <div class="summary-cards">
+          <div class="summary-card">
+            <h3>Celkový počet požadavků</h3>
+            <p class="summary-value" id="total-requests">0</p>
+          </div>
+          
+          <div class="summary-card">
+            <h3>Celkový počet tokenů</h3>
+            <p class="summary-value" id="total-tokens">0</p>
+          </div>
+          
+          <div class="summary-card">
+            <h3>Celkové náklady</h3>
+            <p class="summary-value" id="total-cost">$0.00</p>
+          </div>
+          
+          <div class="summary-card">
+            <h3>Průměrná cena za 1000 tokenů</h3>
+            <p class="summary-value" id="avg-cost-per-1k-tokens">$0.00</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="dashboard-charts">
+        <div class="chart-container">
+          <h2>Využití podle poskytovatele</h2>
+          <canvas id="provider-chart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+          <h2>Využití podle modelu</h2>
+          <canvas id="model-chart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+          <h2>Denní využití</h2>
+          <canvas id="daily-chart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+          <h2>Náklady podle poskytovatele</h2>
+          <canvas id="cost-chart"></canvas>
+        </div>
+      </section>
+      
+      <section class="dashboard-tables">
+        <h2>Detailní statistiky</h2>
+        
+        <div class="table-container">
+          <h3>Podle poskytovatele</h3>
+          <table id="provider-table">
+            <thead>
+              <tr>
+                <th>Poskytovatel</th>
+                <th>Počet požadavků</th>
+                <th>Vstupní tokeny</th>
+                <th>Výstupní tokeny</th>
+                <th>Celkem tokenů</th>
+                <th>Náklady</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Zde budou dynamicky vloženy řádky -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="table-container">
+          <h3>Podle modelu</h3>
+          <table id="model-table">
+            <thead>
+              <tr>
+                <th>Poskytovatel</th>
+                <th>Model</th>
+                <th>Počet požadavků</th>
+                <th>Vstupní tokeny</th>
+                <th>Výstupní tokeny</th>
+                <th>Celkem tokenů</th>
+                <th>Náklady</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Zde budou dynamicky vloženy řádky -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 AIMapa. Všechna práva vyhrazena.</p>
+    </div>
+  </footer>
+
+  <script src="js/auth0-client.js"></script>
+  <script src="js/supabase-client.js"></script>
+  
+  <script>
+    // Inicializace dashboardu
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicializace Auth0
+      initAuth();
+      
+      // Inicializace Supabase
+      initSupabase();
+      
+      // Inicializace filtrů
+      initFilters();
+      
+      // Načtení dat
+      loadDashboardData();
+    });
+    
+    // Inicializace Auth0
+    function initAuth() {
+      // Zde bude kód pro inicializaci Auth0
+      console.log('Auth0 inicializován');
+      
+      // Přihlášení/odhlášení
+      const loginButton = document.getElementById('login-button');
+      
+      loginButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        
+        // Zde bude kód pro přihlášení/odhlášení
+        console.log('Přihlášení/odhlášení');
+      });
+    }
+    
+    // Inicializace Supabase
+    function initSupabase() {
+      // Zde bude kód pro inicializaci Supabase
+      console.log('Supabase inicializován');
+    }
+    
+    // Inicializace filtrů
+    function initFilters() {
+      const dateRangeSelect = document.getElementById('date-range');
+      const customDateRange = document.querySelector('.custom-date-range');
+      const startDateInput = document.getElementById('start-date');
+      const endDateInput = document.getElementById('end-date');
+      const applyFiltersButton = document.getElementById('apply-filters');
+      
+      // Nastavení výchozích hodnot pro vlastní období
+      const today = new Date();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      
+      startDateInput.valueAsDate = thirtyDaysAgo;
+      endDateInput.valueAsDate = today;
+      
+      // Zobrazení/skrytí vlastního období
+      dateRangeSelect.addEventListener('change', () => {
+        if (dateRangeSelect.value === 'custom') {
+          customDateRange.style.display = 'flex';
+        } else {
+          customDateRange.style.display = 'none';
+        }
+      });
+      
+      // Aplikace filtrů
+      applyFiltersButton.addEventListener('click', () => {
+        loadDashboardData();
+      });
+    }
+    
+    // Načtení dat pro dashboard
+    function loadDashboardData() {
+      // Zde bude kód pro načtení dat z API
+      console.log('Načítání dat pro dashboard');
+      
+      // Simulace dat pro ukázku
+      const mockData = {
+        totalRequests: 1250,
+        totalInputTokens: 250000,
+        totalOutputTokens: 150000,
+        totalTokens: 400000,
+        totalCost: 12.75,
+        byProvider: {
+          openai: {
+            requests: 750,
+            inputTokens: 150000,
+            outputTokens: 90000,
+            totalTokens: 240000,
+            cost: 8.25
+          },
+          anthropic: {
+            requests: 350,
+            inputTokens: 70000,
+            outputTokens: 42000,
+            totalTokens: 112000,
+            cost: 3.5
+          },
+          deepseek: {
+            requests: 150,
+            inputTokens: 30000,
+            outputTokens: 18000,
+            totalTokens: 48000,
+            cost: 1.0
+          }
+        },
+        byModel: {
+          'openai-gpt-4': {
+            provider: 'openai',
+            model: 'gpt-4',
+            requests: 400,
+            inputTokens: 80000,
+            outputTokens: 48000,
+            totalTokens: 128000,
+            cost: 5.5
+          },
+          'openai-gpt-3.5-turbo': {
+            provider: 'openai',
+            model: 'gpt-3.5-turbo',
+            requests: 350,
+            inputTokens: 70000,
+            outputTokens: 42000,
+            totalTokens: 112000,
+            cost: 2.75
+          },
+          'anthropic-claude-3-opus': {
+            provider: 'anthropic',
+            model: 'claude-3-opus',
+            requests: 200,
+            inputTokens: 40000,
+            outputTokens: 24000,
+            totalTokens: 64000,
+            cost: 2.5
+          },
+          'anthropic-claude-3-sonnet': {
+            provider: 'anthropic',
+            model: 'claude-3-sonnet',
+            requests: 150,
+            inputTokens: 30000,
+            outputTokens: 18000,
+            totalTokens: 48000,
+            cost: 1.0
+          },
+          'deepseek-coder': {
+            provider: 'deepseek',
+            model: 'deepseek-coder',
+            requests: 150,
+            inputTokens: 30000,
+            outputTokens: 18000,
+            totalTokens: 48000,
+            cost: 1.0
+          }
+        },
+        byDate: {
+          '2024-05-01': {
+            date: '2024-05-01',
+            requests: 50,
+            inputTokens: 10000,
+            outputTokens: 6000,
+            totalTokens: 16000,
+            cost: 0.5
+          },
+          '2024-05-02': {
+            date: '2024-05-02',
+            requests: 60,
+            inputTokens: 12000,
+            outputTokens: 7200,
+            totalTokens: 19200,
+            cost: 0.6
+          },
+          '2024-05-03': {
+            date: '2024-05-03',
+            requests: 45,
+            inputTokens: 9000,
+            outputTokens: 5400,
+            totalTokens: 14400,
+            cost: 0.45
+          }
+          // Další dny...
+        }
+      };
+      
+      // Aktualizace UI
+      updateDashboard(mockData);
+    }
+    
+    // Aktualizace dashboardu
+    function updateDashboard(data) {
+      // Aktualizace souhrnných hodnot
+      document.getElementById('total-requests').textContent = data.totalRequests.toLocaleString();
+      document.getElementById('total-tokens').textContent = data.totalTokens.toLocaleString();
+      document.getElementById('total-cost').textContent = `$${data.totalCost.toFixed(2)}`;
+      
+      const avgCostPer1kTokens = (data.totalCost / data.totalTokens) * 1000;
+      document.getElementById('avg-cost-per-1k-tokens').textContent = `$${avgCostPer1kTokens.toFixed(4)}`;
+      
+      // Aktualizace grafů
+      updateProviderChart(data);
+      updateModelChart(data);
+      updateDailyChart(data);
+      updateCostChart(data);
+      
+      // Aktualizace tabulek
+      updateProviderTable(data);
+      updateModelTable(data);
+    }
+    
+    // Aktualizace grafu poskytovatelů
+    function updateProviderChart(data) {
+      const ctx = document.getElementById('provider-chart').getContext('2d');
+      
+      // Příprava dat
+      const providers = Object.keys(data.byProvider);
+      const requestCounts = providers.map(provider => data.byProvider[provider].requests);
+      
+      // Barvy pro poskytovatele
+      const colors = {
+        openai: '#4285f4',
+        anthropic: '#34a853',
+        deepseek: '#ea4335'
+      };
+      
+      // Vytvoření grafu
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: providers,
+          datasets: [{
+            data: requestCounts,
+            backgroundColor: providers.map(provider => colors[provider] || '#999'),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'right',
+            },
+            title: {
+              display: true,
+              text: 'Počet požadavků podle poskytovatele'
+            }
+          }
+        }
+      });
+    }
+    
+    // Aktualizace grafu modelů
+    function updateModelChart(data) {
+      const ctx = document.getElementById('model-chart').getContext('2d');
+      
+      // Příprava dat
+      const models = Object.keys(data.byModel);
+      const modelNames = models.map(model => data.byModel[model].model);
+      const tokenCounts = models.map(model => data.byModel[model].totalTokens);
+      
+      // Barvy pro poskytovatele
+      const colors = {
+        openai: '#4285f4',
+        anthropic: '#34a853',
+        deepseek: '#ea4335'
+      };
+      
+      // Vytvoření grafu
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: modelNames,
+          datasets: [{
+            label: 'Celkový počet tokenů',
+            data: tokenCounts,
+            backgroundColor: models.map(model => colors[data.byModel[model].provider] || '#999'),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Počet tokenů'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Model'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Využití tokenů podle modelu'
+            }
+          }
+        }
+      });
+    }
+    
+    // Aktualizace denního grafu
+    function updateDailyChart(data) {
+      const ctx = document.getElementById('daily-chart').getContext('2d');
+      
+      // Příprava dat
+      const dates = Object.keys(data.byDate).sort();
+      const requestCounts = dates.map(date => data.byDate[date].requests);
+      const tokenCounts = dates.map(date => data.byDate[date].totalTokens);
+      
+      // Vytvoření grafu
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [
+            {
+              label: 'Počet požadavků',
+              data: requestCounts,
+              borderColor: '#4285f4',
+              backgroundColor: 'rgba(66, 133, 244, 0.1)',
+              yAxisID: 'y',
+              fill: true
+            },
+            {
+              label: 'Počet tokenů',
+              data: tokenCounts,
+              borderColor: '#34a853',
+              backgroundColor: 'rgba(52, 168, 83, 0.1)',
+              yAxisID: 'y1',
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Počet požadavků'
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: {
+                drawOnChartArea: false
+              },
+              title: {
+                display: true,
+                text: 'Počet tokenů'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Denní využití'
+            }
+          }
+        }
+      });
+    }
+    
+    // Aktualizace grafu nákladů
+    function updateCostChart(data) {
+      const ctx = document.getElementById('cost-chart').getContext('2d');
+      
+      // Příprava dat
+      const providers = Object.keys(data.byProvider);
+      const costs = providers.map(provider => data.byProvider[provider].cost);
+      
+      // Barvy pro poskytovatele
+      const colors = {
+        openai: '#4285f4',
+        anthropic: '#34a853',
+        deepseek: '#ea4335'
+      };
+      
+      // Vytvoření grafu
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: providers,
+          datasets: [{
+            data: costs,
+            backgroundColor: providers.map(provider => colors[provider] || '#999'),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'right',
+            },
+            title: {
+              display: true,
+              text: 'Náklady podle poskytovatele'
+            }
+          }
+        }
+      });
+    }
+    
+    // Aktualizace tabulky poskytovatelů
+    function updateProviderTable(data) {
+      const tableBody = document.querySelector('#provider-table tbody');
+      tableBody.innerHTML = '';
+      
+      // Příprava dat
+      const providers = Object.keys(data.byProvider);
+      
+      // Vytvoření řádků
+      for (const provider of providers) {
+        const row = document.createElement('tr');
+        
+        const providerData = data.byProvider[provider];
+        
+        row.innerHTML = `
+          <td>${provider}</td>
+          <td>${providerData.requests.toLocaleString()}</td>
+          <td>${providerData.inputTokens.toLocaleString()}</td>
+          <td>${providerData.outputTokens.toLocaleString()}</td>
+          <td>${providerData.totalTokens.toLocaleString()}</td>
+          <td>$${providerData.cost.toFixed(2)}</td>
+        `;
+        
+        tableBody.appendChild(row);
+      }
+    }
+    
+    // Aktualizace tabulky modelů
+    function updateModelTable(data) {
+      const tableBody = document.querySelector('#model-table tbody');
+      tableBody.innerHTML = '';
+      
+      // Příprava dat
+      const models = Object.keys(data.byModel);
+      
+      // Vytvoření řádků
+      for (const model of models) {
+        const row = document.createElement('tr');
+        
+        const modelData = data.byModel[model];
+        
+        row.innerHTML = `
+          <td>${modelData.provider}</td>
+          <td>${modelData.model}</td>
+          <td>${modelData.requests.toLocaleString()}</td>
+          <td>${modelData.inputTokens.toLocaleString()}</td>
+          <td>${modelData.outputTokens.toLocaleString()}</td>
+          <td>${modelData.totalTokens.toLocaleString()}</td>
+          <td>$${modelData.cost.toFixed(2)}</td>
+        `;
+        
+        tableBody.appendChild(row);
+      }
+    }
+  </script>
+  
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registrován:', registration);
+          })
+          .catch(error => {
+            console.error('Chyba při registraci Service Workeru:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

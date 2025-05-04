@@ -1,0 +1,30 @@
+{
+  "domain": "dev-zxj8pir0moo4pdk7.us.auth0.com",
+  "clientId": "H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ",
+  "audience": "https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/",
+  "scope": "openid profile email read:users read:user_idp_tokens",
+  "namespace": "https://aimapa.cz",
+  "rolesPath": "https://aimapa.cz/roles",
+  "permissionsPath": "https://aimapa.cz/permissions",
+  "defaultRole": "user",
+  "roles": {
+    "admin": {
+      "description": "Administrátor s plným přístupem",
+      "permissions": ["read:all", "write:all", "delete:all", "manage:users"]
+    },
+    "moderator": {
+      "description": "Moderátor obsahu",
+      "permissions": ["read:all", "write:content", "manage:content"]
+    },
+    "user": {
+      "description": "Standardní uživatel",
+      "permissions": ["read:content", "write:own", "delete:own"]
+    },
+    "guest": {
+      "description": "Nepřihlášený uživatel",
+      "permissions": ["read:public"]
+    }
+  },
+  "callbackUrl": "http://localhost:3000/callback",
+  "postLogoutRedirectUri": "http://localhost:3000"
+}

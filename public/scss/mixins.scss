@@ -1,0 +1,79 @@
+// Flexbox
+@mixin flex($direction: row, $justify: flex-start, $align: stretch, $wrap: nowrap) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  flex-wrap: $wrap;
+}
+
+// Media queries
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  }
+}
+
+// Tlačítka
+@mixin button($bg-color: $primary-color, $text-color: white, $hover-bg-color: $secondary-color) {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: $transition;
+  font-weight: 500;
+  text-align: center;
+  
+  &:hover {
+    background-color: $hover-bg-color;
+    color: $text-color;
+  }
+}
+
+// Karty
+@mixin card($padding: 20px, $bg-color: $bg-color, $shadow: $shadow) {
+  background-color: $bg-color;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  padding: $padding;
+}
+
+// Formulářové prvky
+@mixin form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  background-color: $bg-color;
+  color: $text-color;
+  transition: $transition;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+  }
+}
+
+// Truncate text
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}

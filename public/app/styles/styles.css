@@ -1,0 +1,4216 @@
+:root {
+    --primary-color: #8B5CF6;
+    --primary-color-rgb: 139, 92, 246;
+    --primary-color-dark: #7c4ddf;
+    --dark-bg: #1a1b26;
+    --card-bg: #1F2937;
+    --text-color: #fff;
+    --text-color-dark: #e2e8f0;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --popup-bg-light: #ffffff;
+    --popup-bg-dark: #2d3748;
+    --popup-text-light: #333333;
+    --popup-text-dark: #e2e8f0;
+    --button-hover-dark: #4c1d95;
+    --input-bg-dark: #374151;
+    --input-border-dark: #4b5563;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+header {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    background-color: var(--primary-color);
+    padding: 15px 0;
+    text-align: center;
+    margin: 0;
+    width: 100%;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.header-buttons {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.settings-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.login-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: white;
+    padding: 6px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.login-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.login-button.logged-in {
+    background: rgba(76, 175, 80, 0.5);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.login-button.logged-in:hover {
+    background: rgba(76, 175, 80, 0.7);
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+.login-button .icon {
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.login-button.logged-in .icon {
+    color: #e6fffa;
+}
+
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-avatar-small {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    flex: 1;
+}
+
+.map-container {
+    background-color: var(--card-bg);
+    padding: 15px;
+    border-radius: 4px;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1400px;
+}
+
+.status-bar {
+    background-color: #064e3b;
+    color: #fff;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    border-left: 3px solid #34d399;
+    font-size: 0.95rem;
+}
+
+.status-icon {
+    color: #34d399;
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.map-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+#map {
+    height: 700px;
+    border-radius: 4px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.map-control-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: white;
+    border: none;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 500;
+}
+
+.map-control-btn .icon {
+    margin: 0;
+    font-size: 18px;
+}
+
+.coordinates-display {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 500;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    font-family: monospace;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body[data-theme="dark"] .coordinates-display {
+    background-color: rgba(45, 55, 72, 0.9);
+    color: #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.map-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: var(--dark-bg);
+    transition: all 0.3s ease-in-out;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.map-fullscreen #map {
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.map-fullscreen .coordinates-display {
+    bottom: 20px;
+    left: 20px;
+    font-size: 14px;
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+}
+
+.map-fullscreen .map-control-btn {
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    transition: all 0.2s ease;
+}
+
+.map-fullscreen .map-control-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.map-fullscreen .map-control-btn .icon {
+    color: white;
+    font-size: 22px;
+}
+
+/* Přidání fullscreen overlay pro lepší přechod */
+.fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.map-fullscreen + .fullscreen-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.route-info {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-around;
+    transition: background-color 0.3s;
+}
+
+body[data-theme="dark"] .route-info {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin: 20px auto 0;
+    max-width: 800px;
+    width: 100%;
+}
+
+.btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+    transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.btn.active {
+    background-color: var(--primary-color-dark);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.icon {
+    margin-right: 10px;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-assistant {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    width: 350px;
+    height: auto;
+    max-height: 500px;
+    overflow: hidden;
+    position: absolute; /* Změněno z fixed na absolute pro správné přesouvání */
+    top: 100px;
+    left: 20px;
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.ai-assistant:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.ai-assistant.dragging {
+    opacity: 0.9;
+    transform: scale(1.02);
+    z-index: 1001;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: move; /* Vždy nastaveno na move */
+    font-weight: 500;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.chat-drag-handle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: move;
+    padding: 2px 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+.chat-drag-handle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 14px;
+    flex: 1;
+    text-align: center;
+}
+
+.chat-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.chat-control-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+    margin-left: 5px;
+}
+
+.chat-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-control-btn.profile-btn {
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.chat-control-btn.profile-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.chat-control-btn.profile-btn.logged-in {
+    background-color: rgba(76, 175, 80, 0.5);
+    border: 1px solid rgba(76, 175, 80, 0.7);
+}
+
+.chat-control-btn.profile-btn.logged-in:hover {
+    background-color: rgba(76, 175, 80, 0.7);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+.chat-control-btn.profile-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.chat-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 15px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 320px;
+    border-radius: 4px;
+}
+
+body[data-theme="dark"] .chat-messages {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.message {
+<<<<<<< HEAD:styles.css
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 90%;
+    white-space: pre-line;
+=======
+    padding: 10px 12px;
+    border-radius: 4px;
+    max-width: 85%;
+    white-space: pre-line;
+    font-size: 0.95rem;
+    line-height: 1.4;
+>>>>>>> v0.3.8.3:public/app/styles.css
+}
+
+.message.ai {
+    background-color: #374151;
+    align-self: flex-start;
+    border-top-left-radius: 0;
+}
+
+body[data-theme="dark"] .message.ai {
+    background-color: #2d3748;
+}
+
+.message.user {
+    background-color: var(--primary-color);
+    align-self: flex-end;
+    border-top-right-radius: 0;
+}
+
+/* Styly pro návrhy dalších akcí */
+.message-container {
+    margin-bottom: 15px;
+}
+
+.suggestions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+    margin-left: 12px;
+}
+
+.suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.15);
+    color: var(--primary-color);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.suggestion-btn:active {
+    background-color: rgba(139, 92, 246, 0.35);
+    transform: scale(0.98);
+}
+
+/* Tmavý režim pro návrhy */
+[data-theme="dark"] .suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+[data-theme="dark"] .suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+/* Styly pro návrhy dalších akcí */
+.message-container {
+    margin-bottom: 15px;
+}
+
+.suggestions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+    margin-left: 12px;
+}
+
+.suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.15);
+    color: var(--primary-color);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.suggestion-btn:active {
+    background-color: rgba(139, 92, 246, 0.35);
+    transform: scale(0.98);
+}
+
+/* Tmavý režim pro návrhy */
+[data-theme="dark"] .suggestion-btn {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+[data-theme="dark"] .suggestion-btn:hover {
+    background-color: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.chat-input {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+    padding: 0 0 5px 0;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: white;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.chat-input input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+body[data-theme="dark"] .chat-input input {
+    background-color: var(--input-bg-dark);
+    color: var(--text-color-dark);
+}
+
+.send-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.send-btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+/* Command Menu Styles */
+.commands-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.commands-button:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.commands-button .icon {
+    margin: 0;
+    font-size: 18px;
+}
+
+.commands-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.commands-overlay.show {
+    opacity: 1;
+}
+
+.commands-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    max-width: 800px;
+    max-height: 85vh;
+    background-color: var(--card-bg);
+    border-radius: 6px;
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s ease;
+}
+
+.commands-menu.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+
+.commands-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 25px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 6px 6px 0 0;
+}
+
+.commands-menu-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.commands-menu-close {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    color: var(--text-color);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.commands-menu-close:hover {
+    color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.commands-menu-search {
+    padding: 15px 25px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.commands-search-input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg-dark);
+    color: var(--text-color);
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.commands-search-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.commands-menu-body {
+    flex: 1;
+    overflow: hidden;
+}
+
+.commands-menu-scroll-container {
+    height: 100%;
+    max-height: calc(80vh - 120px);
+    overflow-y: auto;
+    padding: 10px 20px 20px;
+}
+
+.commands-category {
+    margin-bottom: 15px;
+}
+
+.commands-category-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, border-left-color 0.2s ease;
+}
+
+.commands-category-header:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--primary-color);
+}
+
+.commands-category-icon {
+    margin-right: 12px;
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.commands-category-name {
+    flex: 1;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.commands-category-toggle {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.commands-category-header:hover .commands-category-toggle {
+    color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.2);
+    transform: rotate(180deg);
+}
+
+.commands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 5px 0 15px 45px;
+    margin-top: 5px;
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    transition: background-color 0.2s ease, border-left-color 0.2s ease;
+}
+
+.command-item:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--primary-color);
+}
+
+.command-icon {
+    margin-right: 12px;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+    font-size: 15px;
+}
+
+.command-description {
+    font-size: 13px;
+    opacity: 0.7;
+    line-height: 1.4;
+}
+
+.no-commands-results {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Custom Marker Styles */
+.custom-marker-container {
+    position: relative;
+}
+
+.custom-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    border: 2px solid white;
+    font-size: 14px;
+    z-index: 500;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.custom-marker:hover {
+    background-color: var(--primary-color-dark);
+    transform: scale(1.1);
+}
+
+/* Number inside marker */
+.custom-marker span {
+    position: relative;
+    z-index: 2;
+}
+
+/* Floating animation - minimalizována */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+        box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4), 0 5px 15px rgba(139, 92, 246, 0.2);
+    }
+    50% {
+        transform: translateY(-2px); /* Minimalizováno z -5px na -2px */
+        box-shadow: 0 5px 10px rgba(139, 92, 246, 0.3), 0 8px 20px rgba(139, 92, 246, 0.1);
+    }
+    100% {
+        transform: translateY(0px);
+        box-shadow: 0 3px 8px rgba(139, 92, 246, 0.4), 0 5px 15px rgba(139, 92, 246, 0.2);
+    }
+}
+
+/* Shiny effect animation */
+@keyframes shine {
+    0% {
+        left: -100%;
+        opacity: 0;
+    }
+    10% {
+        left: -100%;
+        opacity: 0.5;
+    }
+    20% {
+        left: 100%;
+        opacity: 0.5;
+    }
+    21% {
+        opacity: 0;
+    }
+    100% {
+        left: 100%;
+        opacity: 0;
+    }
+}
+
+/* Ripple effect animation */
+@keyframes ripple {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    40% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Pulse animation for glow effect */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(139, 92, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+    }
+}
+
+/* Styly pro různé tvary markerů */
+
+/* Čtvercový marker */
+.custom-marker.square-style {
+    border-radius: 8px;
+}
+
+.custom-marker.square-style::after {
+    border-radius: 12px;
+}
+
+/* Diamantový marker */
+.custom-marker.diamond-style {
+    transform: rotate(45deg);
+    border-radius: 4px;
+    animation: none; /* Odstranění levitace */
+}
+
+.custom-marker.diamond-style span {
+    transform: rotate(-45deg);
+}
+
+.custom-marker.diamond-style::after {
+    border-radius: 8px;
+    transform: rotate(0deg);
+}
+
+@keyframes float-diamond {
+    0% {
+        transform: rotate(45deg) translateY(0);
+    }
+    50% {
+        transform: rotate(45deg) translateY(-2px); /* Minimalizováno z -10px na -2px */
+    }
+    100% {
+        transform: rotate(45deg) translateY(0);
+    }
+}
+
+/* Pin marker */
+.custom-marker.pin-style {
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    animation: none; /* Odstranění levitace */
+}
+
+.custom-marker.pin-style span {
+    transform: rotate(45deg);
+}
+
+.custom-marker.pin-style::after {
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(0deg);
+}
+
+@keyframes float-pin {
+    0% {
+        transform: rotate(-45deg) translateY(0);
+    }
+    50% {
+        transform: rotate(-45deg) translateY(-2px); /* Minimalizováno z -10px na -2px */
+    }
+    100% {
+        transform: rotate(-45deg) translateY(0);
+    }
+}
+
+/* Hvězdicový marker */
+.custom-marker.star-style {
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    border: none;
+    width: 36px; /* Zmenšeno z 45px na 36px */
+    height: 36px; /* Zmenšeno z 45px na 36px */
+    animation: rotate-star 6s linear infinite; /* Odstraněna levitace */
+}
+
+.custom-marker.star-style::after {
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+}
+
+@keyframes rotate-star {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Vypnuté efekty */
+.custom-marker.no-effects {
+    animation: none;
+}
+
+.custom-marker.no-effects::before,
+.custom-marker.no-effects::after {
+    display: none;
+}
+
+.custom-marker.no-effects:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Marker colors for different indices */
+.custom-marker.color-1 {
+    background-color: #8B5CF6;
+    box-shadow: 0 2px 5px rgba(139, 92, 246, 0.5);
+}
+
+.custom-marker.color-2 {
+    background-color: #10B981;
+    box-shadow: 0 2px 5px rgba(16, 185, 129, 0.5);
+}
+
+.custom-marker.color-3 {
+    background-color: #F59E0B;
+    box-shadow: 0 2px 5px rgba(245, 158, 11, 0.5);
+}
+
+.custom-marker.color-4 {
+    background-color: #EF4444;
+    box-shadow: 0 2px 5px rgba(239, 68, 68, 0.5);
+}
+
+.custom-marker.color-5 {
+    background-color: #3B82F6;
+    box-shadow: 0 2px 5px rgba(59, 130, 246, 0.5);
+}
+
+/* Active marker state */
+.custom-marker.active {
+    transform: scale(1.2);
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.6);
+    border-color: #fff;
+    border-width: 3px;
+}
+
+/* Selected marker state */
+.custom-marker.selected {
+    border-color: #FFD700;
+    box-shadow: 0 3px 8px rgba(255, 215, 0, 0.5);
+}
+
+/* Settings Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 50px auto;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 6px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 6px 6px 0 0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.close-button {
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.8);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.close-button:hover {
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.modal-body {
+    padding: 20px;
+    border-radius: 0 0 6px 6px;
+}
+
+.settings-section {
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.settings-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Color Options */
+.color-options {
+    display: flex;
+    gap: 18px;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.color-option {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.color-option::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.color-option:hover::before {
+    animation: shine 1.5s infinite;
+    opacity: 1;
+}
+
+@keyframes shine {
+    0% {
+        left: -50%;
+        opacity: 0.7;
+    }
+    100% {
+        left: 150%;
+        opacity: 0;
+    }
+}
+
+.color-option.active {
+    border-color: white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    transform: scale(1.15);
+}
+
+.color-option.blue {
+    background: radial-gradient(circle, #8B5CF6 0%, #7c4ddf 50%, #6d3fcf 100%);
+}
+
+.color-option.purple {
+    background: radial-gradient(circle, #9333EA 0%, #8429d6 50%, #7521c2 100%);
+}
+
+.color-option.green {
+    background: radial-gradient(circle, #10B981 0%, #0e9f6e 50%, #0c8c5f 100%);
+}
+
+.color-option.orange {
+    background: radial-gradient(circle, #F59E0B 0%, #d97706 50%, #b45309 100%);
+}
+
+/* Toggle Switch */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.toggle-container span {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.toggle-container span:first-child {
+    opacity: 0.6;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: .3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 2px;
+    background-color: white;
+    transition: .3s;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(25px);
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+input:checked ~ span:first-child {
+    opacity: 0.6;
+}
+
+input:checked ~ span:last-child {
+    opacity: 1;
+}
+
+/* Select Container */
+.select-container {
+    margin-top: 15px;
+}
+
+.select-container select {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    padding-right: 30px;
+}
+
+.select-container select:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.select-container select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.select-container select option {
+    background-color: #1e1e1e;
+    color: white;
+    padding: 8px;
+}
+
+/* API Options */
+.api-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 15px 0;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.api-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+}
+
+.api-option:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.api-option input[type="radio"] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.api-option input[type="radio"]:checked {
+    border-color: var(--primary-color);
+}
+
+.api-option input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+}
+
+.api-option label {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+}
+
+.api-key-section {
+    margin-top: 15px;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.api-key-section label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.api-key-input {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.api-key-input input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
+}
+
+.api-key-input input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.show-key-btn {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.show-key-btn:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.checkbox-container input[type="checkbox"]:checked {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+}
+
+.checkbox-container input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.checkbox-container label {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+}
+
+.settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.settings-actions button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: none;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.secondary-btn {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.secondary-btn:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+/* Marker Style Options */
+.marker-styles-container {
+    margin-top: 15px;
+}
+
+.marker-style-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.marker-style-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background-color: rgba(0, 0, 0, 0.05);
+    width: 70px;
+}
+
+.marker-style-option:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.marker-style-option.active {
+    border-color: var(--primary-color);
+    background-color: rgba(139, 92, 246, 0.1);
+}
+
+.marker-preview {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.marker-preview span {
+    z-index: 2;
+    font-size: 16px;
+}
+
+/* Circle marker (default) */
+.circle-marker {
+    border-radius: 50%;
+    background-color: #8B5CF6;
+    border: 2px solid white;
+}
+
+/* Square marker */
+.square-marker {
+    border-radius: 4px;
+    background-color: #10B981;
+    border: 2px solid white;
+}
+
+/* Diamond marker */
+.diamond-marker {
+    transform: rotate(45deg);
+    border-radius: 2px;
+    background-color: #F59E0B;
+    border: 2px solid white;
+}
+
+.diamond-marker span {
+    transform: rotate(-45deg);
+}
+
+/* Pin marker */
+.pin-marker {
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    background-color: #EF4444;
+    border: 2px solid white;
+}
+
+.pin-marker span {
+    transform: rotate(45deg);
+}
+
+/* Star marker */
+.star-marker {
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    background-color: #3B82F6;
+    border: none;
+    width: 36px;
+    height: 36px;
+}
+
+.marker-style-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    font-weight: normal;
+}
+
+.marker-style-option:hover .marker-style-label {
+    color: #fff;
+}
+
+.marker-style-option.active .marker-style-label {
+    color: #fff;
+}
+
+.marker-effects-toggle {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Popup styly */
+.popup-content {
+    min-width: 250px;
+    max-width: 350px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] .popup-header {
+    border-bottom-color: var(--border-color);
+}
+
+.popup-title {
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+
+.popup-countdown {
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+    display: none; /* Skryjeme odpočet */
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    text-align: center;
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.popup-countdown:hover {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+.popup-countdown::before {
+    content: '⏱️'; /* Emoji hodiny */
+    margin-right: 3px;
+    font-size: 0.8rem;
+}
+
+body[data-theme="dark"] .popup-countdown {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+
+.countdown-warning {
+    background-color: #f59e0b !important;
+    color: white;
+}
+
+.countdown-danger {
+    background-color: #ef4444 !important;
+    color: white;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.leaflet-popup-content-wrapper {
+    transition: background-color 0.3s;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-tip {
+    transition: background-color 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Zajistí, že popup okna mají konzistentní velikost při různých úrovních zoomu */
+.leaflet-popup {
+    margin-bottom: 20px;
+}
+
+.leaflet-popup-content {
+    margin: 12px 15px;
+    line-height: 1.5;
+}
+
+/* Přidání animace pro plynulejší otevírání popup oken */
+.leaflet-fade-anim .leaflet-popup {
+    opacity: 0;
+    transition: opacity 0.25s linear, transform 0.25s ease-out;
+    transform: scale(0.8);
+    will-change: transform, opacity; /* Optimalizace pro hardwarovou akceleraci */
+}
+
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Styly pro popup okna při zoomu */
+.leaflet-popup.zooming {
+    transition: none !important;
+    pointer-events: none;
+}
+
+/* Styly pro popup okna při pohybu mapy */
+.leaflet-popup.moving {
+    transition: transform 0.1s linear !important;
+    pointer-events: none;
+}
+
+/* Styly pro trasy při zoomu a pohybu mapy */
+.leaflet-overlay-pane.zooming,
+.leaflet-overlay-pane.moving {
+    transition: none !important;
+    pointer-events: none;
+}
+
+/* Optimalizace pro zoomování a pohyb mapy */
+.map-zooming .leaflet-routing-layer,
+.map-moving .leaflet-routing-layer {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Optimalizace pro vykreslování trasy */
+.map-zooming .leaflet-overlay-pane path,
+.map-moving .leaflet-overlay-pane path {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
+}
+
+/* Optimalizace pro popup okna při pohybu mapy */
+.leaflet-popup {
+    transform-origin: bottom center; /* Zajišťuje lepší chování při změně velikosti */
+    backface-visibility: hidden; /* Optimalizace pro hardwarovou akceleraci */
+    perspective: 1000px; /* Optimalizace pro hardwarovou akceleraci */
+}
+
+.leaflet-popup-content-wrapper {
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+    will-change: transform, opacity; /* Optimalizace pro hardwarovou akceleraci */
+}
+
+.leaflet-popup-tip {
+    transition: transform 0.1s ease-out;
+    will-change: transform; /* Optimalizace pro hardwarovou akceleraci */
+}
+
+/* Styly pro popup okna při různých úrovních zoomu */
+@media (max-width: 768px), (max-height: 600px) {
+    .leaflet-popup-content-wrapper {
+        font-size: 0.9rem;
+    }
+
+    .popup-title {
+        font-size: 1.1rem;
+    }
+
+    .popup-form {
+        max-height: 300px;
+    }
+
+    .hours-table th, .hours-table td {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Optimalizace pro různé úrovně zoomu */
+.leaflet-zoom-animated {
+    transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1);
+}
+
+/* Zajištění stabilní velikosti popup při různých úrovních zoomu */
+.leaflet-container .leaflet-popup {
+    margin-bottom: 10px !important; /* Konzistentní odsazení */
+}
+
+/* Optimalizace pro různé úrovně zoomu - zajištění čitelnosti */
+.leaflet-zoom-anim .leaflet-zoom-animated {
+    will-change: transform; /* Optimalizace pro hardwarovou akceleraci */
+}
+
+/* Zajištění stabilní velikosti obsahu popup při různých úrovních zoomu */
+.leaflet-popup-content {
+    margin: 12px 15px !important; /* Konzistentní vnitřní okraje */
+    line-height: 1.5 !important; /* Konzistentní výška řádků */
+    font-size: 14px !important; /* Konzistentní velikost písma */
+}
+
+/* Styly pro popup okna při velmi malém zoomu */
+@media (max-width: 480px), (max-height: 400px) {
+    .leaflet-popup-content-wrapper {
+        font-size: 0.85rem;
+    }
+
+    .popup-title {
+        font-size: 1rem;
+    }
+
+    .popup-form {
+        max-height: 250px;
+    }
+
+    .hours-table th, .hours-table td {
+        padding: 4px 6px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Styly pro popup okna markerů */
+.marker-popup .leaflet-popup-content-wrapper {
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+body[data-theme="dark"] .marker-popup .leaflet-popup-content-wrapper {
+    background-color: rgba(40, 44, 52, 0.95);
+    border: 1px solid rgba(80, 80, 80, 0.3);
+}
+
+.marker-popup .leaflet-popup-tip {
+    background-color: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+body[data-theme="dark"] .marker-popup .leaflet-popup-tip {
+    background-color: rgba(40, 44, 52, 0.95);
+}
+
+/* Styly pro popup klubu */
+.club-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.98);
+    max-width: 350px;
+    min-width: 320px;
+    transform: translateY(-20px); /* Posun popup okna více nahoru pro lepší vycentrování */
+}
+
+.club-popup .leaflet-popup-content {
+    margin: 12px 15px;
+    width: auto !important;
+    max-width: 320px;
+}
+
+.club-popup .leaflet-popup-tip-container {
+    margin-top: -1px; /* Lepší napojení šipky na popup okno */
+}
+
+.club-popup .leaflet-popup-tip {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-content-wrapper {
+    background-color: rgba(30, 34, 42, 0.98);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-tip {
+    background-color: rgba(30, 34, 42, 0.98);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+body[data-theme="dark"] .leaflet-popup-content-wrapper {
+    background-color: var(--popup-bg-dark);
+    color: var(--popup-text-dark);
+}
+
+body[data-theme="dark"] .leaflet-popup-tip {
+    background-color: var(--popup-bg-dark);
+}
+
+.popup-form {
+    padding: 8px 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 3px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+body[data-theme="dark"] .form-group label {
+    color: var(--text-color-dark);
+}
+
+.popup-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+body[data-theme="dark"] .popup-input {
+    background-color: var(--input-bg-dark);
+    border-color: var(--input-border-dark);
+    color: var(--text-color-dark);
+}
+
+.coordinates {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 8px 0;
+    transition: color 0.3s;
+}
+
+body[data-theme="dark"] .coordinates {
+    color: #a0aec0;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.popup-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    text-align: center;
+}
+
+.popup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #45a049;
+}
+
+body[data-theme="dark"] .save-btn:hover {
+    background-color: #3d8b40;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #e53935;
+}
+
+body[data-theme="dark"] .delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Styly pro místa zájmu */
+.place-popup h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    transition: border-color 0.3s;
+}
+
+body[data-theme="dark"] .place-popup h3 {
+    border-bottom-color: var(--border-color);
+}
+
+.place-info {
+    margin-bottom: 15px;
+}
+
+.place-info p {
+    margin: 5px 0;
+}
+
+.reservation-form h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.place-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.place-icon.club {
+    background-color: #9c27b0;
+    color: white;
+}
+
+.club-badge {
+    background-color: #9c27b0;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(156, 39, 176, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 40px;
+}
+
+.club-image-container {
+    margin: 10px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.club-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.club-actions {
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.reserve-dancer-btn {
+    background-color: #9c27b0;
+    color: white;
+    padding: 8px 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border-radius: 24px;
+    box-shadow: 0 4px 10px rgba(156, 39, 176, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.reserve-dancer-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+    z-index: -1;
+}
+
+.reserve-dancer-btn:hover {
+    background-color: #7b1fa2;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(156, 39, 176, 0.5);
+}
+
+.reserve-dancer-btn:hover::before {
+    left: 100%;
+}
+
+body[data-theme="dark"] .reserve-dancer-btn {
+    background-color: #ba68c8;
+    box-shadow: 0 4px 10px rgba(186, 104, 200, 0.4);
+}
+
+body[data-theme="dark"] .reserve-dancer-btn:hover {
+    background-color: #8e24aa;
+    box-shadow: 0 6px 15px rgba(186, 104, 200, 0.5);
+}
+
+/* Styly pro obchody a otevírací doby */
+.store-popup {
+    max-width: 400px !important;
+}
+
+.store-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+.store-popup .leaflet-popup-content {
+    margin: 15px;
+    font-size: 14px;
+}
+
+/* Zajistí, že popup okna obchodů zůstanou čitelná při různých úrovních zoomu */
+.store-popup.leaflet-popup {
+    font-size: 14px !important;
+}
+
+.store-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.store-item {
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid transparent;
+}
+
+.store-item:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+body[data-theme="dark"] .store-item {
+    background-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .store-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.store-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+.store-address {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    opacity: 0.8;
+}
+
+.store-hours {
+    font-size: 0.9rem;
+}
+
+.store-hours-section {
+    margin: 15px 0;
+}
+
+.store-hours-section h4 {
+    margin: 10px 0 5px 0;
+    font-size: 1rem;
+}
+
+.hours-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.hours-table th, .hours-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem;
+}
+
+.hours-table th {
+    background-color: rgba(0, 0, 0, 0.05);
+    font-weight: bold;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.hours-table tr:last-child td {
+    border-bottom: none;
+}
+
+.hours-table tr:hover td {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+body[data-theme="dark"] .hours-table th {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+body[data-theme="dark"] .hours-table th,
+body[data-theme="dark"] .hours-table td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="dark"] .hours-table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.back-button {
+    background-color: transparent;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.back-button::before {
+    content: '\2190'; /* Šipka doleva */
+    font-size: 14px;
+}
+
+.back-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: translateX(-3px);
+}
+
+body[data-theme="dark"] .back-button:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.show-on-map-btn, .details-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.show-on-map-btn::before {
+    content: '\1F4CD'; /* Emoji špendlíku */
+    font-size: 16px;
+}
+
+.details-btn::before {
+    content: '\1F4C3'; /* Emoji dokumentu */
+    font-size: 16px;
+}
+
+.show-on-map-btn:hover, .details-btn:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.place-icon.store {
+    background-color: #2196f3;
+    color: white;
+    box-shadow: 0 3px 10px rgba(33, 150, 243, 0.4);
+    border: 2px solid white;
+    transition: all 0.3s ease;
+}
+
+.place-icon.store:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.6);
+}
+
+/* Styly pro popup okna obchodů na mapě */
+.store-marker-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(33, 150, 243, 0.3);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme="dark"] .store-marker-popup .leaflet-popup-content-wrapper {
+    background-color: rgba(40, 44, 52, 0.95);
+}
+
+.store-marker-popup .leaflet-popup-tip {
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 3px 10px rgba(33, 150, 243, 0.3);
+}
+
+body[data-theme="dark"] .store-marker-popup .leaflet-popup-tip {
+    background-color: rgba(40, 44, 52, 0.95);
+}
+
+.store-marker-popup .popup-title {
+    color: #2196f3;
+    font-weight: bold;
+}
+
+.store-details-popup .hours-table {
+    box-shadow: 0 2px 10px rgba(33, 150, 243, 0.2);
+}
+
+/* Dancer Reservation Modal Styles */
+.dancer-modal-content {
+    max-width: 800px;
+}
+
+.dancers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.dancer-card {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="dark"] .dancer-card {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dancer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dancer-card.selected {
+    border: 2px solid var(--primary-color);
+}
+
+.dancer-image-container {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.dancer-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s;
+}
+
+.dancer-card:hover .dancer-image {
+    transform: scale(1.05);
+}
+
+.dancer-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop');
+}
+
+.dancer-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1974&auto=format&fit=crop');
+}
+
+.dancer-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?q=80&w=1727&auto=format&fit=crop');
+}
+
+.dancer-info {
+    padding: 15px;
+}
+
+.dancer-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+}
+
+.dancer-info p {
+    margin: 0 0 8px 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.dancer-rating {
+    color: #f59e0b;
+    font-size: 0.9rem;
+}
+
+body[data-theme="dark"] .dancer-rating {
+    color: #fbbf24;
+}
+
+.reservation-details-section {
+    margin-top: 30px;
+}
+
+.reservation-terms {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+body[data-theme="dark"] .reservation-terms {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.reservation-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .dancers-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.rating-stars {
+    color: #f59e0b;
+    margin-left: 5px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] .rating-stars {
+    color: #fbbf24;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.club-popup .rating-stars {
+    font-size: 1.1rem;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+textarea.popup-input {
+    min-height: 60px;
+    resize: vertical;
+}
+
+.place-icon.restaurace {
+    background-color: #f44336;
+    color: white;
+}
+
+.place-icon.hotel {
+    background-color: #2196f3;
+    color: white;
+}
+
+.place-icon.kavárna {
+    background-color: #795548;
+    color: white;
+}
+
+.place-icon.atrakce {
+    background-color: #ff9800;
+    color: white;
+}
+
+/* Optimalizace pro tmavý režim - mapové prvky */
+body[data-theme="dark"] .leaflet-control-zoom a {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border-color: #4a5568;
+}
+
+body[data-theme="dark"] .leaflet-control-zoom a:hover {
+    background-color: #4a5568;
+}
+
+body[data-theme="dark"] .leaflet-control-attribution {
+    background-color: rgba(45, 55, 72, 0.8) !important;
+    color: #a0aec0 !important;
+}
+
+body[data-theme="dark"] .map-control-btn {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme="dark"] .map-control-btn:hover {
+    background-color: #4a5568;
+}
+
+/* Optimalizace pro tmavý režim - trasy */
+body[data-theme="dark"] .leaflet-routing-line {
+    stroke: var(--primary-color) !important;
+    stroke-opacity: 0.9 !important;
+}
+
+/* Styly pro Globe.GL režim */
+#simpleGlobeContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1000;
+    display: none;
+    background: radial-gradient(ellipse at center, #0d1423 0%, #090a0f 100%);
+}
+
+/* Glóbus kontejner se zobrazí pouze po kliknutí na tlačítko glóbus */
+.map-globe-mode #simpleGlobeContainer {
+<<<<<<< HEAD:styles.css
+    /* display: block; - Toto je nyní řízeno JavaScriptem */
+=======
+    display: block;
+    z-index: 1000;
+>>>>>>> v0.3.8.3:public/app/styles.css
+}
+
+/* Zvýraznění tlačítka návratu z glóbus režimu v glóbus režimu */
+.map-globe-mode #exitGlobeMode {
+    animation: pulse 2s infinite;
+    border: 3px solid white;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+}
+
+/* Animace pulzování pro tlačítko návratu z glóbus režimu */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+    }
+}
+
+.map-globe-mode #map {
+    visibility: hidden;
+}
+
+/* Ovládací prvky pro Globe.GL */
+.map-globe-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.map-globe-control-btn {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.map-globe-control-btn:hover {
+    background-color: white;
+    transform: scale(1.1);
+}
+
+body[data-theme="dark"] .map-globe-control-btn {
+    background-color: rgba(45, 55, 72, 0.8);
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] .map-globe-control-btn:hover {
+    background-color: #4a5568;
+}
+
+/* Optimalizace pro tmavý režim - popup okna */
+body[data-theme="dark"] .reservation-form h4 {
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] .place-info p {
+    color: #e2e8f0;
+}
+
+/* Styly pro popup okno klubu */
+.club-popup {
+    max-height: 350px !important;
+    max-width: 280px !important;
+    width: 280px !important;
+}
+
+/* Vlastní tlačítko pro zavření popup okna */
+.custom-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #9c27b0;
+    font-size: 18px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.custom-close-button:hover {
+    background: white;
+    color: #7b1fa2;
+    transform: rotate(90deg);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .custom-close-button {
+    background: rgba(40, 44, 52, 0.8);
+    color: #ba68c8;
+}
+
+body[data-theme="dark"] .custom-close-button:hover {
+    background: #2d3748;
+    color: #ce93d8;
+}
+
+.club-popup .leaflet-popup-content-wrapper {
+    border-radius: 16px;
+    width: 280px !important;
+    max-width: 280px !important;
+    max-height: 350px !important;
+    box-shadow: 0 10px 30px rgba(156, 39, 176, 0.2), 0 8px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.club-popup .leaflet-popup-tip {
+    background-color: white;
+    box-shadow: 0 3px 10px rgba(156, 39, 176, 0.2);
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-tip {
+    background-color: #2d3748;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="dark"] .club-popup .leaflet-popup-content-wrapper {
+    background-color: #2d3748;
+    box-shadow: 0 10px 30px rgba(186, 104, 200, 0.2), 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.club-popup .leaflet-popup-content {
+    margin: 10px;
+    width: 260px !important;
+    max-width: 260px !important;
+    overflow: hidden;
+}
+
+.club-popup .club-image-container {
+    max-height: 110px;
+    overflow: hidden;
+    margin: 4px 0 8px 0;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.club-popup .club-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+    max-height: 110px;
+    object-fit: cover;
+}
+
+.club-popup .club-image-container:hover .club-image {
+    transform: scale(1.05);
+}
+
+.club-popup .place-info {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    padding: 0 5px;
+    margin: 0 auto;
+}
+
+.club-popup .info-row {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+    gap: 8px;
+}
+
+.club-popup .info-icon {
+    font-size: 0.9rem;
+    width: 18px;
+    text-align: center;
+    color: #9c27b0;
+}
+
+.club-popup .info-content {
+    flex: 1;
+}
+
+.club-popup .info-content strong {
+    margin-right: 4px;
+    color: #666;
+}
+
+body[data-theme="dark"] .club-popup .info-content strong {
+    color: #aaa;
+}
+
+.club-popup .rating-value {
+    font-weight: bold;
+    color: #333;
+}
+
+.club-popup .rating-stars {
+    color: #ffc107;
+    margin-left: 3px;
+    font-size: 0.75rem;
+}
+
+body[data-theme="dark"] .club-popup .rating-value {
+    color: #eee;
+}
+
+.club-popup .opening-hours {
+    font-weight: bold;
+    color: #e91e63;
+}
+
+.club-popup .address {
+    color: #333;
+}
+
+body[data-theme="dark"] .club-popup .address {
+    color: #eee;
+}
+
+.club-popup .description {
+    margin-top: 8px !important;
+    font-style: italic;
+    color: #555;
+    line-height: 1.3;
+}
+
+body[data-theme="dark"] .club-popup .description {
+    color: #bbb;
+}
+
+.club-popup .popup-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #9c27b0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] .club-popup .popup-title {
+    color: #ce93d8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.club-popup .popup-header {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: 1px solid rgba(156, 39, 176, 0.15);
+    position: relative;
+}
+
+body[data-theme="dark"] .club-popup .popup-header {
+    border-bottom: 1px solid rgba(186, 104, 200, 0.2);
+}
+
+.club-popup .club-actions {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(156, 39, 176, 0.15);
+}
+
+body[data-theme="dark"] .club-popup .club-actions {
+    border-top: 1px solid rgba(186, 104, 200, 0.2);
+}
+
+/* Styly pro uložený marker */
+.saved-marker .popup-info {
+    padding: 12px 15px;
+    background-color: rgba(0, 0, 0, 0.04);
+    border-radius: 10px;
+    margin: 12px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.saved-marker .info-row {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    gap: 10px;
+}
+
+.saved-marker .info-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(156, 39, 176, 0.1);
+    border-radius: 50%;
+    color: #9c27b0;
+}
+
+.saved-marker .info-content {
+    flex: 1;
+}
+
+.saved-marker .info-content strong {
+    font-weight: 600;
+    color: #666;
+    margin-right: 5px;
+}
+
+body[data-theme="dark"] .saved-marker .popup-info {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .saved-marker .info-icon {
+    background-color: rgba(186, 104, 200, 0.2);
+    color: #ce93d8;
+}
+
+body[data-theme="dark"] .saved-marker .info-content strong {
+    color: #aaa;
+}
+
+.saved-marker .edit-btn {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.saved-marker .edit-btn:hover {
+    background-color: #1976d2;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Styly pro dočasný marker smazaného bodu */
+.temp-marker-icon {
+    background-color: #e91e63;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    animation: pulse 1.5s infinite;
+    z-index: 1000;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.temp-marker-popup .leaflet-popup-content-wrapper {
+    background-color: #2d3748;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+}
+
+.temp-marker-popup .leaflet-popup-tip {
+    background-color: #2d3748;
+}
+
+.temp-marker-popup h3 {
+    color: #e91e63;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.temp-marker-popup p {
+    margin: 8px 0;
+    color: #cbd5e0;
+}
+
+.temp-marker-popup .popup-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.temp-marker-popup .popup-btn {
+    background-color: #e91e63;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.temp-marker-popup .popup-btn:hover {
+    background-color: #d81b60;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Styly pro fullscreen režim */
+body.fullscreen-mode {
+    overflow: hidden;
+}
+
+/* Zobrazení ovládacích prvků v fullscreen režimu */
+.map-fullscreen .leaflet-control-container .leaflet-top,
+.map-fullscreen .leaflet-control-container .leaflet-bottom {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
+
+.map-fullscreen .leaflet-control-container .leaflet-top {
+    top: 20px;
+}
+
+.map-fullscreen .leaflet-control-container .leaflet-bottom {
+    bottom: 20px;
+}
+
+/* Zobrazení popup oken v fullscreen režimu */
+.map-fullscreen .leaflet-popup-content-wrapper {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.map-fullscreen .leaflet-popup-tip {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Tlačítko pro rychlý návrat z fullscreen režimu */
+.exit-fullscreen-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Tlačítka pro ovládání mapy ve fullscreen režimu */
+.fullscreen-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 1001;
+}
+
+.fullscreen-controls .fs-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.fullscreen-controls .fs-btn:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.fullscreen-controls .fs-btn.active {
+    background-color: var(--primary-color-dark);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(1px);
+}
+
+.fullscreen-controls .fs-btn .icon {
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.exit-fullscreen-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.exit-fullscreen-btn .icon {
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+/* Styly pro plovoucí chat v režimu celé obrazovky */
+.floating-chat-container {
+    position: absolute;
+    top: 20px;
+    right: 70px; /* Posunuto doprava vedle tlačítka s lodičkou */
+    width: 320px;
+    max-height: 500px;
+    background-color: rgba(31, 41, 55, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: move; /* Ukazatel, že lze přesouvat */
+}
+
+/* Pozice chatu vlevo/vpravo */
+.floating-chat-container.chat-left {
+    left: 20px;
+    right: auto;
+}
+
+.floating-chat-container.chat-right {
+    right: 70px; /* Posunuto doprava vedle tlačítka s lodičkou */
+    left: auto;
+}
+
+/* Hlavička chatu */
+.floating-chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: move;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.chat-title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Obsah chatu */
+.floating-chat-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: calc(500px - 48px);
+}
+
+/* Zprávy v chatu */
+.floating-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 350px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Vstupní pole pro chat */
+.floating-chat-input {
+    display: flex;
+    padding: 10px;
+    gap: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.floating-chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.floating-send-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.floating-send-btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+/* Minimalizovaný chat */
+.floating-chat-container.minimized {
+    height: 48px;
+    max-height: 48px;
+}
+
+/* Minimalizovaný hlavní chat */
+.ai-assistant.minimized .chat-content {
+    display: none;
+}
+
+/* Optimalizace pro mobilní zařízení */
+@media (max-width: 768px) {
+    .exit-fullscreen-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .floating-chat-container {
+        width: 280px;
+        max-height: 400px;
+    }
+
+    .floating-chat-messages {
+        max-height: 250px;
+    }
+
+    .fullscreen-controls {
+        bottom: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 90%;
+    }
+
+    .fullscreen-controls .fs-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Styly pro tlačítko menu příkazů */
+.commands-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+.commands-button:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.commands-button .icon {
+    font-size: 18px;
+}
+
+/* Styly pro tlačítko menu příkazů ve fullscreen režimu */
+.map-fullscreen .commands-button {
+    background-color: rgba(139, 92, 246, 0.8);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.map-fullscreen .commands-button:hover {
+    background-color: rgba(139, 92, 246, 1);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Překrytí pro menu příkazů */
+.commands-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.commands-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Styly pro menu příkazů */
+.commands-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(-10px);
+    width: 320px;
+    max-height: 500px;
+    background-color: rgba(31, 41, 55, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+}
+
+.commands-menu.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+
+.commands-menu.dragging {
+    transition: none;
+}
+
+.commands-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    cursor: move;
+}
+
+.commands-menu-drag-handle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 10px;
+}
+
+.commands-menu-header h3 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 16px;
+    flex: 1;
+}
+
+.commands-menu-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.commands-menu-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.commands-menu-search {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.commands-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    font-size: 14px;
+}
+
+.commands-menu-body {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.commands-menu-scroll-container {
+    height: 100%;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.commands-category {
+    margin-bottom: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.commands-category-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s;
+}
+
+.commands-category-header:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.commands-category-icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.commands-category-name {
+    flex: 1;
+    font-weight: bold;
+}
+
+.commands-category-toggle {
+    font-size: 12px;
+}
+
+.commands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.command-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.command-icon {
+    margin-right: 10px;
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-name {
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.command-description {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.no-commands-results {
+    padding: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+/* Styly pro 3D režim */
+.map-3d-mode {
+    position: relative;
+}
+
+/* Styly pro glóbus */
+.map-globe-mode {
+    position: relative;
+}
+
+.map-globe-mode #map {
+    background-color: #000;
+}
+
+/* Kontejner pro jednoduchý glóbus */
+.simple-globe-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    z-index: 10;
+    display: none;
+    background: radial-gradient(ellipse at center, #0d1423 0%, #090a0f 100%);
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+    user-select: none;
+}
+
+/* Obrázek glóbusu */
+.globe-image {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Earthmap1000x500.jpg/1024px-Earthmap1000x500.jpg');
+    background-size: cover;
+    background-repeat: repeat-x;
+    background-position: 0 center;
+    transition: transform 0.3s ease;
+    transform-origin: center center;
+}
+
+/* Překryvná vrstva pro body */
+.globe-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+    transform-origin: center center;
+}
+
+/* Body na glóbusu */
+.globe-point {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin-left: -16px;
+    margin-top: -16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 20;
+}
+
+.globe-point:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.9);
+}
+
+/* Trasy mezi body */
+.globe-arc {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.7) 0%, rgba(139, 92, 246, 0.3) 100%);
+    transform-origin: left center;
+    pointer-events: none;
+    z-index: 15;
+}
+
+/* Popup okno s informacemi o bodu */
+.globe-popup {
+    position: absolute;
+    width: 250px;
+    background: rgba(30, 41, 59, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    color: white;
+    z-index: 25;
+    pointer-events: auto;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+}
+
+.globe-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: rgba(139, 92, 246, 0.8);
+}
+
+.globe-popup-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.globe-popup-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+}
+
+.globe-popup-content {
+    padding: 15px;
+    font-size: 14px;
+}
+
+.globe-popup-content p {
+    margin: 5px 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Styly pro zobrazení jednoduchého glóbusu */
+.map-globe-mode .simple-globe-container {
+    display: block;
+    z-index: 1000;
+    background: radial-gradient(circle at center, #111 0%, #000 100%);
+}
+
+.map-globe-mode .leaflet-container {
+    display: none !important;
+}
+
+/* Styly pro glóbus markery */
+.globe-marker {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    margin-top: -12px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1001;
+}
+
+.globe-marker:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.globe-marker-label {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1002;
+}
+
+.globe-marker:hover + .globe-marker-label {
+    opacity: 1;
+}
+
+/* Styly pro glóbus trasy */
+.globe-route {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Cesium kontejner (ponecháno pro zpětnou kompatibilitu) */
+.cesium-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    z-index: 10;
+    display: none;
+    background-color: #000000;
+}
+
+.cesium-viewer-bottom,
+.cesium-viewer-timelineContainer,
+.cesium-viewer-animationContainer,
+.cesium-viewer-fullscreenContainer,
+.cesium-viewer-toolbar,
+.cesium-viewer-geocoderContainer {
+    display: none !important;
+}
+
+.cesium-viewer-cesiumWidgetContainer {
+    width: 100%;
+    height: 100%;
+}
+
+.cesium-viewer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+}
+
+.cesium-widget {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.cesium-viewer canvas {
+    display: block;
+}
+
+.cesium-widget canvas {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    display: block;
+}
+
+.cesium-widget-credits {
+    display: none !important;
+}
+
+/* Styly pro lepší zobrazení glóbusu */
+.map-globe-mode .cesium-container {
+    display: none; /* Změněno z block na none, protože používáme Three.js */
+    z-index: 1000;
+}
+
+/* Styly pro Cesium entity */
+.cesium-entity-label {
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    text-shadow: 0 0 2px #000;
+}
+
+.cesium-billboard-image {
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+}
+
+.map-globe-mode .map-globe-controls {
+    z-index: 1000;
+}
+
+.map-3d-mode .leaflet-control-container {
+    z-index: 1000;
+}
+
+.map-3d-mode .osmb-viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+.map-3d-mode .osmb-attribution {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 2px 5px;
+    font-size: 10px;
+    border-radius: 3px;
+}
+
+/* Styly pro tlačítko glóbus režimu */
+#toggleGlobeMode {
+    top: 60px; /* Pozice pod fullscreen tlačítkem */
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+#toggleGlobeMode:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#toggleGlobeMode.active {
+    background-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+/* Styly pro tlačítko návratu z glóbus režimu */
+#exitGlobeMode {
+    top: 60px; /* Pozice pod fullscreen tlačítkem */
+    right: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+    z-index: 1500; /* Vyšší z-index než mapa (1000) */
+    position: absolute; /* Explicitní nastavení pozice */
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    border: 2px solid white; /* Výraznější okraj pro lepší viditelnost */
+}
+
+#exitGlobeMode:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.map-3d-controls, .map-globe-controls {
+    position: absolute;
+    top: 70px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.map-3d-control-btn, .map-globe-control-btn {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    margin: 5px;
+}
+
+.map-3d-control-btn:hover, .map-globe-control-btn:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+body[data-theme="dark"] .map-3d-control-btn,
+body[data-theme="dark"] .map-globe-control-btn {
+    background-color: rgba(45, 55, 72, 0.9);
+    color: white;
+    border-color: rgba(74, 85, 104, 0.5);
+}
+
+body[data-theme="dark"] .map-3d-control-btn:hover,
+body[data-theme="dark"] .map-globe-control-btn:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+}
+
+/* Responzivní úpravy pro různé velikosti obrazovky */
+@media (max-width: 480px) {
+    .club-popup {
+        max-width: 280px !important;
+        width: 280px !important;
+    }
+
+    .club-popup .leaflet-popup-content-wrapper {
+        width: 280px !important;
+        max-width: 280px !important;
+    }
+
+    .club-popup .leaflet-popup-content {
+        width: 260px !important;
+        max-width: 260px !important;
+    }
+
+    .club-popup .club-image-container {
+        max-height: 120px;
+    }
+
+    .club-popup .popup-title {
+        font-size: 1rem;
+    }
+
+    .club-popup .place-info p {
+        font-size: 0.85rem;
+        margin: 4px 0;
+    }
+
+    /* Optimalizace pro mobilní zařízení v fullscreen režimu */
+    .map-fullscreen .coordinates-display {
+        bottom: 10px;
+        left: 10px;
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .map-fullscreen .map-control-btn {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Optimalizace pro tlačítko návratu z glóbus režimu na malých obrazovkách */
+    #exitGlobeMode {
+        top: 60px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        border-width: 2px;
+        z-index: 2000; /* Ještě vyšší z-index pro malé obrazovky */
+    }
+}
+
+/* Leaflet Routing Machine přizpůsobení */
+.leaflet-routing-container {
+    display: none !important; /* Skrytí postraního panelu s instrukcemi */
+}
+
+.leaflet-routing-alt,
+.leaflet-routing-geocoders,
+.leaflet-routing-error {
+    display: none !important;
+}
+
+.leaflet-routing-container-hide {
+    display: none !important;
+}
+
+/* Optimalizace trasy při zoomování */
+.leaflet-routing-layer {
+    will-change: transform;
+    transform-origin: center center;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    transition: none !important;
+}
+
+/* Optimalizace pro vykreslované trasy */
+.leaflet-overlay-pane {
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Stabilizace trasy při zoomování */
+.leaflet-overlay-pane svg,
+.leaflet-overlay-pane path {
+    pointer-events: none;
+    transition: none !important;
+    vector-effect: non-scaling-stroke;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+
+    #map {
+        height: 650px; /* Větší výška na mobilních zařízeních, ale stále menší než na desktopu */
+    }
+
+    .controls {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    .color-options {
+        flex-wrap: wrap;
+    }
+}

@@ -1,0 +1,326 @@
+/**
+ * Styly pro modul zpětné vazby a dotazník
+ * Verze 0.2.8.7.4
+ */
+
+/* Překrytí pro dotazník */
+.feedback-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(3px);
+}
+
+.feedback-overlay.show {
+    opacity: 1;
+}
+
+/* Modální okno s dotazníkem */
+.feedback-survey {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 600px;
+    background-color: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    z-index: 2001;
+    opacity: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.feedback-survey.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.feedback-survey.minimized {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.5;
+    filter: blur(2px);
+}
+
+/* Hlavička dotazníku */
+.feedback-header {
+    background: linear-gradient(135deg, var(--primary-color, #8B5CF6) 0%, var(--primary-color-dark, #6D28D9) 100%);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.feedback-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.feedback-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.feedback-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Obsah dotazníku */
+.feedback-content {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.feedback-content p {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--text-color, #333);
+}
+
+/* Otázky v dotazníku */
+.feedback-question {
+    margin-bottom: 20px;
+}
+
+.feedback-question label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color, #333);
+}
+
+.feedback-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.feedback-options label {
+    display: flex;
+    align-items: center;
+    font-weight: normal;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.feedback-options input[type="radio"],
+.feedback-options input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Hodnocení */
+.feedback-rating {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.feedback-rating label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.rating-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted, #666);
+}
+
+/* Textové pole */
+.feedback-question textarea,
+#declineComment {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 5px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    background-color: var(--input-bg, #f5f5f5);
+    color: var(--text-color, #333);
+}
+
+/* Tlačítka */
+.feedback-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.feedback-submit,
+.feedback-skip,
+.feedback-close-final,
+.decline-submit,
+.decline-cancel {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.feedback-submit,
+.decline-submit,
+.feedback-close-final {
+    background-color: var(--primary-color, #8B5CF6);
+    color: white;
+    border: none;
+}
+
+.feedback-submit:hover,
+.decline-submit:hover,
+.feedback-close-final:hover {
+    background-color: var(--primary-color-dark, #6D28D9);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.feedback-skip,
+.decline-cancel {
+    background-color: transparent;
+    color: var(--text-color, #333);
+    border: 1px solid var(--border-color, #ddd);
+}
+
+.feedback-skip:hover,
+.decline-cancel:hover {
+    background-color: var(--hover-bg, #f0f0f0);
+    transform: translateY(-2px);
+}
+
+/* Dialog pro odmítnutí dotazníku */
+.decline-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 500px;
+    background-color: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    z-index: 2002;
+    opacity: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.decline-dialog.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.decline-header {
+    background-color: var(--warning-color, #f59e0b);
+    padding: 15px 20px;
+    color: white;
+}
+
+.decline-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.decline-content {
+    padding: 20px;
+}
+
+.decline-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.decline-options label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.decline-options input[type="radio"] {
+    margin-right: 8px;
+}
+
+#declineComment {
+    margin-bottom: 15px;
+}
+
+.decline-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Poděkování */
+.thank-you {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.thank-you p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+    .feedback-survey {
+        width: 95%;
+        max-height: 80vh;
+    }
+    
+    .feedback-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .feedback-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .feedback-submit,
+    .feedback-skip {
+        width: 100%;
+    }
+    
+    .decline-dialog {
+        width: 95%;
+    }
+    
+    .decline-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .decline-submit,
+    .decline-cancel {
+        width: 100%;
+    }
+}
