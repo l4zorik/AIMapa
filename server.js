@@ -83,6 +83,11 @@ const auth0Config = {
   issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
   routes: {
     callback: '/callback'
+  },
+  authorizationParams: {
+    response_type: 'code',
+    redirect_uri: process.env.AUTH0_CALLBACK_URL || 'https://www.quicksoft.fun/callback',
+    scope: process.env.AUTH0_SCOPE || 'openid profile email'
   }
 };
 
