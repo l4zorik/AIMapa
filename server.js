@@ -123,9 +123,6 @@ app.get('/metrics', async (req, res) => {
 app.get('/auth/config', (_req, res) => {
     // Určení správné URL pro přesměrování na základě prostředí
     let callbackUrl = process.env.AUTH0_CALLBACK_URL || '';
-    if (callbackUrl.includes(',')) {
-        callbackUrl = callbackUrl.split(',')[0];
-    }
     res.json({
         domain: process.env.AUTH0_DOMAIN,
         clientId: process.env.AUTH0_CLIENT_ID,
