@@ -178,6 +178,14 @@ async function testAuth0Config() {
         }
 
         console.log(`${colors.green}✓${colors.reset} server.js obsahuje správnou konfiguraci Auth0`);
+
+        // Kontrola, zda server.js obsahuje explicitní nastavení redirect_uri
+        if (!serverJs.includes('authorizationParams') || !serverJs.includes('redirect_uri')) {
+            console.log(`${colors.red}✗${colors.reset} server.js neobsahuje explicitní nastavení redirect_uri`);
+            return false;
+        }
+
+        console.log(`${colors.green}✓${colors.reset} server.js obsahuje explicitní nastavení redirect_uri`);
     } catch (error) {
         console.log(`${colors.red}✗${colors.reset} Chyba při kontrole server.js: ${error.message}`);
         return false;
