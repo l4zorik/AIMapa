@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMapa</title>
+
+    <!-- Leaflet dependencies -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <!-- Auth0 Lock -->
+    <script src="https://cdn.auth0.com/js/lock/12.0/lock.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        #app {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #user-menu {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #auth-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #login-status {
+            margin-right: 10px;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #f0f0f0;
+        }
+
+        #main-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- User menu container -->
+        <div id="user-menu">
+            <div id="auth-status">
+                <span id="login-status">Kontrola přihlášení...</span>
+                <button id="login-btn" class="button" style="display:none;">Přihlásit se</button>
+                <button id="logout-btn" class="button" style="display:none;">Odhlásit se</button>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main id="main-content">
+            <!-- Content will be dynamically inserted here -->
+            <h1>AI Mapa</h1>
+            <p>Vítejte v aplikaci AI Mapa!</p>
+
+            <!-- Map container -->
+            <div id="map"></div>
+        </main>
+    </div>
+
+    <script>
+        // Inicializace mapy
+        function initMap() {
+            const map = L.map('map').setView([50.0755, 14.4378], 13); // Praha
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
+
+        // Inicializace aplikace
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializace mapy
+            initMap();
+
+            // Kontrola, zda je Auth0 Lock načtený
+            if (typeof Auth0Lock !== 'function') {
+                console.error('Auth0 Lock není načtený');
+                document.getElementById('login-status').textContent = 'Chyba: Auth0 Lock není dostupný';
+                return;
+            }
+
+            // Inicializace Auth0 Lock
+            const lock = new Auth0Lock(
+                'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ',
+                'dev-zxj8pir0moo4pdk7.us.auth0.com',
+                {
+                    auth: {
+                        redirectUrl: window.location.origin,
+                        responseType: 'token id_token',
+                        params: {
+                            scope: 'openid profile email'
+                        }
+                    },
+                    theme: {
+                        logo: 'https://www.quicksoft.fun/favicon.ico',
+                        primaryColor: '#3498db'
+                    },
+                    language: 'cs',
+                    closable: true,
+                    autoclose: true
+                }
+            );
+
+            // Posluchač události pro přihlášení
+            lock.on('authenticated', function(authResult) {
+                console.log('Uživatel byl úspěšně přihlášen');
+
+                // Uložení tokenu do localStorage
+                localStorage.setItem('id_token', authResult.idToken);
+                localStorage.setItem('access_token', authResult.accessToken);
+                localStorage.setItem('expires_at', JSON.stringify(
+                    authResult.expiresIn * 1000 + new Date().getTime()
+                ));
+
+                // Získání informací o uživateli
+                lock.getUserInfo(authResult.accessToken, function(error, profile) {
+                    if (error) {
+                        console.error('Chyba při získávání informací o uživateli:', error);
+                        return;
+                    }
+
+                    // Uložení profilu do localStorage
+                    localStorage.setItem('user_profile', JSON.stringify(profile));
+
+                    // Aktualizace UI
+                    updateUI();
+                });
+            });
+
+            // Posluchač události pro chybu při přihlašování
+            lock.on('authorization_error', function(error) {
+                console.error('Chyba při přihlašování:', error);
+                document.getElementById('login-status').textContent = 'Chyba při přihlašování: ' + error.description;
+            });
+
+            // Přidání posluchačů událostí
+            document.getElementById('login-btn').addEventListener('click', function() {
+                lock.show();
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                // Odstranění tokenů z localStorage
+                localStorage.removeItem('id_token');
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('expires_at');
+                localStorage.removeItem('user_profile');
+
+                // Přesměrování na Auth0 odhlašovací stránku
+                window.location.href = `https://dev-zxj8pir0moo4pdk7.us.auth0.com/v2/logout?client_id=H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ&returnTo=${encodeURIComponent(window.location.origin)}`;
+            });
+
+            // Aktualizace UI podle stavu přihlášení
+            updateUI();
+        });
+
+        // Aktualizace UI podle stavu přihlášení
+        function updateUI() {
+            const loginStatus = document.getElementById('login-status');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // Kontrola, zda je uživatel přihlášen
+            const isAuthenticated = isUserAuthenticated();
+
+            if (isAuthenticated) {
+                // Získání profilu uživatele
+                const profile = JSON.parse(localStorage.getItem('user_profile') || '{}');
+
+                loginStatus.textContent = `Přihlášen jako: ${profile.name || profile.email || 'Uživatel'}`;
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+            } else {
+                loginStatus.textContent = 'Nepřihlášen';
+                loginBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        // Kontrola, zda je uživatel přihlášen
+        function isUserAuthenticated() {
+            // Kontrola, zda máme token a zda nevypršel
+            const expiresAt = JSON.parse(localStorage.getItem('expires_at') || '0');
+            return new Date().getTime() < expiresAt;
+        }
+    </script>
+</body>
+</html>

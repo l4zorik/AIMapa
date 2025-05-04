@@ -27,9 +27,9 @@ class Auth0Service {
         audience: config.audience || process.env.AUTH0_AUDIENCE
       },
       routes: {
-        login: config.loginRoute !== false,
-        logout: config.logoutRoute !== false,
-        callback: config.callbackRoute !== false
+        login: config.routes && config.routes.login !== undefined ? config.routes.login : '/login',
+        logout: config.routes && config.routes.logout !== undefined ? config.routes.logout : '/logout',
+        callback: config.routes && config.routes.callback !== undefined ? config.routes.callback : '/callback'
       },
       idpLogout: config.idpLogout !== false
     };
