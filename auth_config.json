@@ -25,6 +25,8 @@
       "permissions": ["read:public"]
     }
   },
-  "callbackUrl": "http://localhost:3000/callback",
-  "postLogoutRedirectUri": "http://localhost:3000"
+  "callbackUrl": "https://www.quicksoft.fun/callback",
+  "postLogoutRedirectUri": "https://www.quicksoft.fun",
+  "developmentCallbackUrl": "http://localhost:3000/callback",
+  "developmentPostLogoutRedirectUri": "http://localhost:3000"
 }
