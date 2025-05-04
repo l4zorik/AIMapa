@@ -13,6 +13,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:fastify\" \"npm run dev:client\"",
     "build": "cross-env NODE_ENV=production webpack",
     "build:dev": "webpack",
+    "build:netlify": "cross-env NODE_ENV=production webpack && node scripts/copy-assets.js",
     "test": "node tests/run-tests.js",
     "test:unit": "node -e \"const MapUtilsTest = require('./tests/unit/map-utils.test'); const results = MapUtilsTest.runAllTests(); console.log(JSON.stringify(results, null, 2));\"",
     "test:integration": "node -e \"const MapApiTest = require('./tests/integration/map-api.test'); MapApiTest.runAllTests().then(results => console.log(JSON.stringify(results, null, 2)));\"",
