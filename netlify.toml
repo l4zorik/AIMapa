@@ -40,7 +40,7 @@
 
 [[redirects]]
   from = "/*"
-  to = "/index-simple.html"
+  to = "/index-new.html"
   status = 200
 
 [[headers]]
