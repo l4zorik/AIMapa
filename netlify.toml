@@ -3,7 +3,7 @@
   publish = "public/dist"
 
 [[redirects]]
-  from = "/auth/callback"
+  from = "/callback"
   to = "/index.html"
   status = 200
 

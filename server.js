@@ -71,8 +71,23 @@ const auth0Service = new Auth0Service({
     idpLogout: true
 });
 
-// Auth0 middleware
-app.use(auth0Service.getMiddleware());
+// Auth0 konfigurace podle doporučení Auth0 dashboardu
+const { auth } = require('express-openid-connect');
+
+const auth0Config = {
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.AUTH0_SECRET || 'a long, randomly-generated string stored in env',
+  baseURL: process.env.BASE_URL || 'https://www.quicksoft.fun',
+  clientID: process.env.AUTH0_CLIENT_ID,
+  issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
+  routes: {
+    callback: '/callback'
+  }
+};
+
+// Auth0 middleware - přímá konfigurace podle doporučení Auth0
+app.use(auth(auth0Config));
 
 // Auth0 routes - pouze na /auth cestě pro lepší organizaci
 app.use('/auth', createAuth0Routes(auth0Service));
