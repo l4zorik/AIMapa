@@ -39,7 +39,17 @@ function main() {
   const distDir = path.join(publicDir, 'dist');
 
   // Kopírování HTML souborů
-  const htmlFiles = ['index.html', 'chat.html', 'profile.html'];
+  const htmlFiles = [
+    'index.html',
+    'chat.html',
+    'profile.html',
+    'callback.html',
+    'login.html',
+    'logout.html',
+    'user-profile.html',
+    'env-config.js'
+  ];
+
   htmlFiles.forEach(file => {
     const sourcePath = path.join(publicDir, file);
     const destPath = path.join(distDir, file);
@@ -57,7 +67,8 @@ function main() {
     'app',
     'styles',
     'images',
-    'components'
+    'components',
+    'js'
   ];
 
   // Kopírování adresářů
