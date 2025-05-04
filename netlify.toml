@@ -17,4 +17,4 @@
   [headers.values]
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
-    Content-Security-Policy = "default-src 'self' https://*.auth0.com https://*.supabase.co; script-src 'self' 'unsafe-inline' https://*.auth0.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.auth0.com; connect-src 'self' https://*.auth0.com https://*.supabase.co;"
+    Content-Security-Policy = "default-src 'self' https://*.auth0.com https://*.supabase.co; script-src 'self' 'unsafe-inline' https://*.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.auth0.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz;"

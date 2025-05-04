@@ -5,8 +5,9 @@
 2. [Typy URL v Auth0](#typy-url-v-auth0)
 3. [Časté chyby s Callback URL](#časté-chyby-s-callback-url)
 4. [Řešení problémů](#řešení-problémů)
-5. [Automatická oprava](#automatická-oprava)
-6. [Příklady konfigurace](#příklady-konfigurace)
+5. [Problémy s Content Security Policy (CSP)](#problémy-s-content-security-policy-csp)
+6. [Automatická oprava](#automatická-oprava)
+7. [Příklady konfigurace](#příklady-konfigurace)
 
 ## Úvod
 
@@ -141,6 +142,70 @@ Pokud používáte Netlify, ujistěte se, že máte správně nakonfigurované p
   status = 200
 ```
 
+## Problémy s Content Security Policy (CSP)
+
+Content Security Policy (CSP) je bezpečnostní mechanismus, který pomáhá předcházet útokům typu Cross-Site Scripting (XSS) a dalším útokům na webové stránky. CSP definuje, které zdroje obsahu (skripty, styly, obrázky atd.) může prohlížeč načíst.
+
+### Časté chyby s CSP
+
+#### 1. Blokování externích skriptů
+
+```
+Refused to load the script 'https://cdn.jsdelivr.net/npm/chart.js' because it violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' https://*.auth0.com".
+```
+
+**Příčina**: CSP povoluje načítání skriptů pouze z domén uvedených v direktivě `script-src`.
+
+**Řešení**: Přidat doménu do direktivy `script-src` v hlavičce CSP.
+
+#### 2. Blokování API volání
+
+```
+Refused to connect to 'https://api.example.com' because it violates the following Content Security Policy directive: "connect-src 'self' https://*.auth0.com".
+```
+
+**Příčina**: CSP povoluje připojení pouze k doménám uvedeným v direktivě `connect-src`.
+
+**Řešení**: Přidat doménu do direktivy `connect-src` v hlavičce CSP.
+
+### Řešení problémů s CSP v Netlify
+
+V souboru `netlify.toml` je CSP definována v sekci `[[headers]]`. Zde je příklad správné konfigurace CSP, která povoluje načítání obsahu z Auth0, Supabase a dalších běžně používaných zdrojů:
+
+```toml
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Content-Security-Policy = "default-src 'self' https://*.auth0.com https://*.supabase.co; script-src 'self' 'unsafe-inline' https://*.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.auth0.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz;"
+```
+
+### Běžné zdroje, které je potřeba povolit
+
+- **Auth0**: `https://*.auth0.com`
+- **Supabase**: `https://*.supabase.co`
+- **CDN pro knihovny**: `https://cdn.jsdelivr.net`, `https://unpkg.com`
+- **Mapové API**: `https://api.mapy.cz`, `https://api.openrouteservice.org`
+- **Google služby**: `https://*.googleapis.com`, `https://*.gstatic.com`
+
+### Testování CSP
+
+Pro testování CSP můžete použít nástroj [CSP Evaluator](https://csp-evaluator.withgoogle.com/) od Google, který vám pomůže identifikovat potenciální bezpečnostní problémy ve vaší CSP konfiguraci.
+
+### Dočasné vypnutí CSP pro vývoj
+
+Během vývoje můžete CSP dočasně vypnout nebo zmírnit, abyste mohli snáze identifikovat problémy:
+
+```toml
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';"
+```
+
+**VAROVÁNÍ**: Toto nastavení je velmi permisivní a mělo by být použito pouze pro vývoj, nikdy ne v produkčním prostředí!
+
 ## Automatická oprava
 
 Zde je skript, který můžete použít pro automatickou opravu problémů s callback URL:
@@ -152,41 +217,41 @@ Zde je skript, který můžete použít pro automatickou opravu problémů s cal
 function fixAuth0CallbackIssues() {
   // Získání aktuální konfigurace
   const auth0Config = getAuth0Config();
-  
+
   // Kontrola, zda je explicitně nastavena redirect_uri
   if (!auth0Config.authorizationParams || !auth0Config.authorizationParams.redirect_uri) {
     console.log('Chybí explicitní nastavení redirect_uri, přidávám...');
-    
+
     // Přidání authorizationParams, pokud neexistuje
     if (!auth0Config.authorizationParams) {
       auth0Config.authorizationParams = {};
     }
-    
+
     // Nastavení redirect_uri
-    auth0Config.authorizationParams.redirect_uri = process.env.AUTH0_CALLBACK_URL || 
+    auth0Config.authorizationParams.redirect_uri = process.env.AUTH0_CALLBACK_URL ||
       `${process.env.BASE_URL}/callback`;
-      
+
     console.log(`Nastavena redirect_uri: ${auth0Config.authorizationParams.redirect_uri}`);
   }
-  
+
   // Kontrola, zda je správně nastavena cesta pro callback
   if (!auth0Config.routes || !auth0Config.routes.callback) {
     console.log('Chybí nastavení cesty pro callback, přidávám...');
-    
+
     // Přidání routes, pokud neexistuje
     if (!auth0Config.routes) {
       auth0Config.routes = {};
     }
-    
+
     // Nastavení callback cesty
     auth0Config.routes.callback = '/callback';
-    
+
     console.log(`Nastavena callback cesta: ${auth0Config.routes.callback}`);
   }
-  
+
   // Uložení aktualizované konfigurace
   saveAuth0Config(auth0Config);
-  
+
   console.log('Auth0 konfigurace byla úspěšně aktualizována');
 }
 ```
