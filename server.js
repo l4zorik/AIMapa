@@ -94,6 +94,22 @@ const auth0Config = {
 // Auth0 middleware - přímá konfigurace podle doporučení Auth0
 app.use(auth(auth0Config));
 
+// Import requiresAuth middleware
+const { requiresAuth } = require('express-openid-connect');
+
+// Endpoint pro zobrazení profilu uživatele
+app.get('/profile', requiresAuth(), (req, res) => {
+  res.send(JSON.stringify(req.oidc.user, null, 2));
+});
+
+// Endpoint pro kontrolu stavu přihlášení
+app.get('/auth/status', (req, res) => {
+  res.json({
+    isAuthenticated: req.oidc.isAuthenticated(),
+    user: req.oidc.isAuthenticated() ? req.oidc.user : null
+  });
+});
+
 // Auth0 routes - pouze na /auth cestě pro lepší organizaci
 app.use('/auth', createAuth0Routes(auth0Service));
 

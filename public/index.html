@@ -68,12 +68,51 @@
 <body>
     <div id="app">
         <!-- User menu container -->
-        <div id="user-menu"></div>
+        <div id="user-menu">
+            <div id="auth-status">
+                <span id="login-status">Kontrola přihlášení...</span>
+                <a href="/auth/login" id="login-btn" style="display:none;">Přihlásit se</a>
+                <a href="/profile" id="profile-btn" style="display:none;">Profil</a>
+                <a href="/auth/logout" id="logout-btn" style="display:none;">Odhlásit se</a>
+            </div>
+        </div>
 
         <!-- Main content -->
         <main id="main-content">
             <!-- Content will be dynamically inserted here -->
+            <h1>AI Mapa</h1>
+            <p>Vítejte v aplikaci AI Mapa!</p>
         </main>
     </div>
+
+    <script>
+        // Kontrola stavu přihlášení
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/auth/status')
+                .then(response => response.json())
+                .then(data => {
+                    const loginStatus = document.getElementById('login-status');
+                    const loginBtn = document.getElementById('login-btn');
+                    const profileBtn = document.getElementById('profile-btn');
+                    const logoutBtn = document.getElementById('logout-btn');
+
+                    if (data.isAuthenticated) {
+                        loginStatus.textContent = `Přihlášen jako: ${data.user.name || data.user.email || 'Uživatel'}`;
+                        loginBtn.style.display = 'none';
+                        profileBtn.style.display = 'inline-block';
+                        logoutBtn.style.display = 'inline-block';
+                    } else {
+                        loginStatus.textContent = 'Nepřihlášen';
+                        loginBtn.style.display = 'inline-block';
+                        profileBtn.style.display = 'none';
+                        logoutBtn.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Chyba při kontrole stavu přihlášení:', error);
+                    document.getElementById('login-status').textContent = 'Chyba při kontrole přihlášení';
+                });
+        });
+    </script>
 </body>
 </html>

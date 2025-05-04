@@ -33,11 +33,25 @@ function copyDirRecursive(src, dest) {
 // Hlavní funkce
 function main() {
   console.log('Kopíruji statické soubory do dist složky...');
-  
+
   const rootDir = path.resolve(__dirname, '..');
   const publicDir = path.join(rootDir, 'public');
   const distDir = path.join(publicDir, 'dist');
-  
+
+  // Kopírování HTML souborů
+  const htmlFiles = ['index.html', 'chat.html', 'profile.html'];
+  htmlFiles.forEach(file => {
+    const sourcePath = path.join(publicDir, file);
+    const destPath = path.join(distDir, file);
+
+    if (fs.existsSync(sourcePath)) {
+      fs.copyFileSync(sourcePath, destPath);
+      console.log(`Kopírován soubor: ${file}`);
+    } else {
+      console.log(`Soubor ${file} neexistuje, přeskakuji`);
+    }
+  });
+
   // Seznam adresářů, které chceme zkopírovat
   const dirsToCopy = [
     'app',
@@ -45,12 +59,12 @@ function main() {
     'images',
     'components'
   ];
-  
+
   // Kopírování adresářů
   for (const dir of dirsToCopy) {
     const srcDir = path.join(publicDir, dir);
     const destDir = path.join(distDir, dir);
-    
+
     if (fs.existsSync(srcDir)) {
       console.log(`Kopíruji adresář: ${dir}`);
       copyDirRecursive(srcDir, destDir);
@@ -58,7 +72,7 @@ function main() {
       console.log(`Adresář ${dir} neexistuje, přeskakuji`);
     }
   }
-  
+
   console.log('Kopírování statických souborů dokončeno');
 }
 

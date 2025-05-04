@@ -4214,3 +4214,58 @@ body[data-theme="dark"] .map-globe-control-btn:hover {
         flex-wrap: wrap;
     }
 }
+
+/* Styly pro přihlašovací menu */
+#user-menu {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+}
+
+#auth-status {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+}
+
+#login-status {
+    margin-right: auto;
+    font-size: 0.9rem;
+}
+
+#login-btn, #profile-btn, #logout-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+#login-btn:hover, #profile-btn:hover, #logout-btn:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#logout-btn {
+    background-color: #f44336;
+}
+
+#logout-btn:hover {
+    background-color: #d32f2f;
+}
+
+#profile-btn {
+    background-color: #2196F3;
+}
+
+#profile-btn:hover {
+    background-color: #1976D2;
+}
