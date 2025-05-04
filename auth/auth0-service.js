@@ -34,6 +34,13 @@ class Auth0Service {
       idpLogout: config.idpLogout !== false
     };
 
+    // Nastavení callback URL
+    if (process.env.AUTH0_CALLBACK_URL) {
+      this.config.routes.callback = {
+        path: '/auth/callback'
+      };
+    }
+
     // Vytvoření Auth0 middleware
     this.middleware = auth(this.config);
 

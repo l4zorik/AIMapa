@@ -1,7 +1,7 @@
 /**
  * Auth0 Routes
  * Verze 0.3.8.7
- * 
+ *
  * Express routy pro Auth0 autentizaci
  */
 
@@ -14,7 +14,7 @@ const express = require('express');
  */
 function createAuth0Routes(auth0Service) {
   const router = express.Router();
-  
+
   /**
    * Endpoint pro přihlášení
    * Přesměruje na Auth0 přihlašovací stránku
@@ -23,7 +23,7 @@ function createAuth0Routes(auth0Service) {
     try {
       // Získání returnTo parametru z query
       const returnTo = req.query.returnTo || '/';
-      
+
       // V development módu bez Auth0 konfigurace zobrazíme testovací přihlašovací stránku
       if (process.env.NODE_ENV === 'development' && !process.env.AUTH0_CLIENT_SECRET) {
         res.send(`
@@ -44,7 +44,7 @@ function createAuth0Routes(auth0Service) {
               <div class="container">
                 <h1>Testovací přihlášení</h1>
                 <p>Toto je testovací přihlašovací stránka pro vývojové prostředí.</p>
-                
+
                 <form action="/callback" method="GET">
                   <div class="form-group">
                     <label for="email">Email:</label>
@@ -57,7 +57,7 @@ function createAuth0Routes(auth0Service) {
                   <input type="hidden" name="returnTo" value="${returnTo}">
                   <button type="submit">Přihlásit se</button>
                 </form>
-                
+
                 <div class="note">
                   <p><strong>Poznámka:</strong> Toto je pouze pro testování. V produkčním prostředí by se použil skutečný Auth0 login.</p>
                   <p>Pro nastavení skutečného Auth0 přihlášení je potřeba:</p>
@@ -85,8 +85,8 @@ function createAuth0Routes(auth0Service) {
           }
         } catch (error) {
           console.error('Chyba při přihlašování:', error);
-          res.status(500).json({ 
-            error: 'Chyba při přihlašování', 
+          res.status(500).json({
+            error: 'Chyba při přihlašování',
             message: error.message,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
           });
@@ -94,14 +94,14 @@ function createAuth0Routes(auth0Service) {
       }
     } catch (error) {
       console.error('Chyba v /login endpointu:', error);
-      res.status(500).json({ 
-        error: 'Internal Server Error', 
+      res.status(500).json({
+        error: 'Internal Server Error',
         message: 'Chyba při zpracování přihlášení',
         details: error.message
       });
     }
   });
-  
+
   /**
    * Endpoint pro odhlášení
    * Odhlásí uživatele a přesměruje na domovskou stránku
@@ -110,7 +110,7 @@ function createAuth0Routes(auth0Service) {
     try {
       // Získání returnTo parametru z query
       const returnTo = req.query.returnTo || '/';
-      
+
       // V development módu bez Auth0 konfigurace pouze přesměrujeme na hlavní stránku
       if (process.env.NODE_ENV === 'development' && !process.env.AUTH0_CLIENT_SECRET) {
         res.send(`
@@ -146,8 +146,8 @@ function createAuth0Routes(auth0Service) {
           }
         } catch (error) {
           console.error('Chyba při odhlašování:', error);
-          res.status(500).json({ 
-            error: 'Chyba při odhlašování', 
+          res.status(500).json({
+            error: 'Chyba při odhlašování',
             message: error.message,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
           });
@@ -155,14 +155,14 @@ function createAuth0Routes(auth0Service) {
       }
     } catch (error) {
       console.error('Chyba v /logout endpointu:', error);
-      res.status(500).json({ 
-        error: 'Internal Server Error', 
+      res.status(500).json({
+        error: 'Internal Server Error',
         message: 'Chyba při zpracování odhlášení',
         details: error.message
       });
     }
   });
-  
+
   /**
    * Endpoint pro callback
    * Zpracovává odpověď z Auth0 po přihlášení
@@ -171,7 +171,7 @@ function createAuth0Routes(auth0Service) {
     try {
       // Získání returnTo parametru
       let returnTo = '/';
-      
+
       // Pokus o získání returnTo z state parametru
       if (req.query.state) {
         try {
@@ -183,30 +183,37 @@ function createAuth0Routes(auth0Service) {
           console.error('Chyba při parsování state parametru:', e);
         }
       }
-      
+
       // V development módu bez Auth0 konfigurace simulujeme úspěšné přihlášení
       if (process.env.NODE_ENV === 'development' && !process.env.AUTH0_CLIENT_SECRET) {
         // Simulace přihlášení - v reálné aplikaci by zde byl kód pro zpracování Auth0 odpovědi
         console.log('Simulace úspěšného přihlášení v development módu');
-        
+
         // Přesměrování na returnTo URL nebo domovskou stránku
         res.redirect(returnTo || '/');
       } else {
         // V produkčním prostředí by tento endpoint byl zpracován Auth0 middlewarem
         // Pokud se dostaneme sem, znamená to, že middleware nezpracoval callback
-        console.warn('Auth0 middleware nezpracoval callback - přesměrování na domovskou stránku');
+        console.log('Auth0 callback zpracován - přesměrování na:', returnTo || '/');
+
+        // Logování informací o požadavku pro diagnostiku
+        console.log('Callback URL:', req.originalUrl);
+        console.log('Query parametry:', req.query);
+        console.log('Auth0 stav:', req.oidc ? 'Dostupný' : 'Nedostupný');
+
+        // Přesměrování na returnTo URL nebo domovskou stránku
         res.redirect(returnTo || '/');
       }
     } catch (error) {
       console.error('Chyba v /callback endpointu:', error);
-      res.status(500).json({ 
-        error: 'Internal Server Error', 
+      res.status(500).json({
+        error: 'Internal Server Error',
         message: 'Chyba při zpracování callback',
         details: error.message
       });
     }
   });
-  
+
   /**
    * Endpoint pro získání stavu autentizace
    * Vrací informace o přihlášeném uživateli
@@ -223,14 +230,14 @@ function createAuth0Routes(auth0Service) {
       });
     } catch (error) {
       console.error('Chyba v /auth/status endpointu:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: 'Chyba při získávání Auth0 statusu',
         message: error.message,
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       });
     }
   });
-  
+
   /**
    * Endpoint pro diagnostiku Auth0
    * Vrací detailní informace o Auth0 konfiguraci a stavu
@@ -238,7 +245,7 @@ function createAuth0Routes(auth0Service) {
   router.get('/debug', (req, res) => {
     try {
       const diagnostics = auth0Service.getDiagnostics(req);
-      
+
       // Přidání informací o uživateli, pokud je přihlášen
       if (auth0Service.isAuthenticated(req)) {
         diagnostics.user = {
@@ -248,7 +255,7 @@ function createAuth0Routes(auth0Service) {
           // Neukládáme citlivé údaje
         };
       }
-      
+
       res.json(diagnostics);
     } catch (error) {
       console.error('Chyba v /auth/debug endpointu:', error);
@@ -259,7 +266,7 @@ function createAuth0Routes(auth0Service) {
       });
     }
   });
-  
+
   return router;
 }
 

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth0 Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .success {
+            color: #388e3c;
+            background-color: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Auth0 Test</h1>
+        <p>Tato stránka slouží k testování Auth0 konfigurace.</p>
+        
+        <div class="card">
+            <h2>Aktuální konfigurace</h2>
+            <div id="config-info">Načítání...</div>
+        </div>
+        
+        <div class="card">
+            <h2>Stav přihlášení</h2>
+            <div id="auth-status">Načítání...</div>
+            <div id="auth-buttons" style="margin-top: 20px;">
+                <button id="login-button">Přihlásit se</button>
+                <button id="logout-button">Odhlásit se</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Diagnostika</h2>
+            <div id="diagnostics">Načítání...</div>
+        </div>
+    </div>
+    
+    <script>
+        // Funkce pro zobrazení chyby
+        function showError(message, elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="error">${message}</div>`;
+        }
+        
+        // Funkce pro zobrazení úspěchu
+        function showSuccess(message, elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="success">${message}</div>`;
+        }
+        
+        // Funkce pro zobrazení objektu v HTML
+        function displayObject(obj, elementId) {
+            const element = document.getElementById(elementId);
+            
+            if (!obj || Object.keys(obj).length === 0) {
+                element.innerHTML = '<p>Žádná data k zobrazení</p>';
+                return;
+            }
+            
+            let html = '<table>';
+            html += '<tr><th>Klíč</th><th>Hodnota</th></tr>';
+            
+            for (const [key, value] of Object.entries(obj)) {
+                let displayValue = value;
+                
+                if (typeof value === 'object' && value !== null) {
+                    displayValue = JSON.stringify(value);
+                }
+                
+                html += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
+            }
+            
+            html += '</table>';
+            element.innerHTML = html;
+        }
+        
+        // Načtení Auth0 konfigurace
+        async function loadAuth0Config() {
+            try {
+                const response = await fetch('/auth/config');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                displayObject(config, 'config-info');
+                
+                return config;
+            } catch (error) {
+                showError(`Chyba při načítání Auth0 konfigurace: ${error.message}`, 'config-info');
+                console.error('Chyba při načítání Auth0 konfigurace:', error);
+            }
+        }
+        
+        // Kontrola stavu přihlášení
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/auth/status');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const status = await response.json();
+                
+                if (status.isAuthenticated) {
+                    showSuccess('Uživatel je přihlášen', 'auth-status');
+                    displayObject(status.user, 'auth-status');
+                } else {
+                    document.getElementById('auth-status').innerHTML = '<p>Uživatel není přihlášen</p>';
+                }
+                
+                return status;
+            } catch (error) {
+                showError(`Chyba při kontrole stavu přihlášení: ${error.message}`, 'auth-status');
+                console.error('Chyba při kontrole stavu přihlášení:', error);
+            }
+        }
+        
+        // Načtení diagnostiky
+        async function loadDiagnostics() {
+            try {
+                const response = await fetch('/auth/debug');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const diagnostics = await response.json();
+                displayObject(diagnostics, 'diagnostics');
+                
+                return diagnostics;
+            } catch (error) {
+                showError(`Chyba při načítání diagnostiky: ${error.message}`, 'diagnostics');
+                console.error('Chyba při načítání diagnostiky:', error);
+            }
+        }
+        
+        // Přihlášení uživatele
+        function login() {
+            window.location.href = '/auth/login';
+        }
+        
+        // Odhlášení uživatele
+        function logout() {
+            window.location.href = '/auth/logout';
+        }
+        
+        // Inicializace stránky
+        async function init() {
+            // Načtení dat
+            await loadAuth0Config();
+            await checkAuthStatus();
+            await loadDiagnostics();
+            
+            // Přidání event listenerů
+            document.getElementById('login-button').addEventListener('click', login);
+            document.getElementById('logout-button').addEventListener('click', logout);
+        }
+        
+        // Spuštění inicializace po načtení stránky
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
