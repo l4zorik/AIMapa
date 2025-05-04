@@ -36,8 +36,11 @@ router.get('/test', (req, res) => {
 // Virtuální práce API
 router.use('/virtual-work', require('./virtual-work'));
 
+// Uživatelské API
+router.use('/user', require('./user'));
+
 // Uživatelský profil
-router.get('/profile', 
+router.get('/profile',
     requiresAuth(),
     async (req, res, next) => {
         try {

@@ -1,6 +1,6 @@
-# Auth0 Integrace
+# Auth0 a Supabase Integrace
 
-Tato složka obsahuje soubory pro integraci Auth0 autentizace do aplikace AIMapa.
+Tato složka obsahuje soubory pro integraci Auth0 autentizace a Supabase databáze do aplikace AIMapa.
 
 ## Obsah složky
 
@@ -8,6 +8,7 @@ Tato složka obsahuje soubory pro integraci Auth0 autentizace do aplikace AIMapa
 - **auth0-routes.js** - Express routy pro Auth0 endpointy
 - **auth0-test.js** - Testovací nástroj pro Auth0 endpointy
 - **auth0-endpoints.md** - Dokumentace všech Auth0 endpointů
+- **supabase-auth-sync.js** - Třída pro synchronizaci uživatelů mezi Auth0 a Supabase
 
 ## Použití
 
@@ -55,7 +56,7 @@ app.get('/admin', auth0Service.requireRole('admin'), (req, res) => {
 });
 
 // Ochrana endpointu - vyžaduje vlastnictví záznamu
-app.put('/routes/:id', auth0Service.requireOwnership('routes', 
+app.put('/routes/:id', auth0Service.requireOwnership('routes',
     async (req) => {
         const { data } = await req.supabaseClient
             .from('routes')
@@ -81,11 +82,38 @@ node auth/auth0-test.js
 node auth/auth0-test.js exchange-code KOD
 ```
 
+## Synchronizace s Supabase
+
+Pro synchronizaci uživatelů mezi Auth0 a Supabase použijte třídu `SupabaseAuthSync`:
+
+```javascript
+const SupabaseAuthSync = require('./auth/supabase-auth-sync');
+
+// Inicializace Supabase Auth Sync
+const supabaseAuthSync = new SupabaseAuthSync({
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY
+});
+
+// Middleware pro synchronizaci uživatelů mezi Auth0 a Supabase
+app.use(supabaseAuthSync.createSyncMiddleware());
+```
+
+### API endpointy pro uživatelská data
+
+Pro práci s uživatelskými daty jsou k dispozici následující API endpointy:
+
+- `GET /api/user/profile` - Získá profil přihlášeného uživatele
+- `PUT /api/user/profile` - Aktualizuje profil přihlášeného uživatele
+- `GET /api/user/settings` - Získá uživatelská nastavení
+- `PUT /api/user/settings` - Aktualizuje uživatelská nastavení
+
 ## Konfigurace
 
-Pro správnou funkci Auth0 integrace je potřeba nastavit následující proměnné prostředí:
+Pro správnou funkci Auth0 a Supabase integrace je potřeba nastavit následující proměnné prostředí:
 
 ```
+# Auth0 konfigurace
 AUTH0_DOMAIN=vas-tenant.auth0.com
 AUTH0_CLIENT_ID=vase-client-id
 AUTH0_CLIENT_SECRET=vase-client-secret
@@ -93,6 +121,11 @@ AUTH0_CALLBACK_URL=http://localhost:3000/callback
 AUTH0_LOGOUT_URL=http://localhost:3000
 AUTH0_AUDIENCE=https://vas-tenant.auth0.com/api/v2/
 AUTH0_SCOPE=openid profile email read:users read:user_idp_tokens
+
+# Supabase konfigurace
+SUPABASE_URL=https://vas-projekt.supabase.co
+SUPABASE_KEY=vase-anon-key
+SUPABASE_SERVICE_KEY=vase-service-role-key
 ```
 
 ## Diagnostika
@@ -104,3 +137,19 @@ curl http://localhost:3000/auth/debug
 ```
 
 Tento endpoint vrátí detailní informace o Auth0 konfiguraci a stavu autentizace.
+
+## Skripty pro správu
+
+Pro správu uživatelů a tabulek v Supabase jsou k dispozici následující skripty:
+
+```bash
+# Vytvoření tabulky users v Supabase
+npm run db:create-users
+
+# Synchronizace uživatelů z Auth0 do Supabase
+npm run db:sync-auth0
+```
+
+## Další dokumentace
+
+Podrobnější dokumentace je k dispozici v souboru `docs/auth0-supabase-integration.md`.

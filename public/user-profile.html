@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uživatelský profil | AIMapa</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script src="/js/auth0-client.js"></script>
+    <script src="/js/user-profile.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">AIMapa</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Domů</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/map.html">Mapa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/user-profile.html">Profil</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button id="loginBtn" class="btn btn-light me-2" style="display: none;">Přihlásit</button>
+                    <button id="logoutBtn" class="btn btn-outline-light" style="display: none;">Odhlásit</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Uživatelský profil</h1>
+                <div id="profileLoading" class="alert alert-info">
+                    Načítání profilu...
+                </div>
+                <div id="profileError" class="alert alert-danger" style="display: none;">
+                    Chyba při načítání profilu. Prosím, přihlaste se.
+                </div>
+                <div id="profileContent" style="display: none;">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h2>Základní informace</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 text-center">
+                                    <img id="userPicture" src="" alt="Profilový obrázek" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+                                </div>
+                                <div class="col-md-9">
+                                    <h3 id="userName">Jméno uživatele</h3>
+                                    <p id="userEmail">email@example.com</p>
+                                    <p><strong>ID:</strong> <span id="userId"></span></p>
+                                    <p><strong>Poslední přihlášení:</strong> <span id="userLastLogin"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h2>Nastavení profilu</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="profileForm">
+                                <div class="mb-3">
+                                    <label for="profileName" class="form-label">Jméno</label>
+                                    <input type="text" class="form-control" id="profileName" name="name">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="profilePicture" class="form-label">URL profilového obrázku</label>
+                                    <input type="url" class="form-control" id="profilePicture" name="picture">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Uložit změny</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h2>Nastavení aplikace</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="settingsForm">
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="settingDarkMode" name="darkMode">
+                                    <label class="form-check-label" for="settingDarkMode">Tmavý režim</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="settingMapProvider" class="form-label">Poskytovatel map</label>
+                                    <select class="form-select" id="settingMapProvider" name="mapProvider">
+                                        <option value="mapycz">Mapy.cz</option>
+                                        <option value="openstreetmap">OpenStreetMap</option>
+                                        <option value="google">Google Maps</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="settingLanguage" class="form-label">Jazyk</label>
+                                    <select class="form-select" id="settingLanguage" name="language">
+                                        <option value="cs">Čeština</option>
+                                        <option value="en">English</option>
+                                        <option value="sk">Slovenčina</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Uložit nastavení</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializace Auth0
+            if (window.Auth0Client) {
+                Auth0Client.init();
+            }
+
+            // Reference na elementy
+            const profileLoading = document.getElementById('profileLoading');
+            const profileError = document.getElementById('profileError');
+            const profileContent = document.getElementById('profileContent');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // Formuláře
+            const profileForm = document.getElementById('profileForm');
+            const settingsForm = document.getElementById('settingsForm');
+            
+            // Přihlášení/odhlášení
+            loginBtn.addEventListener('click', () => {
+                Auth0Client.login();
+            });
+            
+            logoutBtn.addEventListener('click', () => {
+                Auth0Client.logout();
+            });
+            
+            // Aktualizace UI podle stavu přihlášení
+            document.addEventListener('auth0StateChanged', (event) => {
+                const isAuthenticated = event.detail.isAuthenticated;
+                
+                loginBtn.style.display = isAuthenticated ? 'none' : 'block';
+                logoutBtn.style.display = isAuthenticated ? 'block' : 'none';
+                
+                if (isAuthenticated) {
+                    // Načtení profilu
+                    UserProfile.loadProfile();
+                    UserProfile.loadSettings();
+                } else {
+                    profileLoading.style.display = 'none';
+                    profileError.style.display = 'block';
+                    profileContent.style.display = 'none';
+                }
+            });
+            
+            // Zpracování načteného profilu
+            document.addEventListener('userProfileLoaded', () => {
+                const user = UserProfile.getCurrentUser();
+                
+                if (user) {
+                    // Aktualizace UI
+                    document.getElementById('userName').textContent = user.name || 'Neznámé jméno';
+                    document.getElementById('userEmail').textContent = user.email || 'Neznámý email';
+                    document.getElementById('userId').textContent = user.auth0_id || '';
+                    document.getElementById('userPicture').src = user.picture || '/img/default-avatar.png';
+                    
+                    if (user.last_login) {
+                        const lastLogin = new Date(user.last_login);
+                        document.getElementById('userLastLogin').textContent = lastLogin.toLocaleString('cs-CZ');
+                    } else {
+                        document.getElementById('userLastLogin').textContent = 'Neznámé';
+                    }
+                    
+                    // Naplnění formuláře
+                    document.getElementById('profileName').value = user.name || '';
+                    document.getElementById('profilePicture').value = user.picture || '';
+                    
+                    // Zobrazení obsahu
+                    profileLoading.style.display = 'none';
+                    profileError.style.display = 'none';
+                    profileContent.style.display = 'block';
+                }
+            });
+            
+            // Zpracování načtených nastavení
+            document.addEventListener('userSettingsLoaded', () => {
+                const settings = UserProfile.getUserSettings();
+                
+                // Naplnění formuláře nastavení
+                document.getElementById('settingDarkMode').checked = settings.darkMode || false;
+                
+                if (settings.mapProvider) {
+                    document.getElementById('settingMapProvider').value = settings.mapProvider;
+                }
+                
+                if (settings.language) {
+                    document.getElementById('settingLanguage').value = settings.language;
+                }
+            });
+            
+            // Odeslání formuláře profilu
+            profileForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                const formData = new FormData(profileForm);
+                const profileData = {
+                    name: formData.get('name'),
+                    picture: formData.get('picture')
+                };
+                
+                await UserProfile.updateProfile(profileData);
+            });
+            
+            // Odeslání formuláře nastavení
+            settingsForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                const formData = new FormData(settingsForm);
+                const settingsData = {
+                    darkMode: formData.get('darkMode') === 'on',
+                    mapProvider: formData.get('mapProvider'),
+                    language: formData.get('language')
+                };
+                
+                await UserProfile.updateSettings(settingsData);
+            });
+        });
+    </script>
+</body>
+</html>

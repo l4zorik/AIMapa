@@ -9,16 +9,26 @@ Všechny významné změny v projektu budou dokumentovány v tomto souboru.
 - Aktualizována konfigurace Auth0 pro novou doménu
 - Vylepšena integrace s Netlify pro nasazení na vlastní doménu
 - Přidáno automatické přesměrování na HTTPS
+- Implementována synchronizace uživatelů mezi Auth0 a Supabase
+- Vytvořena tabulka `users` v Supabase pro ukládání uživatelských dat
+- Přidány API endpointy pro správu uživatelského profilu
+- Implementován klientský modul pro práci s uživatelskými daty
+- Vytvořena stránka uživatelského profilu s možností úpravy nastavení
+- Přidána dokumentace pro integraci Auth0 a Supabase
 
 ### Změněno
 - Aktualizovány všechny URL v konfiguraci pro použití nové domény
 - Vylepšena Content Security Policy pro podporu nové domény
 - Optimalizována konfigurace pro produkční nasazení
+- Vylepšena struktura serverové části aplikace
+- Rozšířeny API endpointy o podporu uživatelských dat
+- Aktualizována dokumentace s informacemi o nové integraci
 
 ### Opraveno
 - Opraveny problémy s přihlašováním na nové doméně
 - Vyřešeny problémy s callback URL pro Auth0
 - Opraveny problémy s CORS při volání API z nové domény
+- Vyřešeny problémy se synchronizací uživatelských dat
 
 ## [0.4.0] - 2023-06-15
 

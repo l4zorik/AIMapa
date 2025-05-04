@@ -1,6 +1,6 @@
 {
   "name": "aimapa",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Interaktivní mapa s AI funkcemi",
   "main": "server.js",
   "scripts": {
@@ -17,12 +17,15 @@
     "test": "node tests/run-tests.js",
     "test:unit": "node -e \"const MapUtilsTest = require('./tests/unit/map-utils.test'); const results = MapUtilsTest.runAllTests(); console.log(JSON.stringify(results, null, 2));\"",
     "test:integration": "node -e \"const MapApiTest = require('./tests/integration/map-api.test'); MapApiTest.runAllTests().then(results => console.log(JSON.stringify(results, null, 2)));\"",
+    "test:auth-sync": "node tests/integration/auth0-supabase-sync.test.js",
     "test:e2e": "node -e \"const MapWorkflowTest = require('./tests/e2e/map-workflow.test'); MapWorkflowTest.runAllScenarios().then(results => console.log(JSON.stringify(results, null, 2)));\"",
     "test:ai": "node -e \"const AIModelTest = require('./tests/ai/model-evaluation.test'); const results = AIModelTest.runAllTests(); console.log(JSON.stringify(results, null, 2));\"",
     "test:migration": "node tests/migration-test.js",
     "test:a11y": "node tests/accessibility/a11y.test.js",
     "test:llm-performance": "node tests/llm-performance/performance.test.js",
     "auth0-explorer": "node auth0-terminal-explorer.js",
+    "db:create-users": "node scripts/create-users-table.js",
+    "db:sync-auth0": "node scripts/sync-auth0-users.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "migrate": "node scripts/migrate-to-new-stack.js"

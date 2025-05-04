@@ -11,6 +11,7 @@ const { auth } = require('express-openid-connect');
 const supabaseService = require('./supabase-service');
 const Auth0Service = require('./auth/auth0-service');
 const createAuth0Routes = require('./auth/auth0-routes');
+const SupabaseAuthSync = require('./auth/supabase-auth-sync');
 
 // Middleware imports
 const { errorHandler } = require('./middleware/errorHandler');
@@ -65,14 +66,15 @@ const auth0Service = new Auth0Service({
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
     scope: process.env.AUTH0_SCOPE || 'openid profile email read:users read:user_idp_tokens',
     audience: process.env.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
-    loginRoute: false,  // Vypneme automatické routy, použijeme vlastní
-    logoutRoute: false,
-    callbackRoute: false,
+    routes: {
+        login: '/login',
+        logout: '/logout',
+        callback: '/callback'
+    },
     idpLogout: true
 });
 
 // Auth0 konfigurace podle doporučení Auth0 dashboardu
-const { auth } = require('express-openid-connect');
 
 const auth0Config = {
   authRequired: false,
@@ -81,9 +83,6 @@ const auth0Config = {
   baseURL: process.env.BASE_URL || 'https://www.quicksoft.fun',
   clientID: process.env.AUTH0_CLIENT_ID,
   issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
-  routes: {
-    callback: '/callback'
-  },
   authorizationParams: {
     response_type: 'code',
     redirect_uri: process.env.AUTH0_CALLBACK_URL || 'https://www.quicksoft.fun/callback',
@@ -98,26 +97,81 @@ app.use(auth(auth0Config));
 const { requiresAuth } = require('express-openid-connect');
 
 // Endpoint pro zobrazení profilu uživatele
-app.get('/profile', requiresAuth(), (req, res) => {
-  res.send(JSON.stringify(req.oidc.user, null, 2));
+app.get('/profile', requiresAuth(), async (req, res) => {
+  try {
+    // Synchronizace uživatele s Supabase
+    const supabaseUser = await supabaseAuthSync.syncUser(req.oidc.user);
+
+    // Kombinace Auth0 a Supabase dat
+    const profile = {
+      auth0: req.oidc.user,
+      supabase: supabaseUser
+    };
+
+    res.send(JSON.stringify(profile, null, 2));
+  } catch (error) {
+    console.error('Chyba při získávání profilu:', error);
+    res.status(500).json({
+      error: 'Chyba při získávání profilu',
+      message: error.message
+    });
+  }
 });
 
 // Endpoint pro kontrolu stavu přihlášení
-app.get('/auth/status', (req, res) => {
-  res.json({
-    isAuthenticated: req.oidc.isAuthenticated(),
-    user: req.oidc.isAuthenticated() ? req.oidc.user : null
-  });
+app.get('/auth/status', async (req, res) => {
+  try {
+    const isAuthenticated = req.oidc.isAuthenticated();
+    let userData = null;
+
+    if (isAuthenticated) {
+      // Získání Supabase uživatele, pokud je přihlášen
+      try {
+        const supabaseUser = await supabaseAuthSync.getUserByAuth0Id(req.oidc.user.sub);
+        userData = {
+          auth0: req.oidc.user,
+          supabase: supabaseUser
+        };
+      } catch (error) {
+        console.error('Chyba při získávání Supabase uživatele:', error);
+        userData = {
+          auth0: req.oidc.user,
+          supabase: null,
+          error: 'Nepodařilo se získat Supabase uživatele'
+        };
+      }
+    }
+
+    res.json({
+      isAuthenticated,
+      user: userData
+    });
+  } catch (error) {
+    console.error('Chyba při kontrole stavu přihlášení:', error);
+    res.status(500).json({
+      error: 'Chyba při kontrole stavu přihlášení',
+      message: error.message
+    });
+  }
 });
 
 // Auth0 routes - pouze na /auth cestě pro lepší organizaci
 app.use('/auth', createAuth0Routes(auth0Service));
+
+// Inicializace Supabase Auth Sync
+const supabaseAuthSync = new SupabaseAuthSync({
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY
+});
 
 // Supabase middleware - přidání klienta do req objektu
 app.use((req, res, next) => {
     req.supabaseClient = supabaseService.getClient();
     next();
 });
+
+// Middleware pro synchronizaci uživatelů mezi Auth0 a Supabase
+app.use(supabaseAuthSync.createSyncMiddleware());
 
 // API Routes s rate limitingem
 app.use('/api', require('./routes/api'));
@@ -134,8 +188,16 @@ app.use(errorHandler);
 app.get('/health', (req, res) => {
     res.json({
         status: 'healthy',
-        version: process.env.npm_package_version,
-        environment: process.env.NODE_ENV
+        version: process.env.npm_package_version || '0.4.1',
+        environment: process.env.NODE_ENV,
+        auth0: {
+            configured: !!(process.env.AUTH0_DOMAIN && process.env.AUTH0_CLIENT_ID && process.env.AUTH0_CLIENT_SECRET),
+            domain: process.env.AUTH0_DOMAIN
+        },
+        supabase: {
+            configured: !!(process.env.SUPABASE_URL && (process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_KEY)),
+            url: process.env.SUPABASE_URL
+        }
     });
 });
 
