@@ -1,7 +1,7 @@
 /**
  * Skript pro aktualizaci Auth0 konfigurace
  * Verze 0.4.1
- * 
+ *
  * Tento skript používá Auth0 Management API k aktualizaci konfigurace aplikace
  */
 
@@ -35,29 +35,29 @@ function loadEnvFile(filePath) {
     try {
         const envContent = fs.readFileSync(filePath, 'utf8');
         const envVars = {};
-        
+
         envContent.split('\n').forEach(line => {
             // Přeskočení komentářů a prázdných řádků
             if (line.trim().startsWith('#') || line.trim() === '') {
                 return;
             }
-            
+
             // Rozdělení řádku na klíč a hodnotu
             const match = line.match(/^([^=]+)=(.*)$/);
             if (match) {
                 const key = match[1].trim();
                 let value = match[2].trim();
-                
+
                 // Odstranění uvozovek, pokud existují
-                if ((value.startsWith('"') && value.endsWith('"')) || 
+                if ((value.startsWith('"') && value.endsWith('"')) ||
                     (value.startsWith("'") && value.endsWith("'"))) {
                     value = value.substring(1, value.length - 1);
                 }
-                
+
                 envVars[key] = value;
             }
         });
-        
+
         return envVars;
     } catch (error) {
         console.error(`${colors.red}Chyba při načítání souboru ${filePath}:${colors.reset}`, error.message);
@@ -72,16 +72,30 @@ function loadEnvFile(filePath) {
  */
 async function getManagementApiToken(config) {
     try {
+        console.log(`Získávání tokenu pro doménu: ${config.domain}`);
+        console.log(`Client ID: ${config.clientId}`);
+        console.log(`Client Secret: ${config.clientSecret ? 'Nastaveno' : 'Chybí'}`);
+
         const response = await axios.post(`https://${config.domain}/oauth/token`, {
             client_id: config.clientId,
             client_secret: config.clientSecret,
             audience: `https://${config.domain}/api/v2/`,
             grant_type: 'client_credentials'
         });
-        
-        return response.data.access_token;
+
+        if (response.data && response.data.access_token) {
+            return response.data.access_token;
+        } else {
+            console.error(`${colors.red}Chyba: Token nebyl vrácen v odpovědi${colors.reset}`);
+            console.log('Odpověď:', JSON.stringify(response.data, null, 2));
+            throw new Error('Token nebyl vrácen v odpovědi');
+        }
     } catch (error) {
         console.error(`${colors.red}Chyba při získávání Management API tokenu:${colors.reset}`, error.response?.data || error.message);
+        if (error.response) {
+            console.error('Status:', error.response.status);
+            console.error('Data:', JSON.stringify(error.response.data, null, 2));
+        }
         throw error;
     }
 }
@@ -121,7 +135,7 @@ async function updateApplicationConfig(config, token) {
                 }
             }
         );
-        
+
         return response.data;
     } catch (error) {
         console.error(`${colors.red}Chyba při aktualizaci konfigurace aplikace:${colors.reset}`, error.response?.data || error.message);
@@ -137,11 +151,11 @@ async function main() {
     console.log(`Verze: 0.4.1`);
     console.log(`Datum: ${new Date().toISOString()}`);
     console.log('');
-    
+
     // Načtení proměnných prostředí
     const envVars = loadEnvFile(ENV_FILE);
     const prodEnvVars = loadEnvFile(ENV_PRODUCTION_FILE);
-    
+
     // Konfigurace Auth0
     const config = {
         domain: prodEnvVars.AUTH0_DOMAIN || envVars.AUTH0_DOMAIN,
@@ -151,28 +165,28 @@ async function main() {
         logoutUrl: prodEnvVars.AUTH0_LOGOUT_URL || envVars.AUTH0_LOGOUT_URL,
         baseUrl: prodEnvVars.BASE_URL || envVars.BASE_URL
     };
-    
+
     // Kontrola konfigurace
     const missingConfig = Object.entries(config)
         .filter(([key, value]) => !value)
         .map(([key]) => key);
-    
+
     if (missingConfig.length > 0) {
         console.error(`${colors.red}Chybí následující konfigurace:${colors.reset}`, missingConfig.join(', '));
         process.exit(1);
     }
-    
+
     try {
         // Získání Management API tokenu
         console.log(`${colors.cyan}Získávání Management API tokenu...${colors.reset}`);
         const token = await getManagementApiToken(config);
         console.log(`${colors.green}✓${colors.reset} Management API token získán`);
-        
+
         // Aktualizace konfigurace aplikace
         console.log(`${colors.cyan}Aktualizace konfigurace aplikace...${colors.reset}`);
         const updatedConfig = await updateApplicationConfig(config, token);
         console.log(`${colors.green}✓${colors.reset} Konfigurace aplikace aktualizována`);
-        
+
         // Výpis aktualizované konfigurace
         console.log(`\n${colors.cyan}Aktualizovaná konfigurace:${colors.reset}`);
         console.log(`- Allowed Callback URLs: ${updatedConfig.callbacks.join(', ')}`);
@@ -181,7 +195,7 @@ async function main() {
         console.log(`- Token Lifetime: ${updatedConfig.jwt_configuration.lifetime_in_seconds} sekund`);
         console.log(`- Refresh Token Rotation: ${updatedConfig.refresh_token.rotation_type === 'rotating' ? 'Enabled' : 'Disabled'}`);
         console.log(`- Refresh Token Lifetime: ${updatedConfig.refresh_token.token_lifetime} sekund`);
-        
+
         console.log(`\n${colors.green}${colors.bright}Auth0 konfigurace byla úspěšně aktualizována${colors.reset}`);
     } catch (error) {
         console.error(`\n${colors.red}${colors.bright}Chyba při aktualizaci Auth0 konfigurace${colors.reset}`);
