@@ -1,28 +1,6 @@
-# Netlify konfigurace pro AIMapa
-# Verze 0.4.1
-
-# Základní nastavení buildu
 [build]
-  publish = "public"
-  functions = "functions"
-
-# Nastavení pro produkční prostředí
-[context.production]
-  environment = { NODE_VERSION = "16" }
-
-# Nastavení pro vývojové prostředí
-[context.branch-deploy]
-  environment = { NODE_VERSION = "16" }
-
-# Nastavení pro deploy preview
-[context.deploy-preview]
-  environment = { NODE_VERSION = "16" }
-
-# Přesměrování a hlavičky
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  command = "npm run build"
+  publish = "public/dist"
 
 [[redirects]]
   from = "/callback"
@@ -30,28 +8,13 @@
   status = 200
 
 [[redirects]]
-  from = "/logout"
+  from = "/*"
   to = "/index.html"
   status = 200
 
-# Nastavení hlaviček pro bezpečnost
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
-    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-
-# Nastavení pro Supabase a Node.js
-[build.environment]
-  SUPABASE_PROJECT = "AI Mapa"
-  NODE_VERSION = "16"
-
-# Nastavení vlastní domény
-[context.production.environment]
-  SITE_URL = "https://www.quicksoft.fun"
-  AUTH0_CALLBACK_URL = "https://www.quicksoft.fun/callback"
-  AUTH0_LOGOUT_URL = "https://www.quicksoft.fun"
+    Content-Security-Policy = "default-src 'self' https://*.auth0.com https://*.supabase.co; script-src 'self' 'unsafe-inline' https://*.auth0.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.auth0.com; connect-src 'self' https://*.auth0.com https://*.supabase.co;"
