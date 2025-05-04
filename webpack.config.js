@@ -11,6 +11,7 @@ module.exports = {
     'auth0-bundle': './public/app/auth0-bundle.js',
     main: './public/js/main.js',
     auth: './public/js/auth0-client.js',
+    discord: './public/js/discord-auth.js',
     supabase: './public/js/supabase-client.js',
     sync: './public/js/sync-manager.js',
     chat: './public/js/chat-client.js'
@@ -88,12 +89,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/index.html',
       filename: 'index.html',
-      chunks: ['main', 'auth', 'supabase', 'sync'],
+      chunks: ['main', 'auth', 'discord', 'supabase', 'sync'],
     }),
     new HtmlWebpackPlugin({
       template: './public/chat.html',
       filename: 'chat.html',
-      chunks: ['main', 'auth', 'supabase', 'sync', 'chat'],
+      chunks: ['main', 'auth', 'discord', 'supabase', 'sync', 'chat'],
     }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash].css',

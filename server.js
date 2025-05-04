@@ -1,6 +1,6 @@
 /**
  * AIMapa - Server
- * Verze 0.3.8.7
+ * Verze 0.4.0
  */
 
 const express = require('express');
@@ -8,9 +8,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const { auth } = require('express-openid-connect');
+const passport = require('passport');
 const supabaseService = require('./supabase-service');
 const Auth0Service = require('./auth/auth0-service');
 const createAuth0Routes = require('./auth/auth0-routes');
+const DiscordService = require('./auth/discord-service');
+const createDiscordRoutes = require('./auth/discord-routes');
 
 // Middleware imports
 const { errorHandler } = require('./middleware/errorHandler');
@@ -35,6 +38,9 @@ console.log('AUTH0_AUDIENCE:', process.env.AUTH0_AUDIENCE ? 'Načteno' : 'Chybí
 console.log('AUTH0_CALLBACK_URL:', process.env.AUTH0_CALLBACK_URL ? 'Načteno' : 'Chybí');
 console.log('AUTH0_LOGOUT_URL:', process.env.AUTH0_LOGOUT_URL ? 'Načteno' : 'Chybí');
 console.log('AUTH0_SCOPE:', process.env.AUTH0_SCOPE ? 'Načteno' : 'Chybí');
+console.log('DISCORD_CLIENT_ID:', process.env.DISCORD_CLIENT_ID ? 'Načteno' : 'Chybí');
+console.log('DISCORD_CLIENT_SECRET:', process.env.DISCORD_CLIENT_SECRET ? 'Načteno' : 'Chybí');
+console.log('DISCORD_CALLBACK_URL:', process.env.DISCORD_CALLBACK_URL ? 'Načteno' : 'Chybí');
 
 const app = express();
 
@@ -113,6 +119,22 @@ app.get('/auth/status', (req, res) => {
 // Auth0 routes - pouze na /auth cestě pro lepší organizaci
 app.use('/auth', createAuth0Routes(auth0Service));
 
+// Inicializace Discord service
+const discordService = new DiscordService({
+    clientID: process.env.DISCORD_CLIENT_ID,
+    clientSecret: process.env.DISCORD_CLIENT_SECRET,
+    callbackURL: process.env.DISCORD_CALLBACK_URL || `${process.env.BASE_URL}/auth/discord/callback`,
+    scope: ['identify', 'email']
+});
+
+// Aplikace Discord middleware
+discordService.getMiddleware().forEach(middleware => {
+    app.use(middleware);
+});
+
+// Discord routes - na /auth cestě pro lepší organizaci
+app.use('/auth', createDiscordRoutes(discordService));
+
 // Supabase middleware - přidání klienta do req objektu
 app.use((req, res, next) => {
     req.supabaseClient = supabaseService.getClient();
@@ -126,6 +148,11 @@ app.use('/api/stripe', require('./routes/stripe'));
 
 // Statické soubory
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Discord login stránka
+app.get('/discord-login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'discord-login.html'));
+});
 
 // Error handling middleware
 app.use(errorHandler);
@@ -169,11 +196,20 @@ app.get('/auth/config', (_req, res) => {
     });
 });
 
+// Endpoint pro získání Discord konfigurace
+app.get('/auth/discord/config', (_req, res) => {
+    res.json({
+        clientId: process.env.DISCORD_CLIENT_ID,
+        callbackUrl: process.env.DISCORD_CALLBACK_URL || `${process.env.BASE_URL}/auth/discord/callback`
+    });
+});
+
 // Spuštění serveru
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server běží na portu ${port}`);
     console.log('Prostředí:', process.env.NODE_ENV);
     console.log('Auth0 Domain:', process.env.AUTH0_DOMAIN);
+    console.log('Discord Client ID:', process.env.DISCORD_CLIENT_ID);
     console.log('Supabase URL:', process.env.SUPABASE_URL);
 });

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Přihlášení - AIMapa</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/dist/js/discord.js" defer></script>
+    <script src="/components/discord-login-button.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #5865F2;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        h1 {
+            margin: 0;
+        }
+        
+        .login-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .user-profile {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            display: none;
+        }
+        
+        .user-profile.visible {
+            display: block;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        
+        .user-info {
+            margin-bottom: 20px;
+        }
+        
+        .user-info p {
+            margin: 5px 0;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #5865F2;
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Discord Přihlášení</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="login-section">
+            <h2>Přihlášení pomocí Discord účtu</h2>
+            <p>Pro přístup k AIMapa se můžete přihlásit pomocí svého Discord účtu.</p>
+            
+            <discord-login-button></discord-login-button>
+        </div>
+        
+        <div class="user-profile" id="userProfile">
+            <h2>Profil uživatele</h2>
+            <img src="" alt="Avatar uživatele" class="user-avatar" id="userAvatar">
+            
+            <div class="user-info">
+                <p><strong>Uživatelské jméno:</strong> <span id="username"></span></p>
+                <p><strong>Discord ID:</strong> <span id="discordId"></span></p>
+                <p><strong>E-mail:</strong> <span id="email"></span></p>
+            </div>
+        </div>
+        
+        <a href="/" class="back-link">Zpět na hlavní stránku</a>
+    </div>
+    
+    <script>
+        // Zobrazení profilu uživatele po přihlášení
+        document.addEventListener('discordAuthStateChanged', (event) => {
+            const { isAuthenticated, user } = event.detail;
+            const userProfile = document.getElementById('userProfile');
+            
+            if (isAuthenticated && user) {
+                // Zobrazení profilu
+                userProfile.classList.add('visible');
+                
+                // Naplnění údajů
+                document.getElementById('username').textContent = user.username || 'Není k dispozici';
+                document.getElementById('discordId').textContent = user.id || 'Není k dispozici';
+                document.getElementById('email').textContent = user.email || 'Není k dispozici';
+                
+                // Avatar
+                if (user.avatar) {
+                    document.getElementById('userAvatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+                } else {
+                    document.getElementById('userAvatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                }
+            } else {
+                // Skrytí profilu
+                userProfile.classList.remove('visible');
+            }
+        });
+        
+        // Kontrola stavu autentizace po načtení stránky
+        document.addEventListener('discordAuthInitialized', () => {
+            if (window.DiscordAuth && window.DiscordAuth.isAuthenticated()) {
+                const user = window.DiscordAuth.getUserProfile();
+                
+                // Vyvolání události pro zobrazení profilu
+                document.dispatchEvent(new CustomEvent('discordAuthStateChanged', { 
+                    detail: { 
+                        isAuthenticated: true,
+                        user: user
+                    } 
+                }));
+            }
+        });
+    </script>
+</body>
+</html>
