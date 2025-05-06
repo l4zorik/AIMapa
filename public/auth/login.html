@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com; frame-src 'self' https://*.auth0.com https://*.stripe.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content">
+    <title>Přihlášení - AI Mapa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .login-button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        .login-button:hover {
+            background-color: #2980b9;
+        }
+
+        .login-button.google {
+            background-color: #4285F4;
+        }
+
+        .login-button.google:hover {
+            background-color: #357ae8;
+        }
+
+        .login-button.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .login-button.loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-top: -10px;
+            margin-left: -10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .dark-mode {
+            background-color: #222;
+            color: #f5f5f5;
+        }
+
+        .dark-mode .login-container {
+            background-color: #333;
+            color: #f5f5f5;
+        }
+
+        .dark-mode h1 {
+            color: #3498db;
+        }
+
+        .dark-mode .login-button {
+            background-color: #3498db;
+        }
+
+        .dark-mode .login-button:hover {
+            background-color: #2980b9;
+        }
+
+        .dark-mode .login-button.google {
+            background-color: #4285F4;
+        }
+
+        .dark-mode .login-button.google:hover {
+            background-color: #357ae8;
+        }
+    </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+    <div class="login-container">
+        <h1>Přihlášení do AI Mapa</h1>
+        <p>Vyberte způsob přihlášení:</p>
+
+        <button id="auth0-login-button" class="login-button">Přihlásit se přes Auth0</button>
+        <button id="google-login-button" class="login-button google">Přihlásit se přes Google</button>
+
+        <div id="error-message" class="error-message"></div>
+    </div>
+
+    <script>
+        // Kontrola, zda má být použit tmavý režim
+        function checkDarkMode() {
+            const isDarkMode = localStorage.getItem('aiMapaDarkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // Kontrola tmavého režimu při načtení stránky
+        checkDarkMode();
+
+        // Funkce pro přihlášení přes Auth0
+        function loginWithAuth0() {
+            const button = document.getElementById('auth0-login-button');
+            button.classList.add('loading');
+
+            // Určení správné URL pro přesměrování
+            const redirectUri = window.location.origin + '/callback';
+
+            // Vytvoření Auth0 URL
+            const authUrl = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?' +
+                'client_id=H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ&' +
+                'redirect_uri=' + encodeURIComponent(redirectUri) + '&' +
+                'response_type=code&' +
+                'scope=openid%20profile%20email&' +
+                'connection=Username-Password-Authentication&' +
+                'prompt=login';
+
+            console.log('Přesměrovávám na Auth0 URL:', authUrl);
+
+            // Přesměrování na Auth0
+            window.location.href = authUrl;
+        }
+
+        // Funkce pro přihlášení přes Google
+        function loginWithGoogle() {
+            const button = document.getElementById('google-login-button');
+            button.classList.add('loading');
+
+            // Určení správné URL pro přesměrování
+            const redirectUri = window.location.origin + '/callback';
+
+            // Vytvoření Auth0 URL s Google připojením
+            const authUrl = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?' +
+                'client_id=H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ&' +
+                'redirect_uri=' + encodeURIComponent(redirectUri) + '&' +
+                'response_type=code&' +
+                'scope=openid%20profile%20email&' +
+                'connection=google-oauth2&' +
+                'prompt=login';
+
+            console.log('Přesměrovávám na Auth0 URL s Google připojením:', authUrl);
+
+            // Přesměrování na Auth0 s Google připojením
+            window.location.href = authUrl;
+        }
+
+        // Přidání posluchačů událostí pro tlačítka
+        document.getElementById('auth0-login-button').addEventListener('click', loginWithAuth0);
+        document.getElementById('google-login-button').addEventListener('click', loginWithGoogle);
+
+        // Kontrola, zda došlo k chybě při přihlašování
+        function checkForErrors() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            const errorDescription = urlParams.get('error_description');
+
+            if (error) {
+                const errorMessage = document.getElementById('error-message');
+                errorMessage.textContent = errorDescription || 'Došlo k chybě při přihlašování. Zkuste to prosím znovu.';
+
+                // Odstranění parametrů z URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        // Kontrola chyb při načtení stránky
+        checkForErrors();
+    </script>
+</body>
+</html>

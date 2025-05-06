@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AIMapa - Správa API klíčů">
+    <meta name="keywords" content="mapa, API, klíče, správa, Google Maps">
+    <meta name="author" content="Jan Lazorík">
+    <meta name="theme-color" content="#4285F4">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com; frame-src 'self' https://*.auth0.com https://*.stripe.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content">
+    <title>Správa API klíčů - AIMapa</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+    <link rel="manifest" href="/assets/manifest.json">
+
+    <!-- Core styles -->
+    <link rel="stylesheet" href="/app/styles/styles.css">
+    <link rel="stylesheet" href="/app/services/auth/auth-service.css">
+    <link rel="stylesheet" href="/app/components/api-keys/api-keys-manager.css">
+
+    <!-- External dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- Core scripts -->
+    <script src="/app/core/config/env-config.js"></script>
+    <script src="/app/services/auth/auth0-auth.js"></script>
+    <script src="/app/services/auth/auth-screen.js"></script>
+    <script src="/app/components/api-keys/api-keys-manager.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="/">
+                        <img src="/images/logo.svg" alt="AIMapa Logo">
+                        <span>AIMapa</span>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="/">Domů</a></li>
+                        <li><a href="/pages/map.html">Mapa</a></li>
+                        <li><a href="/pages/api-keys.html" class="active">API klíče</a></li>
+                        <li><a href="/pages/profile.html">Profil</a></li>
+                    </ul>
+                </nav>
+                <div id="auth-status">
+                    <span id="login-status">Kontrola přihlášení...</span>
+                    <a href="/auth/login.html" id="login-btn" style="display:none;">Přihlásit se</a>
+                    <a href="/pages/profile.html" id="profile-btn" style="display:none;">Profil</a>
+                    <a href="/auth/logout.html" id="logout-btn" style="display:none;">Odhlásit se</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main id="main-content">
+            <div class="page-header">
+                <h1>Správa API klíčů</h1>
+                <p>Zde můžete spravovat své API klíče pro přístup k mapovým službám.</p>
+            </div>
+
+            <div class="api-keys-info">
+                <h2>Co jsou API klíče?</h2>
+                <p>API klíče vám umožňují přístup k různým mapovým službám, jako je Google Maps, OpenRouteService, Mapy.cz a další. Tyto služby poskytují funkce jako vyhledávání míst, plánování tras, zobrazení map a další.</p>
+
+                <h2>Proč potřebuji API klíče?</h2>
+                <p>Mapové služby obvykle vyžadují API klíče pro přístup k jejich funkcím. Tyto klíče jsou obvykle zpoplatněné, ale my vám nabízíme možnost zakoupit si je za výhodné ceny. Zakoupením API klíče získáte přístup k funkcím, které by jinak byly nedostupné nebo drahé.</p>
+
+                <h2>Jak to funguje?</h2>
+                <p>1. Vyberte si plán API klíče, který odpovídá vašim potřebám.</p>
+                <p>2. Zaplaťte za klíč pomocí platební karty.</p>
+                <p>3. Po úspěšné platbě bude váš API klíč aktivován a můžete ho začít používat.</p>
+                <p>4. API klíč je platný po dobu uvedenou v plánu a má omezený počet požadavků (pokud je uvedeno).</p>
+            </div>
+
+            <!-- API Keys Manager bude vložen zde pomocí JavaScriptu -->
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>AIMapa</h3>
+                    <p>Interaktivní mapa s AI funkcemi</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Odkazy</h3>
+                    <ul>
+                        <li><a href="/">Domů</a></li>
+                        <li><a href="/pages/map.html">Mapa</a></li>
+                        <li><a href="/pages/api-keys.html">API klíče</a></li>
+                        <li><a href="/pages/profile.html">Profil</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Kontakt</h3>
+                    <p>Email: info@aimapa.cz</p>
+                    <p>Telefon: +420 123 456 789</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AIMapa. Všechna práva vyhrazena.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Kontrola stavu přihlášení
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/auth/status')
+                .then(response => response.json())
+                .then(data => {
+                    const loginStatus = document.getElementById('login-status');
+                    const loginBtn = document.getElementById('login-btn');
+                    const profileBtn = document.getElementById('profile-btn');
+                    const logoutBtn = document.getElementById('logout-btn');
+
+                    if (data.isAuthenticated) {
+                        loginStatus.textContent = `Přihlášen jako: ${data.user.auth0.name || data.user.auth0.email || 'Uživatel'}`;
+                        loginBtn.style.display = 'none';
+                        profileBtn.style.display = 'inline-block';
+                        logoutBtn.style.display = 'inline-block';
+
+                        // Inicializace komponenty pro správu API klíčů
+                        ApiKeysManager.init();
+                    } else {
+                        loginStatus.textContent = 'Nepřihlášen';
+                        loginBtn.style.display = 'inline-block';
+                        profileBtn.style.display = 'none';
+                        logoutBtn.style.display = 'none';
+
+                        // Zobrazení výzvy k přihlášení
+                        const mainContent = document.getElementById('main-content');
+                        const apiKeysInfo = document.querySelector('.api-keys-info');
+
+                        if (mainContent && apiKeysInfo) {
+                            const loginPrompt = document.createElement('div');
+                            loginPrompt.className = 'login-prompt';
+                            loginPrompt.innerHTML = `
+                                <h2>Pro správu API klíčů se musíte přihlásit</h2>
+                                <p>Pro zakoupení a správu API klíčů se prosím přihlaste nebo zaregistrujte.</p>
+                                <a href="/auth/login.html" class="primary-button">Přihlásit se</a>
+                            `;
+
+                            mainContent.insertBefore(loginPrompt, apiKeysInfo.nextSibling);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Chyba při kontrole stavu přihlášení:', error);
+                    document.getElementById('login-status').textContent = 'Chyba při kontrole přihlášení';
+                });
+        });
+    </script>
+</body>
+</html>

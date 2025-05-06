@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mapa - Testovací Rozhraní</title>
+    <link rel="stylesheet" href="/ai-map/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .settings-button, .logout-button, .chat-button {
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .logout-button {
+            background-color: #e74c3c;
+        }
+
+        .chat-button {
+            background-color: #27ae60;
+        }
+
+        .map-container {
+            height: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .map-controls input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .map-controls button {
+            padding: 10px 15px;
+        }
+
+        /* Styly pro zobrazení využití API */
+        .usage-info {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+
+        .credit-bar-container {
+            margin-bottom: 10px;
+        }
+
+        .credit-bar-label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .credit-bar {
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .credit-bar-fill {
+            height: 100%;
+            background-color: #2ecc71;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Barvy pro různé úrovně využití */
+        .credit-bar-fill.warning {
+            background-color: #f39c12;
+        }
+
+        .credit-bar-fill.danger {
+            background-color: #e74c3c;
+        }
+
+        .usage-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .map-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+
+        .map-info h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .map-info p {
+            margin-bottom: 5px;
+        }
+
+        /* Styly pro zobrazení informací o ceně požadavku */
+        .request-cost-info {
+            text-align: right;
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin: 10px 0;
+            padding: 5px 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .cost-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .cost-value {
+            font-weight: bold;
+        }
+
+        .cost-low {
+            color: #27ae60;
+        }
+
+        .cost-medium {
+            color: #f39c12;
+        }
+
+        .cost-high {
+            color: #e74c3c;
+        }
+
+        .cost-limit {
+            margin-left: 5px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .tokens-info {
+            margin-left: 10px;
+            color: #95a5a6;
+        }
+
+        .optimization-info {
+            margin-top: 5px;
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.9em;
+            border-left: 3px solid #f39c12;
+        }
+
+        .optimization-standard {
+            border-left: 3px solid #f39c12;
+        }
+
+        .optimization-aggressive {
+            border-left: 3px solid #e67e22;
+            background-color: #fef5e7;
+        }
+
+        .optimization-extreme {
+            border-left: 3px solid #e74c3c;
+            background-color: #fdedec;
+        }
+
+        .optimization-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .optimization-standard .optimization-label {
+            color: #f39c12;
+        }
+
+        .optimization-aggressive .optimization-label {
+            color: #e67e22;
+        }
+
+        .optimization-extreme .optimization-label {
+            color: #e74c3c;
+        }
+
+        .limit-info {
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px dashed #e1e4e8;
+            font-size: 0.9em;
+        }
+
+        .limit-label {
+            color: #7f8c8d;
+            margin-right: 5px;
+        }
+
+        .limit-value {
+            font-weight: bold;
+            color: #3498db;
+            margin-right: 10px;
+        }
+
+        .actual-cost {
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .efficiency-mode {
+            margin-left: 10px;
+            color: #7f8c8d;
+        }
+
+        .savings-info {
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px dashed #e1e4e8;
+            font-size: 0.9em;
+        }
+
+        .savings-label {
+            color: #7f8c8d;
+            margin-right: 5px;
+        }
+
+        .original-cost {
+            text-decoration: line-through;
+            color: #e74c3c;
+            margin-right: 10px;
+        }
+
+        .savings-amount {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        /* Styly pro statistiky optimalizace */
+        .optimization-stats {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+            border-left: 3px solid #27ae60;
+        }
+
+        .optimization-stats h4 {
+            margin: 0 0 8px 0;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .stats-item {
+            margin: 5px 0;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .stats-label {
+            color: #7f8c8d;
+            margin-right: 5px;
+        }
+
+        .stats-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* Styly pro popup markeru */
+        .marker-popup h3 {
+            margin: 0 0 8px 0;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .marker-popup p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .confidence-very-high {
+            color: #219653;
+            font-weight: bold;
+        }
+
+        .confidence-high {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .confidence-medium {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .confidence-low {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* Styly pro informace o firmě */
+        .company-info {
+            background-color: #f1f8ff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 3px solid #2980b9;
+        }
+
+        .company-info h4 {
+            margin: 0 0 8px 0;
+            color: #2980b9;
+            font-size: 14px;
+        }
+
+        .company-info p {
+            margin: 4px 0;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .company-info a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .company-info a:hover {
+            text-decoration: underline;
+        }
+
+        .company-description {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e1e4e8;
+            font-style: italic;
+            font-size: 11px;
+            color: #555;
+        }
+
+        /* Styly pro interpretaci dotazu */
+        .interpretation {
+            background-color: #f8f9fa;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin: 8px 0;
+            font-size: 0.9em;
+            border-left: 3px solid #3498db;
+        }
+
+        /* Styly pro alternativní místa */
+        .alternatives {
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+        }
+
+        .alternatives p {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .alternatives ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 0.9em;
+        }
+
+        .alternatives li {
+            margin-bottom: 3px;
+        }
+
+        .alternatives a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .alternatives a:hover {
+            text-decoration: underline;
+        }
+
+        /* Styly pro příklady nejasných dotazů */
+        .examples-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #e1e4e8;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .examples-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e1e4e8;
+            padding-bottom: 10px;
+        }
+
+        .examples-header h3 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .close-examples {
+            font-size: 24px;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-examples:hover {
+            color: #555;
+        }
+
+        .examples-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+        }
+
+        .examples-list li {
+            margin-bottom: 5px;
+            background-color: #fff;
+            padding: 5px 10px;
+            border-radius: 15px;
+            border: 1px solid #e1e4e8;
+            transition: all 0.2s ease;
+        }
+
+        .examples-list li:hover {
+            background-color: #f1f8ff;
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .example-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .example-link:hover {
+            color: #2980b9;
+        }
+
+        .examples-container h4 {
+            margin: 15px 0 10px 0;
+            color: #2c3e50;
+            font-size: 14px;
+            border-bottom: 1px solid #e1e4e8;
+            padding-bottom: 5px;
+        }
+
+        /* Přizpůsobení Leaflet popup */
+        .leaflet-popup-content {
+            margin: 10px 12px;
+            min-width: 200px;
+        }
+
+        /* Styly pro tlačítka v popup */
+        .popup-actions {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .info-button, .route-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s;
+            margin: 0 5px;
+        }
+
+        .info-button:hover {
+            background-color: #2980b9;
+        }
+
+        .route-button {
+            background-color: #27ae60;
+        }
+
+        .route-button:hover {
+            background-color: #219955;
+        }
+
+        /* Styly pro animaci vyhledávání */
+        .search-pulse {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(52, 152, 219, 0.3);
+            z-index: 400;
+            pointer-events: none;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* Styly pro cestu */
+        .leaflet-routing-container {
+            display: none; /* Skryjeme výchozí instrukce */
+        }
+
+        .route-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .route-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+
+        .route-info p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+
+        .close-route {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 16px;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        /* Styly pro modální okno s informacemi */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 70vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #555;
+        }
+
+        .modal-title {
+            margin-top: 0;
+            color: #2c3e50;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-body {
+            margin-top: 15px;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Styly pro zobrazení informací o místě */
+        .place-info {
+            line-height: 1.5;
+        }
+
+        .place-info h1 {
+            font-size: 22px;
+            margin: 15px 0 10px;
+            color: #2c3e50;
+        }
+
+        .place-info h2 {
+            font-size: 18px;
+            margin: 15px 0 10px;
+            color: #3498db;
+        }
+
+        .place-info h3 {
+            font-size: 16px;
+            margin: 12px 0 8px;
+            color: #2980b9;
+        }
+
+        .place-info p {
+            margin: 0 0 10px;
+        }
+
+        .place-info ul, .place-info ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .place-info li {
+            margin-bottom: 5px;
+        }
+
+        .place-info a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .place-info a:hover {
+            text-decoration: underline;
+        }
+
+        .info-footer {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            padding: 15px;
+            background-color: #fdf7f7;
+            border-radius: 4px;
+            border-left: 4px solid #e74c3c;
+        }
+    </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com; frame-src 'self' https://*.auth0.com https://*.stripe.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content">
+</head>
+<body>
+    <div class="container">
+        <div class="header-container">
+            <h1>AI Mapa - Testovací Rozhraní</h1>
+            <div class="user-info">
+                <span class="user-name" id="user-name">Uživatel: Nepřihlášen</span>
+                <button class="chat-button" id="chat-button">Zpět na chat</button>
+                <button class="settings-button" id="settings-button">Nastavení API</button>
+                <button class="logout-button" id="logout-button" style="display: none;">Odhlásit se</button>
+                <button class="login-button" id="login-button">Přihlásit</button>
+            </div>
+        </div>
+
+        <div class="map-info">
+            <h3>Vítejte v testovacím rozhraní AI Mapy</h3>
+            <p>Toto rozhraní umožňuje testovat funkce AI Mapy s využitím Google Gemini API.</p>
+            <p>Můžete vyhledávat místa, získávat informace o bodech zájmu a generovat trasy.</p>
+            <p>Všechny požadavky jsou omezeny limitem 50 Kč.</p>
+            <p><a href="#" id="show-examples">Zobrazit příklady nejasných dotazů</a></p>
+        </div>
+
+        <div id="examples-container" class="examples-container" style="display: none;">
+            <div class="examples-header">
+                <h3>Příklady nejasných dotazů</h3>
+                <span class="close-examples" id="close-examples">&times;</span>
+            </div>
+            <p>Vyzkoušejte tyto nejasné nebo neúplné dotazy:</p>
+            <ul class="examples-list">
+                <li><a href="#" class="example-link">ta velká věž v Paříži</a></li>
+                <li><a href="#" class="example-link">ten most v Praze</a></li>
+                <li><a href="#" class="example-link">někde na jihu Prahy</a></li>
+                <li><a href="#" class="example-link">Václavák</a></li>
+                <li><a href="#" class="example-link">Staromák</a></li>
+                <li><a href="#" class="example-link">Kulaťák</a></li>
+                <li><a href="#" class="example-link">10 km severně od Brna</a></li>
+                <li><a href="#" class="example-link">mezi Prahou a Brnem</a></li>
+                <li><a href="#" class="example-link">ta hora s vysílačem</a></li>
+                <li><a href="#" class="example-link">to jezero na jihu Čech</a></li>
+                <li><a href="#" class="example-link">to velké náměstí v Brně</a></li>
+                <li><a href="#" class="example-link">ta známá restaurace v Praze</a></li>
+                <li><a href="#" class="example-link">ten hrad na kopci</a></li>
+                <li><a href="#" class="example-link">to hlavní nádraží</a></li>
+                <li><a href="#" class="example-link">ta známá zoo</a></li>
+            </ul>
+
+            <h4>Příklady dotazů na firmy:</h4>
+            <ul class="examples-list">
+                <li><a href="#" class="example-link">najdi místo blízko Rohatce kde je firma co vyrábí cukrovinky najdi tu firmu</a></li>
+                <li><a href="#" class="example-link">firma Mariša - Pedro vyrábí sladkosti</a></li>
+                <li><a href="#" class="example-link">továrna na čokoládu v Česku</a></li>
+                <li><a href="#" class="example-link">výrobce cukrovinek v Hodoníně</a></li>
+                <li><a href="#" class="example-link">kde se vyrábí Fidorka</a></li>
+                <li><a href="#" class="example-link">sídlo Škoda Auto</a></li>
+                <li><a href="#" class="example-link">pivovar Plzeň</a></li>
+                <li><a href="#" class="example-link">výrobce nábytku IKEA v ČR</a></li>
+                <li><a href="#" class="example-link">automobilka Toyota v Kolíně</a></li>
+                <li><a href="#" class="example-link">kde se vyrábí Becherovka</a></li>
+            </ul>
+        </div>
+
+        <div class="map-controls">
+            <input type="text" id="search-input" placeholder="Vyhledat místo...">
+            <button id="search-button">Vyhledat</button>
+            <button id="clear-button">Vyčistit</button>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div id="route-info" class="route-info" style="display: none;">
+                <span class="close-route" onclick="hideRoute()">&times;</span>
+                <h3>Informace o cestě</h3>
+                <p id="route-distance"></p>
+                <p id="route-duration"></p>
+            </div>
+        </div>
+
+        <div class="usage-info">
+            <div class="credit-bar-container">
+                <div class="credit-bar-label">Zbývající kredit: <span id="remaining-credit">50.00 Kč</span></div>
+                <div class="credit-bar">
+                    <div id="credit-bar-fill" class="credit-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="usage-details">
+                <div>Celkem využito: <span id="total-cost">0.00 Kč</span></div>
+                <div>Počet požadavků: <span id="request-count">0</span></div>
+            </div>
+        </div>
+
+        <div class="status-container">
+            <p id="status-message"></p>
+        </div>
+
+        <!-- Modální okno pro zobrazení podrobných informací -->
+        <div id="info-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+                <h2 id="modal-title" class="modal-title">Informace o místě</h2>
+                <div id="modal-body" class="modal-body">
+                    <div class="loading-spinner">
+                        <div class="loading"></div>
+                        <p>Načítání informací...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="/ai-map/config.js"></script>
+    <script src="/ai-map/usage-tracker.js"></script>
+    <script src="/ai-map/gemini-api.js"></script>
+    <script src="/ai-map/map-integration.js"></script>
+    <script>
+        // Funkce pro otevření modálního okna
+        function openModal() {
+            document.getElementById('info-modal').style.display = 'block';
+        }
+
+        // Funkce pro zavření modálního okna
+        function closeModal() {
+            document.getElementById('info-modal').style.display = 'none';
+        }
+
+        // Funkce pro získání podrobných informací o místě
+        async function getMoreInfo(encodedData) {
+            try {
+                // Dekódování dat o místě
+                const locationData = JSON.parse(decodeURIComponent(encodedData));
+
+                // Otevření modálního okna s načítacím indikátorem
+                document.getElementById('modal-title').textContent = locationData.name || 'Informace o místě';
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="loading-spinner">
+                        <div class="loading"></div>
+                        <p>Načítání informací...</p>
+                    </div>
+                `;
+                openModal();
+
+                // Kontrola, zda je nastaven API klíč
+                if (!config.hasApiKey('gemini')) {
+                    document.getElementById('modal-body').innerHTML = `
+                        <div class="error-message">
+                            <p>Pro získání informací je potřeba nastavit API klíč pro Gemini.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Kontrola, zda je dostatek kreditu
+                const prompt = `Poskytni podrobné informace o místě: ${locationData.name || 'neznámé místo'} (${locationData.lat}, ${locationData.lng})`;
+                if (!usageTracker.canMakeRequest('gemini', prompt)) {
+                    document.getElementById('modal-body').innerHTML = `
+                        <div class="error-message">
+                            <p>Byl dosažen limit výdajů (50 Kč). Další požadavky nejsou možné.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Sestavení dotazu pro AI podle typu místa
+                let detailedPrompt;
+
+                if (locationData.type === 'firma' || locationData.company_info) {
+                    // Speciální prompt pro firmy
+                    detailedPrompt = `Poskytni VELMI PODROBNÉ informace o firmě: ${locationData.name || 'neznámá firma'} (${locationData.lat}, ${locationData.lng}).
+
+Firma se nachází v zemi: ${locationData.country || 'neznámá země'}.
+${locationData.company_info ? `Oficiální název: ${locationData.company_info.official_name || 'neuvedeno'}` : ''}
+${locationData.company_info ? `Adresa: ${locationData.company_info.address || 'neuvedeno'}` : ''}
+${locationData.company_info ? `Produkty: ${locationData.company_info.products || 'neuvedeno'}` : ''}
+
+Poskytni následující informace:
+1. Podrobný popis firmy, její historie a současnosti (2-3 odstavce)
+2. Detailní informace o produktech a službách
+3. Pozice na trhu a konkurence
+4. Zajímavosti o firmě a její výrobě
+5. Ekonomické informace (pokud jsou dostupné)
+6. Kontaktní informace a otevírací doba (pokud jsou relevantní)
+
+Pokud jde o výrobce potravin nebo cukrovinek, uveď také:
+- Nejznámější produkty a značky
+- Informace o výrobním procesu
+- Možnosti exkurzí nebo návštěv výroby
+- Speciální produkty nebo sezónní nabídky
+
+Formátuj odpověď pomocí Markdown pro lepší čitelnost. Používej nadpisy, odrážky a další formátovací prvky.
+Odpověď by měla být velmi informativní a podrobná (400-500 slov).`;
+                } else {
+                    // Standardní prompt pro ostatní místa
+                    detailedPrompt = `Poskytni podrobné informace o místě: ${locationData.name || 'neznámé místo'} (${locationData.lat}, ${locationData.lng}).
+
+Místo se nachází v zemi: ${locationData.country || 'neznámá země'}.
+Typ místa: ${locationData.type || 'neznámý'}.
+
+Poskytni následující informace:
+1. Stručný popis místa (1-2 odstavce)
+2. Historické informace (pokud jsou relevantní)
+3. Zajímavosti a důležité informace
+4. Turistické atrakce v okolí (pokud je to relevantní)
+
+Formátuj odpověď pomocí Markdown pro lepší čitelnost. Používej nadpisy, odrážky a další formátovací prvky.
+Odpověď by měla být informativní, ale stručná (max. 300 slov).`;
+                }
+
+                // Volání Gemini API
+                const response = await geminiApi.generateResponse(detailedPrompt);
+
+                // Zobrazení odpovědi v modálním okně
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="place-info">
+                        ${convertMarkdownToHtml(response)}
+                    </div>
+                    <div class="info-footer">
+                        <p><small>Souřadnice: ${locationData.lat.toFixed(6)}, ${locationData.lng.toFixed(6)}</small></p>
+                    </div>
+                `;
+
+                // Aktualizace zobrazení využití API
+                updateUsageDisplay();
+
+                // Zobrazení informací o ceně požadavku
+                const lastRequest = usageTracker.getLastRequestInfo('gemini');
+                if (lastRequest) {
+                    const requestCostInfo = document.createElement('div');
+                    requestCostInfo.classList.add('request-cost-info');
+                    requestCostInfo.innerHTML = `
+                        <span class="cost-label">Cena požadavku:</span>
+                        <span class="cost-value">${lastRequest.totalCost.toFixed(4)} Kč</span>
+                        <span class="tokens-info">(Vstup: ${lastRequest.inputTokens} tokenů, Výstup: ${lastRequest.outputTokens} tokenů)</span>
+                    `;
+                    document.getElementById('modal-body').appendChild(requestCostInfo);
+                }
+
+            } catch (error) {
+                console.error('Chyba při získávání informací:', error);
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="error-message">
+                        <p>Došlo k chybě při získávání informací: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Funkce pro konverzi Markdown na HTML
+        function convertMarkdownToHtml(markdown) {
+            // Jednoduchá implementace konverze Markdown na HTML
+            return markdown
+                // Nadpisy
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                // Zvýraznění
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Seznamy
+                .replace(/^\s*\n\* (.*)/gm, '<ul>\n<li>$1</li>')
+                .replace(/^\* (.*)/gm, '<li>$1</li>')
+                .replace(/^\s*\n\d+\. (.*)/gm, '<ol>\n<li>$1</li>')
+                .replace(/^\d+\. (.*)/gm, '<li>$1</li>')
+                // Odstavce
+                .replace(/^\s*\n\s*\n/gm, '</ul>\n\n')
+                // Odkazy
+                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+                // Nové řádky
+                .replace(/\n/g, '<br>');
+        }
+
+        // Zavření modálního okna při kliknutí mimo obsah
+        window.onclick = function(event) {
+            const modal = document.getElementById('info-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kontrola přihlášení pomocí Auth0
+            fetch('/auth/status')
+                .then(response => response.json())
+                .then(data => {
+                    const userNameElement = document.getElementById('user-name');
+                    const loginBtn = document.getElementById('login-button');
+                    const logoutBtn = document.getElementById('logout-button');
+
+                    if (data.isAuthenticated) {
+                        userNameElement.textContent = `Přihlášen jako: ${data.user.auth0.name || data.user.auth0.email || 'Uživatel'}`;
+                        loginBtn.style.display = 'none';
+                        logoutBtn.style.display = 'inline-block';
+                    } else {
+                        userNameElement.textContent = 'Nepřihlášen';
+                        loginBtn.style.display = 'inline-block';
+                        logoutBtn.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Chyba při kontrole stavu přihlášení:', error);
+                    document.getElementById('user-name').textContent = 'Chyba při kontrole přihlášení';
+                });
+
+            // Event listenery pro tlačítka v hlavičce
+            document.getElementById('chat-button').addEventListener('click', function() {
+                window.location.href = '/';
+            });
+
+            document.getElementById('settings-button').addEventListener('click', function() {
+                window.location.href = '/api-settings';
+            });
+
+            document.getElementById('login-button').addEventListener('click', function() {
+                window.location.href = '/login';
+            });
+
+            document.getElementById('logout-button').addEventListener('click', function() {
+                window.location.href = '/logout';
+            });
+
+            // Globální proměnné
+            let map;
+            let userLocation = [50.0755, 14.4378]; // Výchozí poloha (Praha)
+            let searchAnimationInterval;
+            let searchPulses = [];
+            let routeControl;
+
+            // Inicializace mapy
+            map = L.map('map').setView(userLocation, 13);
+
+            // Přidání vrstvy OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Přidání markeru pro výchozí polohu
+            const userMarker = L.marker(userLocation, {
+                icon: L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                })
+            }).addTo(map);
+            userMarker.bindPopup("<b>Vaše poloha</b><br>Výchozí bod pro hledání cesty").openPopup();
+
+            // Funkce pro spuštění animace vyhledávání
+            function startSearchAnimation() {
+                // Vyčištění předchozích animací
+                stopSearchAnimation();
+
+                // Získání středu mapy
+                const center = map.getCenter();
+
+                // Vytvoření pulzujících bodů na mapě
+                const createPulse = () => {
+                    const pulse = L.DomUtil.create('div', 'search-pulse');
+                    document.querySelector('.leaflet-overlay-pane').appendChild(pulse);
+
+                    // Náhodná pozice v okolí středu mapy
+                    const point = map.latLngToLayerPoint(
+                        L.latLng(
+                            center.lat + (Math.random() - 0.5) * 0.1,
+                            center.lng + (Math.random() - 0.5) * 0.2
+                        )
+                    );
+
+                    pulse.style.left = point.x + 'px';
+                    pulse.style.top = point.y + 'px';
+
+                    searchPulses.push(pulse);
+
+                    // Odstranění pulzu po animaci
+                    setTimeout(() => {
+                        if (pulse.parentNode) {
+                            pulse.parentNode.removeChild(pulse);
+                        }
+                        const index = searchPulses.indexOf(pulse);
+                        if (index > -1) {
+                            searchPulses.splice(index, 1);
+                        }
+                    }, 1500);
+                };
+
+                // Vytvoření prvního pulzu
+                createPulse();
+
+                // Vytváření nových pulzů v intervalu
+                searchAnimationInterval = setInterval(createPulse, 300);
+            }
+
+            // Funkce pro zastavení animace vyhledávání
+            function stopSearchAnimation() {
+                if (searchAnimationInterval) {
+                    clearInterval(searchAnimationInterval);
+                    searchAnimationInterval = null;
+                }
+
+                // Odstranění všech pulzů
+                searchPulses.forEach(pulse => {
+                    if (pulse.parentNode) {
+                        pulse.parentNode.removeChild(pulse);
+                    }
+                });
+                searchPulses = [];
+            }
+
+            // Funkce pro animovaný přesun na místo
+            function animateToLocation(latLng) {
+                // Animovaný zoom a přesun
+                map.flyTo(latLng, 14, {
+                    duration: 1.5,
+                    easeLinearity: 0.25
+                });
+            }
+
+            // Funkce pro zobrazení cesty k místu
+            function showRoute(destination) {
+                // Odstranění předchozí cesty, pokud existuje
+                hideRoute();
+
+                // Vytvoření nové cesty
+                routeControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(userLocation[0], userLocation[1]),
+                        L.latLng(destination[0], destination[1])
+                    ],
+                    routeWhileDragging: false,
+                    showAlternatives: false,
+                    fitSelectedRoutes: true,
+                    lineOptions: {
+                        styles: [
+                            {color: '#3498db', opacity: 0.8, weight: 6},
+                            {color: 'white', opacity: 0.3, weight: 10}
+                        ]
+                    },
+                    createMarker: function() { return null; } // Nezobrazovat markery na trase
+                }).addTo(map);
+
+                // Zobrazení informací o cestě po jejím výpočtu
+                routeControl.on('routesfound', function(e) {
+                    const routes = e.routes;
+                    const summary = routes[0].summary;
+
+                    // Výpočet vzdálenosti v km
+                    const distance = (summary.totalDistance / 1000).toFixed(1);
+
+                    // Výpočet času v minutách nebo hodinách
+                    let duration;
+                    if (summary.totalTime < 3600) {
+                        duration = Math.round(summary.totalTime / 60) + ' minut';
+                    } else {
+                        const hours = Math.floor(summary.totalTime / 3600);
+                        const minutes = Math.round((summary.totalTime % 3600) / 60);
+                        duration = hours + ' h ' + minutes + ' min';
+                    }
+
+                    // Zobrazení informací
+                    document.getElementById('route-distance').textContent = `Vzdálenost: ${distance} km`;
+                    document.getElementById('route-duration').textContent = `Doba jízdy: ${duration}`;
+                    document.getElementById('route-info').style.display = 'block';
+                });
+            }
+
+            // Funkce pro skrytí cesty
+            function hideRoute() {
+                if (routeControl) {
+                    map.removeControl(routeControl);
+                    routeControl = null;
+                }
+                document.getElementById('route-info').style.display = 'none';
+            }
+
+            // Pokus o získání aktuální polohy uživatele
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLocation = [position.coords.latitude, position.coords.longitude];
+
+                        // Aktualizace markeru a mapy
+                        userMarker.setLatLng(userLocation);
+                        map.setView(userLocation, 13);
+
+                        userMarker.bindPopup("<b>Vaše poloha</b><br>Aktuální poloha").openPopup();
+                    },
+                    function(error) {
+                        console.warn('Nepodařilo se získat polohu:', error.message);
+                    }
+                );
+            }
+
+            // Funkce pro zobrazení alternativního místa
+            function showAlternative(lat, lng, name) {
+                // Animovaný přesun na alternativní místo
+                animateToLocation([lat, lng]);
+
+                // Přidání markeru pro alternativní místo
+                const altMarker = L.marker([lat, lng], {
+                    icon: L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    })
+                }).addTo(map);
+
+                // Příprava obsahu pro popup
+                const popupContent = `
+                    <div class="marker-popup">
+                        <h3>${name}</h3>
+                        <p><b>Souřadnice:</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
+                        <p><i>Alternativní místo</i></p>
+                    </div>
+                    <div class="popup-actions">
+                        <button class="route-button" onclick="showRoute([${lat}, ${lng}])">
+                            Ukázat cestu
+                        </button>
+                    </div>
+                `;
+
+                altMarker.bindPopup(popupContent).openPopup();
+
+                // Zobrazení informace o alternativním místě
+                showStatus(`Zobrazeno alternativní místo: ${name}`, 'info');
+            }
+
+            // Funkce pro vyhledávání míst pomocí Gemini API
+            async function searchPlace(query) {
+                try {
+                    // Kontrola, zda je nastaven API klíč
+                    if (!config.hasApiKey('gemini')) {
+                        showStatus('Pro vyhledávání je potřeba nastavit API klíč pro Gemini', 'error');
+                        return;
+                    }
+
+                    // Kontrola, zda je dostatek kreditu
+                    if (!usageTracker.canMakeRequest('gemini', query)) {
+                        showStatus('Byl dosažen limit výdajů (50 Kč). Další požadavky nejsou možné.', 'error');
+                        return;
+                    }
+
+                    showStatus('Vyhledávání...', 'info');
+
+                    // Spustit animaci vyhledávání
+                    startSearchAnimation();
+
+                    // Nastavení timeout pro vyhledávání
+                    const searchTimeout = setTimeout(() => {
+                        // Pokud vyhledávání trvá příliš dlouho, zrušíme ho
+                        stopSearchAnimation();
+                        showStatus('Vyhledávání bylo přerušeno z důvodu překročení časového limitu.', 'error');
+
+                        // Zrušení všech probíhajících fetch požadavků
+                        if (window.activeSearchController) {
+                            window.activeSearchController.abort();
+                            window.activeSearchController = null;
+                        }
+                    }, 15000); // 15 sekund timeout
+
+                    // Vytvoření AbortController pro možnost zrušení požadavku
+                    window.activeSearchController = new AbortController();
+
+                    // Sestavení pokročilého dotazu pro AI s podporou nejasných popisů a vysokou přesností a lazy-target architekturou
+                    const prompt = `Najdi EXTRÉMNĚ PŘESNÉ geografické souřadnice pro místo popsané jako: "${query}".
+
+// LAZY-TARGET ARCHITEKTURA: Postupuj v krocích a zastav se, jakmile najdeš dostatečně přesné souřadnice.
+// Krok 1: Rychle identifikuj typ dotazu (místo, firma, adresa, atd.)
+// Krok 2: Pokud je to jednoduché místo, vrať souřadnice ihned
+// Krok 3: Pouze pokud je to složitý dotaz, proveď hlubší analýzu
+// Krok 4: Zastav se, jakmile máš souřadnice s přesností alespoň 90%
+
+Tvým úkolem je najít co nejpřesnější souřadnice pro zadané místo, i když jde o VELMI NEJASNÝ, NEÚPLNÝ, SPECIFICKÝ nebo ŠPATNĚ POPSANÝ dotaz. MUSÍŠ dosáhnout přesnosti alespoň 90%.
+
+POKROČILÉ ZPRACOVÁNÍ NEJASNÝCH POPISŮ:
+1. Pokud je popis nejasný nebo neúplný (např. "ta velká věž v Paříži", "ten most v Praze"), pokus se identifikovat nejpravděpodobnější místo.
+2. Pokud popis obsahuje přibližné umístění (např. "někde na jihu Prahy", "kousek od Brna"), odhadni nejpravděpodobnější souřadnice.
+3. Pokud popis obsahuje chyby (např. překlepy, špatné názvy), pokus se odvodit správné místo.
+4. Pokud popis obsahuje jen částečné informace (např. "Václavák", "Staromák"), doplň chybějící kontext.
+5. Pokud popis obsahuje slang nebo místní názvy (např. "Kulaťák" místo "Vítězné náměstí"), převeď je na oficiální názvy.
+6. Pokud popis obsahuje relativní umístění (např. "10 km severně od Brna"), vypočítej přibližné souřadnice.
+
+SPECIÁLNÍ ZPRACOVÁNÍ FIREM A PODNIKŮ:
+1. Pokud dotaz obsahuje zmínku o firmě, podniku nebo výrobci (např. "firma co vyrábí cukrovinky", "továrna na sladkosti"), proveď DŮKLADNÝ VÝZKUM konkrétní firmy.
+2. Pokud je zmíněn název firmy (i částečně nebo nepřesně), najdi PŘESNÝ název a adresu této firmy.
+3. Pokud je zmíněn typ produktu (např. "cukrovinky", "sladkosti"), najdi VŠECHNY relevantní výrobce v dané lokalitě.
+4. Pokud je zmíněna lokalita firmy (např. "blízko Rohatce"), hledej firmy v okruhu až 20 km od zmíněného místa.
+5. Pro firmy vždy uveď PŘESNOU adresu a souřadnice sídla nebo výrobního závodu.
+6. Pokud existuje více poboček nebo závodů, uveď hlavní sídlo nebo závod nejbližší zmíněné lokalitě.
+
+PRIORITY PRO NEJEDNOZNAČNÉ DOTAZY:
+1. Preferuj místa v České republice, pokud není uvedeno jinak.
+2. Preferuj známější a významnější místa před méně známými.
+3. Preferuj místa, která lépe odpovídají kontextu dotazu.
+4. Pokud je více možností, vyber tu nejpravděpodobnější a uveď nižší hodnotu confidence.
+5. Pro firmy a podniky preferuj oficiální sídla a výrobní závody před prodejnami.
+
+TYPY MÍST, KTERÉ MUSÍŠ UMĚT NAJÍT:
+- Adresy (i neúplné nebo s chybami)
+- Památky a turistické atrakce (i s přezdívkami nebo slangovými názvy)
+- Města, obce, čtvrti (i s přibližným umístěním)
+- Přírodní útvary (hory, jezera, řeky, lesy)
+- Veřejná místa (náměstí, parky, nádraží)
+- Obchodní centra, restaurace, hotely
+- Relativní popisy míst ("mezi Prahou a Brnem", "severně od Plzně")
+- Firmy, podniky, továrny a výrobní závody (s EXTRÉMNÍ přesností)
+- Specifické podniky podle typu výroby nebo produktů
+
+Odpověz POUZE ve formátu JSON s následujícími klíči:
+- "lat": zeměpisná šířka (číslo)
+- "lng": zeměpisná délka (číslo)
+- "name": plný oficiální název místa (řetězec)
+- "type": typ místa (město, památka, přírodní útvar, adresa, firma, atd.) (řetězec)
+- "country": země, kde se místo nachází (řetězec)
+- "confidence": tvoje jistota v přesnost souřadnic na stupnici 0-1 (číslo) - MUSÍ BÝT ALESPOŇ 0.9 pro firmy
+- "interpretation": jak jsi interpretoval nejasný dotaz (řetězec)
+- "alternatives": pole alternativních míst, pokud je dotaz nejednoznačný (pole objektů s klíči name, lat, lng)
+
+DODATEČNÉ POLE PRO FIRMY A PODNIKY:
+- "company_info": objekt s podrobnými informacemi o firmě (pouze pokud jde o firmu)
+  - "official_name": oficiální název firmy včetně právní formy
+  - "address": úplná adresa (ulice, číslo, město, PSČ)
+  - "products": hlavní produkty nebo služby firmy
+  - "website": webová stránka firmy (pokud je známá)
+  - "founded": rok založení (pokud je známý)
+  - "description": krátký popis firmy (max 100 slov)
+
+Příklad odpovědi pro dotaz o firmě "firma co vyrábí cukrovinky blízko Rohatce":
+{
+  "lat": 48.8765,
+  "lng": 17.1234,
+  "name": "Kordárna Plus a.s. - výrobní závod",
+  "type": "firma",
+  "country": "Česká republika",
+  "confidence": 0.95,
+  "interpretation": "Dotaz jsem interpretoval jako hledání firmy, která vyrábí cukrovinky v blízkosti obce Rohatec. Identifikoval jsem firmu Kordárna Plus a.s., která má výrobní závod v této lokalitě.",
+  "alternatives": [
+    {"name": "I.D.C. Praha, a.s. - výrobní závod Figaro", "lat": 48.8901, "lng": 17.1432},
+    {"name": "Nestlé Česko s.r.o. - závod Hodonín", "lat": 48.8512, "lng": 17.1298}
+  ],
+  "company_info": {
+    "official_name": "Kordárna Plus a.s.",
+    "address": "Velká nad Veličkou 890, 696 74 Velká nad Veličkou",
+    "products": "Technické tkaniny, cukrovinky, čokoládové výrobky",
+    "website": "www.kordarna.cz",
+    "founded": 1948,
+    "description": "Kordárna Plus a.s. je významný výrobce technických tkanin a cukrovinek v regionu jižní Moravy. Firma se specializuje na výrobu kvalitních cukrovinek a čokoládových výrobků s dlouhou tradicí."
+  }
+}
+
+Nepiš nic jiného než tento JSON objekt.`;
+
+                    // Volání Gemini API s možností zrušení
+                    let response;
+                    try {
+                        response = await geminiApi.generateResponse(prompt, {
+                            signal: window.activeSearchController.signal
+                        });
+
+                        // Zrušení timeoutu, protože požadavek byl úspěšně dokončen
+                        clearTimeout(searchTimeout);
+                    } catch (error) {
+                        // Kontrola, zda byl požadavek zrušen
+                        if (error.name === 'AbortError') {
+                            throw new Error('Vyhledávání bylo zrušeno.');
+                        }
+                        throw error;
+                    }
+
+                    // Pokročilé parsování odpovědi s podporou různých formátů
+                    try {
+                        // Extrahování JSON z odpovědi
+                        const jsonMatch = response.match(/\{[\s\S]*\}/);
+                        if (!jsonMatch) {
+                            throw new Error('Neplatný formát odpovědi');
+                        }
+
+                        // Pokus o parsování JSON
+                        let locationData;
+                        try {
+                            locationData = JSON.parse(jsonMatch[0]);
+                        } catch (jsonError) {
+                            console.warn('Chyba při parsování JSON, pokus o opravu:', jsonError);
+
+                            // Pokročilá oprava JSON
+                            let fixedJson = jsonMatch[0]
+                                // Odstranění trailing čárek
+                                .replace(/,(\s*[}\]])/g, '$1')
+                                // Přidání uvozovek kolem klíčů
+                                .replace(/([{,]\s*)([a-zA-Z0-9_]+)(\s*:)/g, '$1"$2"$3')
+                                // Oprava neplatných escape sekvencí
+                                .replace(/\\([^"\\\/bfnrtu])/g, '\\\\$1')
+                                // Oprava chybějících uvozovek kolem hodnot
+                                .replace(/:(\s*)([a-zA-Z0-9_]+)(\s*[,}])/g, ':"$2"$3')
+                                // Oprava neuzavřených řetězců
+                                .replace(/"([^"]*?)(\n)/g, '"$1"$2');
+
+                            try {
+                                locationData = JSON.parse(fixedJson);
+                            } catch (fixError) {
+                                console.error('Nepodařilo se opravit JSON:', fixError);
+
+                                // Poslední pokus - extrakce souřadnic pomocí regulárních výrazů
+                                const latMatch = response.match(/"lat"?\s*:\s*(-?\d+\.?\d*)/);
+                                const lngMatch = response.match(/"lng"?\s*:\s*(-?\d+\.?\d*)/);
+                                const nameMatch = response.match(/"name"?\s*:\s*"([^"]+)"/);
+
+                                if (latMatch && lngMatch) {
+                                    locationData = {
+                                        lat: parseFloat(latMatch[1]),
+                                        lng: parseFloat(lngMatch[1]),
+                                        name: nameMatch ? nameMatch[1] : query,
+                                        confidence: 0.5,
+                                        interpretation: "Odpověď byla extrahována z neplatného JSON formátu.",
+                                        type: "neznámý",
+                                        country: "neznámá"
+                                    };
+                                } else {
+                                    throw new Error('Nepodařilo se extrahovat souřadnice z odpovědi');
+                                }
+                            }
+                        }
+
+                        // Kontrola a oprava povinných polí
+                        if (!locationData.lat || !locationData.lng) {
+                            throw new Error('Chybějící souřadnice v odpovědi');
+                        }
+
+                        // Zajištění, že souřadnice jsou čísla
+                        locationData.lat = parseFloat(locationData.lat);
+                        locationData.lng = parseFloat(locationData.lng);
+
+                        // Zajištění, že ostatní pole existují
+                        locationData.name = locationData.name || query;
+                        locationData.type = locationData.type || "neznámý";
+                        locationData.country = locationData.country || "neznámá";
+                        locationData.confidence = locationData.confidence || 0.7;
+
+                        // Kontrola, zda jsou souřadnice v platném rozsahu
+                        if (locationData.lat < -90 || locationData.lat > 90 ||
+                            locationData.lng < -180 || locationData.lng > 180) {
+                            throw new Error('Neplatné souřadnice: ' +
+                                locationData.lat + ', ' + locationData.lng);
+                        }
+
+                        // Zastavení animace vyhledávání
+                        stopSearchAnimation();
+
+                        // Animovaný přesun mapy na nalezené místo
+                        animateToLocation([locationData.lat, locationData.lng]);
+
+                        // Příprava obsahu pro popup
+                        let popupContent = `<div class="marker-popup">`;
+
+                        // Název místa
+                        popupContent += `<h3>${locationData.name || query}</h3>`;
+
+                        // Typ místa a země
+                        if (locationData.type || locationData.country) {
+                            popupContent += `<p>`;
+                            if (locationData.type) popupContent += `<b>Typ:</b> ${locationData.type}<br>`;
+                            if (locationData.country) popupContent += `<b>Země:</b> ${locationData.country}`;
+                            popupContent += `</p>`;
+                        }
+
+                        // Informace o firmě (pokud existují)
+                        if (locationData.company_info) {
+                            popupContent += `<div class="company-info">
+                                <h4>Informace o firmě</h4>
+                                <p><b>Oficiální název:</b> ${locationData.company_info.official_name || 'Neuvedeno'}</p>
+                                <p><b>Adresa:</b> ${locationData.company_info.address || 'Neuvedeno'}</p>
+                                <p><b>Produkty:</b> ${locationData.company_info.products || 'Neuvedeno'}</p>`;
+
+                            if (locationData.company_info.website) {
+                                popupContent += `<p><b>Web:</b> <a href="https://${locationData.company_info.website}" target="_blank">${locationData.company_info.website}</a></p>`;
+                            }
+
+                            if (locationData.company_info.founded) {
+                                popupContent += `<p><b>Založeno:</b> ${locationData.company_info.founded}</p>`;
+                            }
+
+                            if (locationData.company_info.description) {
+                                popupContent += `<div class="company-description">
+                                    <p>${locationData.company_info.description}</p>
+                                </div>`;
+                            }
+
+                            popupContent += `</div>`;
+                        }
+
+                        // Interpretace dotazu (pokud existuje)
+                        if (locationData.interpretation) {
+                            popupContent += `<div class="interpretation">
+                                <p><b>Interpretace dotazu:</b> ${locationData.interpretation}</p>
+                            </div>`;
+                        }
+
+                        // Souřadnice
+                        popupContent += `<p><b>Souřadnice:</b> ${locationData.lat.toFixed(6)}, ${locationData.lng.toFixed(6)}`;
+
+                        // Úroveň jistoty
+                        if (locationData.confidence) {
+                            const confidencePercent = Math.round(locationData.confidence * 100);
+                            const confidenceClass = confidencePercent > 90 ? 'very-high' :
+                                                   (confidencePercent > 80 ? 'high' :
+                                                   (confidencePercent > 50 ? 'medium' : 'low'));
+                            popupContent += `<br><b>Přesnost:</b> <span class="confidence-${confidenceClass}">${confidencePercent}%</span>`;
+                        }
+
+                        popupContent += `</p>`;
+
+                        // Alternativní místa (pokud existují)
+                        if (locationData.alternatives && locationData.alternatives.length > 0) {
+                            popupContent += `<div class="alternatives">
+                                <p><b>Alternativní místa:</b></p>
+                                <ul>`;
+
+                            locationData.alternatives.forEach(alt => {
+                                popupContent += `<li>
+                                    <a href="#" onclick="showAlternative(${alt.lat}, ${alt.lng}, '${alt.name.replace(/'/g, "\\'")}'); return false;">
+                                        ${alt.name}
+                                    </a>
+                                </li>`;
+                            });
+
+                            popupContent += `</ul></div>`;
+                        }
+
+                        popupContent += `</div>`;
+
+                        // Přidání tlačítek pro akce
+                        popupContent += `<div class="popup-actions">
+                            <button class="info-button" onclick="getMoreInfo('${encodeURIComponent(JSON.stringify(locationData))}')">
+                                Více informací
+                            </button>
+                            <button class="route-button" onclick="showRoute([${locationData.lat}, ${locationData.lng}])">
+                                Ukázat cestu
+                            </button>
+                        </div>`;
+
+                        // Přidání markeru s vylepšeným popup obsahem
+                        const newMarker = L.marker([locationData.lat, locationData.lng]).addTo(map);
+                        newMarker.bindPopup(popupContent).openPopup();
+
+                        showStatus(`Místo "${query}" bylo nalezeno`, 'info');
+
+                        // Zobrazení informací o ceně požadavku
+                        const lastRequest = usageTracker.getLastRequestInfo('gemini');
+                        if (lastRequest) {
+                            const requestCostInfo = document.createElement('div');
+                            requestCostInfo.classList.add('request-cost-info');
+
+                            // Získání limitu ceny na jedno vyhledávání
+                            const searchCostLimit = config.getSearchCostLimit();
+
+                            // Výpočet procenta využití limitu
+                            const limitPercentage = (lastRequest.totalCost / searchCostLimit) * 100;
+
+                            // Určení třídy podle procenta využití limitu
+                            let costClass = 'cost-low';
+                            if (limitPercentage > 90) {
+                                costClass = 'cost-high';
+                            } else if (limitPercentage > 70) {
+                                costClass = 'cost-medium';
+                            }
+
+                            // Základní informace o ceně
+                            let costHtml = `
+                                <span class="cost-label">Cena požadavku:</span>
+                                <span class="cost-value ${costClass}">${lastRequest.totalCost.toFixed(4)} Kč</span>
+                                <span class="cost-limit">(Limit: ${searchCostLimit.toFixed(4)} Kč)</span>
+                                <span class="tokens-info">(Vstup: ${lastRequest.inputTokens} tokenů, Výstup: ${lastRequest.outputTokens} tokenů)</span>
+                            `;
+
+                            // Přidání informace o optimalizaci a úspoře, pokud byla provedena
+                            if (lastRequest.wasOptimized || localStorage.getItem('prompt_optimized') === 'true') {
+                                // Výpočet úspory v procentech
+                                const savingsPercent = lastRequest.originalCost > 0
+                                    ? Math.round((lastRequest.savedAmount / lastRequest.originalCost) * 100)
+                                    : 0;
+
+                                // Získání úrovně optimalizace
+                                const optimizationLevel = parseInt(localStorage.getItem('optimization_level') || '1');
+
+                                // Určení textu podle úrovně optimalizace
+                                let optimizationText = "Prompt byl optimalizován pro dodržení limitu ceny.";
+                                let optimizationClass = "optimization-standard";
+
+                                if (optimizationLevel >= 3) {
+                                    optimizationText = "Prompt byl EXTRÉMNĚ optimalizován pro dodržení limitu ceny.";
+                                    optimizationClass = "optimization-extreme";
+                                } else if (optimizationLevel >= 2) {
+                                    optimizationText = "Prompt byl AGRESIVNĚ optimalizován pro dodržení limitu ceny.";
+                                    optimizationClass = "optimization-aggressive";
+                                }
+
+                                costHtml += `
+                                <div class="optimization-info ${optimizationClass}">
+                                    <span class="optimization-label">${optimizationText}</span>
+                                    <span class="efficiency-mode">Režim: ${config.getSearchEfficiency()}, Úroveň optimalizace: ${optimizationLevel}</span>
+                                    <div class="savings-info">
+                                        <span class="savings-label">Původní cena:</span>
+                                        <span class="original-cost">${lastRequest.originalCost.toFixed(4)} Kč</span>
+                                        <span class="savings-amount">Úspora: ${lastRequest.savedAmount.toFixed(4)} Kč (${savingsPercent}%)</span>
+                                    </div>
+                                    <div class="limit-info">
+                                        <span class="limit-label">Limit na vyhledávání:</span>
+                                        <span class="limit-value">${searchCostLimit.toFixed(4)} Kč</span>
+                                        <span class="actual-cost">Skutečná cena: ${lastRequest.totalCost.toFixed(4)} Kč</span>
+                                    </div>
+                                </div>`;
+
+                                // Resetování příznaků optimalizace
+                                localStorage.removeItem('prompt_optimized');
+                                localStorage.removeItem('optimization_level');
+                            }
+
+                            requestCostInfo.innerHTML = costHtml;
+
+                            document.querySelector('.map-container').insertAdjacentElement('afterend', requestCostInfo);
+                        }
+
+                        // Aktualizace zobrazení využití API
+                        updateUsageDisplay();
+                    } catch (error) {
+                        console.error('Chyba při parsování odpovědi:', error);
+                        showStatus(`Nepodařilo se zpracovat odpověď: ${error.message}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Chyba při vyhledávání:', error);
+                    showStatus(`Chyba při vyhledávání: ${error.message}`, 'error');
+                }
+            }
+
+            // Event listener pro vyhledávací tlačítko
+            document.getElementById('search-button').addEventListener('click', function() {
+                const query = document.getElementById('search-input').value.trim();
+                if (query) {
+                    searchPlace(query);
+                } else {
+                    showStatus('Zadejte místo pro vyhledávání', 'error');
+                }
+            });
+
+            // Event listener pro tlačítko vyčištění
+            document.getElementById('clear-button').addEventListener('click', function() {
+                // Odstranění všech markerů
+                map.eachLayer(function(layer) {
+                    if (layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
+
+                // Vyčištění vyhledávacího pole
+                document.getElementById('search-input').value = '';
+
+                // Odstranění informací o ceně požadavku
+                const costInfoElements = document.querySelectorAll('.request-cost-info');
+                costInfoElements.forEach(element => element.remove());
+
+                // Skrytí cesty
+                hideRoute();
+
+                showStatus('Mapa byla vyčištěna', 'info');
+            });
+
+            // Event listenery pro příklady nejasných dotazů
+            document.getElementById('show-examples').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('examples-container').style.display = 'block';
+            });
+
+            document.getElementById('close-examples').addEventListener('click', function() {
+                document.getElementById('examples-container').style.display = 'none';
+            });
+
+            // Přidání event listenerů pro všechny příklady
+            document.querySelectorAll('.example-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const query = this.textContent;
+                    document.getElementById('search-input').value = query;
+                    searchPlace(query);
+                    document.getElementById('examples-container').style.display = 'none';
+                });
+            });
+
+            // Event listener pro vyhledávání pomocí klávesy Enter
+            document.getElementById('search-input').addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    const query = this.value.trim();
+                    if (query) {
+                        searchPlace(query);
+                    } else {
+                        showStatus('Zadejte místo pro vyhledávání', 'error');
+                    }
+                }
+            });
+
+            // Funkce pro zobrazení stavové zprávy
+            function showStatus(message, type = 'info') {
+                const statusMessage = document.getElementById('status-message');
+                statusMessage.textContent = message;
+                statusMessage.className = type;
+
+                // Automatické skrytí zprávy po 5 sekundách
+                setTimeout(() => {
+                    statusMessage.textContent = '';
+                }, 5000);
+            }
+
+            // Funkce pro aktualizaci zobrazení využití API
+            function updateUsageDisplay() {
+                const usageInfo = geminiApi.getUsageInfo();
+
+                // Aktualizace zobrazení zbývajícího kreditu
+                const remainingCreditElement = document.getElementById('remaining-credit');
+                const totalCostElement = document.getElementById('total-cost');
+                const requestCountElement = document.getElementById('request-count');
+                const creditBarFill = document.getElementById('credit-bar-fill');
+
+                // Získání celkového využití
+                const remainingCredit = parseFloat(usageInfo.remainingCredit);
+                const totalCost = parseFloat(usageInfo.totalCost);
+                const usagePercentage = usageTracker.getUsagePercentage();
+
+                // Aktualizace textových hodnot
+                remainingCreditElement.textContent = `${remainingCredit.toFixed(2)} Kč`;
+                totalCostElement.textContent = `${totalCost.toFixed(2)} Kč`;
+                requestCountElement.textContent = usageInfo.requests;
+
+                // Aktualizace progress baru
+                creditBarFill.style.width = `${usagePercentage}%`;
+
+                // Nastavení barvy podle úrovně využití
+                creditBarFill.className = 'credit-bar-fill';
+                if (usagePercentage > 75) {
+                    creditBarFill.classList.add('danger');
+                } else if (usagePercentage > 50) {
+                    creditBarFill.classList.add('warning');
+                }
+
+                // Aktualizace statistik úspor
+                updateSavingsStats();
+            }
+
+            // Funkce pro zobrazení statistik úspor
+            function updateSavingsStats() {
+                const usage = usageTracker.getUsage();
+
+                // Kontrola, zda existují statistiky pro Gemini
+                if (usage.gemini && usage.gemini.optimizedRequests) {
+                    const optimizedRequests = usage.gemini.optimizedRequests || 0;
+                    const totalRequests = usage.gemini.requests || 0;
+                    const savedAmount = usage.gemini.savedAmount || 0;
+
+                    // Výpočet procenta optimalizovaných požadavků
+                    const optimizedPercent = totalRequests > 0
+                        ? Math.round((optimizedRequests / totalRequests) * 100)
+                        : 0;
+
+                    // Přidání statistik do UI - vytvoříme element, pokud neexistuje
+                    let statsElement = document.getElementById('optimization-stats');
+                    if (!statsElement) {
+                        statsElement = document.createElement('div');
+                        statsElement.id = 'optimization-stats';
+                        statsElement.className = 'optimization-stats';
+
+                        // Vložení do stránky pod informace o kreditu
+                        const creditInfoElement = document.querySelector('.credit-info');
+                        if (creditInfoElement) {
+                            creditInfoElement.parentNode.insertBefore(statsElement, creditInfoElement.nextSibling);
+                        }
+                    }
+
+                    statsElement.innerHTML = `
+                        <h4>Statistiky optimalizace</h4>
+                        <div class="stats-item">
+                            <span class="stats-label">Optimalizované požadavky:</span>
+                            <span class="stats-value">${optimizedRequests}/${totalRequests} (${optimizedPercent}%)</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Celková úspora:</span>
+                            <span class="stats-value savings-amount">${savedAmount.toFixed(4)} Kč</span>
+                        </div>
+                    `;
+                }
+            }
+
+            // Inicializace zobrazení využití API
+            updateUsageDisplay();
+
+            // Poslouchání na události aktualizace využití API
+            document.addEventListener('usage-updated', updateUsageDisplay);
+        });
+    </script>
+</body>
+</html>

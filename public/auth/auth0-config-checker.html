@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth0 Config Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .url-list {
+            margin-top: 20px;
+        }
+        .url-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .url-item button {
+            margin-left: 10px;
+        }
+    </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com; frame-src 'self' https://*.auth0.com https://*.stripe.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content">
+</head>
+<body>
+    <h1>Auth0 Config Checker</h1>
+    
+    <div>
+        <h2>Kontrola Auth0 konfigurace</h2>
+        <p>Tato stránka vám pomůže zjistit, jaké callback URL jsou povoleny ve vašem Auth0 dashboardu.</p>
+    </div>
+    
+    <div class="result">
+        <h3>Aktuální konfigurace:</h3>
+        <pre id="configOutput">
+domain: 'dev-zxj8pir0moo4pdk7.us.auth0.com',
+clientId: 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ'
+        </pre>
+    </div>
+
+    <div class="url-list">
+        <h3>Zkuste následující callback URL:</h3>
+        <div class="url-item">
+            <span>http://localhost:3000/callback</span>
+            <button onclick="testUrl('http://localhost:3000/callback')">Zkusit</button>
+        </div>
+        <div class="url-item">
+            <span>http://localhost:3000</span>
+            <button onclick="testUrl('http://localhost:3000')">Zkusit</button>
+        </div>
+        <div class="url-item">
+            <span>http://localhost:3000/map.html/callback</span>
+            <button onclick="testUrl('http://localhost:3000/map.html/callback')">Zkusit</button>
+        </div>
+        <div class="url-item">
+            <span>http://localhost:3000/auth/callback</span>
+            <button onclick="testUrl('http://localhost:3000/auth/callback')">Zkusit</button>
+        </div>
+    </div>
+
+    <div class="url-list">
+        <h3>Vlastní callback URL:</h3>
+        <div class="url-item">
+            <input type="text" id="customUrl" placeholder="Zadejte vlastní callback URL" style="width: 300px; padding: 8px;">
+            <button onclick="testCustomUrl()">Zkusit</button>
+        </div>
+    </div>
+
+    <script>
+        // Funkce pro testování URL
+        function testUrl(url) {
+            const domain = 'dev-zxj8pir0moo4pdk7.us.auth0.com';
+            const clientId = 'H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ';
+            const audience = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/';
+            const scope = 'openid profile email';
+            
+            const authUrl = `https://${domain}/authorize?` +
+                `client_id=${clientId}&` +
+                `redirect_uri=${encodeURIComponent(url)}&` +
+                `response_type=code&` +
+                `scope=${encodeURIComponent(scope)}&` +
+                `audience=${encodeURIComponent(audience)}&` +
+                `state=${Math.random().toString(36).substring(2, 15)}`;
+            
+            console.log('Přesměrovávám na Auth0 URL:', authUrl);
+            window.location.href = authUrl;
+        }
+
+        // Funkce pro testování vlastní URL
+        function testCustomUrl() {
+            const customUrl = document.getElementById('customUrl').value;
+            if (customUrl) {
+                testUrl(customUrl);
+            } else {
+                alert('Zadejte vlastní callback URL');
+            }
+        }
+    </script>
+</body>
+</html>

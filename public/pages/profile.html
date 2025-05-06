@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com; frame-src 'self' https://*.auth0.com https://*.stripe.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content">
+    <title>Uživatelský profil - AI Mapa</title>
+    <link rel="stylesheet" href="/app/styles/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+    <link rel="manifest" href="/assets/manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .profile-info {
+            margin-top: 20px;
+        }
+        .profile-info p {
+            margin: 10px 0;
+        }
+        .profile-info strong {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+            float: left;
+        }
+        .profile-header {
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .profile-actions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .btn-logout {
+            background-color: #f44336;
+        }
+        .btn-back {
+            background-color: #2196F3;
+        }
+        #loading {
+            text-align: center;
+            padding: 20px;
+        }
+        #error {
+            color: #f44336;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: none;
+        }
+        #profile-data {
+            display: none;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+    <div class="container">
+        <h1>Uživatelský profil</h1>
+
+        <div id="loading">
+            Načítání profilu...
+        </div>
+
+        <div id="error"></div>
+
+        <div id="profile-data">
+            <div class="profile-header">
+                <img id="profile-picture" class="profile-picture" src="" alt="Profilový obrázek">
+                <h2 id="profile-name"></h2>
+                <p id="profile-email"></p>
+            </div>
+
+            <div class="profile-info">
+                <p><strong>ID uživatele:</strong> <span id="profile-id"></span></p>
+                <p><strong>Poslední přihlášení:</strong> <span id="profile-last-login"></span></p>
+                <p><strong>Vytvořeno:</strong> <span id="profile-created"></span></p>
+            </div>
+
+            <div class="profile-raw">
+                <h3>Kompletní data profilu</h3>
+                <pre id="profile-raw"></pre>
+            </div>
+
+            <div class="profile-actions">
+                <a href="/" class="btn btn-back">Zpět na hlavní stránku</a>
+                <a href="/auth/logout.html" class="btn btn-logout">Odhlásit se</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Načtení profilu
+            fetch('/profile')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Nepodařilo se načíst profil. Možná nejste přihlášeni.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Skrytí načítání
+                    document.getElementById('loading').style.display = 'none';
+
+                    // Zobrazení dat profilu
+                    document.getElementById('profile-data').style.display = 'block';
+
+                    // Nastavení základních informací
+                    document.getElementById('profile-name').textContent = data.name || data.nickname || data.email || 'Neznámé jméno';
+                    document.getElementById('profile-email').textContent = data.email || 'Email není k dispozici';
+                    document.getElementById('profile-id').textContent = data.sub || 'ID není k dispozici';
+
+                    // Nastavení časových údajů
+                    if (data.updated_at) {
+                        document.getElementById('profile-last-login').textContent = new Date(data.updated_at).toLocaleString();
+                    } else {
+                        document.getElementById('profile-last-login').textContent = 'Není k dispozici';
+                    }
+
+                    if (data.created_at) {
+                        document.getElementById('profile-created').textContent = new Date(data.created_at).toLocaleString();
+                    } else {
+                        document.getElementById('profile-created').textContent = 'Není k dispozici';
+                    }
+
+                    // Nastavení profilového obrázku
+                    if (data.picture) {
+                        document.getElementById('profile-picture').src = data.picture;
+                    } else {
+                        document.getElementById('profile-picture').src = 'https://via.placeholder.com/100';
+                    }
+
+                    // Zobrazení kompletních dat
+                    document.getElementById('profile-raw').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    // Zobrazení chyby
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = error.message;
+                });
+        });
+    </script>
+</body>
+</html>

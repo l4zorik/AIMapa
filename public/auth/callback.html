@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com; frame-src 'self' https://*.auth0.com https://*.stripe.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content">
+    <title>Přihlašování - AI Mapa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .callback-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        p {
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .dark-mode {
+            background-color: #222;
+            color: #f5f5f5;
+        }
+
+        .dark-mode .callback-container {
+            background-color: #333;
+            color: #f5f5f5;
+        }
+
+        .dark-mode h1 {
+            color: #3498db;
+        }
+    </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+    <div class="callback-container">
+        <h1>Přihlašování do AI Mapa</h1>
+        <div class="loader"></div>
+        <p>Probíhá zpracování přihlášení...</p>
+        <p>Budete automaticky přesměrováni zpět do aplikace.</p>
+    </div>
+
+    <script>
+        // Kontrola, zda má být použit tmavý režim
+        function checkDarkMode() {
+            const isDarkMode = localStorage.getItem('aiMapaDarkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // Kontrola tmavého režimu při načtení stránky
+        checkDarkMode();
+
+        // Funkce pro získání parametru z URL
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Kontrola, zda máme autentizační kód
+        const code = getParameterByName('code');
+        const state = getParameterByName('state');
+        const error = getParameterByName('error');
+        const errorDescription = getParameterByName('error_description');
+
+        // Logování pro debugování
+        console.log('Callback parametry:');
+        console.log('Code:', code ? 'Přítomen' : 'Chybí');
+        console.log('State:', state ? 'Přítomen' : 'Chybí');
+        console.log('Error:', error || 'Žádná chyba');
+
+        // Kontrola, zda došlo k chybě
+        if (error) {
+            console.error('Chyba při přihlašování:', error, errorDescription);
+            document.querySelector('.loader').style.display = 'none';
+            document.querySelector('p').innerHTML = 'Došlo k chybě při přihlašování: ' + errorDescription;
+
+            // Přesměrování na hlavní stránku po delší prodlevě
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 5000);
+        } else if (code) {
+            // Máme autentizační kód, uložíme informaci o přihlášení
+            localStorage.setItem('aiMapaLoggedIn', 'true');
+            localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+            console.log('Autentizační kód byl úspěšně přijat, přesměrovávám na hlavní stránku...');
+
+            // Přesměrování na hlavní stránku po krátké prodlevě
+            setTimeout(() => {
+                // Odstranění parametrů z URL při přesměrování
+                window.location.href = '/';
+            }, 2000);
+        } else {
+            console.warn('Chybí autentizační kód, přesměrovávám na hlavní stránku...');
+
+            // Přesměrování na hlavní stránku po krátké prodlevě
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mapa - Nastavení API</title>
+    <link rel="stylesheet" href="/ai-map/styles.css">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .api-key-form {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button.secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .api-key-list {
+            margin-top: 30px;
+        }
+
+        .api-key-item {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4285F4;
+        }
+
+        .api-key-item h3 {
+            margin-top: 0;
+        }
+
+        .api-key-item p {
+            margin: 5px 0;
+        }
+
+        .api-key-value {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 5px;
+            border-radius: 3px;
+            word-break: break-all;
+        }
+
+        .api-key-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section h2 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cost-limit-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .efficiency-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .efficiency-option {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .efficiency-option.selected {
+            background-color: #e6f2ff;
+            border-color: #4285F4;
+        }
+
+        .usage-stats {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .usage-bar {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .usage-progress {
+            height: 100%;
+            background-color: #4285F4;
+            width: 0%;
+        }
+    </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com; frame-src 'self' https://*.auth0.com https://*.stripe.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content">
+</head>
+<body>
+    <div class="container">
+        <div class="header-container">
+            <h1>AI Mapa - Nastavení API</h1>
+            <div class="user-info">
+                <span class="user-name" id="user-name">Uživatel: Nepřihlášen</span>
+                <button class="map-button" id="map-button">Zpět na mapu</button>
+                <button class="logout-button" id="logout-button" style="display: none;">Odhlásit se</button>
+                <button class="login-button" id="login-button">Přihlásit</button>
+            </div>
+        </div>
+
+        <div class="settings-container">
+            <div class="settings-section">
+                <h2>API Klíče</h2>
+                <div class="api-key-form">
+                    <div class="form-group">
+                        <label for="api-type">Typ API:</label>
+                        <select id="api-type">
+                            <option value="gemini">Google Gemini API</option>
+                            <option value="google_maps">Google Maps API</option>
+                            <option value="mapycz">Mapy.cz API</option>
+                            <option value="openrouteservice">OpenRouteService API</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="api-key">API Klíč:</label>
+                        <input type="text" id="api-key" placeholder="Zadejte váš API klíč">
+                    </div>
+                    <div class="button-group">
+                        <button id="save-api-key">Uložit API klíč</button>
+                        <button id="remove-api-key" class="secondary">Odstranit API klíč</button>
+                    </div>
+                </div>
+
+                <div class="api-key-list" id="api-key-list">
+                    <!-- Seznam API klíčů bude dynamicky generován -->
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2>Nastavení Vyhledávání</h2>
+                <div class="form-group">
+                    <label for="cost-limit">Maximální cena za jedno vyhledávání (Kč):</label>
+                    <input type="range" id="cost-limit" class="cost-limit-slider" min="0.01" max="1.00" step="0.01" value="0.50">
+                    <div class="slider-value" id="cost-limit-value">0.50 Kč</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Efektivita vyhledávání:</label>
+                    <div class="efficiency-options">
+                        <div class="efficiency-option" data-value="high-precision">
+                            <h3>Vysoká přesnost</h3>
+                            <p>Maximální kvalita výsledků, vyšší cena</p>
+                        </div>
+                        <div class="efficiency-option selected" data-value="balanced">
+                            <h3>Vyvážená</h3>
+                            <p>Dobrá kvalita za rozumnou cenu</p>
+                        </div>
+                        <div class="efficiency-option" data-value="low-cost">
+                            <h3>Nízká cena</h3>
+                            <p>Úspora nákladů, nižší kvalita</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2>Využití API</h2>
+                <div class="usage-stats" id="usage-stats">
+                    <p>Celkové využití: <span id="total-usage">0.00</span> Kč</p>
+                    <p>Zbývající kredit: <span id="remaining-credit">50.00</span> Kč</p>
+                    <div class="usage-bar">
+                        <div class="usage-progress" id="usage-progress" style="width: 0%"></div>
+                    </div>
+                    <p>Počet požadavků: <span id="request-count">0</span></p>
+                    <p>Počet tokenů: <span id="token-count">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/ai-map/config.js"></script>
+    <script src="/ai-map/usage-tracker.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kontrola přihlášení
+            fetch('/auth/status')
+                .then(response => response.json())
+                .then(data => {
+                    const userNameElement = document.getElementById('user-name');
+                    const loginBtn = document.getElementById('login-button');
+                    const logoutBtn = document.getElementById('logout-button');
+
+                    if (data.isAuthenticated) {
+                        userNameElement.textContent = `Přihlášen jako: ${data.user.auth0.name || data.user.auth0.email || 'Uživatel'}`;
+                        loginBtn.style.display = 'none';
+                        logoutBtn.style.display = 'inline-block';
+                    } else {
+                        userNameElement.textContent = 'Nepřihlášen';
+                        loginBtn.style.display = 'inline-block';
+                        logoutBtn.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Chyba při kontrole stavu přihlášení:', error);
+                    document.getElementById('user-name').textContent = 'Chyba při kontrole přihlášení';
+                });
+
+            // Inicializace nastavení
+            initSettings();
+
+            // Event listenery pro tlačítka
+            document.getElementById('map-button').addEventListener('click', function() {
+                window.location.href = '/ai-map/index.html';
+            });
+
+            document.getElementById('login-button').addEventListener('click', function() {
+                window.location.href = '/login';
+            });
+
+            document.getElementById('logout-button').addEventListener('click', function() {
+                window.location.href = '/logout';
+            });
+
+            document.getElementById('save-api-key').addEventListener('click', saveApiKey);
+            document.getElementById('remove-api-key').addEventListener('click', removeApiKey);
+
+            // Event listener pro slider limitu ceny
+            document.getElementById('cost-limit').addEventListener('input', function() {
+                const value = this.value;
+                document.getElementById('cost-limit-value').textContent = `${value} Kč`;
+                config.setSearchCostLimit(parseFloat(value));
+            });
+
+            // Event listenery pro možnosti efektivity
+            document.querySelectorAll('.efficiency-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.efficiency-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    config.setSearchEfficiency(this.dataset.value);
+                });
+            });
+        });
+
+        // Inicializace nastavení
+        function initSettings() {
+            // Nastavení limitu ceny
+            const costLimit = config.getSearchCostLimit();
+            document.getElementById('cost-limit').value = costLimit;
+            document.getElementById('cost-limit-value').textContent = `${costLimit} Kč`;
+
+            // Nastavení efektivity
+            const efficiency = config.getSearchEfficiency();
+            document.querySelectorAll('.efficiency-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.value === efficiency) {
+                    option.classList.add('selected');
+                }
+            });
+
+            // Zobrazení API klíčů
+            displayApiKeys();
+
+            // Zobrazení statistik využití
+            displayUsageStats();
+        }
+
+        // Zobrazení API klíčů
+        function displayApiKeys() {
+            const apiKeyList = document.getElementById('api-key-list');
+            apiKeyList.innerHTML = '';
+
+            const providers = ['gemini', 'google_maps', 'mapycz', 'openrouteservice'];
+            const providerNames = {
+                'gemini': 'Google Gemini API',
+                'google_maps': 'Google Maps API',
+                'mapycz': 'Mapy.cz API',
+                'openrouteservice': 'OpenRouteService API'
+            };
+
+            providers.forEach(provider => {
+                const apiKey = config.getApiKey(provider);
+                if (apiKey) {
+                    const apiKeyItem = document.createElement('div');
+                    apiKeyItem.className = 'api-key-item';
+                    
+                    const timestamp = config.getApiKeyTimestamp(provider);
+                    const date = new Date(parseInt(timestamp));
+                    const formattedDate = date.toLocaleString();
+
+                    apiKeyItem.innerHTML = `
+                        <h3>${providerNames[provider]} <span class="api-key-status status-active">Aktivní</span></h3>
+                        <p>Klíč: <span class="api-key-value">${maskApiKey(apiKey)}</span></p>
+                        <p>Přidáno: ${formattedDate}</p>
+                    `;
+                    
+                    apiKeyList.appendChild(apiKeyItem);
+                }
+            });
+
+            if (apiKeyList.children.length === 0) {
+                apiKeyList.innerHTML = '<p>Nemáte nastaveny žádné API klíče.</p>';
+            }
+        }
+
+        // Maskování API klíče pro zobrazení
+        function maskApiKey(key) {
+            if (key.length <= 8) return '********';
+            return key.substring(0, 4) + '...' + key.substring(key.length - 4);
+        }
+
+        // Zobrazení statistik využití
+        function displayUsageStats() {
+            const usage = usageTracker.getUsage().gemini || { totalCost: 0, inputTokens: 0, outputTokens: 0, requests: 0 };
+            const remainingCredit = usageTracker.getRemainingCredit();
+            const usagePercentage = usageTracker.getUsagePercentage();
+
+            document.getElementById('total-usage').textContent = usage.totalCost.toFixed(2);
+            document.getElementById('remaining-credit').textContent = remainingCredit.toFixed(2);
+            document.getElementById('usage-progress').style.width = `${usagePercentage}%`;
+            document.getElementById('request-count').textContent = usage.requests;
+            document.getElementById('token-count').textContent = (usage.inputTokens + usage.outputTokens).toLocaleString();
+        }
+
+        // Uložení API klíče
+        function saveApiKey() {
+            const apiType = document.getElementById('api-type').value;
+            const apiKey = document.getElementById('api-key').value.trim();
+
+            if (!apiKey) {
+                alert('Zadejte platný API klíč');
+                return;
+            }
+
+            config.setApiKey(apiType, apiKey);
+            document.getElementById('api-key').value = '';
+            displayApiKeys();
+            alert(`API klíč pro ${apiType} byl úspěšně uložen`);
+        }
+
+        // Odstranění API klíče
+        function removeApiKey() {
+            const apiType = document.getElementById('api-type').value;
+            
+            if (!config.hasApiKey(apiType)) {
+                alert(`Nemáte nastaven API klíč pro ${apiType}`);
+                return;
+            }
+
+            if (confirm(`Opravdu chcete odstranit API klíč pro ${apiType}?`)) {
+                config.removeApiKey(apiType);
+                displayApiKeys();
+                alert(`API klíč pro ${apiType} byl úspěšně odstraněn`);
+            }
+        }
+    </script>
+</body>
+</html>
