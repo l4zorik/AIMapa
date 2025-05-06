@@ -3,8 +3,9 @@
   publish = "public/dist"
 
 [build.environment]
-  NODE_VERSION = "16"
+  NODE_VERSION = "18.16.0"
   NPM_VERSION = "8"
+  NODE_ENV = "production"
 
 [dev]
   command = "npm run dev"
@@ -60,6 +61,12 @@
 [[redirects]]
   from = "/user-profile"
   to = "/user-profile.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/demo"
+  to = "/demo.html"
   status = 200
   force = true
 

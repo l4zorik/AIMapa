@@ -47,6 +47,7 @@ function main() {
     'login.html',
     'logout.html',
     'user-profile.html',
+    'demo.html',
     'env-config.js',
     'favicon.ico',
     'manifest.json'
