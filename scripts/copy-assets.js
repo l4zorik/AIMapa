@@ -38,8 +38,8 @@ function main() {
   const publicDir = path.join(rootDir, 'public');
   const distDir = path.join(publicDir, 'dist');
 
-  // Kopírování HTML souborů
-  const htmlFiles = [
+  // Kopírování HTML souborů a dalších statických souborů
+  const staticFiles = [
     'index.html',
     'chat.html',
     'profile.html',
@@ -47,10 +47,12 @@ function main() {
     'login.html',
     'logout.html',
     'user-profile.html',
-    'env-config.js'
+    'env-config.js',
+    'favicon.ico',
+    'manifest.json'
   ];
 
-  htmlFiles.forEach(file => {
+  staticFiles.forEach(file => {
     const sourcePath = path.join(publicDir, file);
     const destPath = path.join(distDir, file);
 
@@ -70,6 +72,12 @@ function main() {
     'components',
     'js'
   ];
+
+  // Ensure js directory exists in dist
+  const jsDistDir = path.join(distDir, 'js');
+  if (!fs.existsSync(jsDistDir)) {
+    fs.mkdirSync(jsDistDir, { recursive: true });
+  }
 
   // Kopírování adresářů
   for (const dir of dirsToCopy) {

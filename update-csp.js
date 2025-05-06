@@ -6,12 +6,16 @@ const fs = require('fs');
 const path = require('path');
 
 // Enhanced CSP with high security settings and explicit unsafe-eval positioned first
-const enhancedCSP = `default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'unsafe-eval' 'unsafe-inline' 'self' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com; frame-src 'self' https://*.auth0.com https://*.stripe.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content`;
+// Added wasm-unsafe-eval for WebAssembly support and additional domains for crypto wallets
+const enhancedCSP = `default-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; script-src 'unsafe-eval' 'unsafe-inline' 'self' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com https://*.coinbase.com https://*.walletconnect.com https://*.solana.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.auth0.com https://api.mapy.cz https://unpkg.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://cdn.auth0.com https://via.placeholder.com https://*.googleusercontent.com; connect-src 'self' https://*.auth0.com https://*.supabase.co https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://dev-zxj8pir0moo4pdk7.us.auth0.com https://*.stripe.com https://*.googleapis.com https://*.coinbase.com https://*.walletconnect.com https://*.solana.com; frame-src 'self' https://*.auth0.com https://*.stripe.com https://*.coinbase.com https://*.walletconnect.com https://*.solana.com; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://cdnjs.cloudflare.com; object-src 'none'; upgrade-insecure-requests; block-all-mixed-content; script-src-elem 'unsafe-eval' 'unsafe-inline' 'self' https://*.auth0.com https://cdn.auth0.com https://cdn.jsdelivr.net https://api.mapy.cz https://unpkg.com https://*.openstreetmap.org https://*.openrouteservice.org https://*.freemap.sk https://*.windy.com https://cdnjs.cloudflare.com https://js.stripe.com https://*.coinbase.com https://*.walletconnect.com https://*.solana.com`;
 
 // Font Awesome link tag
 const fontAwesomeLink = `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
       crossorigin="anonymous" referrerpolicy="no-referrer" />`;
+
+// Polyfill script tag for browser compatibility
+const polyfillScript = `<script src="/js/polyfills.js"></script>`;
 
 // Function to find all HTML files recursively
 function findHtmlFiles(dir, fileList = []) {
@@ -56,6 +60,18 @@ function updateHtmlFile(filePath) {
 
         content = content.slice(0, insertPos) + '\n    <!-- Font Awesome -->\n    ' + fontAwesomeLink + '\n' + content.slice(insertPos);
         modified = true;
+    }
+
+    // Add polyfill script if not already present
+    if (!content.includes('/js/polyfills.js')) {
+        const headPos = content.indexOf('</head>');
+        if (headPos !== -1) {
+            content = content.slice(0, headPos) +
+                     '\n    <!-- Browser compatibility polyfills -->\n    ' +
+                     polyfillScript + '\n' +
+                     content.slice(headPos);
+            modified = true;
+        }
     }
 
     // Remove any existing CSP meta tags to avoid conflicts
