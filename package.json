@@ -13,7 +13,8 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:fastify\" \"npm run dev:client\"",
     "build": "cross-env NODE_ENV=production webpack",
     "build:dev": "webpack",
-    "build:netlify": "cross-env NODE_ENV=production webpack && node scripts/copy-assets.js",
+    "build:netlify": "node update-csp.js && cross-env NODE_ENV=production webpack && node scripts/copy-assets.js",
+    "update-csp": "node update-csp.js",
     "test": "node tests/run-tests.js",
     "test:unit": "node -e \"const MapUtilsTest = require('./tests/unit/map-utils.test'); const results = MapUtilsTest.runAllTests(); console.log(JSON.stringify(results, null, 2));\"",
     "test:integration": "node -e \"const MapApiTest = require('./tests/integration/map-api.test'); MapApiTest.runAllTests().then(results => console.log(JSON.stringify(results, null, 2)));\"",
@@ -28,10 +29,14 @@
     "db:sync-auth0": "node scripts/sync-auth0-users.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "migrate": "node scripts/migrate-to-new-stack.js"
+    "migrate": "node scripts/migrate-to-new-stack.js",
+    "supabase:start": "node start-local-supabase.js",
+    "supabase:stop": "node stop-local-supabase.js",
+    "dev:local": "cross-env USE_LOCAL_SUPABASE=true nodemon server.js",
+    "dev:all:local": "cross-env USE_LOCAL_SUPABASE=true concurrently \"npm run dev\" \"npm run dev:fastify\" \"npm run dev:client\""
   },
   "repository": {
-    "type": "git",
+    "type": "commonjs",
     "url": "git+https://github.com/l4zorik/AIMapa.git"
   },
   "keywords": [
@@ -73,6 +78,7 @@
     "langchain": "^0.3.24",
     "marked": "^11.1.1",
     "mongoose": "^7.5.0",
+    "node-fetch": "^2.7.0",
     "redis": "^4.6.13",
     "request": "^2.88.2",
     "stripe": "^18.0.0"
