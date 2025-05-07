@@ -85,6 +85,7 @@ const auth0Config = {
   secret: process.env.AUTH0_SECRET || 'a long, randomly-generated string stored in env',
   baseURL: process.env.BASE_URL || 'https://www.quicksoft.fun',
   clientID: process.env.AUTH0_CLIENT_ID,
+  clientSecret: process.env.AUTH0_CLIENT_SECRET,
   issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
   routes: {
     callback: false  // Vypneme automatický callback, použijeme vlastní
@@ -93,7 +94,8 @@ const auth0Config = {
     response_type: 'code',
     redirect_uri: process.env.AUTH0_CALLBACK_URL || 'https://www.quicksoft.fun/callback',
     scope: process.env.AUTH0_SCOPE || 'openid profile email'
-  }
+  },
+  clientAuthMethod: 'client_secret_basic'
 };
 
 // Auth0 middleware - přímá konfigurace podle doporučení Auth0
