@@ -1,0 +1,496 @@
+/* Základní proměnné pro barvy */
+:root {
+  --primary-green: #2ecc71;
+  --primary-green-dark: #27ae60;
+  --primary-green-light: #a9dfbf;
+  
+  --primary-red: #e74c3c;
+  --primary-red-dark: #c0392b;
+  --primary-red-light: #f5b7b1;
+  
+  --primary-orange: #f39c12;
+  --primary-orange-dark: #d35400;
+  --primary-orange-light: #fad7a0;
+  
+  --dark-bg: #1e272e;
+  --light-bg: #f5f6fa;
+  --card-bg: #2c3e50;
+  --card-hover: #34495e;
+  
+  --text-light: #ecf0f1;
+  --text-dark: #2c3e50;
+  --text-muted: #95a5a6;
+  
+  --border-color: #7f8c8d;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Hlavní kontejner */
+.enhanced-api-key-manager {
+  background-color: var(--dark-bg);
+  border-radius: 10px;
+  padding: 20px;
+  color: var(--text-light);
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+/* Hlavička */
+.api-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.api-manager-header h2 {
+  font-size: 24px;
+  margin: 0;
+  color: var(--primary-green);
+}
+
+.api-manager-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.add-key-button {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-key-button:hover {
+  background-color: var(--primary-green-dark);
+}
+
+/* Formulář pro přidání klíče */
+.add-key-form {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 10px var(--shadow-color);
+  border-left: 4px solid var(--primary-green);
+}
+
+.add-key-form h3 {
+  margin-top: 0;
+  color: var(--primary-green);
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--dark-bg);
+  color: var(--text-light);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-button {
+  background-color: var(--text-muted);
+  color: var(--text-light);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: var(--primary-green-dark);
+}
+
+/* Mřížka API klíčů */
+.api-keys-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+/* Karta API klíče */
+.api-key-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 3px 10px var(--shadow-color);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.api-key-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px var(--shadow-color);
+}
+
+.api-key-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background-color: var(--primary-green);
+}
+
+.api-key-card.openai::before {
+  background-color: var(--primary-green);
+}
+
+.api-key-card.google::before {
+  background-color: var(--primary-orange);
+}
+
+.api-key-card.mapbox::before {
+  background-color: var(--primary-red);
+}
+
+.api-key-card.inactive {
+  opacity: 0.7;
+}
+
+.api-key-card.active {
+  border: 2px solid var(--primary-green);
+}
+
+/* Hlavička karty */
+.api-key-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.api-key-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-light);
+}
+
+.api-key-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.provider-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.provider-badge.openai {
+  background-color: var(--primary-green-dark);
+  color: var(--text-light);
+}
+
+.provider-badge.google {
+  background-color: var(--primary-orange-dark);
+  color: var(--text-light);
+}
+
+.provider-badge.mapbox {
+  background-color: var(--primary-red-dark);
+  color: var(--text-light);
+}
+
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-badge.verified {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+}
+
+.status-badge.unverified {
+  background-color: var(--primary-red);
+  color: var(--text-light);
+}
+
+.active-badge {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Zabezpečený API klíč */
+.api-key-secure {
+  background-color: var(--dark-bg);
+  padding: 10px;
+  border-radius: 5px;
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.key-prefix, .key-suffix {
+  color: var(--primary-orange);
+}
+
+.key-mask {
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin: 0 5px;
+  user-select: none;
+}
+
+.copy-button {
+  background: none;
+  border: none;
+  color: var(--primary-green);
+  cursor: pointer;
+  margin-left: auto;
+  padding: 5px;
+  transition: color 0.3s;
+}
+
+.copy-button:hover {
+  color: var(--primary-green-light);
+}
+
+/* Využití API klíče */
+.api-key-usage {
+  margin-bottom: 15px;
+}
+
+.usage-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.usage-cost {
+  color: var(--primary-orange);
+  font-weight: bold;
+}
+
+.usage-bar {
+  height: 8px;
+  background-color: var(--dark-bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.usage-progress {
+  height: 100%;
+  background-color: var(--primary-green);
+  border-radius: 4px;
+  transition: width 0.5s;
+}
+
+/* Detaily API klíče */
+.api-key-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.detail-value {
+  font-weight: bold;
+}
+
+/* Stav ověření */
+.verification-status {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.verification-status.success {
+  background-color: rgba(46, 204, 113, 0.2);
+  border-left: 3px solid var(--primary-green);
+}
+
+.verification-status.error {
+  background-color: rgba(231, 76, 60, 0.2);
+  border-left: 3px solid var(--primary-red);
+}
+
+.verifying {
+  display: flex;
+  align-items: center;
+}
+
+.verifying::after {
+  content: '';
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--primary-orange);
+  border-radius: 50%;
+  border-top-color: transparent;
+  margin-left: 10px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Propojení s chatem */
+.chat-connection {
+  background-color: rgba(46, 204, 113, 0.2);
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  border-left: 3px solid var(--primary-green);
+}
+
+.connection-icon {
+  color: var(--primary-green);
+  margin-right: 10px;
+}
+
+.connection-message {
+  font-size: 14px;
+}
+
+/* Akce API klíče */
+.api-key-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.verify-button, .connect-button {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.verify-button {
+  background-color: var(--primary-orange);
+  color: var(--text-light);
+}
+
+.verify-button:hover {
+  background-color: var(--primary-orange-dark);
+}
+
+.connect-button {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+}
+
+.connect-button:hover {
+  background-color: var(--primary-green-dark);
+}
+
+.connect-button:disabled, .verify-button:disabled {
+  background-color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.remove-button {
+  background-color: var(--primary-red);
+  color: var(--text-light);
+  border: none;
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.remove-button:hover {
+  background-color: var(--primary-red-dark);
+}
+
+/* Prázdný stav */
+.no-api-keys {
+  background-color: var(--card-bg);
+  padding: 30px;
+  text-align: center;
+  border-radius: 8px;
+  color: var(--text-muted);
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .api-keys-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .api-key-header {
+    flex-direction: column;
+  }
+  
+  .api-key-badges {
+    margin-top: 10px;
+  }
+  
+  .api-key-details {
+    grid-template-columns: 1fr;
+  }
+}

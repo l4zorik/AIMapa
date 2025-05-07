@@ -34,6 +34,7 @@ interface MapComponentProps {
   provider?: string;
   markers?: Marker[];
   route?: Route | null;
+  apiKey?: string | null; // Přidáno: API klíč pro mapové služby
   onMarkerClick?: (marker: Marker) => void;
   onMapClick?: (latlng: [number, number]) => void;
 }
@@ -44,6 +45,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   provider = 'openstreetmap',
   markers = [],
   route = null,
+  apiKey = null, // Přidáno: API klíč
   onMarkerClick,
   onMapClick
 }) => {
@@ -54,36 +56,46 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [currentRoute, setCurrentRoute] = useState<L.Polyline | null>(null);
 
   // Definice poskytovatelů map
-  const mapProviders: Record<string, MapProvider> = {
-    openstreetmap: {
-      id: 'openstreetmap',
-      name: 'OpenStreetMap',
-      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19
-    },
-    mapycz: {
-      id: 'mapycz',
-      name: 'Mapy.cz',
-      url: 'https://mapserver.mapy.cz/turist-m/{z}-{x}-{y}',
-      attribution: '&copy; <a href="https://www.seznam.cz">Seznam.cz, a.s.</a>',
-      maxZoom: 18
-    },
-    google: {
-      id: 'google',
-      name: 'Google Maps',
-      url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-      attribution: '&copy; Google Maps',
-      maxZoom: 20
-    },
-    mapbox: {
-      id: 'mapbox',
-      name: 'Mapbox',
-      url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw',
-      attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>',
-      maxZoom: 19
-    }
+  const getMapProviders = (): Record<string, MapProvider> => {
+    // Základní URL pro Mapbox s API klíčem
+    const mapboxUrl = apiKey && provider === 'mapbox'
+      ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${apiKey}`
+      : 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+
+    return {
+      openstreetmap: {
+        id: 'openstreetmap',
+        name: 'OpenStreetMap',
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      },
+      mapycz: {
+        id: 'mapycz',
+        name: 'Mapy.cz',
+        url: 'https://mapserver.mapy.cz/turist-m/{z}-{x}-{y}',
+        attribution: '&copy; <a href="https://www.seznam.cz">Seznam.cz, a.s.</a>',
+        maxZoom: 18
+      },
+      google: {
+        id: 'google',
+        name: 'Google Maps',
+        url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+        attribution: '&copy; Google Maps',
+        maxZoom: 20
+      },
+      mapbox: {
+        id: 'mapbox',
+        name: 'Mapbox',
+        url: mapboxUrl,
+        attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>',
+        maxZoom: 19
+      }
+    };
   };
+
+  // Získání poskytovatelů map
+  const mapProviders = getMapProviders();
 
   // Inicializace mapy
   useEffect(() => {
@@ -133,7 +145,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useEffect(() => {
     if (!map) return;
 
-    const selectedProvider = mapProviders[provider] || mapProviders.openstreetmap;
+    // Získáme aktualizované poskytovatele map (s aktuálním API klíčem)
+    const updatedProviders = getMapProviders();
+    const selectedProvider = updatedProviders[provider] || updatedProviders.openstreetmap;
 
     // Odstranění aktuální vrstvy
     if (currentTileLayer) {
@@ -148,7 +162,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
     tileLayer.addTo(map);
     setCurrentTileLayer(tileLayer);
-  }, [map, provider]);
+
+    // Zobrazíme informaci o použití API klíče v konzoli
+    if (provider === 'mapbox' && apiKey) {
+      console.log('Používám Mapbox s API klíčem:', apiKey.substring(0, 6) + '...' + apiKey.substring(apiKey.length - 4));
+    }
+  }, [map, provider, apiKey]);
 
   // Aktualizace markerů
   useEffect(() => {
