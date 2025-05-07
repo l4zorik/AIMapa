@@ -31,11 +31,11 @@ const authLimiter = rateLimit({
 const checkPermissions = (requiredPermissions) => {
     return (req, res, next) => {
         try {
-            if (!req.oidc.isAuthenticated()) {
+            if (!req.isAuthenticated()) {
                 throw new AppError(401, 'Nepřihlášený uživatel');
             }
 
-            const userPermissions = req.oidc.user.permissions || [];
+            const userPermissions = req.user.permissions || [];
             const hasAllPermissions = requiredPermissions.every(
                 permission => userPermissions.includes(permission)
             );

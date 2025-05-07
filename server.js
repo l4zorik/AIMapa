@@ -9,8 +9,6 @@ const cors = require('cors');
 const path = require('path');
 const passport = require('passport');
 const supabaseService = require('./supabase-service');
-const Auth0Service = require('./auth/auth0-service');
-const createAuth0Routes = require('./auth/auth0-routes');
 const DiscordService = require('./auth/discord-service');
 const createDiscordRoutes = require('./auth/discord-routes');
 
@@ -27,8 +25,6 @@ if (process.env.NODE_ENV === 'production') {
     require('dotenv').config();
     console.log('Načteny vývojové proměnné prostředí z .env');
 }
-
-// Kontrola načtení proměnných prostředí je vypnuta
 
 const app = express();
 
@@ -49,65 +45,6 @@ app.use(apiLogger.middleware());
 // Rate limiting
 app.use('/api/', apiLimiter);
 app.use(['/login', '/callback', '/register'], authLimiter);
-
-// Inicializace Auth0 service
-const auth0Service = new Auth0Service({
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
-    clientID: process.env.AUTH0_CLIENT_ID,
-    issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
-    secret: process.env.AUTH0_CLIENT_SECRET,
-    clientSecret: process.env.AUTH0_CLIENT_SECRET,
-    scope: process.env.AUTH0_SCOPE || 'openid profile email read:users read:user_idp_tokens',
-    audience: process.env.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.quicksoft.fun/api/v2/',
-    loginRoute: false,  // Vypneme automatické routy, použijeme vlastní
-    logoutRoute: false,
-    callbackRoute: false,
-    idpLogout: true
-});
-
-// Auth0 konfigurace podle doporučení Auth0 dashboardu
-const { auth } = require('express-openid-connect');
-
-const auth0Config = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: process.env.AUTH0_SECRET || 'a long, randomly-generated string stored in env',
-  baseURL: process.env.BASE_URL || 'https://www.quicksoft.fun',
-  clientID: process.env.AUTH0_CLIENT_ID,
-  clientSecret: process.env.AUTH0_CLIENT_SECRET,
-  issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
-  routes: {
-    callback: false  // Vypneme automatický callback, použijeme vlastní
-  },
-  authorizationParams: {
-    response_type: 'code',
-    redirect_uri: process.env.AUTH0_CALLBACK_URL || 'https://www.quicksoft.fun/callback',
-    scope: process.env.AUTH0_SCOPE || 'openid profile email'
-  },
-  clientAuthMethod: 'client_secret_basic'
-};
-
-// Auth0 middleware - přímá konfigurace podle doporučení Auth0
-app.use(auth(auth0Config));
-
-// Import requiresAuth middleware
-const { requiresAuth } = require('express-openid-connect');
-
-// Endpoint pro zobrazení profilu uživatele
-app.get('/profile', requiresAuth(), (req, res) => {
-  res.send(JSON.stringify(req.oidc.user, null, 2));
-});
-
-// Endpoint pro kontrolu stavu přihlášení
-app.get('/auth/status', (req, res) => {
-  res.json({
-    isAuthenticated: req.oidc.isAuthenticated(),
-    user: req.oidc.isAuthenticated() ? req.oidc.user : null
-  });
-});
-
-// Auth0 routes - pouze na /auth cestě pro lepší organizaci
-app.use('/auth', createAuth0Routes(auth0Service));
 
 // Inicializace Discord service
 const discordService = new DiscordService({
@@ -159,8 +96,8 @@ app.get('/health', (req, res) => {
 // Metriky aplikace (pouze pro adminy)
 app.get('/metrics', async (req, res) => {
     try {
-        if (!req.oidc.isAuthenticated() ||
-            !req.oidc.user['https://aimapa.cz/roles'].includes('admin')) {
+        // Kontrola autentizace přes Discord
+        if (!req.isAuthenticated() || !req.user.roles || !req.user.roles.includes('admin')) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
@@ -170,20 +107,6 @@ app.get('/metrics', async (req, res) => {
         console.error('Error fetching metrics:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-});
-
-// Endpoint pro získání Auth0 konfigurace (pouze clientId a domain pro klienta)
-app.get('/auth/config', (_req, res) => {
-    // Určení správné URL pro přesměrování na základě prostředí
-    let callbackUrl = process.env.AUTH0_CALLBACK_URL || '';
-    res.json({
-        domain: process.env.AUTH0_DOMAIN,
-        clientId: process.env.AUTH0_CLIENT_ID,
-        audience: process.env.AUTH0_AUDIENCE,
-        scope: process.env.AUTH0_SCOPE,
-        callbackUrl: callbackUrl,
-        logoutUrl: process.env.AUTH0_LOGOUT_URL
-    });
 });
 
 // Endpoint pro získání Discord konfigurace
