@@ -117,6 +117,25 @@ app.get('/auth/discord/config', (_req, res) => {
     });
 });
 
+// Debug endpoint pro autentizaci
+app.get('/auth/debug', (req, res) => {
+    console.log('DEBUG AUTH: /auth/debug endpoint called');
+    console.log('DEBUG AUTH: req.user:', req.user);
+    console.log('DEBUG AUTH: req.oidc:', req.oidc);
+    console.log('DEBUG AUTH: req.isAuthenticated:', req.isAuthenticated ? req.isAuthenticated() : 'undefined');
+
+    res.json({
+        authenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+        user: req.user || null,
+        oidc: req.oidc || null,
+        session: req.session || null,
+        headers: {
+            authorization: req.headers.authorization || null,
+            cookie: req.headers.cookie || null
+        }
+    });
+});
+
 // Spuštění serveru
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
