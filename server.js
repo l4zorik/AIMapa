@@ -58,7 +58,7 @@ const auth0Service = new Auth0Service({
     secret: process.env.AUTH0_CLIENT_SECRET,
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
     scope: process.env.AUTH0_SCOPE || 'openid profile email read:users read:user_idp_tokens',
-    audience: process.env.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/api/v2/',
+    audience: process.env.AUTH0_AUDIENCE || 'https://dev-zxj8pir0moo4pdk7.us.quicksoft.fun/api/v2/',
     loginRoute: false,  // Vypneme automatické routy, použijeme vlastní
     logoutRoute: false,
     callbackRoute: false,
