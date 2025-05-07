@@ -7,7 +7,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const { auth } = require('express-openid-connect');
 const passport = require('passport');
 const supabaseService = require('./supabase-service');
 const Auth0Service = require('./auth/auth0-service');
