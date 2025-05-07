@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import EnhancedMapPage from './pages/EnhancedMapPage';
+import DocsPage from './pages/DocsPage';
 import './App.css';
 
 // Komponenty stránek
@@ -58,6 +59,7 @@ function App() {
               <li><Link to="/">Domů</Link></li>
               <li><Link to="/map">Mapa</Link></li>
               <li><Link to="/profile">Profil</Link></li>
+              <li><Link to="/docs">Dokumentace</Link></li>
             </ul>
           </nav>
           <div className="auth-status">
@@ -70,6 +72,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/map" element={<EnhancedMapPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/docs" element={<DocsPage />} />
           </Routes>
         </main>
 

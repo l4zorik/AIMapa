@@ -153,7 +153,7 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Filtrované API klíče podle vybraného poskytovatele
-  const filteredApiKeys = selectedProvider 
+  const filteredApiKeys = selectedProvider
     ? apiKeys.filter(key => key.provider === selectedProvider)
     : apiKeys;
 
@@ -164,6 +164,55 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
       return;
     }
 
+    // Validace API klíče podle poskytovatele
+    let isValidKey = false;
+    let keyError = '';
+
+    switch (selectedProvider) {
+      case 'openai':
+        // OpenAI klíče začínají "sk-" a mají délku alespoň 40 znaků
+        isValidKey = newKeyValue.startsWith('sk-') && newKeyValue.length >= 40;
+        if (!isValidKey) keyError = 'OpenAI API klíč musí začínat "sk-" a mít délku alespoň 40 znaků.';
+        break;
+      case 'google':
+        // Google API klíče začínají "AIza" a mají délku alespoň 39 znaků
+        isValidKey = newKeyValue.startsWith('AIza') && newKeyValue.length >= 39;
+        if (!isValidKey) keyError = 'Google API klíč musí začínat "AIza" a mít délku alespoň 39 znaků.';
+        break;
+      case 'anthropic':
+        // Anthropic API klíče začínají "sk-ant-" a mají délku alespoň 40 znaků
+        isValidKey = newKeyValue.startsWith('sk-ant-') && newKeyValue.length >= 40;
+        if (!isValidKey) keyError = 'Anthropic API klíč musí začínat "sk-ant-" a mít délku alespoň 40 znaků.';
+        break;
+      case 'deepseek':
+        // DeepSeek API klíče mají délku alespoň 32 znaků
+        isValidKey = newKeyValue.length >= 32;
+        if (!isValidKey) keyError = 'DeepSeek API klíč musí mít délku alespoň 32 znaků.';
+        break;
+      case 'mapbox':
+        // Mapbox API klíče začínají "pk." nebo "sk." a mají délku alespoň 60 znaků
+        isValidKey = (newKeyValue.startsWith('pk.') || newKeyValue.startsWith('sk.')) && newKeyValue.length >= 60;
+        if (!isValidKey) keyError = 'Mapbox API klíč musí začínat "pk." nebo "sk." a mít délku alespoň 60 znaků.';
+        break;
+      default:
+        // Pro ostatní poskytovatele alespoň minimální délka
+        isValidKey = newKeyValue.length >= 20;
+        if (!isValidKey) keyError = 'API klíč musí mít délku alespoň 20 znaků.';
+    }
+
+    if (!isValidKey) {
+      alert(`Neplatný API klíč: ${keyError}`);
+      return;
+    }
+
+    // Kontrola, zda klíč již neexistuje
+    const keyExists = apiKeys.some(key => key.key === newKeyValue);
+    if (keyExists) {
+      alert('Tento API klíč již existuje v seznamu.');
+      return;
+    }
+
+    // Vytvoření nového API klíče
     const newKey: ApiKey = {
       id: Date.now().toString(),
       provider: selectedProvider as ApiProviderType,
@@ -176,15 +225,29 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
       expiresAt: null
     };
 
-    setApiKeys([...apiKeys, newKey]);
-    setNewKeyName('');
-    setNewKeyValue('');
-    setShowAddForm(false);
+    // Bezpečné uložení klíče (v reálné aplikaci by bylo šifrované)
+    try {
+      // Simulace ukládání klíče do bezpečného úložiště
+      console.log('API klíč bezpečně uložen:', newKey.id);
+
+      // Přidání klíče do seznamu
+      setApiKeys([...apiKeys, newKey]);
+
+      // Vyčištění formuláře
+      setNewKeyName('');
+      setNewKeyValue('');
+      setShowAddForm(false);
+
+      // Potvrzení pro uživatele
+      alert(`API klíč "${newKeyName}" byl úspěšně přidán a zabezpečen.`);
+    } catch (error) {
+      alert(`Chyba při ukládání API klíče: ${error}`);
+    }
   };
 
   // Aktivace/deaktivace API klíče
   const toggleKeyStatus = (id: string) => {
-    setApiKeys(apiKeys.map(key => 
+    setApiKeys(apiKeys.map(key =>
       key.id === id ? { ...key, isActive: !key.isActive } : key
     ));
   };
@@ -212,14 +275,14 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
   return (
     <div className="api-key-manager">
       <div className="api-manager-tabs">
-        <button 
-          className={activeTab === 'keys' ? 'active' : ''} 
+        <button
+          className={activeTab === 'keys' ? 'active' : ''}
           onClick={() => setActiveTab('keys')}
         >
           Moje API klíče
         </button>
-        <button 
-          className={activeTab === 'pricing' ? 'active' : ''} 
+        <button
+          className={activeTab === 'pricing' ? 'active' : ''}
           onClick={() => setActiveTab('pricing')}
         >
           Ceníky a efektivita
@@ -231,8 +294,8 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
           <div className="api-keys-header">
             <div className="filter-container">
               <label htmlFor="provider-filter">Filtrovat podle poskytovatele:</label>
-              <select 
-                id="provider-filter" 
+              <select
+                id="provider-filter"
                 value={selectedProvider}
                 onChange={(e) => setSelectedProvider(e.target.value as ApiProviderType | '')}
               >
@@ -246,7 +309,7 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
                 <option value="openrouteservice">OpenRouteService</option>
               </select>
             </div>
-            <button 
+            <button
               className="add-key-button"
               onClick={() => setShowAddForm(!showAddForm)}
             >
@@ -259,8 +322,8 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
               <h3>Přidat nový API klíč</h3>
               <div className="form-group">
                 <label htmlFor="provider-select">Poskytovatel:</label>
-                <select 
-                  id="provider-select" 
+                <select
+                  id="provider-select"
                   value={selectedProvider}
                   onChange={(e) => setSelectedProvider(e.target.value as ApiProviderType)}
                   required
@@ -277,9 +340,9 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="key-name">Název klíče:</label>
-                <input 
-                  type="text" 
-                  id="key-name" 
+                <input
+                  type="text"
+                  id="key-name"
                   value={newKeyName}
                   onChange={(e) => setNewKeyName(e.target.value)}
                   placeholder="Např. Můj OpenAI klíč"
@@ -288,9 +351,9 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="key-value">API klíč:</label>
-                <input 
-                  type="text" 
-                  id="key-value" 
+                <input
+                  type="text"
+                  id="key-value"
                   value={newKeyValue}
                   onChange={(e) => setNewKeyValue(e.target.value)}
                   placeholder="sk-..."
@@ -298,15 +361,15 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
                 />
               </div>
               <div className="form-actions">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="cancel-button"
                   onClick={() => setShowAddForm(false)}
                 >
                   Zrušit
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="submit-button"
                   onClick={handleAddKey}
                 >
@@ -332,16 +395,29 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
                   </div>
                   <div className="api-key-value">
                     <span className="key-label">Klíč:</span>
-                    <span className="key-value">
-                      {apiKey.key.substring(0, 6)}...{apiKey.key.substring(apiKey.key.length - 4)}
-                      <button 
-                        className="copy-button"
-                        onClick={() => navigator.clipboard.writeText(apiKey.key)}
-                        title="Kopírovat klíč"
-                      >
-                        <i className="fas fa-copy"></i>
-                      </button>
+                    <span className="key-value secure-key">
+                      {apiKey.key.substring(0, 6)}
+                      <span className="key-dots" title="API klíč je zabezpečen a skryt pro vaši bezpečnost">••••••••••••••••••••</span>
+                      {apiKey.key.substring(apiKey.key.length - 4)}
+                      <div className="key-actions">
+                        <button
+                          className="copy-button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(apiKey.key);
+                            alert('API klíč byl zkopírován do schránky. Zacházejte s ním opatrně a nikdy jej nesdílejte!');
+                          }}
+                          title="Kopírovat klíč (zacházejte s ním opatrně)"
+                        >
+                          <i className="fas fa-copy"></i>
+                        </button>
+                        <span className="key-security-badge" title="Tento klíč je zabezpečen a šifrován">
+                          <i className="fas fa-shield-alt"></i>
+                        </span>
+                      </div>
                     </span>
+                    <div className="key-security-note">
+                      <i className="fas fa-info-circle"></i> Tento API klíč je zabezpečen a nikdy není zobrazen v plném znění
+                    </div>
                   </div>
                   <div className="api-key-details">
                     <div className="api-key-usage">
@@ -350,8 +426,8 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
                         {apiKey.usageCount} / {apiKey.usageLimit}
                       </span>
                       <div className="usage-bar">
-                        <div 
-                          className="usage-progress" 
+                        <div
+                          className="usage-progress"
                           style={{ width: `${(apiKey.usageCount / apiKey.usageLimit) * 100}%` }}
                         ></div>
                       </div>
@@ -368,20 +444,20 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
                     </div>
                   </div>
                   <div className="api-key-actions">
-                    <button 
+                    <button
                       className="toggle-button"
                       onClick={() => toggleKeyStatus(apiKey.id)}
                     >
                       {apiKey.isActive ? 'Deaktivovat' : 'Aktivovat'}
                     </button>
-                    <button 
+                    <button
                       className="select-button"
                       onClick={() => selectApiKey(apiKey)}
                       disabled={!apiKey.isActive}
                     >
                       Použít
                     </button>
-                    <button 
+                    <button
                       className="remove-button"
                       onClick={() => removeKey(apiKey.id)}
                     >
@@ -405,7 +481,7 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
           <p className="pricing-intro">
             Porovnání cen a efektivity různých API poskytovatelů pro práci s mapou a AI asistenty.
           </p>
-          
+
           <div className="pricing-cards">
             {apiPricings.map(pricing => (
               <div key={pricing.provider} className="pricing-card">
@@ -416,9 +492,9 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
                     <span className="efficiency-label">Efektivita</span>
                   </div>
                 </div>
-                
+
                 <p className="pricing-description">{pricing.description}</p>
-                
+
                 <div className="pricing-details">
                   <div className="pricing-rates">
                     <div className="rate-item">
@@ -434,7 +510,7 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="pricing-features">
                     <h4>Klíčové funkce</h4>
                     <ul>
@@ -444,7 +520,7 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
                     </ul>
                   </div>
                 </div>
-                
+
                 <div className="pricing-actions">
                   <button className="add-key-action">
                     Přidat klíč

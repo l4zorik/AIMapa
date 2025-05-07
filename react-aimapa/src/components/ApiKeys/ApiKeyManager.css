@@ -215,6 +215,28 @@
   background-color: #f0f0f0;
   padding: 5px 10px;
   border-radius: 4px;
+  position: relative;
+}
+
+.secure-key {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  background-color: #f8f8f8;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.key-dots {
+  color: #666;
+  letter-spacing: 2px;
+  margin: 0 2px;
+  user-select: none;
+}
+
+.key-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .copy-button {
@@ -224,6 +246,37 @@
   cursor: pointer;
   margin-left: 10px;
   padding: 0;
+  transition: color 0.2s;
+}
+
+.copy-button:hover {
+  color: #3367d6;
+}
+
+.key-security-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  margin-left: 8px;
+  font-size: 10px;
+}
+
+.key-security-note {
+  font-size: 11px;
+  color: #666;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.key-security-note i {
+  margin-right: 5px;
+  color: #4caf50;
 }
 
 .api-key-details {
@@ -448,24 +501,24 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .filter-container {
     margin-bottom: 10px;
     width: 100%;
   }
-  
+
   .filter-container select {
     width: 100%;
   }
-  
+
   .add-key-button {
     width: 100%;
   }
-  
+
   .api-keys-list {
     grid-template-columns: 1fr;
   }
-  
+
   .pricing-cards {
     grid-template-columns: 1fr;
   }
