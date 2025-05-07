@@ -28,18 +28,7 @@ if (process.env.NODE_ENV === 'production') {
     console.log('Načteny vývojové proměnné prostředí z .env');
 }
 
-// Kontrola načtení proměnných prostředí
-console.log('Kontrola načtení proměnných prostředí:');
-console.log('AUTH0_DOMAIN:', process.env.AUTH0_DOMAIN ? 'Načteno' : 'Chybí');
-console.log('AUTH0_CLIENT_ID:', process.env.AUTH0_CLIENT_ID ? 'Načteno' : 'Chybí');
-console.log('AUTH0_CLIENT_SECRET:', process.env.AUTH0_CLIENT_SECRET ? 'Načteno' : 'Chybí');
-console.log('AUTH0_AUDIENCE:', process.env.AUTH0_AUDIENCE ? 'Načteno' : 'Chybí');
-console.log('AUTH0_CALLBACK_URL:', process.env.AUTH0_CALLBACK_URL ? 'Načteno' : 'Chybí');
-console.log('AUTH0_LOGOUT_URL:', process.env.AUTH0_LOGOUT_URL ? 'Načteno' : 'Chybí');
-console.log('AUTH0_SCOPE:', process.env.AUTH0_SCOPE ? 'Načteno' : 'Chybí');
-console.log('DISCORD_CLIENT_ID:', process.env.DISCORD_CLIENT_ID ? 'Načteno' : 'Chybí');
-console.log('DISCORD_CLIENT_SECRET:', process.env.DISCORD_CLIENT_SECRET ? 'Načteno' : 'Chybí');
-console.log('DISCORD_CALLBACK_URL:', process.env.DISCORD_CALLBACK_URL ? 'Načteno' : 'Chybí');
+// Kontrola načtení proměnných prostředí je vypnuta
 
 const app = express();
 
@@ -208,9 +197,5 @@ app.get('/auth/discord/config', (_req, res) => {
 // Spuštění serveru
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`Server běží na portu ${port}`);
-    console.log('Prostředí:', process.env.NODE_ENV);
-    console.log('Auth0 Domain:', process.env.AUTH0_DOMAIN);
-    console.log('Discord Client ID:', process.env.DISCORD_CLIENT_ID);
-    console.log('Supabase URL:', process.env.SUPABASE_URL);
+    console.log(`Server běží na portu ${port} v prostředí ${process.env.NODE_ENV}`);
 });

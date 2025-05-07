@@ -42,11 +42,7 @@ class Auth0Service {
     // Vytvoření Auth0 middleware
     this.middleware = auth(this.config);
 
-    // Logování konfigurace
-    console.log('Auth0Service: Inicializováno');
-    console.log('Auth0 Domain:', process.env.AUTH0_DOMAIN);
-    console.log('Auth0 Client ID:', process.env.AUTH0_CLIENT_ID ? 'Nastaveno' : 'Chybí');
-    console.log('Auth0 Client Secret:', process.env.AUTH0_CLIENT_SECRET ? 'Nastaveno' : 'Chybí');
+    // Logování konfigurace je vypnuto
   }
 
   /**
