@@ -36,9 +36,7 @@ class Auth0Service {
 
     // Nastavení callback URL
     if (process.env.AUTH0_CALLBACK_URL) {
-      this.config.routes.callback = {
-        path: '/auth/callback'
-      };
+      this.config.routes.callback = false; // Vypneme automatický callback, použijeme vlastní
     }
 
     // Vytvoření Auth0 middleware
