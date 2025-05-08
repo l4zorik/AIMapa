@@ -86,6 +86,172 @@ const EnhancedMapPage: React.FC = () => {
     }
   }, []);
 
+  // Efekt pro automatické přidání místa k úkolu "Najít vhodné místo pro zapálení cigarety"
+  useEffect(() => {
+    // Funkce pro přidání místa k úkolu pro zapálení cigarety
+    const addSmokingLocationToTask = () => {
+      const taskId = "1746726897965-0"; // ID úkolu "Najít vhodné místo pro zapálení cigarety"
+
+      console.log('Automatické přidání místa k úkolu pro zapálení cigarety s ID:', taskId);
+
+      // Načtení plánů z localStorage
+      const savedPlans = localStorage.getItem('plans');
+      if (!savedPlans) {
+        console.log('Žádné plány nebyly nalezeny v localStorage');
+        return;
+      }
+
+      try {
+        const plans = JSON.parse(savedPlans);
+
+        // Hledání úkolu podle ID
+        let foundPlan: any = null;
+        let foundTask: any = null;
+
+        for (const plan of plans) {
+          if (!plan.items || !Array.isArray(plan.items)) continue;
+
+          for (const item of plan.items) {
+            if (item.id === taskId) {
+              foundPlan = plan;
+              foundTask = item;
+              break;
+            }
+          }
+          if (foundPlan) break;
+        }
+
+        // Pokud jsme našli úkol, přidáme k němu vhodné místo pro zapálení cigarety
+        if (foundPlan && foundTask) {
+          console.log('Nalezen úkol pro zapálení cigarety:', foundTask.title, 'v plánu:', foundPlan.title);
+
+          // Pokud úkol již má lokaci, nebudeme ji přepisovat
+          if (foundTask.type === 'location' && foundTask.location) {
+            console.log('Úkol již má přiřazenou lokaci:', foundTask.location);
+
+            // Zobrazíme lokaci na mapě
+            handleLocationSelect(foundTask.location);
+
+            // Nastavíme aktivní plán a úkol
+            const taskIndex = foundPlan.items.findIndex((item: any) => item.id === taskId);
+            if (taskIndex !== -1) {
+              // Dispatch event pro aktualizaci UI
+              const planUpdatedEvent = new CustomEvent('planUpdated', {
+                detail: {
+                  planId: foundPlan.id,
+                  taskId: taskId,
+                  taskIndex: taskIndex
+                }
+              });
+              window.dispatchEvent(planUpdatedEvent);
+            }
+
+            return;
+          }
+
+          // Přidání vhodného místa pro zapálení cigarety
+          const smokingLocation = {
+            lat: 50.0755,
+            lng: 14.4378,
+            name: "Vhodné místo pro zapálení cigarety - Praha, Václavské náměstí"
+          };
+
+          // Použijeme funkci pro přímé přidání lokace k úkolu
+          // Načtení aktuálních plánů
+          const savedPlans = localStorage.getItem('plans');
+          if (!savedPlans) {
+            console.error('Žádné plány nebyly nalezeny');
+            return;
+          }
+
+          try {
+            let plans = JSON.parse(savedPlans);
+
+            // Najdeme plán a úkol
+            const planIndex = plans.findIndex((p: any) => p.id === foundPlan.id);
+            if (planIndex === -1) {
+              console.error('Plán nebyl nalezen:', foundPlan.id);
+              return;
+            }
+
+            const plan = plans[planIndex];
+            const taskIndex = plan.items.findIndex((item: any) => item.id === foundTask.id);
+            if (taskIndex === -1) {
+              console.error('Úkol nebyl nalezen:', foundTask.id);
+              return;
+            }
+
+            // Aktualizace úkolu s novou lokací
+            plan.items[taskIndex] = {
+              ...plan.items[taskIndex],
+              type: 'location',
+              location: smokingLocation
+            };
+
+            // Nastavení aktivního indexu na tento úkol
+            plan.activeItemIndex = taskIndex;
+            plan.updatedAt = new Date();
+            plans[planIndex] = plan;
+
+            // Uložení aktualizovaných plánů
+            localStorage.setItem('plans', JSON.stringify(plans));
+
+            // Automaticky zaměřit mapu na novou lokaci
+            console.log('Zobrazuji lokaci na mapě po přímém přidání:', smokingLocation);
+
+            // Použití setTimeout pro zajištění, že se změny projeví
+            setTimeout(() => {
+              // Vytvoření markeru
+              const newMarker = {
+                lat: smokingLocation.lat,
+                lng: smokingLocation.lng,
+                name: smokingLocation.name || 'Místo'
+              };
+
+              // Nastavení mapy
+              setMapCenter([smokingLocation.lat, smokingLocation.lng]);
+              setMapZoom(15);
+              setMarkers([newMarker]);
+
+              // Zobrazení panelu plánování, pokud není viditelný
+              if (!isPlanningVisible) {
+                setIsPlanningVisible(true);
+              }
+
+              // Nastavení aktivního plánu v UI
+              const updatedPlan = plans.find((p: any) => p.id === foundPlan.id);
+              if (updatedPlan) {
+                console.log('Nastavuji aktivní plán po přidání lokace:', updatedPlan.title);
+                // Dispatch event pro aktualizaci UI - toto pomůže synchronizovat stav mezi komponentami
+                const planUpdatedEvent = new CustomEvent('planUpdated', {
+                  detail: {
+                    planId: foundPlan.id,
+                    taskId: foundTask.id,
+                    taskIndex: taskIndex
+                  }
+                });
+                window.dispatchEvent(planUpdatedEvent);
+              }
+            }, 100);
+
+            console.log('Úspěšně přidáno vhodné místo pro zapálení cigarety k úkolu');
+          } catch (error) {
+            console.error('Chyba při přidávání lokace k úkolu:', error);
+          }
+        } else {
+          console.log('Úkol pro zapálení cigarety nebyl nalezen');
+        }
+      } catch (error) {
+        console.error('Chyba při automatickém přidávání místa k úkolu pro zapálení cigarety:', error);
+      }
+    };
+
+    // Spustíme funkci pro přidání místa k úkolu po krátké prodlevě, aby se aplikace stihla načíst
+    setTimeout(() => {
+      addSmokingLocationToTask();
+    }, 1000);
+  }, [isPlanningVisible, setMapCenter, setMapZoom, setMarkers]);
+
   // Zpracování výběru lokace z chatu
   const handleLocationSelect = (location: { lat: number; lng: number; name?: string }) => {
     setMapCenter([location.lat, location.lng]);
