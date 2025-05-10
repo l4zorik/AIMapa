@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ApiKey, ApiProviderType } from '../ApiKeys/ApiKeyManager';
+import routingService from '../../services/RoutingService';
 import './ChatComponent.css';
 
 // Rozhraní pro zprávu
@@ -33,15 +34,15 @@ interface Model {
 interface ChatComponentProps {
   apiKey?: ApiKey;
   onLocationSelect?: (location: { lat: number; lng: number; name?: string }) => void;
-  onRouteSelect?: (route: { 
-    start: { lat: number; lng: number; name?: string }; 
+  onRouteSelect?: (route: {
+    start: { lat: number; lng: number; name?: string };
     end: { lat: number; lng: number; name?: string };
     waypoints?: Array<{ lat: number; lng: number; name?: string }>;
   }) => void;
 }
 
-const ChatComponent: React.FC<ChatComponentProps> = ({ 
-  apiKey, 
+const ChatComponent: React.FC<ChatComponentProps> = ({
+  apiKey,
   onLocationSelect,
   onRouteSelect
 }) => {
@@ -97,7 +98,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   const [maxCostLimit, setMaxCostLimit] = useState<number>(0.05);
   const [estimatedCost, setEstimatedCost] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(0);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -125,20 +126,20 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   // Zpracování změny vstupu
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
-    
+
     // Odhad ceny
     if (isCostEstimationEnabled) {
       const inputChars = e.target.value.length;
       // Průměrná délka odpovědi je přibližně 3x délka dotazu
       const estimatedOutputChars = inputChars * 3;
-      
+
       // Ceny za 1K znaků (příklad pro Gemini Pro)
       const inputPrice = 0.000125;
       const outputPrice = 0.000375;
-      
+
       const estimatedInputCost = (inputChars / 1000) * inputPrice;
       const estimatedOutputCost = (estimatedOutputChars / 1000) * outputPrice;
-      
+
       setEstimatedCost(estimatedInputCost + estimatedOutputCost);
     }
   };
@@ -152,7 +153,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
-    
+
     // Kontrola limitu nákladů
     if (isCostEstimationEnabled && estimatedCost > maxCostLimit) {
       alert(`Odhadovaná cena (${estimatedCost.toFixed(4)} USD) překračuje váš limit (${maxCostLimit} USD).`);
@@ -166,75 +167,306 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
       content: inputValue,
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
-    
+
     // Simulace odpovědi asistenta
     handleAssistantResponse(inputValue);
   };
 
-  // Simulace odpovědi asistenta
+  // Vylepšená odpověď asistenta s podporou pro plány a mapu
   const handleAssistantResponse = (userInput: string) => {
     setIsTyping(true);
-    
+
     // Simulace zpoždění
     setTimeout(() => {
       setIsTyping(false);
-      
-      // Analýza vstupu pro detekci lokací a tras
-      const locationMatch = userInput.match(/najdi|ukaž|kde je|zobraz|vyhledej|najít|ukázat|vyhledat/i);
-      const routeMatch = userInput.match(/trasa|cesta|jak se dostat|navigace|naviguj|naplánuj cestu/i);
-      
+
+      // Rozšířená analýza vstupu pro detekci lokací, tras a plánů
+      const locationMatch = userInput.match(/najdi|ukaž|kde je|zobraz|vyhledej|najít|ukázat|vyhledat|místo|lokace|lokaci|bod/i);
+      const routeMatch = userInput.match(/trasa|cesta|jak se dostat|navigace|naviguj|naplánuj cestu|trasu|cestu/i);
+      const planMatch = userInput.match(/plán|naplánuj|vytvoř plán|přidej plán|nový plán|plánování|úkol|úkoly/i);
+
+      // Detekce požadavků na přidání lokace k úkolu
+      const taskLocationMatch = userInput.match(/přidej\s+(?:lokaci|místo|lokalitu)?\s*([a-zá-žA-ZÁ-Ž\s]+)\s+(?:k|do)\s+(?:úkolu|úkol|tasku)/i) ||
+                               userInput.match(/přidej\s+(?:k|do)\s+(?:úkolu|úkol|tasku).*(?:lokaci|místo|lokalitu)/i) ||
+                               userInput.match(/dej tam jakoukoliv lokalitu/i) ||
+                               userInput.match(/přidej jakoukoliv lokaci/i) ||
+                               userInput.match(/přidej místo k úkolu/i);
+
+      // Detekce konkrétních míst nebo tras
+      const pragueMention = userInput.match(/prah[auy]|prague/i);
+      const brnoMention = userInput.match(/brn[oau]/i);
+      const ostravaMention = userInput.match(/ostrav[auy]/i);
+      const plzenMention = userInput.match(/plz[eě]ň|pilsen/i);
+      const hradecMention = userInput.match(/hradec/i);
+      const hodoninMention = userInput.match(/hodon[ií]n/i);
+      const rohatecMention = userInput.match(/rohatec/i);
+
       let response: Message;
-      
-      if (routeMatch) {
-        // Simulace nalezení trasy
-        const route = {
-          start: { lat: 50.0755, lng: 14.4378, name: 'Praha' },
-          end: { lat: 49.1951, lng: 16.6068, name: 'Brno' }
-        };
-        
+
+      // Zpracování dotazu na plán
+      if (planMatch) {
+        // Vytvoření události pro vytvoření plánu
+        const planEvent = new CustomEvent('createPlanFromChat', {
+          detail: {
+            query: userInput,
+            source: 'chat'
+          }
+        });
+
+        // Vyvolání události pro vytvoření plánu
+        window.dispatchEvent(planEvent);
+
+        // Vynucené překreslení seznamu plánů po krátké prodlevě
+        setTimeout(() => {
+          // Načtení aktuálních plánů z localStorage
+          const savedPlans = localStorage.getItem('plans');
+          if (savedPlans) {
+            try {
+              const parsedPlans = JSON.parse(savedPlans);
+              // Najdeme nejnovější plán (předpokládáme, že byl právě vytvořen)
+              if (parsedPlans.length > 0) {
+                // Seřadíme plány podle data vytvoření (nejnovější první)
+                const sortedPlans = [...parsedPlans].sort((a, b) =>
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+                const newestPlan = sortedPlans[0];
+
+                // Vyvolání události pro aktualizaci UI s ID nového plánu
+                const plansUpdatedEvent = new CustomEvent('plansUpdated', {
+                  detail: {
+                    action: 'create',
+                    planId: newestPlan.id,
+                    source: 'chat'
+                  }
+                });
+                window.dispatchEvent(plansUpdatedEvent);
+
+                console.log('Vyvolána událost plansUpdated pro aktualizaci seznamu plánů z chatu s ID plánu:', newestPlan.id);
+              }
+            } catch (error) {
+              console.error('Chyba při načítání plánů z localStorage:', error);
+            }
+          }
+        }, 500);
+
         response = {
           id: `assistant-${Date.now()}`,
           sender: 'assistant',
-          content: `Našel jsem trasu z Prahy do Brna. Cesta je dlouhá přibližně 205 km a trvá asi 2 hodiny jízdy autem. Chcete zobrazit podrobnosti?`,
-          timestamp: new Date(),
-          route
+          content: `Vytvářím plán na základě vašeho požadavku "${userInput}". Plán bude obsahovat automaticky vygenerované úkoly a lokace. Můžete ho pak dále upravovat v sekci plánování.`,
+          timestamp: new Date()
         };
-        
-        // Volání callbacku pro zobrazení trasy na mapě
-        if (onRouteSelect) {
-          onRouteSelect(route);
+
+        // Aktualizace zpráv
+        setMessages(prev => [...prev, response]);
+
+        // Aktualizace celkových nákladů
+        if (isCostEstimationEnabled) {
+          setTotalCost(prev => prev + estimatedCost);
+          setEstimatedCost(0);
         }
-      } else if (locationMatch) {
-        // Simulace nalezení místa
-        const location = { lat: 50.0811, lng: 14.4280, name: 'Václavské náměstí, Praha' };
-        
+
+        return; // Ukončíme funkci zde
+      }
+
+      // Zpracování dotazu na trasu
+      if (routeMatch) {
+        let start = { lat: 50.0755, lng: 14.4378, name: 'Praha' };
+        let end = { lat: 49.1951, lng: 16.6068, name: 'Brno' };
+
+        // Detekce konkrétních míst pro trasu
+        if (pragueMention && brnoMention) {
+          start = { lat: 50.0755, lng: 14.4378, name: 'Praha' };
+          end = { lat: 49.1951, lng: 16.6068, name: 'Brno' };
+        } else if (pragueMention && ostravaMention) {
+          start = { lat: 50.0755, lng: 14.4378, name: 'Praha' };
+          end = { lat: 49.8209, lng: 18.2625, name: 'Ostrava' };
+        } else if (pragueMention && plzenMention) {
+          start = { lat: 50.0755, lng: 14.4378, name: 'Praha' };
+          end = { lat: 49.7384, lng: 13.3736, name: 'Plzeň' };
+        } else if (brnoMention && ostravaMention) {
+          start = { lat: 49.1951, lng: 16.6068, name: 'Brno' };
+          end = { lat: 49.8209, lng: 18.2625, name: 'Ostrava' };
+        }
+
+        // Základní trasa bez geometrie
+        const basicRoute = { start, end };
+
+        // Zobrazení zprávy o vyhledávání trasy
+        setMessages(prev => [...prev, {
+          id: `assistant-searching-${Date.now()}`,
+          sender: 'assistant',
+          content: `Vyhledávám trasu z ${start.name} do ${end.name}...`,
+          timestamp: new Date()
+        }]);
+
+        // Asynchronní vyhledání trasy pomocí routingService
+        if (!routingService.getApiKey()) {
+          // Použijeme testovací klíč pro ukázku
+          routingService.setApiKey('5b3ce3597851110001cf6248f8f3f5e5a0a94a5c8e9e7e7e9e7e7e9e');
+        }
+
+        // Vyhledání trasy pomocí Promise
+        routingService.getRoute(start, end)
+          .then(routeResult => {
+            // Vytvoření rozšířené trasy s geometrií
+            const enhancedRoute = {
+              ...basicRoute,
+              geometry: routeResult.geometry,
+              distance: routeResult.distance,
+              duration: routeResult.duration
+            };
+
+            // Vytvoření události pro animované zaměření na trasu
+            const focusEvent = new CustomEvent('focusOnRoute', {
+              detail: {
+                route: enhancedRoute,
+                animate: true,
+                duration: 1.5,
+                taskId: `chat-${Date.now()}`,
+                taskTitle: `Trasa ${start.name} - ${end.name}`,
+                showPath: true
+              }
+            });
+
+            // Vyvolání události pro zaměření na trasu
+            window.dispatchEvent(focusEvent);
+
+            // Formátování vzdálenosti a času
+            const formattedDistance = routingService.formatDistance(routeResult.distance);
+            const formattedDuration = routingService.formatDuration(routeResult.duration);
+
+            const routeResponse: Message = {
+              id: `assistant-${Date.now()}`,
+              sender: 'assistant' as 'user' | 'assistant',
+              content: `Našel jsem trasu z ${start.name} do ${end.name}. Cesta je dlouhá ${formattedDistance} a trvá přibližně ${formattedDuration}. Trasa je zobrazena na mapě. Chcete tuto trasu přidat do plánu?`,
+              timestamp: new Date(),
+              route: enhancedRoute
+            };
+
+            // Volání callbacku pro zobrazení trasy na mapě
+            if (onRouteSelect) {
+              onRouteSelect(enhancedRoute);
+            }
+
+            // Aktualizace zpráv
+            setMessages(prev => [...prev, routeResponse]);
+
+            // Aktualizace celkových nákladů
+            if (isCostEstimationEnabled) {
+              setTotalCost(prev => prev + estimatedCost);
+              setEstimatedCost(0);
+            }
+          })
+          .catch(error => {
+            console.error('Chyba při vyhledávání trasy:', error);
+
+            // V případě chyby použijeme základní trasu
+            const errorResponse: Message = {
+              id: `assistant-${Date.now()}`,
+              sender: 'assistant' as 'user' | 'assistant',
+              content: `Omlouvám se, ale nepodařilo se mi vyhledat přesnou trasu z ${start.name} do ${end.name}. Zobrazuji alespoň přímou linii mezi těmito body. Chyba: ${error instanceof Error ? error.message : 'Neznámá chyba'}`,
+              timestamp: new Date(),
+              route: basicRoute
+            };
+
+            // Volání callbacku pro zobrazení základní trasy na mapě
+            if (onRouteSelect) {
+              onRouteSelect(basicRoute);
+            }
+
+            // Aktualizace zpráv
+            setMessages(prev => [...prev, errorResponse]);
+
+            // Aktualizace celkových nákladů
+            if (isCostEstimationEnabled) {
+              setTotalCost(prev => prev + estimatedCost);
+              setEstimatedCost(0);
+            }
+          });
+
+        return; // Ukončíme funkci zde
+      }
+
+      // Zpracování dotazu na lokaci
+      if (locationMatch || taskLocationMatch) {
+        let location = { lat: 50.0811, lng: 14.4280, name: 'Václavské náměstí, Praha' };
+
+        // Detekce konkrétních míst
+        if (pragueMention) {
+          location = { lat: 50.0755, lng: 14.4378, name: 'Praha' };
+        } else if (brnoMention) {
+          location = { lat: 49.1951, lng: 16.6068, name: 'Brno' };
+        } else if (ostravaMention) {
+          location = { lat: 49.8209, lng: 18.2625, name: 'Ostrava' };
+        } else if (plzenMention) {
+          location = { lat: 49.7384, lng: 13.3736, name: 'Plzeň' };
+        } else if (hradecMention) {
+          location = { lat: 50.2099, lng: 15.8325, name: 'Hradec Králové' };
+        } else if (hodoninMention) {
+          location = { lat: 48.8492, lng: 17.1247, name: 'Hodonín' };
+        } else if (rohatecMention) {
+          location = { lat: 48.8783, lng: 17.1750, name: 'Rohatec' };
+        }
+
+        // Vytvoření události pro animované zaměření na lokaci
+        const focusEvent = new CustomEvent('focusOnLocation', {
+          detail: {
+            location,
+            zoom: 14,
+            animate: true,
+            duration: 1.5,
+            taskId: `chat-${Date.now()}`,
+            taskTitle: `Lokace ${location.name}`
+          }
+        });
+
+        // Vyvolání události pro zaměření na lokaci
+        window.dispatchEvent(focusEvent);
+
         response = {
           id: `assistant-${Date.now()}`,
           sender: 'assistant',
-          content: `Našel jsem Václavské náměstí v Praze. Je to jedno z nejznámějších a nejrušnějších míst v Praze, které se nachází v centru města. Chcete zobrazit další informace o tomto místě?`,
+          content: `Našel jsem lokaci ${location.name}. Místo je zobrazeno na mapě. Chcete tuto lokaci přidat do plánu?`,
           timestamp: new Date(),
           location
         };
-        
+
         // Volání callbacku pro zobrazení místa na mapě
         if (onLocationSelect) {
           onLocationSelect(location);
         }
-      } else {
-        // Obecná odpověď
-        response = {
-          id: `assistant-${Date.now()}`,
-          sender: 'assistant',
-          content: `Rozumím vašemu dotazu "${userInput}". Mohu vám pomoci s vyhledáváním míst nebo plánováním tras. Zkuste se mě zeptat například "Kde je Václavské náměstí?" nebo "Jak se dostanu z Prahy do Brna?".`,
-          timestamp: new Date()
-        };
+
+        // Aktualizace zpráv
+        setMessages(prev => [...prev, response]);
+
+        // Aktualizace celkových nákladů
+        if (isCostEstimationEnabled) {
+          setTotalCost(prev => prev + estimatedCost);
+          setEstimatedCost(0);
+        }
+
+        return; // Ukončíme funkci zde
       }
-      
+
+      // Obecná odpověď (pokud neodpovídá žádnému specifickému typu)
+      response = {
+        id: `assistant-${Date.now()}`,
+        sender: 'assistant',
+        content: `Rozumím vašemu dotazu "${userInput}". Mohu vám pomoci s:
+1. Vyhledáváním míst - např. "Kde je Václavské náměstí?"
+2. Plánováním tras - např. "Jak se dostanu z Prahy do Brna?"
+3. Vytvářením plánů - např. "Vytvoř plán na výlet do Prahy"
+
+Co byste chtěli udělat?`,
+        timestamp: new Date()
+      };
+
+      // Aktualizace zpráv
       setMessages(prev => [...prev, response]);
-      
+
       // Aktualizace celkových nákladů
       if (isCostEstimationEnabled) {
         setTotalCost(prev => prev + estimatedCost);
@@ -254,17 +486,17 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   // Formátování zprávy s odkazy na místa a trasy
   const formatMessage = (message: Message) => {
     let formattedContent = message.content;
-    
+
     // Přidání odkazů na místa
     if (message.location) {
       formattedContent += ` <a href="#" class="location-link" data-lat="${message.location.lat}" data-lng="${message.location.lng}">Zobrazit na mapě</a>`;
     }
-    
+
     // Přidání odkazů na trasy
     if (message.route) {
       formattedContent += ` <a href="#" class="route-link" data-start-lat="${message.route.start.lat}" data-start-lng="${message.route.start.lng}" data-end-lat="${message.route.end.lat}" data-end-lng="${message.route.end.lng}">Zobrazit trasu</a>`;
     }
-    
+
     return { __html: formattedContent };
   };
 
@@ -278,14 +510,14 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
       <div className="chat-header">
         <h2>AI Asistent</h2>
         <div className="model-selector">
-          <select 
-            id="model-selector" 
-            value={selectedModel} 
+          <select
+            id="model-selector"
+            value={selectedModel}
             onChange={handleModelChange}
           >
             {availableModels.map(model => (
-              <option 
-                key={model.id} 
+              <option
+                key={model.id}
                 value={model.id}
                 disabled={!model.isAvailable}
               >
@@ -299,25 +531,25 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
           </div>
         </div>
       </div>
-      
+
       <div className="chat-settings">
         <div className="cost-estimation">
           <label htmlFor="cost-estimation-toggle">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               id="cost-estimation-toggle"
               checked={isCostEstimationEnabled}
               onChange={() => setIsCostEstimationEnabled(!isCostEstimationEnabled)}
             />
             Povolit odhad nákladů
           </label>
-          
+
           {isCostEstimationEnabled && (
             <div className="cost-limit-container">
               <label htmlFor="cost-limit">
                 Max. limit na dotaz:
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   id="cost-limit"
                   min="0.01"
                   step="0.01"
@@ -326,7 +558,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
                 />
                 USD
               </label>
-              
+
               <div className="cost-display">
                 <div className="estimated-cost">
                   <span className="cost-label">Odhadovaná cena:</span>
@@ -341,7 +573,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
           )}
         </div>
       </div>
-      
+
       <div className="chat-messages" id="chat-messages">
         {messages.map(message => (
           <div key={message.id} className={`message ${message.sender}`}>
@@ -351,7 +583,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
             </div>
           </div>
         ))}
-        
+
         {isTyping && (
           <div className="message assistant typing">
             <div className="typing-indicator">
@@ -361,30 +593,30 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
-      
+
       <form className="chat-input" onSubmit={handleSubmit}>
-        <textarea 
-          id="user-input" 
+        <textarea
+          id="user-input"
           value={inputValue}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
-          placeholder="Napište zprávu... (např. 'Kde je Václavské náměstí?' nebo 'Jak se dostanu z Prahy do Brna?')" 
+          placeholder="Napište zprávu... (např. 'Kde je Václavské náměstí?' nebo 'Jak se dostanu z Prahy do Brna?')"
           rows={2}
         />
         <button type="submit" id="send-button" disabled={!inputValue.trim() || (isCostEstimationEnabled && estimatedCost > maxCostLimit)}>
           <i className="fas fa-paper-plane"></i>
         </button>
       </form>
-      
+
       {isCostEstimationEnabled && estimatedCost > maxCostLimit && (
         <div className="cost-warning">
           Upozornění: Odhadovaná cena překračuje váš limit.
         </div>
       )}
-      
+
       {!apiKey && (
         <div className="no-api-key-warning">
           <i className="fas fa-exclamation-triangle"></i>

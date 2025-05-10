@@ -1,0 +1,326 @@
+/* Základní proměnné pro barvy */
+:root {
+  --primary-green: #2ecc71;
+  --primary-green-dark: #27ae60;
+  --primary-green-light: #a9dfbf;
+
+  --primary-red: #e74c3c;
+  --primary-red-dark: #c0392b;
+  --primary-red-light: #f5b7b1;
+
+  --primary-orange: #f39c12;
+  --primary-orange-dark: #d35400;
+  --primary-orange-light: #fad7a0;
+
+  --dark-bg: #1e272e;
+  --light-bg: #f5f6fa;
+  --card-bg: #2c3e50;
+  --card-hover: #34495e;
+
+  --text-light: #ecf0f1;
+  --text-dark: #2c3e50;
+  --text-muted: #95a5a6;
+
+  --border-color: #7f8c8d;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Kontejner pro plány předplatného */
+.subscription-plans-container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--text-light);
+}
+
+.subscription-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: var(--primary-green);
+}
+
+.subscription-subtitle {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+  color: var(--text-muted);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Mřížka plánů */
+.subscription-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+/* Karta plánu */
+.subscription-plan-card {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  border: 2px solid transparent;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.subscription-plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.subscription-plan-card.selected {
+  border-color: var(--primary-green);
+}
+
+.subscription-plan-card.popular {
+  border-color: var(--primary-orange);
+  transform: scale(1.03);
+}
+
+.subscription-plan-card.popular:hover {
+  transform: translateY(-5px) scale(1.03);
+}
+
+/* Odznak popularity */
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background-color: var(--primary-orange);
+  color: var(--text-light);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Hlavička plánu */
+.plan-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.plan-name {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--text-light);
+}
+
+.plan-price {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  margin-bottom: 5px;
+}
+
+.price {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary-green);
+}
+
+.currency {
+  font-size: 1.2rem;
+  margin-left: 5px;
+  color: var(--text-light);
+}
+
+.interval {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+/* Funkce plánu */
+.plan-features {
+  margin-bottom: 20px;
+}
+
+.plan-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-features li {
+  padding: 8px 0;
+  position: relative;
+  padding-left: 25px;
+  color: var(--text-light);
+}
+
+.plan-features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--primary-green);
+  font-weight: bold;
+}
+
+/* API limity */
+.plan-api-limits {
+  background-color: rgba(46, 204, 113, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.plan-api-limits h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--primary-green);
+  font-size: 1rem;
+}
+
+.plan-api-limits p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+/* Tlačítko pro výběr plánu */
+.select-plan-button {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  margin-top: auto;
+}
+
+.select-plan-button:hover:not(:disabled) {
+  background-color: var(--primary-green-dark);
+}
+
+.select-plan-button.current {
+  background-color: var(--primary-orange);
+  cursor: pointer;
+}
+
+.select-plan-button.current:hover {
+  background-color: var(--primary-orange-dark);
+}
+
+.select-plan-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Výzva k přihlášení */
+.login-prompt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.login-prompt-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+.login-prompt-content {
+  background-color: var(--card-bg);
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  z-index: 1001;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.login-prompt-content h3 {
+  margin-top: 0;
+  color: var(--primary-orange);
+  font-size: 1.5rem;
+}
+
+.login-prompt-content p {
+  margin-bottom: 10px;
+}
+
+.login-prompt-content .info-text {
+  color: var(--primary-green);
+  font-style: italic;
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+.login-prompt-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.login-button {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: var(--primary-green-dark);
+}
+
+.cancel-button {
+  background-color: var(--text-muted);
+  color: var(--text-light);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+  background-color: var(--primary-red);
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .subscription-plans-container {
+    padding: 20px 15px;
+  }
+
+  .subscription-plans-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .subscription-plan-card.popular {
+    transform: none;
+  }
+
+  .subscription-plan-card.popular:hover {
+    transform: translateY(-5px);
+  }
+}

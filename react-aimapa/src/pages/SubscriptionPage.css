@@ -1,0 +1,303 @@
+/* Základní proměnné pro barvy */
+:root {
+  --primary-green: #2ecc71;
+  --primary-green-dark: #27ae60;
+  --primary-green-light: #a9dfbf;
+
+  --primary-red: #e74c3c;
+  --primary-red-dark: #c0392b;
+  --primary-red-light: #f5b7b1;
+
+  --primary-orange: #f39c12;
+  --primary-orange-dark: #d35400;
+  --primary-orange-light: #fad7a0;
+
+  --dark-bg: #1e272e;
+  --light-bg: #f5f6fa;
+  --card-bg: #2c3e50;
+  --card-hover: #34495e;
+
+  --text-light: #ecf0f1;
+  --text-dark: #2c3e50;
+  --text-muted: #95a5a6;
+
+  --border-color: #7f8c8d;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Stránka předplatného */
+.subscription-page {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--text-light);
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+  height: calc(100vh - 150px);
+  background-color: var(--dark-bg);
+}
+
+/* Hlavička stránky */
+.subscription-header {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.header-actions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.back-to-map-button {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+}
+
+.back-to-map-button:hover {
+  background-color: var(--primary-green-dark);
+}
+
+.subscription-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: var(--primary-green);
+}
+
+.subscription-header p {
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto 20px;
+  color: var(--text-muted);
+}
+
+/* Stav přihlášení */
+.auth-status {
+  background-color: var(--card-bg);
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto;
+  max-width: 600px;
+}
+
+.user-info, .login-prompt {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logout-button {
+  background-color: var(--primary-red);
+  color: var(--text-light);
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: var(--primary-red-dark);
+}
+
+.login-button {
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: var(--primary-green-dark);
+}
+
+/* Obsah stránky */
+.subscription-content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.subscription-section {
+  margin-bottom: 20px;
+}
+
+/* Nástroje pro vývojáře */
+.subscription-tools {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.tools-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.tools-header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: var(--primary-orange);
+}
+
+.tools-header p {
+  color: var(--text-muted);
+}
+
+.tools-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.tool-button {
+  background-color: var(--card-hover);
+  color: var(--text-light);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool-button i {
+  font-size: 1.2rem;
+}
+
+.tool-button:hover {
+  background-color: var(--primary-orange-dark);
+}
+
+.tool-button.active {
+  background-color: var(--primary-orange);
+}
+
+.tool-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Informace o API */
+.api-info {
+  background-color: var(--dark-bg);
+  border-radius: 10px;
+  padding: 25px;
+}
+
+.api-info h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--primary-orange);
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.api-info-section {
+  margin-bottom: 25px;
+}
+
+.api-info-section h4 {
+  color: var(--primary-green);
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.api-info-section p {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.api-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.api-list li {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(127, 140, 141, 0.2);
+}
+
+.api-list li:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.api-provider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.api-provider i {
+  color: var(--primary-orange);
+  font-size: 1.2rem;
+}
+
+.api-provider span {
+  font-weight: bold;
+  color: var(--text-light);
+}
+
+.api-list p {
+  margin: 0;
+  color: var(--text-muted);
+  padding-left: 30px;
+}
+
+.api-info-section ul {
+  padding-left: 20px;
+}
+
+.api-info-section li {
+  margin-bottom: 8px;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .subscription-page {
+    padding: 20px 15px;
+  }
+
+  .tools-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tool-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

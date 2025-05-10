@@ -1,0 +1,206 @@
+/**
+ * TimelineEvent.css
+ * Styly pro komponentu události na časové ose
+ */
+
+.timeline-event {
+  display: flex;
+  margin-bottom: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.timeline-event:hover {
+  transform: translateX(5px);
+}
+
+.timeline-event-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 15px;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-event-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--event-color, #3498db);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.timeline-event-dot i {
+  font-size: 14px;
+}
+
+.timeline-event-line {
+  width: 2px;
+  flex-grow: 1;
+  background-color: var(--event-color, #3498db);
+  opacity: 0.5;
+  margin-top: 5px;
+}
+
+.timeline-event:last-child .timeline-event-line {
+  display: none;
+}
+
+.timeline-event-content {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 15px;
+  border-left: 3px solid var(--event-color, #3498db);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.timeline-event:hover .timeline-event-content {
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.timeline-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.timeline-event-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ecf0f1;
+}
+
+.timeline-event-time {
+  font-size: 0.9rem;
+  color: #bdc3c7;
+  display: flex;
+  align-items: center;
+}
+
+.timeline-event-time .separator {
+  margin: 0 5px;
+  color: #7f8c8d;
+}
+
+.timeline-event-description {
+  font-size: 0.9rem;
+  color: #bdc3c7;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.timeline-event-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: #95a5a6;
+}
+
+.timeline-event-duration, .timeline-event-location {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.timeline-event-progress-container {
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.timeline-event-progress-bar {
+  height: 100%;
+  background-color: var(--event-color, #3498db);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Stavy událostí */
+.timeline-event.past .timeline-event-dot {
+  background-color: rgba(127, 140, 141, 0.7);
+  border-color: var(--event-color, #3498db);
+}
+
+.timeline-event.past .timeline-event-content {
+  opacity: 0.7;
+}
+
+.timeline-event.current .timeline-event-dot {
+  animation: eventPulse 2s infinite;
+  transform: scale(1.1);
+  border-color: white;
+}
+
+.timeline-event.future .timeline-event-dot {
+  opacity: 0.7;
+}
+
+.timeline-event.future .timeline-event-content {
+  opacity: 0.7;
+}
+
+.timeline-event.completed .timeline-event-dot::after {
+  content: '✓';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  background-color: #27ae60;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Animace */
+@keyframes eventPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--event-color-rgb, 52, 152, 219), 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--event-color-rgb, 52, 152, 219), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--event-color-rgb, 52, 152, 219), 0);
+  }
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .timeline-event-header {
+    flex-direction: column;
+  }
+  
+  .timeline-event-time {
+    margin-top: 5px;
+  }
+  
+  .timeline-event-dot {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .timeline-event-dot i {
+    font-size: 12px;
+  }
+}

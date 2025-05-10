@@ -1,0 +1,392 @@
+.mission-completed-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.mission-completed-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.mission-completed-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  z-index: 10000;
+}
+
+.mission-text, .completed-text, .plan-title {
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+  position: relative;
+}
+
+.mission-text.visible, .completed-text.visible, .plan-title.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.mission-text {
+  font-size: 5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #f8d030;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.completed-text {
+  font-size: 6rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
+  color: #3498db;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  animation: textShadowPulse 2s ease-in-out infinite;
+}
+
+.plan-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #2ecc71;
+  max-width: 80%;
+  padding: 1.5rem 2.5rem;
+  border-radius: 15px;
+  background-color: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 30px rgba(46, 204, 113, 0.7);
+  border: 2px solid rgba(46, 204, 113, 0.5);
+  animation: borderPulse 3s ease-in-out infinite;
+}
+
+/* Efekty pro text */
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 10px rgba(248, 208, 48, 0.7);
+  }
+  100% {
+    text-shadow: 0 0 30px rgba(248, 208, 48, 0.9), 0 0 60px rgba(248, 208, 48, 0.5);
+  }
+}
+
+@keyframes textShadowPulse {
+  0% {
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(52, 152, 219, 0.9), 0 0 60px rgba(52, 152, 219, 0.5);
+  }
+  100% {
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+  }
+}
+
+@keyframes borderPulse {
+  0% {
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+    border-color: rgba(46, 204, 113, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(46, 204, 113, 0.8);
+    border-color: rgba(46, 204, 113, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+    border-color: rgba(46, 204, 113, 0.5);
+  }
+}
+
+/* Konfety */
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10001;
+}
+
+.confetti {
+  position: absolute;
+  top: -20px;
+  width: 15px;
+  height: 15px;
+  opacity: 0.9;
+  z-index: 10001;
+  will-change: transform;
+}
+
+.confetti.square {
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+}
+
+.confetti.circle {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.confetti.triangle {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 20px solid;
+  background-color: transparent !important;
+}
+
+.confetti.star {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  width: 20px;
+  height: 20px;
+}
+
+.confetti.slow {
+  animation: confettiFallSlow 8s ease-in-out forwards;
+}
+
+.confetti.medium {
+  animation: confettiFallMedium 6s ease-in-out forwards;
+}
+
+.confetti.fast {
+  animation: confettiFallFast 4s ease-in-out forwards;
+}
+
+/* Barvy konfet */
+.confetti.color1 { background-color: #f44336; }
+.confetti.color2 { background-color: #2196f3; }
+.confetti.color3 { background-color: #4caf50; }
+.confetti.color4 { background-color: #ffeb3b; }
+.confetti.color5 { background-color: #9c27b0; }
+.confetti.color6 { background-color: #ff9800; }
+.confetti.color7 { background-color: #03a9f4; }
+.confetti.color8 { background-color: #8bc34a; }
+
+/* Třpytivý efekt */
+.confetti.glitter {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+  mix-blend-mode: overlay;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confettiFallSlow {
+  0% {
+    transform: translateY(-20px) translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(25vh) translateX(100px) rotate(180deg) scale(1.1);
+  }
+  50% {
+    transform: translateY(50vh) translateX(10px) rotate(360deg) scale(0.9);
+  }
+  75% {
+    transform: translateY(75vh) translateX(50px) rotate(540deg) scale(1.2);
+  }
+  100% {
+    transform: translateY(105vh) translateX(20px) rotate(720deg) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes confettiFallMedium {
+  0% {
+    transform: translateY(-20px) translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(30vh) translateX(-80px) rotate(220deg) scale(0.8);
+  }
+  60% {
+    transform: translateY(60vh) translateX(20px) rotate(440deg) scale(1.1);
+  }
+  100% {
+    transform: translateY(105vh) translateX(-30px) rotate(720deg) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes confettiFallFast {
+  0% {
+    transform: translateY(-20px) translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(50vh) translateX(30px) rotate(360deg) scale(1.2);
+  }
+  100% {
+    transform: translateY(105vh) translateX(-10px) rotate(720deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Odměny */
+.reward-points {
+  opacity: 0;
+  transform: scale(0.5);
+  animation: rewardAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s forwards;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #f1c40f;
+  margin-top: 1.5rem;
+  padding: 1rem 2rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50px;
+  box-shadow: 0 0 30px rgba(241, 196, 15, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.reward-icon {
+  font-size: 2.5rem;
+  animation: bounce 1s infinite;
+}
+
+.reward-value {
+  animation: textShadowPulse 2s infinite;
+}
+
+@keyframes rewardAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Ohňostroj */
+.fireworks-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+.firework {
+  position: absolute;
+  bottom: 0;
+  width: 5px;
+  height: 5px;
+  background-color: white;
+  border-radius: 50%;
+  animation: fireworkLaunch 2s ease-out forwards;
+}
+
+.firework::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: white;
+  transform: scale(0);
+  opacity: 0;
+  animation: fireworkExplode 2s ease-out 1.5s forwards;
+}
+
+@keyframes fireworkLaunch {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-70vh) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-80vh) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes fireworkExplode {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+    box-shadow: none;
+  }
+  1% {
+    transform: scale(0.1);
+    opacity: 1;
+    box-shadow: 0 0 5px 5px var(--explosion-color, #f39c12);
+  }
+  30% {
+    transform: scale(8);
+    opacity: 1;
+    box-shadow: 0 0 20px 20px var(--explosion-color, #f39c12);
+  }
+  100% {
+    transform: scale(15);
+    opacity: 0;
+    box-shadow: 0 0 40px 40px var(--explosion-color, #f39c12);
+  }
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .mission-text {
+    font-size: 3rem;
+  }
+
+  .completed-text {
+    font-size: 4rem;
+  }
+
+  .plan-title {
+    font-size: 1.8rem;
+  }
+
+  .reward-points {
+    font-size: 1.5rem;
+  }
+
+  .reward-icon {
+    font-size: 2rem;
+  }
+}

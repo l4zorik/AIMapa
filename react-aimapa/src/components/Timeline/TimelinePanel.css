@@ -1,0 +1,182 @@
+/**
+ * TimelinePanel.css
+ * Styly pro komponentu časové osy
+ */
+
+.timeline-panel {
+  display: flex;
+  flex-direction: column;
+  background-color: #1a2634;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  color: #ecf0f1;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.timeline-panel.compact {
+  padding: 10px;
+}
+
+.timeline-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+}
+
+.timeline-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.8rem;
+  color: #3498db;
+  font-weight: 600;
+}
+
+.timeline-date-range {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #bdc3c7;
+}
+
+.timeline-date-range .separator {
+  margin: 0 10px;
+  color: #7f8c8d;
+}
+
+.timeline-current-time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: rgba(52, 152, 219, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #3498db;
+}
+
+.time-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #3498db;
+}
+
+.time-indicator i {
+  font-size: 1.4rem;
+}
+
+.timeline-events-container {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: rgba(52, 152, 219, 0.3);
+  z-index: 1;
+}
+
+/* Animace pro časovou osu */
+@keyframes timelinePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+  }
+}
+
+@keyframes timelineProgress {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Prázdný stav */
+.timeline-panel.empty {
+  justify-content: center;
+  align-items: center;
+}
+
+.timeline-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: #7f8c8d;
+  text-align: center;
+}
+
+.timeline-empty-state i {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.timeline-empty-state p {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .timeline-panel {
+    padding: 15px;
+  }
+  
+  .timeline-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .time-indicator {
+    font-size: 1rem;
+  }
+  
+  .time-indicator i {
+    font-size: 1.2rem;
+  }
+}
+
+/* Animace pro aktuální čas */
+.time-indicator {
+  position: relative;
+  animation: timelinePulse 2s infinite;
+}
+
+/* Scrollbar styly */
+.timeline-events-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.timeline-events-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.timeline-events-container::-webkit-scrollbar-thumb {
+  background: rgba(52, 152, 219, 0.5);
+  border-radius: 4px;
+}
+
+.timeline-events-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 152, 219, 0.7);
+}

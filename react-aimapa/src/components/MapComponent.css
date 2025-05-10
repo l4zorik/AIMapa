@@ -19,26 +19,56 @@
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  padding: 0;
 }
 
 .leaflet-popup-content {
-  margin: 10px 12px;
-  line-height: 1.5;
+  margin: 0;
+  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-popup-close-button {
+  color: #fff !important;
+  font-size: 20px !important;
+  top: 8px !important;
+  right: 8px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.leaflet-popup-close-button:hover {
+  transform: scale(1.2);
 }
 
 .leaflet-control-zoom {
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
 }
 
 .leaflet-control-zoom a {
   color: #333;
+  transition: all 0.2s ease;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #f5f5f5;
+  color: #000;
 }
 
 .leaflet-control-attribution {
   font-size: 10px;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 /* Styly pro markery */
@@ -61,32 +91,313 @@
 
 /* Styly pro trasy */
 .route-info {
-  padding: 10px;
-  background-color: white;
+  margin-top: 10px;
+  padding: 8px;
+  background-color: #f5f5f5;
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1000;
-  max-width: 300px;
+  border-left: 4px solid #4285F4;
 }
 
-.route-info h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
+.route-info div {
+  margin: 5px 0;
+  font-size: 13px;
+}
+
+.route-info strong {
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+/* Styly pro popup s trasou */
+.leaflet-popup-content {
+  min-width: 250px;
+}
+
+/* Základní styly pro všechny popupy */
+.location-popup,
+.route-popup,
+.task-popup,
+.user-location-popup {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Hlavička popupu */
+.popup-header {
+  background-color: #3498db;
+  color: white;
+  padding: 12px 15px;
+  font-weight: 600;
   font-size: 16px;
+  position: relative;
+  margin: 0;
+  display: flex;
+  align-items: center;
 }
 
+.popup-header i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+/* Obsah popupu */
+.popup-content {
+  padding: 15px;
+  background-color: white;
+}
+
+/* Sekce v popupu */
+.popup-section {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.popup-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* Nadpisy v popupu */
+.popup-section-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.popup-section-title i {
+  margin-right: 5px;
+  color: #3498db;
+}
+
+/* Položky v popupu */
+.popup-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.popup-item i {
+  margin-right: 8px;
+  color: #3498db;
+  width: 16px;
+  text-align: center;
+}
+
+.popup-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Speciální styly pro různé typy popupů */
+.location-popup .popup-header {
+  background-color: #3498db;
+}
+
+.route-popup .popup-header {
+  background-color: #9b59b6;
+}
+
+.task-popup .popup-header {
+  background-color: #2ecc71;
+}
+
+.user-location-popup .popup-header {
+  background-color: #e74c3c;
+}
+
+/* Stavy úkolů */
+.task-status {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.task-status.completed {
+  background-color: rgba(46, 204, 113, 0.2);
+  color: #27ae60;
+}
+
+.task-status.active {
+  background-color: rgba(52, 152, 219, 0.2);
+  color: #2980b9;
+}
+
+.task-status.pending {
+  background-color: rgba(241, 196, 15, 0.2);
+  color: #f39c12;
+}
+
+/* Tlačítka v popupu */
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.popup-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: 8px;
+}
+
+.popup-button:hover {
+  background-color: #2980b9;
+}
+
+.popup-button.secondary {
+  background-color: #95a5a6;
+}
+
+.popup-button.secondary:hover {
+  background-color: #7f8c8d;
+}
+
+/* Informace o trase */
 .route-info-item {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  font-size: 13px;
 }
 
 .route-info-item i {
   margin-right: 8px;
-  color: var(--primary-color);
+  color: #9b59b6;
+  width: 16px;
+  text-align: center;
+}
+
+/* Styly pro markery plánu */
+.plan-marker {
+  background: transparent;
+  border: none;
+}
+
+.plan-marker-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: white;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  position: relative;
+  transition: all 0.3s ease;
+  transform-origin: center bottom;
+  overflow: visible;
+  /* Přidání gradientu pro lepší vzhled */
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2));
+  /* Přidání okraje pro lepší viditelnost */
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+/* Animace pro dokončené úkoly */
+@keyframes completedPulse {
+  0% { transform: scale(1); box-shadow: 0 0 5px rgba(39, 174, 96, 0.7); }
+  50% { transform: scale(1.15); box-shadow: 0 0 15px rgba(39, 174, 96, 0.9); }
+  100% { transform: scale(1); box-shadow: 0 0 5px rgba(39, 174, 96, 0.7); }
+}
+
+/* Animace pro běžné markery */
+@keyframes markerBounce {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-15px); }
+  60% { transform: translateY(-10px); }
+  80% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+/* Animace pro nové markery */
+@keyframes markerDrop {
+  0% { transform: translateY(-100px) scale(0.8); opacity: 0; }
+  60% { transform: translateY(10px) scale(1.1); opacity: 1; }
+  80% { transform: translateY(-5px); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Animace pro zvýraznění markeru */
+@keyframes markerHighlight {
+  0% { transform: scale(1); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4); }
+  50% { transform: scale(1.3); box-shadow: 0 0 20px rgba(52, 152, 219, 0.9); }
+  100% { transform: scale(1); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4); }
+}
+
+/* Aplikace animace na dokončené úkoly */
+.plan-marker-inner.completed {
+  animation: completedPulse 2s infinite;
+  box-shadow: 0 0 15px rgba(39, 174, 96, 0.8);
+}
+
+/* Aplikace animace na nové markery */
+.plan-marker-inner.new {
+  animation: markerDrop 0.6s ease-out;
+}
+
+/* Aplikace animace na zvýrazněné markery */
+.plan-marker-inner.highlight {
+  animation: markerHighlight 1s ease-out;
+}
+
+/* Aplikace animace na hover */
+.plan-marker-inner:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.plan-marker-inner i {
+  font-size: 16px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.plan-marker-title {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  /* Přidání gradientu pro lepší vzhled */
+  background-image: linear-gradient(to bottom, rgba(50, 50, 50, 0.9), rgba(0, 0, 0, 0.9));
+  /* Přidání okraje pro lepší viditelnost */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* Přidání stínu textu pro lepší čitelnost */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  /* Přidání zaoblení pro lepší vzhled */
+  letter-spacing: 0.5px;
+}
+
+.plan-marker-inner:hover .plan-marker-title {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-5px);
 }
 
 /* Styly pro chybové zprávy */
@@ -107,4 +418,299 @@
   border-radius: 4px;
   margin-top: 10px;
   cursor: pointer;
+}
+
+/* Styly pro měření vzdálenosti */
+.measure-marker {
+  background: transparent;
+  border: none;
+}
+
+.measure-marker-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.measure-marker-inner.start {
+  background-color: #2ecc71;
+}
+
+.measure-marker-inner.end {
+  background-color: #e74c3c;
+}
+
+.distance-label {
+  background: transparent;
+  border: none;
+}
+
+.distance-label-inner {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+/* Styly pro marker polohy uživatele */
+.user-location-marker {
+  background: transparent;
+  border: none;
+}
+
+.user-location-marker-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: #e74c3c;
+  font-size: 40px;
+  position: relative;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5));
+}
+
+/* Animace pulzování pro marker polohy uživatele */
+@keyframes userLocationPulse {
+  0% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 5px rgba(231, 76, 60, 0.7)); }
+  50% { transform: scale(1.2); opacity: 0.8; filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.9)); }
+  100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 5px rgba(231, 76, 60, 0.7)); }
+}
+
+/* Animace pro kruh přesnosti */
+@keyframes accuracyPulse {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.2; }
+}
+
+.user-location-marker-inner i {
+  animation: userLocationPulse 2s infinite;
+}
+
+/* Styly pro popup s informacemi o poloze uživatele */
+.user-location-popup {
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.user-location-popup .popup-header {
+  background-color: #e74c3c;
+  color: white;
+  padding: 12px 15px;
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.user-location-popup .popup-header i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.user-location-popup .popup-content {
+  padding: 15px;
+  background-color: white;
+}
+
+.user-location-popup .popup-section {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.user-location-popup .popup-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.user-location-popup .popup-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.user-location-popup .popup-item i {
+  margin-right: 8px;
+  color: #e74c3c;
+  width: 16px;
+  text-align: center;
+}
+
+.user-location-popup .popup-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Styly pro kruh přesnosti */
+.accuracy-circle {
+  animation: accuracyPulse 3s infinite;
+  transition: all 0.5s ease;
+}
+
+/* Styly pro tlačítko zaměření na aktuální polohu uživatele */
+.location-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.location-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.location-button i {
+  color: #3498db;
+  font-size: 20px;
+}
+
+/* Styly pro animované trasy */
+@keyframes routeDash {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 30;
+  }
+}
+
+.animated-route {
+  animation: routeDash 1s linear infinite;
+}
+
+.active-route {
+  filter: drop-shadow(0 0 5px rgba(155, 89, 182, 0.8));
+}
+
+/* Styly pro markery trasy */
+.route-marker {
+  background: transparent;
+  border: none;
+}
+
+.route-marker-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.route-marker-inner i {
+  font-size: 24px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+.route-marker-inner.start i {
+  color: #2ecc71;
+}
+
+.route-marker-inner.end i {
+  color: #e74c3c;
+}
+
+.route-marker-label {
+  position: absolute;
+  top: -25px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.route-marker-inner:hover .route-marker-label {
+  opacity: 1;
+  transform: translateY(-5px);
+}
+
+/* Styly pro popup trasy */
+.route-popup {
+  min-width: 250px;
+}
+
+.route-popup .popup-header {
+  background-color: #9b59b6;
+}
+
+.route-popup .popup-content {
+  padding: 15px;
+}
+
+/* Styly pro elegantní ukazatel souřadnic */
+.coordinates-display {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(44, 62, 80, 0.9);
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 14px;
+  color: #ecf0f1;
+  border: 2px solid #3498db;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease, opacity 0.5s ease;
+  opacity: 1;
+  /* Přidání gradientu pro lepší vzhled */
+  background-image: linear-gradient(to bottom, rgba(52, 152, 219, 0.2), rgba(44, 62, 80, 0.9));
+}
+
+.coordinates-display i {
+  color: #f39c12;
+  font-size: 18px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.coordinates-value {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Animace pro ukazatel souřadnic */
+@keyframes coordinatesAppear {
+  0% { transform: translate(-50%, 50px); opacity: 0; }
+  50% { transform: translate(-50%, -5px); opacity: 1; }
+  70% { transform: translate(-50%, 3px); opacity: 1; }
+  100% { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.coordinates-display {
+  animation: coordinatesAppear 0.5s ease-out;
 }

@@ -1,3 +1,13 @@
+/**
+ * AIMapa - Inteligentní mapová aplikace
+ *
+ * Copyright (c) 2025 Jan Lazorik
+ *
+ * UPOZORNĚNÍ: Tento software je chráněn autorskými právy.
+ * Neoprávněné použití tohoto kódu bude mít za následek právní postih.
+ * Více informací naleznete v souboru LICENSE.md.
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';

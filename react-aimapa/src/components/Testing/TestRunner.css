@@ -1,0 +1,242 @@
+/* 
+ * Styly pro TestRunner
+ * Verze 0.4.2
+ */
+
+.test-runner {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 800px;
+  height: 80vh;
+  max-height: 800px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.test-runner-header {
+  background-color: #3498db;
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.test-runner-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.close-button:hover {
+  opacity: 1;
+}
+
+.test-runner-content {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.test-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.run-tests-button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.2s;
+}
+
+.run-tests-button:hover {
+  background-color: #27ae60;
+}
+
+.run-tests-button:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background-color: #ffebee;
+  border-left: 4px solid #e74c3c;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.error-message i {
+  color: #e74c3c;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.error-message p {
+  margin: 0;
+  color: #c0392b;
+  font-size: 14px;
+}
+
+.test-results {
+  margin-bottom: 20px;
+}
+
+.test-results h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.result-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.result-card {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.result-header {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 15px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.result-content {
+  padding: 15px;
+}
+
+.result-stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.result-stat:last-child {
+  margin-bottom: 0;
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 13px;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: #333;
+  font-size: 13px;
+}
+
+.stat-value.success {
+  color: #27ae60;
+}
+
+.stat-value.warning {
+  color: #f39c12;
+}
+
+.stat-value.error {
+  color: #e74c3c;
+}
+
+.test-logs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.test-logs h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.logs-container {
+  background-color: #2c3e50;
+  border-radius: 6px;
+  padding: 15px;
+  color: #ecf0f1;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-y: auto;
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.no-logs {
+  color: #95a5a6;
+  font-style: italic;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.log-line {
+  margin-bottom: 5px;
+}
+
+.log-line.success {
+  color: #2ecc71;
+}
+
+.log-line.warning {
+  color: #f39c12;
+}
+
+.log-line.error {
+  color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+  .test-runner {
+    width: 95%;
+    height: 90vh;
+  }
+  
+  .result-summary {
+    grid-template-columns: 1fr;
+  }
+}

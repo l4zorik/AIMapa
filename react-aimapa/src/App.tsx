@@ -1,7 +1,19 @@
+/**
+ * AIMapa - Inteligentní mapová aplikace
+ *
+ * Copyright (c) 2025 Jan Lazorik
+ *
+ * UPOZORNĚNÍ: Tento software je chráněn autorskými právy.
+ * Neoprávněné použití tohoto kódu bude mít za následek právní postih.
+ * Více informací naleznete v souboru LICENSE.md.
+ */
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import EnhancedMapPage from './pages/EnhancedMapPage';
 import DocsPage from './pages/DocsPage';
+import SubscriptionPage from './pages/SubscriptionPage';
+import TimelinePage from './pages/TimelinePage';
 import './App.css';
 
 // Komponenty stránek
@@ -58,7 +70,9 @@ function App() {
             <ul>
               <li><Link to="/">Domů</Link></li>
               <li><Link to="/map">Mapa</Link></li>
+              <li><Link to="/timeline">Časová osa</Link></li>
               <li><Link to="/profile">Profil</Link></li>
+              <li><Link to="/subscription">Předplatné</Link></li>
               <li><Link to="/docs">Dokumentace</Link></li>
             </ul>
           </nav>
@@ -71,13 +85,15 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/map" element={<EnhancedMapPage />} />
+            <Route path="/timeline" element={<TimelinePage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/docs" element={<DocsPage />} />
           </Routes>
         </main>
 
         <footer className="App-footer">
-          <p>&copy; 2024 AIMapa. Všechna práva vyhrazena.</p>
+          <p>&copy; 2025 AIMapa | Jan Lazorik | Všechna práva vyhrazena. Neoprávněné použití tohoto softwaru bude mít za následek právní postih.</p>
         </footer>
       </div>
     </Router>

@@ -1,0 +1,170 @@
+/**
+ * TimelineControls.css
+ * Styly pro ovládací prvky časové osy
+ */
+
+.timeline-controls {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: auto;
+}
+
+.timeline-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.timeline-time {
+  font-size: 0.85rem;
+  color: #bdc3c7;
+  min-width: 50px;
+}
+
+.timeline-time.start {
+  text-align: right;
+}
+
+.timeline-time.end {
+  text-align: left;
+}
+
+.timeline-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.timeline-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.timeline-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.timeline-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.timeline-button {
+  background-color: rgba(52, 152, 219, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ecf0f1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.timeline-button:hover {
+  background-color: rgba(52, 152, 219, 0.4);
+  transform: scale(1.1);
+}
+
+.timeline-button:active {
+  transform: scale(0.95);
+}
+
+.timeline-button.play-pause {
+  background-color: #3498db;
+  width: 50px;
+  height: 50px;
+}
+
+.timeline-button.play-pause:hover {
+  background-color: #2980b9;
+}
+
+.timeline-button.reset {
+  background-color: rgba(231, 76, 60, 0.2);
+}
+
+.timeline-button.reset:hover {
+  background-color: rgba(231, 76, 60, 0.4);
+}
+
+.timeline-speed-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.timeline-button.speed {
+  border-radius: 4px;
+  width: auto;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.timeline-button.speed.active {
+  background-color: #3498db;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .timeline-controls {
+    padding: 10px;
+  }
+  
+  .timeline-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .timeline-button {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .timeline-button.play-pause {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .timeline-speed-controls {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+}

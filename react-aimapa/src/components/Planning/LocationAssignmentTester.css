@@ -1,0 +1,326 @@
+/* 
+ * Styly pro LocationAssignmentTester
+ * Verze 0.4.2
+ */
+
+.location-assignment-tester {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 600px;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.location-assignment-tester-header {
+  background-color: #9b59b6;
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.location-assignment-tester-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cancel-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.cancel-button:hover {
+  opacity: 1;
+}
+
+.cancel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.location-assignment-tester-content {
+  padding: 20px;
+}
+
+.processing-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.spinner {
+  font-size: 30px;
+  color: #9b59b6;
+  margin-bottom: 15px;
+}
+
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #e74c3c;
+  margin-bottom: 20px;
+}
+
+.error-message i {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.retry-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 15px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #c0392b;
+}
+
+.completion-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #27ae60;
+  margin-bottom: 20px;
+}
+
+.completion-message i {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.completion-stats {
+  width: 100%;
+  margin: 15px 0;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.stat:last-child {
+  margin-bottom: 0;
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: #333;
+}
+
+.close-button {
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: #219653;
+}
+
+.progress-container {
+  margin-top: 15px;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: #ecf0f1;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #9b59b6;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  text-align: right;
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+.stats-container {
+  width: 100%;
+  margin: 20px 0;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.stats-container h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.improvement-section {
+  width: 100%;
+  margin: 20px 0;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.improvement-section h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+}
+
+.improvement-section p {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+}
+
+.improve-button {
+  background-color: #9b59b6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  margin: 10px auto;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  display: block;
+}
+
+.improve-button:hover {
+  background-color: #8e44ad;
+}
+
+.improve-button:disabled {
+  background-color: #7f8c8d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.improvements-container {
+  width: 100%;
+  margin: 15px 0;
+}
+
+.improvements-container h5 {
+  margin: 15px 0 10px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.improvements-list {
+  margin: 0;
+  padding: 0 0 0 20px;
+  list-style-type: disc;
+}
+
+.improvements-list li {
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #555;
+}
+
+.keywords-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 10px 0;
+}
+
+.keyword {
+  background-color: #3498db;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.locations-list {
+  margin: 0;
+  padding: 0 0 0 20px;
+  list-style-type: disc;
+}
+
+.locations-list li {
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #555;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.retry-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #2980b9;
+}

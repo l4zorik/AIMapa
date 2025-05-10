@@ -1,0 +1,1279 @@
+.planning-panel {
+  position: absolute;
+  top: 0;
+  left: -380px; /* Zvětšení šířky panelu */
+  width: 380px; /* Zvětšení šířky panelu */
+  height: 100%;
+  background-color: #1e272e;
+  color: #ecf0f1;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  transition: left 0.3s ease-in-out;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid #34495e;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Overlay pro modální okna */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.planning-panel.visible {
+  left: 0;
+}
+
+.planning-header {
+  padding: 6px 8px; /* Zmenšení vnitřního odsazení */
+  background-color: #2c3e50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #34495e;
+}
+
+.planning-header h2 {
+  margin: 0;
+  font-size: 0.95rem; /* Menší velikost písma */
+  color: #f39c12;
+}
+
+.planning-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.new-plan-button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 3px; /* Menší zaoblení rohů */
+  padding: 3px 6px; /* Zmenšení vnitřního odsazení */
+  font-size: 0.75rem; /* Menší velikost písma */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px; /* Menší mezera mezi ikonou a textem */
+  transition: background-color 0.2s;
+}
+
+.new-plan-button:hover {
+  background-color: #27ae60;
+}
+
+.new-plan-form {
+  padding: 6px 8px; /* Zmenšení vnitřního odsazení */
+  background-color: #34495e;
+  display: flex;
+  gap: 4px; /* Menší mezera mezi prvky */
+}
+
+.new-plan-form input {
+  flex: 1;
+  padding: 4px 8px; /* Zmenšení vnitřního odsazení */
+  border: 1px solid #7f8c8d;
+  border-radius: 3px; /* Menší zaoblení rohů */
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  font-size: 0.85rem; /* Menší velikost písma */
+}
+
+.new-plan-form button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 3px; /* Menší zaoblení rohů */
+  padding: 4px 8px; /* Zmenšení vnitřního odsazení */
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.75rem; /* Menší velikost písma */
+}
+
+.new-plan-form button:hover {
+  background-color: #27ae60;
+}
+
+.plan-selector {
+  padding: 8px 6px;
+  overflow-y: auto;
+  max-height: 400px; /* Další zvětšení maximální výšky pro zobrazení více plánů */
+  border-bottom: 1px solid #34495e; /* Tenčí okraj */
+  background-color: #263238;
+  box-shadow: inset 0 -3px 8px -5px rgba(0, 0, 0, 0.2); /* Menší stín */
+}
+
+.plan-list-header {
+  color: #f39c12;
+  margin: 0 0 6px 0; /* Zmenšení spodního okraje */
+  padding-bottom: 4px; /* Zmenšení spodního odsazení */
+  border-bottom: 1px solid #34495e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem; /* Menší velikost písma */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.plan-list-header h3 {
+  margin: 0;
+}
+
+.remove-all-plans-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 3px; /* Menší zaoblení rohů */
+  padding: 3px 6px; /* Zmenšení vnitřního odsazení */
+  font-size: 0.75rem; /* Menší velikost písma */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px; /* Menší mezera mezi ikonou a textem */
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Menší stín */
+}
+
+.remove-all-plans-button:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.remove-all-plans-button i {
+  font-size: 0.9rem;
+}
+
+/* Nové styly pro plány */
+.plan-item-new {
+  margin-bottom: 10px; /* Zmenšení mezery mezi plány */
+  border-radius: 8px; /* Menší zaoblení rohů pro kompaktnější vzhled */
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4); /* Menší stín pro kompaktnější vzhled */
+  cursor: pointer;
+  transition: all 0.3s;
+  border-left: 4px solid #3498db; /* Tenčí levý okraj */
+  background-color: #2c3e50;
+}
+
+.plan-item-new:hover {
+  transform: translateX(5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.plan-item-new.active {
+  border-left: 5px solid #e74c3c;
+  transform: translateX(8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.plan-item-new.active::after {
+  content: "✓";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 25px;
+  height: 25px;
+  background-color: #27ae60;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.plan-header-new {
+  background-color: #f39c12;
+  padding: 12px 10px; /* Zmenšení vnitřního odsazení */
+  text-align: center;
+}
+
+.plan-item-new.active .plan-header-new {
+  background-color: #e74c3c;
+}
+
+.plan-title-new {
+  color: white;
+  font-size: 1.4rem; /* Menší velikost písma */
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.2; /* Menší řádkování */
+  max-width: 100%; /* Využití celé šířky */
+}
+
+/* Přidání stylu pro ikonu chat sessions u plánu */
+.plan-chat-sessions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #3498db;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.plan-item-new.active .plan-title-new {
+  font-size: 1.7rem;
+}
+
+.plan-footer-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px; /* Zmenšení vnitřního odsazení */
+  background-color: #34495e;
+}
+
+.plan-items-count-new {
+  font-size: 0.85rem; /* Menší velikost písma */
+  color: #ecf0f1;
+  background-color: #2c3e50;
+  padding: 4px 8px; /* Zmenšení vnitřního odsazení */
+  border-radius: 16px; /* Menší zaoblení rohů */
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px; /* Menší mezera mezi položkami */
+  border: 1px solid #3498db;
+}
+
+.plan-items-count-new i {
+  color: #f39c12;
+}
+
+.subtasks-info {
+  display: flex;
+  align-items: center;
+  gap: 3px; /* Menší mezera mezi ikonou a textem */
+  font-size: 0.75rem; /* Menší velikost písma */
+  color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.1);
+  padding: 2px 4px; /* Zmenšení vnitřního odsazení */
+  border-radius: 8px; /* Menší zaoblení rohů */
+  border: 1px solid #2ecc71;
+}
+
+.subtasks-info i {
+  color: #2ecc71;
+  font-size: 0.7rem; /* Menší velikost ikony */
+}
+
+.subtasks-info.warning {
+  color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid #e74c3c;
+}
+
+.subtasks-info.warning i {
+  color: #e74c3c;
+}
+
+.remove-plan-button-new {
+  background-color: #2c3e50;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 0.8rem; /* Menší velikost písma */
+  padding: 3px 8px; /* Zmenšení vnitřního odsazení */
+  border-radius: 16px; /* Menší zaoblení rohů */
+  opacity: 0.8;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 3px; /* Menší mezera mezi ikonou a textem */
+  white-space: nowrap;
+}
+
+.remove-plan-button-new:hover {
+  background-color: #e74c3c;
+  color: white;
+  opacity: 1;
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+}
+
+.plan-selector .plan-item {
+  padding: 0;
+  margin-bottom: 20px;
+  background-color: #2c3e50;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s;
+  border-left: 5px solid #3498db;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: visible;
+  max-width: 100%;
+}
+
+.plan-selector .plan-item:hover {
+  background-color: #34495e;
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.plan-selector .plan-item.active {
+  background-color: #2980b9;
+  transform: translateX(8px) scale(1.03);
+  border-left: 6px solid #f39c12;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.plan-selector .plan-item.active .plan-title-container {
+  background-color: #e74c3c; /* Výrazná červená barva pro aktivní plán */
+  border-bottom: 2px solid #c0392b;
+}
+
+.plan-selector .plan-item.active .plan-title {
+  color: #ffffff; /* Bílá barva textu pro aktivní plán */
+  font-weight: bold;
+  font-size: 1.7rem;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Přidání výrazného označení pro aktivní plán */
+.plan-selector .plan-item.active::before {
+  content: "✓";
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #ffffff;
+  background-color: #27ae60;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  z-index: 3;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.plan-title-container {
+  width: 100%;
+  margin: 0;
+  padding: 20px 15px;
+  text-align: center;
+  background-color: #f39c12; /* Výrazná oranžová barva */
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.plan-selector .plan-title {
+  margin: 0;
+  color: #ffffff; /* Bílá barva textu pro maximální kontrast */
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  z-index: 2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+  display: block;
+}
+
+.plan-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 15px;
+  background-color: #34495e;
+  border-radius: 0 0 10px 10px;
+}
+
+.plan-selector .plan-items-count {
+  font-size: 0.9rem;
+  color: #ecf0f1;
+  background-color: #34495e;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #3498db;
+}
+
+.plan-selector .plan-items-count i {
+  color: #f39c12;
+}
+
+.plan-id-badge {
+  font-size: 0.85rem;
+  background-color: #34495e;
+  color: #f39c12;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+  border: 1px solid #f39c12;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.plan-id-badge:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+.remove-plan-button {
+  background-color: #34495e;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 5px 10px;
+  border-radius: 20px;
+  opacity: 0.8;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.remove-plan-button:hover {
+  background-color: #e74c3c;
+  color: white;
+  opacity: 1;
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+}
+
+.active-plan {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 8px 6px; /* Zmenšení vnitřního odsazení */
+}
+
+.active-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px; /* Menší spodní okraj */
+  flex-wrap: nowrap;
+  background-color: #2c3e50;
+  border-radius: 3px; /* Menší zaoblení rohů */
+  padding: 4px 6px; /* Zmenšení vnitřního odsazení */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Menší stín */
+}
+
+.plan-title-container {
+  position: relative;
+  overflow: hidden;
+  max-width: calc(100% - 110px); /* Ponechání místa pro tlačítka */
+  height: 1.5rem; /* Pevná výška pro kontejner */
+  background-color: transparent;
+  border-radius: 4px;
+  flex: 1;
+}
+
+/* Nový marquee efekt s plynulým přechodem */
+.marquee-wrapper {
+  display: flex;
+  position: relative;
+  white-space: nowrap;
+  height: 100%;
+  align-items: center;
+}
+
+.marquee-text {
+  display: inline-block;
+  color: #ecf0f1; /* Světlá barva textu pro lepší kontrast */
+  font-size: 1rem; /* Velikost písma */
+  font-weight: 500; /* Mírně tučnější pro lepší čitelnost */
+  padding: 0;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Jemný stín pro lepší čitelnost */
+}
+
+/* Stav pro dlouhý text - aktivace marquee efektu */
+.marquee-wrapper.animate {
+  animation: marquee-continuous var(--animation-duration) linear infinite;
+  animation-delay: 2.5s; /* Zpoždění před začátkem animace */
+}
+
+/* Zastavení animace při najetí myší */
+.plan-title-container:hover .marquee-wrapper.animate {
+  animation-play-state: paused;
+}
+
+/* Plynulá animace bez přerušení */
+@keyframes marquee-continuous {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - var(--text-width) / 2));
+  }
+}
+
+.plan-header-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  justify-content: flex-end;
+  margin: 0;
+  padding: 0;
+  max-width: 100px; /* Omezení maximální šířky */
+}
+
+/* Společné styly pro všechna tlačítka v plánovacím panelu */
+.plan-header-actions button {
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  position: relative; /* Pro tooltip */
+  opacity: 0.9;
+}
+
+.plan-header-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  opacity: 1;
+}
+
+.plan-header-actions button:disabled {
+  background-color: #7f8c8d;
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+
+.plan-header-actions button i {
+  font-size: 0.9rem;
+}
+
+/* Tooltip pro tlačítka */
+.plan-header-actions button::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.plan-header-actions button:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Specifické styly pro jednotlivá tlačítka */
+.add-item-button {
+  background-color: #2ecc71;
+}
+
+.add-item-button:hover {
+  background-color: #27ae60;
+}
+
+.auto-location-button {
+  background-color: #9b59b6;
+}
+
+.auto-location-button:hover {
+  background-color: #8e44ad;
+}
+
+.test-location-button {
+  background-color: #f39c12;
+}
+
+.test-location-button:hover {
+  background-color: #d35400;
+}
+
+.start-navigation-button {
+  background-color: #3498db;
+}
+
+.start-navigation-button:hover {
+  background-color: #2980b9;
+}
+
+.stop-navigation-button {
+  background-color: #e74c3c;
+}
+
+.stop-navigation-button:hover {
+  background-color: #c0392b;
+}
+
+/* Navigační ovládací prvky */
+.navigation-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #34495e;
+  padding: 4px 8px; /* Zmenšení vnitřního odsazení */
+  border-radius: 3px; /* Menší zaoblení rohů */
+  margin: 4px 0; /* Menší vnější okraje */
+}
+
+.nav-prev-button, .nav-next-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 3px; /* Menší zaoblení rohů */
+  padding: 3px 6px; /* Zmenšení vnitřního odsazení */
+  font-size: 0.75rem; /* Menší velikost písma */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px; /* Menší mezera mezi ikonou a textem */
+  transition: background-color 0.2s;
+}
+
+.nav-prev-button:hover, .nav-next-button:hover {
+  background-color: #2980b9;
+}
+
+.nav-prev-button:disabled, .nav-next-button:disabled {
+  background-color: #7f8c8d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.nav-progress {
+  display: flex;
+  align-items: center;
+  gap: 3px; /* Menší mezera mezi prvky */
+  font-size: 0.9rem; /* Menší velikost písma */
+}
+
+.current-step {
+  color: #f39c12;
+  font-weight: bold;
+  font-size: 1.1rem; /* Menší velikost písma */
+}
+
+.total-steps {
+  color: #95a5a6;
+  font-size: 0.85rem; /* Menší velikost písma */
+}
+
+.plan-description {
+  margin: 0 0 8px 0; /* Menší spodní okraj */
+  color: #95a5a6;
+  font-size: 0.85rem; /* Menší velikost písma */
+  line-height: 1.2; /* Menší řádkování */
+}
+
+.plan-items {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.no-items {
+  color: #95a5a6;
+  text-align: center;
+  margin-top: 20px;
+  font-style: italic;
+}
+
+.plan-item {
+  background-color: #2c3e50;
+  border-radius: 4px; /* Menší zaoblení rohů */
+  padding: 8px; /* Zmenšení vnitřního odsazení */
+  margin-bottom: 6px; /* Menší spodní okraj */
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  border-left: 2px solid #3498db; /* Tenčí levý okraj */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15); /* Menší stín */
+}
+
+.plan-item:hover {
+  background-color: #34495e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.plan-item.completed {
+  opacity: 0.8;
+  border-left-color: #27ae60;
+  background-color: #2c3e50;
+}
+
+.plan-item.completed:hover {
+  background-color: #34495e;
+}
+
+.plan-item.completed h4 {
+  text-decoration: line-through;
+  color: #95a5a6;
+}
+
+.plan-item.completed::after {
+  content: "✓";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #27ae60;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.plan-item.active-navigation-item {
+  background-color: #3498db;
+  transform: scale(1.02) translateX(3px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.6);
+  border-left: 4px solid #f39c12;
+}
+
+.plan-item.active-navigation-item:hover {
+  background-color: #2980b9;
+  transform: scale(1.03) translateX(5px);
+}
+
+.plan-item.active-navigation-item::before {
+  content: '▶';
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f39c12;
+  font-size: 0.9rem;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* Aktivní úkol (i když není v navigaci) */
+.plan-item[data-active="true"] {
+  background-color: #2980b9;
+  border-left: 4px solid #f39c12;
+  padding-left: 8px;
+  box-shadow: 0 3px 8px rgba(52, 152, 219, 0.4);
+}
+
+.plan-item[data-active="true"]:hover {
+  background-color: #3498db;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(52, 152, 219, 0.5);
+}
+
+.item-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 3px; /* Menší spodní okraj */
+}
+
+.item-id-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 3px; /* Menší spodní okraj */
+  padding-bottom: 2px; /* Menší spodní odsazení */
+  border-bottom: 1px dashed #34495e;
+}
+
+.item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-title-row h4 {
+  margin: 0;
+  flex: 1;
+  cursor: pointer;
+  color: #ecf0f1; /* Světlá barva textu pro lepší kontrast */
+  font-size: 0.95rem; /* Menší velikost písma */
+  font-weight: 600;
+  padding: 2px 0; /* Menší vnitřní odsazení */
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.editable-title:hover {
+  text-decoration: underline;
+  color: #3498db;
+}
+
+.item-id-badge {
+  font-size: 0.75rem; /* Menší velikost písma */
+  background-color: #34495e;
+  color: #f39c12;
+  padding: 3px 6px; /* Zmenšení vnitřního odsazení */
+  border-radius: 2px; /* Menší zaoblení rohů */
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
+  font-weight: bold;
+  border: 1px solid #f39c12;
+}
+
+.item-id-badge:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+.item-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.edit-item-button {
+  background: none;
+  border: none;
+  color: #3498db;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px 5px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.edit-item-button:hover {
+  opacity: 1;
+}
+
+.item-time-row {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 25px;
+  margin-top: 5px;
+}
+
+.item-time {
+  font-size: 0.8rem;
+  color: #f39c12;
+  cursor: pointer;
+}
+
+.editable-time:hover {
+  text-decoration: underline;
+}
+
+.item-type {
+  font-size: 0.8rem;
+  color: #95a5a6;
+  background-color: rgba(52, 73, 94, 0.5);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.item-description {
+  margin: 3px 0 3px 20px; /* Menší okraje a odsazení */
+  font-size: 0.85rem; /* Menší velikost písma */
+  color: #bdc3c7;
+  line-height: 1.2; /* Menší řádkování */
+}
+
+.item-location, .item-route {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Menší mezera mezi ikonou a textem */
+  margin-top: 5px; /* Menší horní okraj */
+  font-size: 0.85rem; /* Menší velikost písma */
+  color: #3498db;
+}
+
+.item-add-location, .item-add-route {
+  margin-top: 5px; /* Menší horní okraj */
+}
+
+.location-buttons {
+  display: flex;
+  gap: 4px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+
+.add-location-button, .add-route-button {
+  background-color: #34495e;
+  color: #3498db;
+  border: 1px dashed #3498db;
+  border-radius: 3px; /* Menší zaoblení rohů */
+  padding: 3px; /* Menší vnitřní odsazení */
+  font-size: 0.7rem; /* Menší velikost písma */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  width: 24px; /* Menší šířka */
+  height: 24px; /* Menší výška */
+  position: relative;
+  overflow: hidden;
+}
+
+.add-location-button:hover, .add-route-button:hover {
+  background-color: #3498db;
+  color: white;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+.add-location-button:active, .add-route-button:active {
+  transform: scale(0.98);
+}
+
+.add-location-button i, .add-route-button i {
+  font-size: 0.8rem; /* Menší velikost ikony */
+}
+
+.add-location-ai-button {
+  background-color: #34495e;
+  color: #f39c12;
+  border: 1px dashed #f39c12;
+  border-radius: 3px; /* Menší zaoblení rohů */
+  padding: 3px; /* Menší vnitřní odsazení */
+  font-size: 0.7rem; /* Menší velikost písma */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  width: 24px; /* Menší šířka */
+  height: 24px; /* Menší výška */
+  position: relative;
+  overflow: hidden;
+}
+
+.add-location-ai-button:hover {
+  background-color: #f39c12;
+  color: white;
+  box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+}
+
+.add-location-ai-button:active {
+  transform: scale(0.98);
+}
+
+.add-location-ai-button i {
+  font-size: 0.8rem; /* Menší velikost ikony */
+}
+
+/* Tooltip pro tlačítka přidání lokace */
+.add-location-button::after,
+.add-location-ai-button::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.add-location-button:hover::after,
+.add-location-ai-button:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.item-type-selector {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.item-type-selector select {
+  background-color: #34495e;
+  color: #ecf0f1;
+  border: 1px solid #7f8c8d;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.remove-item-button {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px 5px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.remove-item-button:hover {
+  opacity: 1;
+}
+
+/* Styly pro chat input byly odstraněny - nyní se používá pouze pravý chat */
+
+/* Scrollbar styling */
+.plan-selector::-webkit-scrollbar,
+.plan-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.plan-selector::-webkit-scrollbar-track,
+.plan-items::-webkit-scrollbar-track {
+  background: #2c3e50;
+}
+
+.plan-selector::-webkit-scrollbar-thumb,
+.plan-items::-webkit-scrollbar-thumb {
+  background-color: #7f8c8d;
+  border-radius: 3px;
+}
+
+/* Styl pro zprávu o chybějících plánech */
+.no-plans-message {
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(52, 73, 94, 0.5);
+  border-radius: 8px;
+  margin: 10px 0;
+  border: 1px dashed #7f8c8d;
+}
+
+.no-plans-message p {
+  margin: 5px 0;
+  color: #ecf0f1;
+}
+
+.no-plans-message p:first-child {
+  font-weight: bold;
+  color: #f39c12;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+/* Styly pro kontejner AutoLocationAssigner */
+.auto-location-assigner-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  width: 90%;
+  max-width: 500px;
+}
+
+/* Styly pro kontejner LocationAssignmentTester */
+.location-assignment-tester-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  width: 90%;
+  max-width: 600px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .planning-panel {
+    width: 300px; /* Zvětšení šířky panelu na mobilních zařízeních */
+    left: -300px;
+  }
+
+  .auto-location-assigner-container {
+    width: 95%;
+    max-width: 280px;
+  }
+
+  .location-assignment-tester-container {
+    width: 95%;
+    max-width: 280px;
+  }
+
+  /* Skrytí textu tlačítek na mobilních zařízeních */
+  .plan-header-actions button .button-text,
+  .remove-all-plans-button span {
+    display: none;
+  }
+
+  .plan-header-actions button {
+    width: 22px; /* Menší tlačítka */
+    height: 22px;
+    padding: 2px;
+  }
+
+  .plan-header-actions button i,
+  .remove-all-plans-button i {
+    font-size: 0.75rem; /* Menší ikony */
+  }
+
+  .remove-all-plans-button {
+    width: 24px; /* Menší tlačítko */
+    height: 24px;
+    padding: 3px;
+    justify-content: center;
+  }
+
+  .plan-header-actions {
+    max-width: 80px;
+    gap: 2px;
+  }
+
+  /* Úprava kontejneru titulku pro mobilní zařízení */
+  .plan-title-container {
+    max-width: calc(100% - 90px);
+  }
+
+  /* Úprava animace pro mobilní zařízení */
+  .marquee-wrapper.animate {
+    animation-delay: 1.5s; /* Kratší zpoždění na mobilních zařízeních */
+  }
+
+  /* Skrytí tooltip na mobilních zařízeních */
+  .plan-header-actions button::after,
+  .add-location-button::after,
+  .add-location-ai-button::after,
+  .add-route-button::after {
+    display: none;
+  }
+
+  /* Kompaktnější zobrazení plánů na mobilních zařízeních */
+  .plan-item-new {
+    margin-bottom: 8px;
+  }
+
+  .plan-header-new {
+    padding: 10px 8px;
+  }
+
+  .plan-footer-new {
+    padding: 6px 8px;
+  }
+
+  .plan-title-new {
+    font-size: 1.3rem;
+  }
+}
+
+/* Responzivní design pro velmi malé obrazovky */
+@media (max-width: 320px) {
+  .planning-panel {
+    width: 280px; /* Menší šířka panelu na velmi malých obrazovkách */
+    left: -280px;
+  }
+
+  .plan-header-actions {
+    max-width: 55px;
+  }
+
+  .plan-header-actions button {
+    width: 18px; /* Ještě menší tlačítka */
+    height: 18px;
+  }
+
+  .plan-header-actions button i {
+    font-size: 0.65rem; /* Ještě menší ikony */
+  }
+
+  /* Úprava kontejneru titulku pro velmi malé obrazovky */
+  .plan-title-container {
+    max-width: calc(100% - 65px);
+  }
+
+  /* Úprava animace pro velmi malé obrazovky */
+  .marquee-wrapper.animate {
+    animation-delay: 1s; /* Ještě kratší zpoždění na velmi malých obrazovkách */
+  }
+
+  /* Ještě kompaktnější zobrazení plánů na velmi malých obrazovkách */
+  .plan-item-new {
+    margin-bottom: 6px;
+  }
+
+  .plan-header-new {
+    padding: 8px 6px;
+  }
+
+  .plan-footer-new {
+    padding: 5px 6px;
+  }
+
+  .plan-title-new {
+    font-size: 1.2rem;
+  }
+
+  .plan-items-count-new {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+
+  .remove-plan-button-new {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+  }
+}

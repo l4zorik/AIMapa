@@ -1,0 +1,310 @@
+/* Styly pro vylepšené markery */
+
+/* Základní styl pro marker */
+.plan-marker {
+  position: relative;
+  z-index: 1000;
+}
+
+.plan-marker-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  overflow: visible;
+}
+
+/* Styly pro tvary markerů */
+.plan-marker-inner.square {
+  border-radius: 4px;
+}
+
+.plan-marker-inner.diamond {
+  transform: rotate(45deg);
+}
+
+.plan-marker-inner.diamond i {
+  transform: rotate(-45deg);
+}
+
+.plan-marker-inner.triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.plan-marker-inner.pin {
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
+
+.plan-marker-inner.pin i {
+  transform: rotate(45deg);
+}
+
+.plan-marker-inner.hexagon {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+/* Styly pro ikony */
+.plan-marker-inner i {
+  font-size: 1.2rem;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Styly pro název markeru */
+.plan-marker-title {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.plan-marker-inner:hover .plan-marker-title {
+  opacity: 1;
+}
+
+/* Animace pro markery */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.plan-marker-inner.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse-highlight {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.plan-marker-inner.pulse-highlight {
+  animation: pulse-highlight 1.5s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.plan-marker-inner.bounce {
+  animation: bounce 2s infinite;
+}
+
+@keyframes fade {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.plan-marker-inner.fade {
+  animation: fade 2s infinite;
+}
+
+/* Styly pro stavy markerů */
+.plan-marker-inner.active {
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.7), 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+}
+
+.plan-marker-inner.completed {
+  opacity: 0.8;
+}
+
+.plan-marker-inner.new-marker {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7), 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Indikátory pro markery */
+.marker-new-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  background-color: #f39c12;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.marker-active-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  background-color: #3498db;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Progress bar pro markery */
+.marker-progress-container {
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.marker-progress-bar {
+  height: 100%;
+  background-color: #2ecc71;
+  transition: width 0.3s ease;
+}
+
+/* Odměna pro markery */
+.marker-reward {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: #f39c12;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Popup okno */
+.task-popup {
+  padding: 0;
+}
+
+.popup-header {
+  background-color: #34495e;
+  color: white;
+  padding: 10px;
+  border-radius: 4px 4px 0 0;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.popup-content {
+  padding: 10px;
+}
+
+.popup-section {
+  margin-bottom: 10px;
+}
+
+.popup-section-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.popup-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+
+.task-status {
+  padding: 5px;
+  border-radius: 3px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.task-status.completed {
+  background-color: rgba(46, 204, 113, 0.2);
+  color: #27ae60;
+}
+
+.task-status.pending {
+  background-color: rgba(52, 152, 219, 0.2);
+  color: #2980b9;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.popup-button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.popup-button.navigate-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.popup-button.navigate-button:hover {
+  background-color: #2980b9;
+}
+
+.popup-button.secondary {
+  background-color: #ecf0f1;
+  color: #34495e;
+}
+
+.popup-button.secondary:hover {
+  background-color: #bdc3c7;
+}

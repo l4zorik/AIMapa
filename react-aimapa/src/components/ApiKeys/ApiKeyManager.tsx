@@ -29,42 +29,8 @@ export interface ApiPricing {
   features: string[];
 }
 
-// Ukázkové API klíče
-const sampleApiKeys: ApiKey[] = [
-  {
-    id: '1',
-    provider: 'openai',
-    key: 'sk-1234567890abcdefghijklmnopqrstuvwxyz',
-    name: 'OpenAI GPT-4',
-    isActive: true,
-    usageCount: 120,
-    usageLimit: 1000,
-    createdAt: new Date('2023-12-01'),
-    expiresAt: new Date('2024-12-01')
-  },
-  {
-    id: '2',
-    provider: 'google',
-    key: 'AIza1234567890abcdefghijklmnopqrstuvwxyz',
-    name: 'Google Gemini Pro',
-    isActive: true,
-    usageCount: 45,
-    usageLimit: 500,
-    createdAt: new Date('2024-01-15'),
-    expiresAt: null
-  },
-  {
-    id: '3',
-    provider: 'mapbox',
-    key: 'pk.1234567890abcdefghijklmnopqrstuvwxyz',
-    name: 'Mapbox Standard',
-    isActive: true,
-    usageCount: 230,
-    usageLimit: 1000,
-    createdAt: new Date('2023-11-10'),
-    expiresAt: new Date('2024-11-10')
-  }
-];
+// Prázdné pole API klíčů
+const emptyApiKeys: ApiKey[] = [];
 
 // Ceníky API
 const apiPricings: ApiPricing[] = [
@@ -145,12 +111,29 @@ interface ApiKeyManagerProps {
 }
 
 const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>(sampleApiKeys);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>(emptyApiKeys);
   const [selectedProvider, setSelectedProvider] = useState<ApiProviderType | ''>('');
   const [newKeyName, setNewKeyName] = useState('');
   const [newKeyValue, setNewKeyValue] = useState('');
   const [activeTab, setActiveTab] = useState<'keys' | 'pricing'>('keys');
   const [showAddForm, setShowAddForm] = useState(false);
+
+  // Načtení API klíčů z localStorage při inicializaci
+  useEffect(() => {
+    const savedKeys = localStorage.getItem('api-keys');
+    if (savedKeys) {
+      try {
+        const parsedKeys = JSON.parse(savedKeys);
+        setApiKeys(parsedKeys.map((key: any) => ({
+          ...key,
+          createdAt: new Date(key.createdAt),
+          expiresAt: key.expiresAt ? new Date(key.expiresAt) : null
+        })));
+      } catch (error) {
+        console.error('Chyba při načítání API klíčů:', error);
+      }
+    }
+  }, []);
 
   // Filtrované API klíče podle vybraného poskytovatele
   const filteredApiKeys = selectedProvider
@@ -231,7 +214,11 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
       console.log('API klíč bezpečně uložen:', newKey.id);
 
       // Přidání klíče do seznamu
-      setApiKeys([...apiKeys, newKey]);
+      const updatedKeys = [...apiKeys, newKey];
+      setApiKeys(updatedKeys);
+
+      // Uložení do localStorage
+      localStorage.setItem('api-keys', JSON.stringify(updatedKeys));
 
       // Vyčištění formuláře
       setNewKeyName('');
@@ -247,15 +234,19 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ onSelectApiKey }) => {
 
   // Aktivace/deaktivace API klíče
   const toggleKeyStatus = (id: string) => {
-    setApiKeys(apiKeys.map(key =>
+    const updatedKeys = apiKeys.map(key =>
       key.id === id ? { ...key, isActive: !key.isActive } : key
-    ));
+    );
+    setApiKeys(updatedKeys);
+    localStorage.setItem('api-keys', JSON.stringify(updatedKeys));
   };
 
   // Odstranění API klíče
   const removeKey = (id: string) => {
     if (window.confirm('Opravdu chcete odstranit tento API klíč?')) {
-      setApiKeys(apiKeys.filter(key => key.id !== id));
+      const updatedKeys = apiKeys.filter(key => key.id !== id);
+      setApiKeys(updatedKeys);
+      localStorage.setItem('api-keys', JSON.stringify(updatedKeys));
     }
   };
 

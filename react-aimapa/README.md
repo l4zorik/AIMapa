@@ -1,6 +1,14 @@
-# Getting Started with Create React App
+# AIMapa - Inteligentní mapová aplikace
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Aplikace AIMapa je inteligentní mapová aplikace využívající AI pro plánování tras, vyhledávání míst a vytváření plánů.
+
+**UPOZORNĚNÍ: Tento software je chráněn autorskými právy. Neoprávněné použití tohoto kódu bude mít za následek právní postih. Více informací naleznete v souboru [LICENSE.md](./LICENSE.md).**
+
+Copyright (c) 2025 Jan Lazorik
+
+---
+
+Tento projekt byl vytvořen pomocí [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
@@ -44,3 +52,9 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Licence
+
+Tento software je poskytován pod vlastní licencí, která zakazuje jakékoliv neoprávněné použití, kopírování, modifikaci nebo distribuci. Porušení licenčních podmínek bude mít za následek právní postih.
+
+Úplné znění licenčních podmínek naleznete v souboru [LICENSE.md](./LICENSE.md).

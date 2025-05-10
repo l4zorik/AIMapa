@@ -114,8 +114,8 @@ const EnhancedApiKeyManager: React.FC<{
       // V reálné aplikaci by zde byl API požadavek pro ověření klíče
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Simulace úspěšného ověření (v reálné aplikaci by záviselo na odpovědi API)
-      const isVerified = Math.random() > 0.2; // 80% šance na úspěch pro demo
+      // Pro účely testování vždy vracíme true - klíč je platný
+      const isVerified = true; // Vždy úspěšné ověření pro demo
 
       // Klíč je ověřený, ale ještě není označen jako isVerified, dokud nebude propojen s chatem
       // Pouze aktualizujeme stav ověření, ale neměníme isVerified příznak
@@ -149,10 +149,14 @@ const EnhancedApiKeyManager: React.FC<{
 
   // Funkce pro aktivaci API klíče a propojení s chatem
   const activateAndConnectKey = async (apiKey: ApiKey) => {
+    console.log('Aktivace a propojení klíče:', apiKey.name);
+
     // Nejprve ověříme klíč
     const isVerified = await verifyApiKey(apiKey);
+    console.log('Výsledek ověření klíče:', isVerified);
 
     if (isVerified) {
+      console.log('Klíč je ověřený, nastavuji jako aktivní');
       // Nastavíme klíč jako aktivní a označíme jako ověřený
       setActiveKeyId(apiKey.id);
 
@@ -164,6 +168,8 @@ const EnhancedApiKeyManager: React.FC<{
         lastUsed: new Date(),
         totalCost: apiKey.totalCost + apiKey.costPerUse
       };
+
+      console.log('Aktualizovaný klíč:', updatedKey.name, 'isVerified:', updatedKey.isVerified);
 
       // Aktualizujeme stav API klíčů
       setApiKeys(keys => keys.map(k => k.id === apiKey.id ? updatedKey : k));

@@ -1,0 +1,294 @@
+/**
+ * TimelinePage.css
+ * Styly pro stránku časové osy
+ */
+
+.timeline-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #0f1923;
+  color: #ecf0f1;
+}
+
+.timeline-page-header {
+  padding: 20px;
+  background-color: #1a2634;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timeline-page-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2rem;
+  color: #3498db;
+}
+
+.timeline-page-header p {
+  margin: 0;
+  color: #bdc3c7;
+  font-size: 1rem;
+}
+
+.timeline-page-content {
+  flex: 1;
+  padding: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-container {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.timeline-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 20px;
+}
+
+.timeline-loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(52, 152, 219, 0.2);
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.timeline-loading p {
+  font-size: 1.2rem;
+  color: #bdc3c7;
+}
+
+.timeline-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 15px;
+  text-align: center;
+}
+
+.timeline-error i {
+  font-size: 3rem;
+  color: #e74c3c;
+}
+
+.timeline-error p {
+  font-size: 1.2rem;
+  color: #bdc3c7;
+  max-width: 500px;
+}
+
+.timeline-error button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.timeline-error button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* Detail události */
+.timeline-event-detail {
+  flex: 0 0 350px;
+  background-color: #1a2634;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.timeline-event-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: rgba(52, 152, 219, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timeline-event-detail-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #3498db;
+}
+
+.timeline-event-detail-close {
+  background: none;
+  border: none;
+  color: #bdc3c7;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.timeline-event-detail-close:hover {
+  color: #e74c3c;
+  transform: scale(1.1);
+}
+
+.timeline-event-detail-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.timeline-event-detail-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #bdc3c7;
+}
+
+.timeline-event-detail-time i {
+  color: #3498db;
+}
+
+.timeline-event-detail-time .separator {
+  color: #7f8c8d;
+}
+
+.timeline-event-detail-description {
+  margin-bottom: 20px;
+  line-height: 1.5;
+  color: #ecf0f1;
+}
+
+.timeline-event-detail-location {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.timeline-event-detail-location h3,
+.timeline-event-detail-status h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  color: #3498db;
+}
+
+.location-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #ecf0f1;
+}
+
+.location-info i {
+  color: #e74c3c;
+}
+
+.location-coordinates {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #bdc3c7;
+}
+
+.show-on-map-button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.show-on-map-button:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+}
+
+.timeline-event-detail-status {
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-badge.completed {
+  background-color: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+}
+
+.status-badge.pending {
+  background-color: rgba(243, 156, 18, 0.2);
+  color: #f39c12;
+}
+
+/* Responzivní design */
+@media (max-width: 992px) {
+  .timeline-container {
+    flex-direction: column;
+  }
+  
+  .timeline-event-detail {
+    flex: 0 0 auto;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline-page-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .timeline-page-content {
+    padding: 15px;
+  }
+}

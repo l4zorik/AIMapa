@@ -1,0 +1,227 @@
+.home-address-settings {
+  margin-bottom: 2rem;
+}
+
+.settings-description {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.current-address {
+  margin-bottom: 1.5rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.current-address h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.address-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  border-radius: 6px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.address-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.address-info i {
+  font-size: 1.25rem;
+  color: #4285f4;
+  margin-right: 0.75rem;
+}
+
+.address-details {
+  flex: 1;
+}
+
+.address-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.address-coordinates {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.remove-address-button {
+  background-color: transparent;
+  border: none;
+  color: #d93025;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.remove-address-button:hover {
+  background-color: rgba(217, 48, 37, 0.1);
+}
+
+.address-search {
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.address-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  font-size: 1rem;
+}
+
+.search-button {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  padding: 0 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-button:hover {
+  background-color: #3367d6;
+}
+
+.search-button:disabled {
+  background-color: #a8c7fa;
+  cursor: not-allowed;
+}
+
+.current-location-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  color: #3c4043;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.current-location-button:hover {
+  background-color: #f1f3f4;
+}
+
+.current-location-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.current-location-button i {
+  margin-right: 0.5rem;
+  color: #4285f4;
+}
+
+.error-message, .success-message {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  background-color: #fce8e6;
+  color: #d93025;
+}
+
+.success-message {
+  background-color: #e6f4ea;
+  color: #137333;
+}
+
+.error-message i, .success-message i {
+  margin-right: 0.5rem;
+}
+
+.search-results {
+  margin-top: 1.5rem;
+}
+
+.search-results h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.results-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid #dadce0;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-info {
+  flex: 1;
+}
+
+.result-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.result-coordinates {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.select-button {
+  display: flex;
+  align-items: center;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.select-button:hover {
+  background-color: #3367d6;
+}
+
+.select-button i {
+  margin-right: 0.5rem;
+}

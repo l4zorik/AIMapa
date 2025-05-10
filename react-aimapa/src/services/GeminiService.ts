@@ -76,7 +76,7 @@ export interface GeminiMapResponse {
 class GeminiService {
   private apiKey: string | null = null;
   private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
-  private model = 'gemini-1.5-flash'; // Použijeme Gemini 1.5 Flash - nejrychlejší a nejefektivnější model
+  private model = 'gemini-1.5-flash'; // Použijeme Gemini 1.5 Flash - nejnovější dostupný model
   private costPerInputToken = 0.000125; // $0.000125 za 1K vstupních tokenů
   private costPerOutputToken = 0.000375; // $0.000375 za 1K výstupních tokenů
   private maxCost = 50; // Maximální náklady v CZK
@@ -85,6 +85,7 @@ class GeminiService {
 
   // Nastavení API klíče
   setApiKey(key: string) {
+    console.log('Nastavuji API klíč:', key.substring(0, 6) + '...');
     this.apiKey = key;
   }
 
@@ -115,6 +116,51 @@ class GeminiService {
     this.remainingCredit = Math.max(0, this.maxCost - this.totalCostCZK);
   }
 
+  // Získání seznamu dostupných modelů
+  async listModels(): Promise<string[]> {
+    if (!this.apiKey) {
+      throw new Error('API klíč není nastaven');
+    }
+
+    try {
+      console.log('Získávám seznam dostupných modelů...');
+      const response = await fetch(`${this.apiUrl}?key=${this.apiKey}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Chyba API: ${errorData.error?.message || response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Odpověď API:', data);
+
+      if (!data.models || !Array.isArray(data.models)) {
+        console.log('Neplatná odpověď API, vracím výchozí modely');
+        return ['gemini-1.5-flash', 'gemini-1.5-pro', 'embedding-001'];
+      }
+
+      // Vrátíme seznam názvů modelů
+      const modelNames = data.models.map((model: any) => {
+        const fullName = model.name || '';
+        const parts = fullName.split('/');
+        return parts[parts.length - 1];
+      }).filter(Boolean);
+
+      console.log('Nalezené modely:', modelNames);
+
+      if (modelNames.length === 0) {
+        console.log('Žádné modely nenalezeny, vracím výchozí modely');
+        return ['gemini-1.5-flash', 'gemini-1.5-pro', 'embedding-001'];
+      }
+
+      return modelNames;
+    } catch (error) {
+      console.error('Chyba při získávání seznamu modelů:', error);
+      console.log('Vracím výchozí modely po chybě');
+      return ['gemini-1.5-flash', 'gemini-1.5-pro', 'embedding-001'];
+    }
+  }
+
   // Odeslání zprávy do Gemini API
   async sendMessage(message: string, mapContext?: { center?: [number, number]; zoom?: number }): Promise<GeminiMapResponse> {
     if (!this.apiKey) {
@@ -124,6 +170,44 @@ class GeminiService {
     // Kontrola zbývajícího kreditu
     if (this.remainingCredit <= 0) {
       throw new Error('Vyčerpán kredit pro API volání. Maximální limit je ' + this.maxCost + ' CZK.');
+    }
+
+    // Zkusíme získat seznam dostupných modelů a použít první dostupný
+    try {
+      const models = await this.listModels();
+      console.log('Dostupné modely:', models);
+
+      // Zkusíme najít model gemini-1.5-flash
+      const geminiFlashModel = models.find(model => model.includes('gemini-1.5-flash'));
+      if (geminiFlashModel) {
+        console.log('Používám model:', geminiFlashModel);
+        this.model = geminiFlashModel;
+      }
+      // Zkusíme najít model gemini-1.5-pro
+      else {
+        const geminiProModel = models.find(model => model.includes('gemini-1.5-pro'));
+        if (geminiProModel) {
+          console.log('Používám model:', geminiProModel);
+          this.model = geminiProModel;
+        }
+        // Zkusíme najít jakýkoliv gemini model
+        else {
+          const geminiModel = models.find(model => model.includes('gemini'));
+          if (geminiModel) {
+            console.log('Používám model:', geminiModel);
+            this.model = geminiModel;
+          }
+        }
+      }
+
+      // Pokud není k dispozici žádný gemini model, použijeme první dostupný model
+      if (!geminiFlashModel && models.length > 0) {
+        console.log('Žádný gemini model není k dispozici, používám první dostupný model:', models[0]);
+        this.model = models[0];
+      }
+    } catch (error) {
+      console.error('Chyba při získávání seznamu modelů:', error);
+      // Pokračujeme s aktuálním modelem
     }
 
     try {
@@ -161,6 +245,9 @@ Uživatelský dotaz: ${message}`
       };
 
       // Odeslání požadavku
+      console.log(`Odesílám požadavek na ${this.apiUrl}/${this.model}:generateContent`);
+      console.log('Požadavek:', JSON.stringify(request, null, 2));
+
       const response = await fetch(`${this.apiUrl}/${this.model}:generateContent?key=${this.apiKey}`, {
         method: 'POST',
         headers: {

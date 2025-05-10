@@ -1,0 +1,200 @@
+/* Základní proměnné pro barvy */
+:root {
+  --primary-green: #2ecc71;
+  --primary-green-dark: #27ae60;
+  --primary-green-light: #a9dfbf;
+
+  --primary-red: #e74c3c;
+  --primary-red-dark: #c0392b;
+  --primary-red-light: #f5b7b1;
+
+  --primary-orange: #f39c12;
+  --primary-orange-dark: #d35400;
+  --primary-orange-light: #fad7a0;
+
+  --dark-bg: #1e272e;
+  --light-bg: #f5f6fa;
+  --card-bg: #2c3e50;
+  --card-hover: #34495e;
+
+  --text-light: #ecf0f1;
+  --text-dark: #2c3e50;
+  --text-muted: #95a5a6;
+
+  --border-color: #7f8c8d;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Kontejner služeb */
+.api-services-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--dark-bg);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease-in-out;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Hlavička služeb */
+.api-services-header {
+  background-color: var(--card-bg);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.api-services-header h3 {
+  margin: 0;
+  color: var(--primary-green);
+  font-size: 18px;
+}
+
+.close-services-button {
+  background-color: transparent;
+  border: none;
+  color: var(--text-light);
+  font-size: 16px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.close-services-button:hover {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: var(--primary-red);
+}
+
+/* Varování */
+.api-services-warning {
+  background-color: rgba(243, 156, 18, 0.2);
+  color: var(--primary-orange);
+  padding: 10px 15px;
+  margin: 15px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.api-services-warning i {
+  font-size: 18px;
+}
+
+/* Mřížka služeb */
+.api-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 15px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Karta služby */
+.api-service-card {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s, background-color 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.api-service-card:hover {
+  background-color: var(--card-hover);
+  transform: translateY(-5px);
+}
+
+.api-service-card.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.service-icon {
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.service-name {
+  color: var(--text-light);
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.service-description {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Překrytí pro nedostupné služby */
+.service-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-light);
+}
+
+.service-overlay i {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: var(--primary-red);
+}
+
+/* Patička služeb */
+.api-services-footer {
+  background-color: var(--card-bg);
+  padding: 15px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.api-services-footer p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.api-key-status {
+  margin-top: 5px !important;
+  font-weight: bold;
+  color: var(--primary-green) !important;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+  .api-services-grid {
+    grid-template-columns: 1fr;
+  }
+}
