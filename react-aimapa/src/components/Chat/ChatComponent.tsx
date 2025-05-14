@@ -176,7 +176,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   };
 
   // Vylepšená odpověď asistenta s podporou pro plány a mapu
-  const handleAssistantResponse = (userInput: string) => {
+  const handleAssistantResponse = async (userInput: string) => {
     setIsTyping(true);
 
     // Simulace zpoždění
@@ -208,50 +208,9 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
 
       // Zpracování dotazu na plán
       if (planMatch) {
-        // Vytvoření události pro vytvoření plánu
-        const planEvent = new CustomEvent('createPlanFromChat', {
-          detail: {
-            query: userInput,
-            source: 'chat'
-          }
-        });
+        console.log('Detekován požadavek na vytvoření plánu:', userInput);
 
-        // Vyvolání události pro vytvoření plánu
-        window.dispatchEvent(planEvent);
-
-        // Vynucené překreslení seznamu plánů po krátké prodlevě
-        setTimeout(() => {
-          // Načtení aktuálních plánů z localStorage
-          const savedPlans = localStorage.getItem('plans');
-          if (savedPlans) {
-            try {
-              const parsedPlans = JSON.parse(savedPlans);
-              // Najdeme nejnovější plán (předpokládáme, že byl právě vytvořen)
-              if (parsedPlans.length > 0) {
-                // Seřadíme plány podle data vytvoření (nejnovější první)
-                const sortedPlans = [...parsedPlans].sort((a, b) =>
-                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-                );
-                const newestPlan = sortedPlans[0];
-
-                // Vyvolání události pro aktualizaci UI s ID nového plánu
-                const plansUpdatedEvent = new CustomEvent('plansUpdated', {
-                  detail: {
-                    action: 'create',
-                    planId: newestPlan.id,
-                    source: 'chat'
-                  }
-                });
-                window.dispatchEvent(plansUpdatedEvent);
-
-                console.log('Vyvolána událost plansUpdated pro aktualizaci seznamu plánů z chatu s ID plánu:', newestPlan.id);
-              }
-            } catch (error) {
-              console.error('Chyba při načítání plánů z localStorage:', error);
-            }
-          }
-        }, 500);
-
+        // Nejprve přidáme zprávu o vytváření plánu
         response = {
           id: `assistant-${Date.now()}`,
           sender: 'assistant',
@@ -261,6 +220,82 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
 
         // Aktualizace zpráv
         setMessages(prev => [...prev, response]);
+
+        // Resetujeme příznak trvalého odstranění plánů, pokud existuje
+        // Toto zajistí, že plány budou moci být vytvořeny i po předchozím odstranění
+        try {
+          // Použijeme centralizovanou službu pro resetování příznaku
+          const planStorageService = (await import('../../services/PlanStorageService')).default;
+          if (planStorageService.werePlansRemoved()) {
+            console.log('Resetuji příznak trvalého odstranění plánů před vytvořením nového plánu');
+            planStorageService.resetPlansRemovedFlag();
+          }
+        } catch (error) {
+          console.error('Chyba při resetování příznaku trvalého odstranění plánů:', error);
+        }
+
+        // Vytvoření události pro vytvoření plánu
+        const planEvent = new CustomEvent('createPlanFromChat', {
+          detail: {
+            query: userInput,
+            source: 'chat'
+          }
+        });
+
+        // Vyvolání události pro vytvoření plánu
+        console.log('Vyvolávám událost createPlanFromChat');
+        window.dispatchEvent(planEvent);
+
+        // Vynucené překreslení seznamu plánů po krátké prodlevě
+        // Použijeme delší timeout, abychom zajistili, že plán bude vytvořen a uložen
+        setTimeout(() => {
+          console.log('Kontroluji vytvoření plánu v localStorage');
+          // Načtení aktuálních plánů z localStorage
+          const savedPlans = localStorage.getItem('plans');
+          if (savedPlans) {
+            try {
+              const parsedPlans = JSON.parse(savedPlans);
+              console.log('Načteno plánů z localStorage:', parsedPlans.length);
+
+              // Najdeme nejnovější plán (předpokládáme, že byl právě vytvořen)
+              if (parsedPlans.length > 0) {
+                // Seřadíme plány podle data vytvoření (nejnovější první)
+                const sortedPlans = [...parsedPlans].sort((a, b) =>
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+                const newestPlan = sortedPlans[0];
+                console.log('Nejnovější plán:', newestPlan.title, 'ID:', newestPlan.id);
+
+                // Vyvolání události pro aktualizaci UI s ID nového plánu
+                const plansUpdatedEvent = new CustomEvent('plansUpdated', {
+                  detail: {
+                    action: 'create',
+                    planId: newestPlan.id,
+                    source: 'chat',
+                    setActive: true // Explicitně nastavíme plán jako aktivní
+                  }
+                });
+                console.log('Vyvolávám událost plansUpdated s ID plánu:', newestPlan.id);
+                window.dispatchEvent(plansUpdatedEvent);
+
+                // Vyvoláme ještě jednu událost pro aktualizaci zobrazení plánu
+                // Použijeme delší timeout, aby se stihly zpracovat všechna změny
+                setTimeout(() => {
+                  console.log('Vyvolávám událost refreshPlanDisplay pro vynucení aktualizace UI');
+                  const refreshEvent = new CustomEvent('refreshPlanDisplay', {
+                    detail: {
+                      planId: newestPlan.id,
+                      action: 'forceRefresh'
+                    }
+                  });
+                  window.dispatchEvent(refreshEvent);
+                }, 200);
+              }
+            } catch (error) {
+              console.error('Chyba při načítání plánů z localStorage:', error);
+            }
+          }
+        }, 800);
 
         // Aktualizace celkových nákladů
         if (isCostEstimationEnabled) {
