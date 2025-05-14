@@ -75,14 +75,36 @@ const SimplePlanningPanel: React.FC<SimplePlanningPanelProps> = ({
   const [plans, setPlans] = useState<Plan[]>([]);
   const [activePlan, setActivePlan] = useState<Plan | null>(null);
 
+  // Funkce pro kontrolu, zda byly plány trvale odstraněny
+  const checkPermanentlyRemovedPlans = (): boolean => {
+    const permanentlyRemoved = localStorage.getItem('plans_permanently_removed');
+    if (permanentlyRemoved === 'true') {
+      const timestamp = localStorage.getItem('plans_removed_timestamp');
+      console.log(`Plány byly trvale odstraněny ${timestamp ? 'v čase: ' + timestamp : ''}`);
+      return true;
+    }
+    return false;
+  };
+
   // Efekt pro načtení plánů z localStorage při inicializaci
   useEffect(() => {
+    // Nejprve zkontrolujeme, zda byly plány trvale odstraněny
+    if (checkPermanentlyRemovedPlans()) {
+      console.log('Plány byly trvale odstraněny, nebudu je načítat');
+      // Ujistíme se, že v localStorage nejsou žádné plány
+      if (localStorage.getItem('plans')) {
+        console.log('Nalezeny plány v localStorage, přestože byly trvale odstraněny - odstraňuji je');
+        localStorage.removeItem('plans');
+      }
+      return;
+    }
+
     const savedPlans = localStorage.getItem('plans');
     if (savedPlans) {
       try {
         const parsedPlans = JSON.parse(savedPlans);
         setPlans(parsedPlans);
-        
+
         // Nastavení posledního plánu jako aktivního
         if (parsedPlans.length > 0) {
           setActivePlan(parsedPlans[parsedPlans.length - 1]);
@@ -97,6 +119,15 @@ const SimplePlanningPanel: React.FC<SimplePlanningPanelProps> = ({
   useEffect(() => {
     // Funkce pro zpracování události vytvoření plánu z chatu
     const handleCreatePlanFromChat = (event: CreatePlanFromChatEvent) => {
+      // Nejprve zkontrolujeme, zda byly plány trvale odstraněny
+      if (checkPermanentlyRemovedPlans()) {
+        console.log('Plány byly trvale odstraněny, nemohu vytvořit nový plán');
+        // Resetujeme příznak trvalého odstranění, aby bylo možné vytvořit nový plán
+        localStorage.removeItem('plans_permanently_removed');
+        localStorage.removeItem('plans_removed_timestamp');
+        console.log('Příznak trvalého odstranění plánů byl resetován, nyní lze vytvářet nové plány');
+      }
+
       const { query, source } = event.detail;
 
       console.log(`Vytvářím plán z chatu: "${query}" (zdroj: ${source})`);
@@ -130,7 +161,7 @@ const SimplePlanningPanel: React.FC<SimplePlanningPanelProps> = ({
 
       // Přidání plánu do seznamu
       const updatedPlans = [...currentPlans, newPlan];
-      
+
       // Aktualizace localStorage
       localStorage.setItem('plans', JSON.stringify(updatedPlans));
 
@@ -160,13 +191,30 @@ const SimplePlanningPanel: React.FC<SimplePlanningPanelProps> = ({
     };
   }, []);
 
+  // Efekt pro naslouchání události odstranění všech plánů
+  useEffect(() => {
+    const handlePlansRemoved = (event: CustomEvent) => {
+      console.log('Událost plansRemoved zachycena v SimplePlanningPanel:', event.detail);
+
+      // Aktualizace stavu aplikace
+      setPlans([]);
+      setActivePlan(null);
+    };
+
+    window.addEventListener('plansRemoved', handlePlansRemoved as EventListener);
+
+    return () => {
+      window.removeEventListener('plansRemoved', handlePlansRemoved as EventListener);
+    };
+  }, []);
+
   return (
     <div className="planning-panel">
       <h2>Plány</h2>
       <div className="plans-list">
         {plans.map(plan => (
-          <div 
-            key={plan.id} 
+          <div
+            key={plan.id}
             className={`plan-item ${activePlan?.id === plan.id ? 'active' : ''}`}
             onClick={() => setActivePlan(plan)}
           >

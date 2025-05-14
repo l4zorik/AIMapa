@@ -1656,36 +1656,71 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
     if (window.confirm('Opravdu chcete odstranit VŠECHNY plány? Tato akce je nevratná!')) {
       console.log('Odstraňuji všechna plány...');
 
-      // Odstranění plánů z localStorage
-      localStorage.removeItem('plans');
+      try {
+        // Odstranění plánů z localStorage
+        localStorage.removeItem('plans');
 
-      // Aktualizace stavu aplikace
-      setPlans(prevPlans => {
-        console.log('Aktualizace stavu plánů po odstranění všech plánů - předchozí plány:',
-          prevPlans.map(p => ({ id: p.id, title: p.title })));
-        return [];
-      });
-      setActivePlan(null);
+        // Nastavení příznaku, že plány byly záměrně odstraněny
+        localStorage.setItem('plans_permanently_removed', 'true');
+        localStorage.setItem('plans_removed_timestamp', new Date().toISOString());
 
-      // Zobrazení potvrzení o úspěšném odstranění
-      const successMessage = document.createElement('div');
-      successMessage.className = 'coordinates-display';
-      successMessage.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        <span>Všechna plány byly úspěšně odstraněny</span>
-      `;
+        // Kontrola, zda byly plány skutečně odstraněny
+        const checkPlans = localStorage.getItem('plans');
+        if (checkPlans) {
+          console.error('Plány nebyly úspěšně odstraněny z localStorage!');
 
-      document.body.appendChild(successMessage);
+          // Pokus o opětovné odstranění
+          localStorage.removeItem('plans');
 
-      // Animace potvrzovací zprávy
-      setTimeout(() => {
-        successMessage.style.opacity = '0';
+          // Druhá kontrola
+          const secondCheck = localStorage.getItem('plans');
+          if (secondCheck) {
+            console.error('Plány se nepodařilo odstranit ani po druhém pokusu!');
+            alert('Nepodařilo se odstranit plány. Zkuste to prosím znovu nebo obnovte stránku.');
+            return;
+          }
+        }
+
+        // Aktualizace stavu aplikace
+        setPlans(prevPlans => {
+          console.log('Aktualizace stavu plánů po odstranění všech plánů - předchozí plány:',
+            prevPlans.map(p => ({ id: p.id, title: p.title })));
+          return [];
+        });
+        setActivePlan(null);
+
+        // Vyvolání události pro informování ostatních komponent
+        const plansRemovedEvent = new CustomEvent('plansRemoved', {
+          detail: {
+            action: 'removeAll',
+            timestamp: new Date().toISOString()
+          }
+        });
+        window.dispatchEvent(plansRemovedEvent);
+
+        // Zobrazení potvrzení o úspěšném odstranění
+        const successMessage = document.createElement('div');
+        successMessage.className = 'coordinates-display';
+        successMessage.innerHTML = `
+          <i class="fas fa-check-circle"></i>
+          <span>Všechna plány byly úspěšně odstraněny</span>
+        `;
+
+        document.body.appendChild(successMessage);
+
+        // Animace potvrzovací zprávy
         setTimeout(() => {
-          document.body.removeChild(successMessage);
-        }, 500);
-      }, 2000);
+          successMessage.style.opacity = '0';
+          setTimeout(() => {
+            document.body.removeChild(successMessage);
+          }, 500);
+        }, 2000);
 
-      console.log('Všechna plány byly úspěšně odstraněny');
+        console.log('Všechna plány byly úspěšně odstraněny');
+      } catch (error) {
+        console.error('Chyba při odstraňování plánů:', error);
+        alert('Při odstraňování plánů došlo k chybě: ' + (error instanceof Error ? error.message : 'Neznámá chyba'));
+      }
     } else {
       console.log('Odstranění všech plánů bylo zrušeno uživatelem');
     }

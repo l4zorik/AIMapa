@@ -72,6 +72,55 @@ const EnhancedMapPage: React.FC = () => {
     };
   }, []);
 
+  // Efekt pro naslouchání události smazání historie chatů
+  useEffect(() => {
+    const handleChatHistoryCleared = () => {
+      console.log('Událost chatHistoryCleared zachycena v EnhancedMapPage');
+
+      // Zde můžeme provést další akce, pokud je potřeba
+      // Například aktualizovat stav aplikace nebo zobrazit oznámení
+    };
+
+    window.addEventListener('chatHistoryCleared', handleChatHistoryCleared);
+
+    return () => {
+      window.removeEventListener('chatHistoryCleared', handleChatHistoryCleared);
+    };
+  }, []);
+
+  // Efekt pro naslouchání události odstranění všech plánů
+  useEffect(() => {
+    const handlePlansRemoved = (event: CustomEvent) => {
+      console.log('Událost plansRemoved zachycena v EnhancedMapPage:', event.detail);
+
+      // Aktualizace stavu aplikace
+      setPlans([]);
+      setSelectedTask(null);
+      setSelectedLocation(null);
+      setSelectedRoute(false);
+      setMarkers([]);
+      setRoute(undefined);
+
+      // Kontrola, zda byly plány skutečně odstraněny z localStorage
+      if (localStorage.getItem('plans')) {
+        console.log('Plány stále existují v localStorage, odstraňuji je');
+        localStorage.removeItem('plans');
+      }
+
+      // Ujistíme se, že je nastaven příznak trvalého odstranění
+      localStorage.setItem('plans_permanently_removed', 'true');
+      localStorage.setItem('plans_removed_timestamp', new Date().toISOString());
+
+      console.log('Stav aplikace byl aktualizován po odstranění všech plánů');
+    };
+
+    window.addEventListener('plansRemoved', handlePlansRemoved as EventListener);
+
+    return () => {
+      window.removeEventListener('plansRemoved', handlePlansRemoved as EventListener);
+    };
+  }, []);
+
   // Efekt pro inicializaci sledování polohy uživatele
   useEffect(() => {
     console.log('Inicializace sledování polohy uživatele');
@@ -148,6 +197,71 @@ const EnhancedMapPage: React.FC = () => {
     };
   }, [isNavigating, selectedLocation, selectedRoute]);
 
+  // Funkce pro kontrolu, zda byly plány trvale odstraněny
+  const checkPermanentlyRemovedPlans = (): boolean => {
+    const permanentlyRemoved = localStorage.getItem('plans_permanently_removed');
+    if (permanentlyRemoved === 'true') {
+      const timestamp = localStorage.getItem('plans_removed_timestamp');
+      console.log(`Plány byly trvale odstraněny ${timestamp ? 'v čase: ' + timestamp : ''}`);
+      return true;
+    }
+    return false;
+  };
+
+  // Funkce pro čištění duplicitních plánů v localStorage
+  const cleanupDuplicatePlans = () => {
+    console.log('Čištění duplicitních plánů v localStorage...');
+
+    // Nejprve zkontrolujeme, zda byly plány trvale odstraněny
+    if (checkPermanentlyRemovedPlans()) {
+      console.log('Plány byly trvale odstraněny, nebudu je načítat');
+      // Ujistíme se, že v localStorage nejsou žádné plány
+      if (localStorage.getItem('plans')) {
+        console.log('Nalezeny plány v localStorage, přestože byly trvale odstraněny - odstraňuji je');
+        localStorage.removeItem('plans');
+      }
+      return [];
+    }
+
+    const savedPlans = localStorage.getItem('plans');
+    if (savedPlans) {
+      try {
+        const parsedPlans = JSON.parse(savedPlans);
+        console.log(`Načteno ${parsedPlans.length} plánů z localStorage před čištěním`);
+
+        // Vytvoření mapy plánů podle ID pro odstranění duplicit
+        const planMap = new Map();
+        parsedPlans.forEach((plan: any) => {
+          // Pokud plán s tímto ID již existuje, použijeme novější verzi (podle updatedAt)
+          if (planMap.has(plan.id)) {
+            const existingPlan = planMap.get(plan.id);
+            const existingDate = new Date(existingPlan.updatedAt).getTime();
+            const newDate = new Date(plan.updatedAt).getTime();
+
+            if (newDate > existingDate) {
+              planMap.set(plan.id, plan);
+            }
+          } else {
+            planMap.set(plan.id, plan);
+          }
+        });
+
+        // Převedení mapy zpět na pole
+        const uniquePlans = Array.from(planMap.values());
+        console.log(`Po odstranění duplicit zůstalo ${uniquePlans.length} plánů`);
+
+        // Uložení vyčištěných plánů zpět do localStorage
+        localStorage.setItem('plans', JSON.stringify(uniquePlans));
+
+        return uniquePlans;
+      } catch (error) {
+        console.error('Chyba při čištění duplicitních plánů:', error);
+        return [];
+      }
+    }
+    return [];
+  };
+
   // Efekt pro načtení uloženého API klíče a plánů
   useEffect(() => {
     // Načtení uloženého API klíče z localStorage
@@ -164,37 +278,67 @@ const EnhancedMapPage: React.FC = () => {
       }
     }
 
-    // Načtení plánů z localStorage
-    const savedPlans = localStorage.getItem('plans');
-    if (savedPlans) {
-      try {
-        const parsedPlans = JSON.parse(savedPlans);
-        console.log('Načítám uložené plány:', parsedPlans.length);
+    // Nejprve vyčistíme duplicitní plány
+    const cleanedPlans = cleanupDuplicatePlans();
 
-        // Kontrola a oprava plánů, které nemají podúkoly
-        const fixedPlans = checkAndFixPlansWithoutSubtasks(parsedPlans);
+    if (cleanedPlans.length > 0) {
+      console.log(`Načteno ${cleanedPlans.length} vyčištěných plánů z localStorage`);
 
-        // Pokud byly provedeny opravy, uložíme opravené plány zpět do localStorage
-        if (fixedPlans !== parsedPlans) {
-          console.log('Byly provedeny opravy plánů, ukládám opravené plány do localStorage');
+      // Kontrola a oprava plánů, které nemají podúkoly
+      const fixedPlans = checkAndFixPlansWithoutSubtasks(cleanedPlans);
 
-          // Převedení objektů Date na ISO string pro správné uložení do localStorage
-          const plansToSave = fixedPlans.map((plan: any) => ({
-            ...plan,
-            createdAt: plan.createdAt instanceof Date ? plan.createdAt.toISOString() : plan.createdAt,
-            updatedAt: plan.updatedAt instanceof Date ? plan.updatedAt.toISOString() : plan.updatedAt,
-            items: plan.items.map((item: any) => ({
-              ...item,
-              createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : item.createdAt
-            }))
-          }));
+      // Pokud byly provedeny opravy, uložíme opravené plány zpět do localStorage
+      if (fixedPlans !== cleanedPlans) {
+        console.log('Byly provedeny opravy plánů, ukládám opravené plány do localStorage');
 
-          localStorage.setItem('plans', JSON.stringify(plansToSave));
+        // Převedení objektů Date na ISO string pro správné uložení do localStorage
+        const plansToSave = fixedPlans.map((plan: any) => ({
+          ...plan,
+          createdAt: plan.createdAt instanceof Date ? plan.createdAt.toISOString() : plan.createdAt,
+          updatedAt: plan.updatedAt instanceof Date ? plan.updatedAt.toISOString() : plan.updatedAt,
+          items: plan.items.map((item: any) => ({
+            ...item,
+            createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : item.createdAt
+          }))
+        }));
+
+        localStorage.setItem('plans', JSON.stringify(plansToSave));
+      }
+
+      setPlans(fixedPlans);
+    } else {
+      // Pokud čištění nevrátilo žádné plány, zkusíme načíst plány přímo
+      const savedPlans = localStorage.getItem('plans');
+      if (savedPlans) {
+        try {
+          const parsedPlans = JSON.parse(savedPlans);
+          console.log('Načítám uložené plány:', parsedPlans.length);
+
+          // Kontrola a oprava plánů, které nemají podúkoly
+          const fixedPlans = checkAndFixPlansWithoutSubtasks(parsedPlans);
+
+          // Pokud byly provedeny opravy, uložíme opravené plány zpět do localStorage
+          if (fixedPlans !== parsedPlans) {
+            console.log('Byly provedeny opravy plánů, ukládám opravené plány do localStorage');
+
+            // Převedení objektů Date na ISO string pro správné uložení do localStorage
+            const plansToSave = fixedPlans.map((plan: any) => ({
+              ...plan,
+              createdAt: plan.createdAt instanceof Date ? plan.createdAt.toISOString() : plan.createdAt,
+              updatedAt: plan.updatedAt instanceof Date ? plan.updatedAt.toISOString() : plan.updatedAt,
+              items: plan.items.map((item: any) => ({
+                ...item,
+                createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : item.createdAt
+              }))
+            }));
+
+            localStorage.setItem('plans', JSON.stringify(plansToSave));
+          }
+
+          setPlans(fixedPlans);
+        } catch (error) {
+          console.error('Chyba při načítání uložených plánů:', error);
         }
-
-        setPlans(fixedPlans);
-      } catch (error) {
-        console.error('Chyba při načítání uložených plánů:', error);
       }
     }
 
@@ -1629,20 +1773,40 @@ Pro přidání lokace nebo trasy k úkolu máte několik možností:
           updatedAt: new Date()
         };
 
-        // Uložení plánu do localStorage
+        // Uložení plánu do localStorage s kontrolou duplicit
         const savedPlans = localStorage.getItem('plans');
         let plans = [];
 
         if (savedPlans) {
           try {
             plans = JSON.parse(savedPlans);
+
+            // Kontrola, zda plán s tímto ID již neexistuje
+            const existingPlanIndex = plans.findIndex((p: any) => p.id === newPlan.id);
+            if (existingPlanIndex !== -1) {
+              console.log(`Plán s ID ${newPlan.id} již existuje, aktualizuji ho`);
+              plans[existingPlanIndex] = newPlan;
+            } else {
+              // Přidání nového plánu
+              plans.push(newPlan);
+            }
           } catch (error) {
             console.error('Chyba při načítání plánů:', error);
+            // V případě chyby vytvoříme nové pole plánů
+            plans = [newPlan];
           }
+        } else {
+          // Pokud neexistují žádné plány, vytvoříme nové pole s tímto plánem
+          plans = [newPlan];
         }
 
-        plans.push(newPlan);
-        localStorage.setItem('plans', JSON.stringify(plans));
+        // Uložení plánů do localStorage
+        try {
+          localStorage.setItem('plans', JSON.stringify(plans));
+          console.log(`Plány úspěšně uloženy do localStorage (celkem ${plans.length} plánů)`);
+        } catch (error) {
+          console.error('Chyba při ukládání plánů do localStorage:', error);
+        }
 
         // Zobrazení panelu plánování, pokud není viditelný
         if (!isPlanningVisible) {
@@ -3138,36 +3302,164 @@ Pro přidání lokace nebo trasy k úkolu máte několik možností:
           updatedAt: new Date()
         };
 
-        // Automatické generování podúkolů, pokud plán nemá žádné podúkoly
-        if (!hasPlanSubtasks(newPlan)) {
-          console.log('Plán nemá podúkoly, generuji je automaticky');
+        // Kontrola, zda plán obsahuje smysluplné úkoly
+        const hasDefaultItems = newPlan.items.some((item: any) =>
+          item.title === 'Výlet do Prahy' ||
+          item.title === newPlan.title ||
+          item.title === 'Nový úkol'
+        );
 
-          // Generování podúkolů na základě názvu plánu
-          const subtasks = generateRelevantSubtasks(newPlan.title, newPlan.id);
+        // Kontrola, zda zpráva obsahuje klíčová slova pro specifické typy plánů
+        const lowerMessage = message.toLowerCase();
+        const lowerTitle = newPlan.title.toLowerCase();
 
-          // Přidání podúkolů do plánu
-          newPlan.items = [...newPlan.items, ...subtasks];
+        // Rozšířená detekce klíčových slov pro eshop
+        const isEshopPlan =
+          lowerMessage.includes('eshop') || lowerMessage.includes('e-shop') ||
+          lowerMessage.includes('e-commerce') || lowerMessage.includes('ecommerce') ||
+          lowerMessage.includes('online obchod') || lowerMessage.includes('internetový obchod') ||
+          lowerMessage.includes('dokončení e-') || lowerMessage.includes('dokončení e ') ||
+          lowerMessage.includes('dokončit e-') || lowerMessage.includes('dokončit e ') ||
+          lowerTitle.includes('eshop') || lowerTitle.includes('e-shop') ||
+          lowerTitle.includes('e-commerce') || lowerTitle.includes('ecommerce') ||
+          lowerTitle.includes('online obchod') || lowerTitle.includes('internetový obchod') ||
+          lowerTitle.includes('dokončení e-') || lowerTitle.includes('dokončení e ') ||
+          lowerTitle.includes('dokončit e-') || lowerTitle.includes('dokončit e ');
 
-          console.log('Plán vytvořen s automaticky generovanými podúkoly:', newPlan.items.length);
+        // Pokud plán obsahuje pouze výchozí úkoly nebo je to specifický typ plánu, generujeme relevantní úkoly
+        if ((hasDefaultItems && newPlan.items.length <= 1) || isEshopPlan) {
+          console.log('Plán obsahuje pouze výchozí úkoly nebo je specifického typu, generuji relevantní úkoly');
+
+          // Odstraníme výchozí úkoly
+          newPlan.items = [];
+
+          // Vytvoříme hlavní úkol na základě zprávy
+          const mainTaskTitle = message.length > 40 ? message.substring(0, 40) + '...' : message;
+          const mainItem = {
+            id: `${newPlan.id}-0`,
+            title: isEshopPlan ? 'Dokončení eshopu - hlavní úkol' : `Hlavní úkol: ${mainTaskTitle}`,
+            description: `Úkol vytvořený na základě zprávy: ${message}`,
+            time: '',
+            completed: false,
+            type: 'task',
+            createdAt: new Date()
+          };
+
+          // Přidáme hlavní úkol
+          newPlan.items.push(mainItem);
+
+          // Pro plány typu eshop vždy generujeme specifické podúkoly
+          if (isEshopPlan) {
+            console.log('Detekován plán typu eshop, generuji specifické podúkoly');
+
+            // Nejprve zkusíme explicitně vygenerovat podúkoly pro eshop
+            const eshopSubtasks = generateRelevantSubtasks('eshop', newPlan.id);
+
+            if (eshopSubtasks.length > 0) {
+              console.log('Úspěšně vygenerovány podúkoly pro eshop:', eshopSubtasks.length);
+              newPlan.items = [...newPlan.items, ...eshopSubtasks];
+            } else {
+              // Pokud se nepodařilo vygenerovat podúkoly pro eshop, vytvoříme je ručně
+              console.log('Nepodařilo se vygenerovat podúkoly pro eshop, vytvářím je ručně');
+
+              const manualEshopSubtasks = [
+                {
+                  id: `${newPlan.id}-1`,
+                  title: 'Dokončení designu',
+                  description: 'Finalizace UI/UX designu všech stránek eshopu',
+                  time: '',
+                  completed: false,
+                  type: 'task',
+                  createdAt: new Date()
+                },
+                {
+                  id: `${newPlan.id}-2`,
+                  title: 'Implementace košíku',
+                  description: 'Dokončení funkcionality nákupního košíku a objednávkového procesu',
+                  time: '',
+                  completed: false,
+                  type: 'task',
+                  createdAt: new Date()
+                },
+                {
+                  id: `${newPlan.id}-3`,
+                  title: 'Platební brány',
+                  description: 'Integrace platebních metod a zabezpečení transakcí',
+                  time: '',
+                  completed: false,
+                  type: 'task',
+                  createdAt: new Date()
+                },
+                {
+                  id: `${newPlan.id}-4`,
+                  title: 'Správa produktů',
+                  description: 'Dokončení administrace pro správu produktů a kategorií',
+                  time: '',
+                  completed: false,
+                  type: 'task',
+                  createdAt: new Date()
+                },
+                {
+                  id: `${newPlan.id}-5`,
+                  title: 'Testování a nasazení',
+                  description: 'Komplexní testování a nasazení do produkce',
+                  time: '',
+                  completed: false,
+                  type: 'task',
+                  createdAt: new Date()
+                }
+              ];
+
+              newPlan.items = [...newPlan.items, ...manualEshopSubtasks];
+            }
+          } else {
+            // Pro ostatní typy plánů generujeme podúkoly na základě obsahu zprávy
+            const subtasks = generateRelevantSubtasks(message, newPlan.id);
+
+            if (subtasks.length > 0) {
+              console.log('Vygenerovány podúkoly na základě obsahu zprávy:', subtasks.length);
+              // Přidání podúkolů do plánu
+              newPlan.items = [...newPlan.items, ...subtasks];
+            } else {
+              console.log('Nepodařilo se vygenerovat podúkoly na základě obsahu zprávy');
+            }
+          }
+
+          console.log('Plán vytvořen s relevantními úkoly na základě zprávy:', newPlan.items.length);
         } else {
-          console.log('Plán vytvořen s položkami:', newPlan.items.length);
+          console.log('Plán vytvořen s položkami z API:', newPlan.items.length);
         }
 
-        // Uložení plánu do localStorage
+        // Uložení plánu do localStorage s kontrolou duplicit
         const savedPlans = localStorage.getItem('plans');
         let plans = [];
 
         if (savedPlans) {
           try {
             plans = JSON.parse(savedPlans);
+
+            // Kontrola, zda plán s tímto ID již neexistuje
+            const existingPlanIndex = plans.findIndex((p: any) => p.id === newPlan.id);
+            if (existingPlanIndex !== -1) {
+              console.log(`Plán s ID ${newPlan.id} již existuje, aktualizuji ho`);
+              plans[existingPlanIndex] = newPlan;
+            } else {
+              // Přidání nového plánu
+              plans.push(newPlan);
+            }
           } catch (error) {
             console.error('Chyba při načítání plánů:', error);
+            // V případě chyby vytvoříme nové pole plánů
+            plans = [newPlan];
           }
+        } else {
+          // Pokud neexistují žádné plány, vytvoříme nové pole s tímto plánem
+          plans = [newPlan];
         }
 
-        // Přidání nového plánu do seznamu plánů
-        const updatedPlans = [...plans, newPlan];
-        console.log('Aktualizovaný seznam plánů po přidání nového plánu:', updatedPlans.map(p => ({ id: p.id, title: p.title })));
+        // Použijeme již aktualizovaný seznam plánů
+        const updatedPlans = plans;
+        console.log('Aktualizovaný seznam plánů:', updatedPlans.map((p: any) => ({ id: p.id, title: p.title })));
 
         try {
           // Převedení objektů Date na ISO string pro správné uložení do localStorage
