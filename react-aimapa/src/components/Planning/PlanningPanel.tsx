@@ -177,7 +177,16 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
       setPlans(prevPlans => {
         console.log('Aktualizace stavu plánů - předchozí plány:',
           prevPlans.map(p => ({ id: p.id, title: p.title })));
-        return [...formattedPlans];
+
+        // Výpis všech plánů, které budou nastaveny
+        console.log('Nastavuji nové plány:',
+          formattedPlans.map(p => ({ id: p.id, title: p.title })));
+
+        // Vytvoření zcela nového pole plánů
+        const newPlans = [...formattedPlans];
+        console.log(`Počet plánů po aktualizaci: ${newPlans.length}`);
+
+        return newPlans;
       });
 
       // Pokud není aktivní plán nebo byl vytvořen nový plán, nastavíme nejnovější jako aktivní
@@ -248,7 +257,14 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
   // Načtení plánů při prvním renderování
   useEffect(() => {
+    console.log('PlanningPanel - useEffect pro načtení plánů');
     loadPlansFromStorage();
+
+    // Vynucené načtení plánů po 500ms pro zajištění, že všechny plány budou načteny
+    setTimeout(() => {
+      console.log('Vynucené načtení plánů po 500ms');
+      forceRefreshPlans();
+    }, 500);
 
     // Načtení chat sessions pro každý plán
     const loadChatSessionsForPlans = () => {
@@ -1016,6 +1032,47 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
     }
   }, [plans]);
 
+  // Funkce pro vynucené načtení plánů z localStorage
+  const forceRefreshPlans = () => {
+    console.log('Vynucené načtení plánů z localStorage');
+
+    // Načtení aktuálních plánů z localStorage
+    const savedPlans = localStorage.getItem('plans');
+    if (!savedPlans) {
+      console.log('Žádné plány nebyly nalezeny v localStorage při vynuceném načtení');
+      return;
+    }
+
+    try {
+      const parsedPlans = JSON.parse(savedPlans);
+
+      // Výpis všech načtených plánů pro debugging
+      console.log(`Načteno ${parsedPlans.length} plánů z localStorage při vynuceném načtení:`);
+      parsedPlans.forEach((plan: Plan, index: number) => {
+        console.log(`Plán ${index + 1}/${parsedPlans.length}: ID=${plan.id}, Název=${plan.title}`);
+      });
+
+      // Formátování plánů - převod řetězců na objekty Date
+      const formattedPlans = parsedPlans.map((plan: any) => ({
+        ...plan,
+        createdAt: plan.createdAt ? new Date(plan.createdAt) : new Date(),
+        updatedAt: plan.updatedAt ? new Date(plan.updatedAt) : new Date(),
+      }));
+
+      // Aktualizace stavu s novým polem plánů
+      setPlans([...formattedPlans]);
+
+      // Pokud nemáme aktivní plán a máme plány, nastavíme první jako aktivní
+      if (!activePlan && formattedPlans.length > 0) {
+        setActivePlan({...formattedPlans[0]});
+      }
+
+      console.log('Stav plánů byl aktualizován po vynuceném načtení');
+    } catch (error) {
+      console.error('Chyba při vynuceném načtení plánů:', error);
+    }
+  };
+
   // Efekt pro poslouchání události refreshUI
   useEffect(() => {
     const handleRefreshUI = (event: CustomEvent) => {
@@ -1257,9 +1314,18 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
     setPlans(prevPlans => {
       console.log('Aktualizace stavu plánů po vytvoření nového plánu - předchozí plány:',
         prevPlans.map(p => ({ id: p.id, title: p.title })));
-      return updatedPlans;
+
+      // Výpis všech plánů, které budou nastaveny
+      console.log('Nastavuji nové plány po vytvoření nového plánu:',
+        updatedPlans.map(p => ({ id: p.id, title: p.title })));
+
+      // Vytvoření zcela nového pole plánů
+      const newPlans = [...updatedPlans];
+      console.log(`Počet plánů po vytvoření nového plánu: ${newPlans.length}`);
+
+      return newPlans;
     });
-    setActivePlan(newPlan);
+    setActivePlan({...newPlan});
     setNewPlanTitle('');
     setShowNewPlanForm(false);
 
@@ -1316,8 +1382,22 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
         p.id === newPlanId ? planWithItem : p
       );
 
-      setPlans(plansWithItem);
-      setActivePlan(planWithItem);
+      // Aktualizace všech plánů, ne jen aktivního
+      setPlans(prevPlans => {
+        console.log('Aktualizace stavu plánů po přidání automatické lokace - předchozí plány:',
+          prevPlans.map(p => ({ id: p.id, title: p.title })));
+
+        // Výpis všech plánů, které budou nastaveny
+        console.log('Nastavuji nové plány po přidání automatické lokace:',
+          plansWithItem.map(p => ({ id: p.id, title: p.title })));
+
+        // Vytvoření zcela nového pole plánů
+        const newPlans = [...plansWithItem];
+        console.log(`Počet plánů po přidání automatické lokace: ${newPlans.length}`);
+
+        return newPlans;
+      });
+      setActivePlan({...planWithItem});
 
       // Pokud nemáme adresu bydliště, použijeme AI pro přidání lokace
       if (!homeAddress) {
@@ -1435,8 +1515,22 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
           p.id === planId ? planWithActiveItem : p
         );
 
-        setPlans(plansWithActiveItem);
-        setActivePlan(planWithActiveItem);
+        // Aktualizace všech plánů, ne jen aktivního
+        setPlans(prevPlans => {
+          console.log('Aktualizace stavu plánů po označení položky jako dokončené - předchozí plány:',
+            prevPlans.map(p => ({ id: p.id, title: p.title })));
+
+          // Výpis všech plánů, které budou nastaveny
+          console.log('Nastavuji nové plány po označení položky jako dokončené:',
+            plansWithActiveItem.map(p => ({ id: p.id, title: p.title })));
+
+          // Vytvoření zcela nového pole plánů
+          const newPlans = [...plansWithActiveItem];
+          console.log(`Počet plánů po označení položky jako dokončené: ${newPlans.length}`);
+
+          return newPlans;
+        });
+        setActivePlan({...planWithActiveItem});
 
         // Zobrazíme položku na mapě
         if (nextItem.type === 'location' && nextItem.location) {
@@ -1480,8 +1574,22 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
                 p.id === nextPlan.id ? nextPlanWithActiveItem : p
               );
 
-              setPlans(plansWithActiveItem);
-              setActivePlan(nextPlanWithActiveItem);
+              // Aktualizace všech plánů, ne jen aktivního
+              setPlans(prevPlans => {
+                console.log('Aktualizace stavu plánů po přepnutí na další plán - předchozí plány:',
+                  prevPlans.map(p => ({ id: p.id, title: p.title })));
+
+                // Výpis všech plánů, které budou nastaveny
+                console.log('Nastavuji nové plány po přepnutí na další plán:',
+                  plansWithActiveItem.map(p => ({ id: p.id, title: p.title })));
+
+                // Vytvoření zcela nového pole plánů
+                const newPlans = [...plansWithActiveItem];
+                console.log(`Počet plánů po přepnutí na další plán: ${newPlans.length}`);
+
+                return newPlans;
+              });
+              setActivePlan({...nextPlanWithActiveItem});
 
               // Zobrazíme položku na mapě
               if (firstIncompleteItem.type === 'location' && firstIncompleteItem.location) {
@@ -1624,9 +1732,25 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
     setPlans(prevPlans => {
       console.log('Aktualizace stavu plánů po výběru položky - předchozí plány:',
         prevPlans.map(p => ({ id: p.id, title: p.title })));
-      return updatedPlans;
+
+      // Výpis všech plánů, které budou nastaveny
+      console.log('Nastavuji nové plány po výběru položky:',
+        updatedPlans.map(p => ({ id: p.id, title: p.title })));
+
+      // Vytvoření zcela nového pole plánů
+      const newPlans = [...updatedPlans];
+      console.log(`Počet plánů po výběru položky: ${newPlans.length}`);
+
+      return newPlans;
     });
-    setActivePlan(updatedPlans.find(p => p.id === planId) || null);
+
+    // Najdeme aktualizovaný plán a nastavíme ho jako aktivní
+    const updatedActivePlan = updatedPlans.find(p => p.id === planId);
+    if (updatedActivePlan) {
+      setActivePlan({...updatedActivePlan});
+    } else {
+      console.warn(`Plán s ID ${planId} nebyl nalezen při výběru položky`);
+    }
 
     // Zobrazení položky na mapě s vylepšeným zaměřením
     if (item.type === 'location' && item.location) {
@@ -2524,8 +2648,9 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
               p.id === planId ? planWithActiveItem : p
             );
 
-            setPlans(plansWithActiveItem);
-            setActivePlan(planWithActiveItem);
+            // Aktualizace všech plánů, ne jen aktivního
+            setPlans([...plansWithActiveItem]);
+            setActivePlan({...planWithActiveItem});
           }
         } else if (updatedItem.type === 'route' && updatedItem.route) {
           console.log('Zobrazuji trasu na mapě po úpravě:', updatedItem.route);
@@ -2545,8 +2670,9 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
               p.id === planId ? planWithActiveItem : p
             );
 
-            setPlans(plansWithActiveItem);
-            setActivePlan(planWithActiveItem);
+            // Aktualizace všech plánů, ne jen aktivního
+            setPlans([...plansWithActiveItem]);
+            setActivePlan({...planWithActiveItem});
           }
         }
       }
@@ -2582,17 +2708,27 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
       <div className="plan-selector">
         <div className="plan-list-header">
-          <h3>Seznam plánů</h3>
-          {plans.length > 0 && (
+          <h3>Seznam plánů ({plans.length})</h3>
+          <div className="plan-list-actions">
             <button
-              className="remove-all-plans-button"
-              onClick={handleRemoveAllPlans}
-              title="Odstranit všechna plány"
+              className="refresh-plans-button"
+              onClick={forceRefreshPlans}
+              title="Obnovit seznam plánů"
             >
-              <i className="fas fa-trash-alt"></i>
-              <span>Odstranit vše</span>
+              <i className="fas fa-sync-alt"></i>
+              <span>Obnovit</span>
             </button>
-          )}
+            {plans.length > 0 && (
+              <button
+                className="remove-all-plans-button"
+                onClick={handleRemoveAllPlans}
+                title="Odstranit všechna plány"
+              >
+                <i className="fas fa-trash-alt"></i>
+                <span>Odstranit vše</span>
+              </button>
+            )}
+          </div>
         </div>
         <div className="plan-list-content">
           {/* Pokud nejsou žádná plány, zobrazíme informaci */}

@@ -129,6 +129,36 @@
   margin: 0;
 }
 
+.plan-list-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.refresh-plans-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.refresh-plans-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.refresh-plans-button i {
+  font-size: 0.9rem;
+}
+
 .remove-all-plans-button {
   background-color: #e74c3c;
   color: white;
