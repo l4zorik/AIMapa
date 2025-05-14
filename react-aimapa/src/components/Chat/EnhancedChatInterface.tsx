@@ -515,9 +515,8 @@ const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
                     aria-label="Vytvořit podobný plán"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '6px' }}>
-                      <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor" />
+                      <path d="M19 13H14.82C14.4 11.84 13.3 11 12 11C10.7 11 9.6 11.84 9.18 13H5C3.9 13 3 13.9 3 15V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V15C21 13.9 20.1 13 19 13ZM12 15C12.55 15 13 15.45 13 16C13 16.55 12.55 17 12 17C11.45 17 11 16.55 11 16C11 15.45 11.45 15 12 15ZM14 17H7V15H14V17ZM17 13H7V11H17V13ZM17 9H7V7H17V9Z" fill="currentColor" />
                     </svg>
-                    Vytvořit podobný plán
                   </button>
                 </div>
               )}
@@ -560,7 +559,14 @@ const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
               if (messages.length > 0) {
                 const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
                 if (lastUserMessage) {
-                  handleCreatePlanFromChat(lastUserMessage.content);
+                  // Vyvolání události pro vytvoření plánu z chatu
+                  const createPlanEvent = new CustomEvent('createPlanFromChat', {
+                    detail: {
+                      query: lastUserMessage.content,
+                      source: 'chat'
+                    }
+                  });
+                  window.dispatchEvent(createPlanEvent);
                 }
               }
             }}

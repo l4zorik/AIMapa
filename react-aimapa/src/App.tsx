@@ -16,6 +16,18 @@ import SubscriptionPage from './pages/SubscriptionPage';
 import TimelinePage from './pages/TimelinePage';
 import './App.css';
 
+// Import routingService a konfigurace
+import routingService from './services/RoutingService';
+import { MAP_CONFIG } from './config/mapConfig';
+
+// Inicializace routingService s API klíčem
+if (MAP_CONFIG.openRouteService.apiKey) {
+  routingService.setApiKey(MAP_CONFIG.openRouteService.apiKey);
+  console.log('OpenRouteService API key initialized');
+} else {
+  console.warn('OpenRouteService API key is missing. Some features might not work.');
+}
+
 // Komponenty stránek
 const HomePage: React.FC = () => (
   <div className="page home-page">

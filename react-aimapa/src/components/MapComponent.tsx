@@ -10,14 +10,22 @@ import PlanPathAnimation from './Map/PlanPathAnimation';
 import { Plan, PlanItem } from './Planning/PlanningPanel';
 import EnhancedMarkers from './Map/EnhancedMarkers';
 
+// Oprava Leaflet ikon
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
+
 // Definice typů pro markery a trasy
-interface Marker {
+export interface Marker {
   lat: number;
   lng: number;
   name?: string;
 }
 
-interface Route {
+export interface Route {
   start: Marker;
   end: Marker;
   waypoints?: Marker[];
@@ -27,7 +35,7 @@ interface Route {
 }
 
 // Definice typů pro poskytovatele map
-type MapProviderType = 'openstreetmap' | 'mapycz' | 'google' | 'mapbox';
+export type MapProviderType = 'openstreetmap' | 'mapycz' | 'google' | 'mapbox';
 
 interface MapProvider {
   id: MapProviderType;
@@ -51,9 +59,9 @@ declare global {
 interface MapComponentProps {
   center?: [number, number];
   zoom?: number;
-  provider?: string;
+  provider?: MapProviderType;
   markers?: Marker[];
-  route?: Route | null;
+  route?: Route;
   planItems?: PlanItem[]; // Přidáno: Položky plánu pro zobrazení na mapě
   apiKey?: string | null; // Přidáno: API klíč pro mapové služby
   onMarkerClick?: (marker: Marker) => void;
@@ -67,7 +75,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   zoom = 13,
   provider = 'openstreetmap',
   markers = [],
-  route = null,
+  route,
   planItems = [], // Přidáno: Položky plánu
   apiKey = null, // Přidáno: API klíč
   onMarkerClick,

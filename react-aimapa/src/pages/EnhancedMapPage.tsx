@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { ApiKey } from '../components/ApiKeys/EnhancedApiKeyManager';
 import EnhancedApiKeyManager from '../components/ApiKeys/EnhancedApiKeyManager';
 import EnhancedChatInterface from '../components/Chat/EnhancedChatInterface';
-import MapComponent from '../components/MapComponent';
+import MapComponent, { MapProviderType, Route } from '../components/MapComponent';
 import GlobeComponent from '../components/GlobeComponent';
-import PlanningPanel, { PlanItem } from '../components/Planning/PlanningPanel';
+import PlanningPanel, { PlanItem, Plan } from '../components/Planning/PlanningPanel';
 import EnhancedTaskInfoPanel from '../components/Map/EnhancedTaskInfoPanel';
 import TestRunner from '../components/Testing/TestRunner';
 import simpleGeminiService from '../services/SimpleGeminiService';
@@ -33,14 +33,10 @@ const EnhancedMapPage: React.FC = () => {
   // Stav pro mapu
   const [mapCenter, setMapCenter] = useState<[number, number]>([50.0755, 14.4378]); // Praha
   const [mapZoom, setMapZoom] = useState<number>(13);
-  const [mapProvider, setMapProvider] = useState<string>('google');
+  const [mapProvider, setMapProvider] = useState<MapProviderType>('google');
   const [markers, setMarkers] = useState<Array<{ lat: number; lng: number; name?: string }>>([]);
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number; name?: string } | null>(null);
-  const [route, setRoute] = useState<{
-    start: { lat: number; lng: number; name?: string };
-    end: { lat: number; lng: number; name?: string };
-    waypoints?: Array<{ lat: number; lng: number; name?: string }>;
-  } | null>(null);
+  const [route, setRoute] = useState<Route | undefined>(undefined);
   const [selectedRoute, setSelectedRoute] = useState<boolean>(false);
   const [planItems, setPlanItems] = useState<PlanItem[]>([]);
   const [plans, setPlans] = useState<Array<any>>([]);
@@ -387,7 +383,7 @@ const EnhancedMapPage: React.FC = () => {
     setMapCenter([location.lat, location.lng]);
     setMapZoom(15);
     setMarkers([location]);
-    setRoute(null);
+    setRoute(undefined);
     setSelectedLocation(location);
     setSelectedRoute(false);
 
@@ -493,7 +489,7 @@ const EnhancedMapPage: React.FC = () => {
 
   // Zpracování změny poskytovatele mapy
   const handleMapProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setMapProvider(e.target.value);
+    setMapProvider(e.target.value as MapProviderType);
   };
 
   // Funkce pro výběr API klíče
@@ -1719,31 +1715,37 @@ Pro přidání lokace nebo trasy k úkolu máte několik možností:
         // Použijeme celý název úkolu jako název plánu bez zkracování
         const planTitle = response.taskTitle;
 
-        // Vytvoření nového plánu
-        const newPlan: any = {
-          id: newPlanId,
-          title: `Plán: ${planTitle}`,
-          description: `Plán vytvořený pro úkol: ${response.taskTitle}`,
-          items: [],
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-
-        // Vytvoření nového hlavního úkolu
-        const mainItemId = `${newPlanId}-0`;
-        const mainItem: any = {
-          id: mainItemId,
+        // Vytvoření hlavního úkolu
+        const mainItem = {
+          id: `${newPlanId}-0`,
           title: response.taskTitle,
-          description: response.taskDescription || '',
+          description: response.taskDescription || `Úkol: ${response.taskTitle}`,
           time: '',
           completed: false,
           type: 'task',
           createdAt: new Date()
         };
 
-        // Přidání úkolu do plánu
-        newPlan.items.push(mainItem);
-        console.log('Přidán hlavní úkol do plánu:', mainItem);
+        // Vytvoření nového plánu
+        const newPlan: any = {
+          id: newPlanId,
+          title: `Plán: ${planTitle}`,
+          description: `Plán vytvořený pro úkol: ${response.taskTitle}`,
+          items: [mainItem],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        // Generování relevantních podúkolů na základě obsahu zprávy
+        const subtasks = generateRelevantSubtasks(message, newPlanId);
+        console.log('Vygenerované podúkoly pro plán na základě zprávy:', subtasks);
+
+        // Přidání podúkolů do plánu
+        if (subtasks.length > 0) {
+          newPlan.items = [...newPlan.items, ...subtasks];
+        }
+
+        console.log('Plán vytvořen s podúkoly:', newPlan.items.length);
 
         // Uložení plánu do localStorage
         plans.push(newPlan);
@@ -3763,7 +3765,7 @@ Zkontrolujte, zda jste zadali správné ID úkolu. Můžete použít příkaz "s
           </button>
 
           <button
-            className="chat-toggle-button"
+            className={`chat-toggle-button ${isChatVisible ? 'hide-chat' : ''}`}
             onClick={() => {
               setIsChatVisible(!isChatVisible);
               // Vynucení překreslení mapy po změně viditelnosti chatu

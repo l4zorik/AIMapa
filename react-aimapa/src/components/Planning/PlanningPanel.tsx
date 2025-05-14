@@ -7,6 +7,7 @@ import geocodingService from '../../services/GeocodingService';
 import taskLocationService from '../../services/TaskLocationService';
 import userSettingsService, { HomeAddress } from '../../services/UserSettingsService';
 import chatSessionService from '../../services/ChatSessionService';
+import { ChatSession } from '../../models/ChatSession';
 import LocationSelector from '../Location/LocationSelector';
 import AutoLocationAssigner from './AutoLocationAssigner';
 import LocationAssignmentTester from './LocationAssignmentTester';
@@ -309,6 +310,38 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
   const [showLocationAssignmentTester, setShowLocationAssignmentTester] = useState<boolean>(false);
   const [planChatSessions, setPlanChatSessions] = useState<{ [planId: string]: string[] }>({}); // Mapování plánů na chat sessions
 
+  // Definice typů pro události
+  interface CreatePlanFromChatEvent extends CustomEvent {
+    detail: {
+      query: string;
+      source: string;
+    };
+  }
+
+  interface MarkerPositionUpdatedEvent extends CustomEvent {
+    detail: {
+      originalMarker: { lat: number; lng: number };
+      updatedMarker: { lat: number; lng: number };
+    };
+  }
+
+  interface PlansUpdatedEvent extends CustomEvent {
+    detail: {
+      action: 'create' | 'update' | 'delete' | 'refresh';
+      planId?: string;
+      source?: string;
+      setActive?: boolean;
+    };
+  }
+
+  interface LocationRemovedFromTaskEvent extends CustomEvent {
+    detail: {
+      taskId: string;
+      location: { lat: number; lng: number };
+      forceRefresh?: boolean;
+    };
+  }
+
   // Funkce pro načtení plánů z localStorage
   const loadPlansFromStorage = () => {
     const savedPlans = localStorage.getItem('plans');
@@ -440,7 +473,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
       const chatHistory = chatSessionService.getChatHistory();
       const sessionsMap: { [planId: string]: string[] } = {};
 
-      // Procházíme všechny sessions a hledáme plány
+      // Procházíme všechna sessions a hledáme plány
       chatHistory.sessions.forEach(session => {
         if (session.metadata?.planIds && session.metadata.planIds.length > 0) {
           // Pro každý plán v session přidáme session do mapy
@@ -463,10 +496,10 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
   // Efekt pro poslouchání události aktualizace polohy markeru
   useEffect(() => {
-    const handleMarkerPositionUpdated = (event: CustomEvent) => {
+    const handleMarkerPositionUpdated = (event: MarkerPositionUpdatedEvent) => {
       const { originalMarker, updatedMarker } = event.detail;
 
-      // Najdeme všechny úkoly, které mají tuto lokaci
+      // Najdeme všechna úkoly, které mají tuto lokaci
       if (activePlan) {
         let planUpdated = false;
 
@@ -600,8 +633,6 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
     };
   }, [activePlan, plans]);
 
-  // Efekt pro pravidelnou kontrolu nových plánů - odstraněno, protože způsobuje problémy s přepínáním
-
   // Efekt pro poslouchání události aktualizace plánu
   useEffect(() => {
     // Funkce pro zpracování události aktualizace plánu
@@ -655,7 +686,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
   // Efekt pro poslouchání události odstranění lokace z úkolu
   useEffect(() => {
     // Funkce pro zpracování události odstranění lokace z úkolu
-    const handleLocationRemovedFromTask = (event: CustomEvent) => {
+    const handleLocationRemovedFromTask = (event: LocationRemovedFromTaskEvent) => {
       const { taskId, location, forceRefresh } = event.detail;
       console.log('Zachycena událost locationRemovedFromTask:', { taskId, location, forceRefresh });
 
@@ -670,13 +701,13 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
       const task = activePlan.items[taskIndex];
 
-      // Ověříme, že úkol má lokaci a že se jedná o stejnou lokaci
+      // Ověříme, zda úkol má lokaci a že se jedná o stejnou lokaci
       if (task.type !== 'location' || !task.location) {
         console.error('Úkol nemá lokaci:', task);
         return;
       }
 
-      // Ověříme, že se jedná o stejnou lokaci
+      // Ověříme, zda se jedná o stejnou lokaci
       const isSameLocation =
         Math.abs(task.location.lat - location.lat) < 0.0001 &&
         Math.abs(task.location.lng - location.lng) < 0.0001;
@@ -721,13 +752,9 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
       console.log('Vytvořen nový objekt plánu:', updatedPlan);
 
       // Vytvoříme zcela nové pole plánů
-      const updatedPlans = plans.map(p => {
-        if (p.id === activePlan.id) {
-          return updatedPlan;
-        }
-        // Pro ostatní plány vytvoříme kopie
-        return { ...p };
-      });
+      const updatedPlans = plans.map(p =>
+        p.id === activePlan.id ? updatedPlan : p
+      );
 
       console.log('Aktualizovaný plán po odstranění lokace:', updatedPlan);
 
@@ -790,7 +817,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
       window.dispatchEvent(planUpdatedEvent);
 
       // Vyvoláme ještě jednu událost pro aktualizaci zobrazení úkolu
-      // Použijeme delší timeout, aby se stihly zpracovat všechny změny
+      // Použijeme delší timeout, aby se stihly zpracovat všechna změny
       setTimeout(() => {
         // Nejprve načteme aktuální plány z localStorage
         const savedPlans = localStorage.getItem('plans');
@@ -856,9 +883,9 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
   // Efekt pro poslouchání události aktualizace seznamu plánů
   useEffect(() => {
     // Funkce pro zpracování události aktualizace seznamu plánů
-    const handlePlansUpdated = (event: CustomEvent) => {
+    const handlePlansUpdated = (event: PlansUpdatedEvent) => {
       console.log('Zachycena událost plansUpdated:', event.detail);
-      const { action, planId, source } = event.detail;
+      const { action, planId, source, setActive } = event.detail;
 
       // Načtení aktuálních plánů z localStorage
       const savedPlans = localStorage.getItem('plans');
@@ -918,27 +945,10 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
   // Efekt pro poslouchání události vytvoření plánu z chatu
   useEffect(() => {
     // Funkce pro zpracování události vytvoření plánu z chatu
-    const handleCreatePlanFromChat = async (event: CustomEvent) => {
+    const handleCreatePlanFromChat = (event: CreatePlanFromChatEvent) => {
       const { query, source } = event.detail;
 
       console.log(`Vytvářím plán z chatu: "${query}" (zdroj: ${source})`);
-
-      // Uložení aktuálního aktivního plánu, abychom ho mohli obnovit po vytvoření nového plánu
-      const currentActivePlan = activePlan;
-      console.log('Aktuální aktivní plán před vytvořením nového:', currentActivePlan?.title);
-
-      // Import geolocationService
-      const geolocationService = (await import('../../services/GeolocationService')).default;
-
-      // Získání aktuální polohy uživatele
-      let userLocation = null;
-      try {
-        const position = await geolocationService.getCurrentPosition();
-        userLocation = geolocationService.positionToLocation(position, 'Moje aktuální poloha');
-        console.log('Získána aktuální poloha uživatele:', userLocation);
-      } catch (error) {
-        console.error('Nepodařilo se získat polohu uživatele:', error);
-      }
 
       // Vytvoření nového plánu s automatickým názvem odvozeným z dotazu
       const planTitle = query.length > 30
@@ -947,407 +957,82 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
       // Vytvoření nového plánu
       const newPlanId = Date.now().toString();
+
+      // Přidání hlavního úkolu do plánu
+      const mainItem = {
+        id: `${newPlanId}-0`,
+        title: planTitle,
+        description: `Hlavní úkol pro ${planTitle}`,
+        time: '',
+        completed: false,
+        type: 'task',
+        createdAt: new Date()
+      };
+
+      // Generování relevantních podúkolů na základě názvu hlavního úkolu
+      const subTasks = generateRelevantSubtasks(planTitle, newPlanId);
+      console.log('Vygenerované podúkoly pro nový plán z chatu:', subTasks);
+
       const newPlan: Plan = {
         id: newPlanId,
         title: planTitle,
-        items: [],
+        items: [mainItem, ...subTasks],
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
-      // Přidání prvního úkolu s aktuální polohou uživatele, pokud je k dispozici
-      if (userLocation) {
-        const startItem: PlanItem = {
-          id: uuidv4(),
-          title: 'Začátek plánu - Moje aktuální poloha',
-          description: 'Automaticky přidaná položka s vaší aktuální polohou',
-          time: new Date().toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }),
-          type: 'location',
-          completed: false,
-          location: userLocation
-        };
+      console.log('Vytvořen nový plán z chatu s podúkoly:', newPlan);
 
-        // Přidání položky do plánu
-        newPlan.items.push(startItem);
-        console.log('Přidána položka s aktuální polohou uživatele:', startItem);
-      }
-
-      // Načtení aktuálních plánů z localStorage, abychom měli jistotu, že pracujeme s aktuálními daty
+      // Načtení aktuálních plánů z localStorage
       const savedPlans = localStorage.getItem('plans');
       let currentPlans = [];
 
       if (savedPlans) {
         try {
           currentPlans = JSON.parse(savedPlans);
-          console.log('Načtené aktuální plány z localStorage před přidáním nového plánu:',
-            currentPlans.map((p: Plan) => ({ id: p.id, title: p.title })));
         } catch (error) {
           console.error('Chyba při načítání plánů z localStorage:', error);
         }
       }
 
-      // Přidání plánu do seznamu - důležité je vytvořit nové pole
+      // Přidání plánu do seznamu
       const updatedPlans = [...currentPlans, newPlan];
-      console.log('Aktualizovaný seznam plánů po přidání nového plánu:',
-        updatedPlans.map((p: Plan) => ({ id: p.id, title: p.title })));
 
-      // Okamžitá aktualizace localStorage pro zajištění persistence
-      localStorage.setItem('plans', JSON.stringify(updatedPlans));
+      // Aktualizace localStorage
+      try {
+        // Převedení objektů Date na ISO string pro správné uložení do localStorage
+        const plansToSave = updatedPlans.map((plan: any) => ({
+          ...plan,
+          createdAt: plan.createdAt instanceof Date ? plan.createdAt.toISOString() : plan.createdAt,
+          updatedAt: plan.updatedAt instanceof Date ? plan.updatedAt.toISOString() : plan.updatedAt,
+          items: plan.items.map((item: any) => ({
+            ...item,
+            createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : item.createdAt
+          }))
+        }));
 
-      // Aktualizace stavu s novým polem plánů - použijeme funkci, která nezávisí na aktuálním stavu
-      setPlans(prevPlans => {
-        console.log('Aktualizace stavu plánů - předchozí plány:', prevPlans.map(p => ({ id: p.id, title: p.title })));
-        return updatedPlans;
-      });
+        localStorage.setItem('plans', JSON.stringify(plansToSave));
+        console.log('Plán s podúkoly byl úspěšně uložen do localStorage');
+      } catch (error) {
+        console.error('Chyba při ukládání plánu do localStorage:', error);
+      }
 
-      // Dočasně nastavíme aktivní plán na nový plán, ale později ho obnovíme
+      // Aktualizace stavu
+      setPlans(updatedPlans);
       setActivePlan(newPlan);
 
-      // Logování pro debugging
-      console.log('Plán vytvořen z chatu:', newPlan);
-      console.log('Aktualizovaný seznam plánů:', updatedPlans);
-
-      // Automatické přidání úkolů na základě dotazu
-      // Použijeme async/await místo setTimeout pro lepší kontrolu
-      (async () => {
-        // Simulace přidání úkolů na základě dotazu
-        const newItems: Omit<PlanItem, 'id'>[] = [];
-
-        // Detekce klíčových slov v dotazu
-        const pragueMention = query.match(/prah[auy]|prague/i);
-        const brnoMention = query.match(/brn[oau]/i);
-        const ostravaMention = query.match(/ostrav[auy]/i);
-        const plzenMention = query.match(/plz[eě]ň|pilsen/i);
-
-        // Přidání lokací na základě detekovaných míst
-        if (pragueMention) {
-          newItems.push({
-            title: 'Navštívit Prahu',
-            description: 'Prohlídka hlavního města',
-            time: '10:00',
-            completed: false,
-            type: 'location',
-            location: {
-              lat: 50.0755,
-              lng: 14.4378,
-              name: 'Praha'
-            }
-          });
+      // Vyvolání události pro aktualizaci UI
+      const plansUpdatedEvent = new CustomEvent('plansUpdated', {
+        detail: {
+          action: 'create',
+          planId: newPlanId,
+          source: 'chat',
+          setActive: true
         }
+      });
+      window.dispatchEvent(plansUpdatedEvent);
 
-        if (brnoMention) {
-          newItems.push({
-            title: 'Navštívit Brno',
-            description: 'Prohlídka druhého největšího města',
-            time: '14:00',
-            completed: false,
-            type: 'location',
-            location: {
-              lat: 49.1951,
-              lng: 16.6068,
-              name: 'Brno'
-            }
-          });
-        }
-
-        if (ostravaMention) {
-          newItems.push({
-            title: 'Navštívit Ostravu',
-            description: 'Prohlídka třetího největšího města',
-            time: '16:00',
-            completed: false,
-            type: 'location',
-            location: {
-              lat: 49.8209,
-              lng: 18.2625,
-              name: 'Ostrava'
-            }
-          });
-        }
-
-        if (plzenMention) {
-          newItems.push({
-            title: 'Navštívit Plzeň',
-            description: 'Prohlídka města piva',
-            time: '12:00',
-            completed: false,
-            type: 'location',
-            location: {
-              lat: 49.7384,
-              lng: 13.3736,
-              name: 'Plzeň'
-            }
-          });
-        }
-
-        // Pokud byla detekována dvě města, přidáme trasu mezi nimi
-        // Nejprve vytvoříme základní trasy
-        const routesToAdd = [];
-
-        if (pragueMention && brnoMention) {
-          routesToAdd.push({
-            title: 'Cesta z Prahy do Brna',
-            description: 'Trasa mezi městy',
-            time: '12:00',
-            start: {
-              lat: 50.0755,
-              lng: 14.4378,
-              name: 'Praha'
-            },
-            end: {
-              lat: 49.1951,
-              lng: 16.6068,
-              name: 'Brno'
-            }
-          });
-        } else if (pragueMention && ostravaMention) {
-          routesToAdd.push({
-            title: 'Cesta z Prahy do Ostravy',
-            description: 'Trasa mezi městy',
-            time: '15:00',
-            start: {
-              lat: 50.0755,
-              lng: 14.4378,
-              name: 'Praha'
-            },
-            end: {
-              lat: 49.8209,
-              lng: 18.2625,
-              name: 'Ostrava'
-            }
-          });
-        } else if (pragueMention && plzenMention) {
-          routesToAdd.push({
-            title: 'Cesta z Prahy do Plzně',
-            description: 'Trasa mezi městy',
-            time: '11:00',
-            start: {
-              lat: 50.0755,
-              lng: 14.4378,
-              name: 'Praha'
-            },
-            end: {
-              lat: 49.7384,
-              lng: 13.3736,
-              name: 'Plzeň'
-            }
-          });
-        }
-
-        // Nyní pro každou trasu získáme geometrii pomocí routingService
-        for (const routeInfo of routesToAdd) {
-          try {
-            // Pokud nemáme API klíč, nastavíme testovací
-            if (!routingService.getApiKey()) {
-              routingService.setApiKey('5b3ce3597851110001cf6248f8f3f5e5a0a94a5c8e9e7e7e9e7e7e9e');
-            }
-
-            // Získání trasy
-            const routeResult = await routingService.getRoute(routeInfo.start, routeInfo.end);
-
-            // Přidání trasy s geometrií
-            newItems.push({
-              title: routeInfo.title,
-              description: routeInfo.description,
-              time: routeInfo.time,
-              completed: false,
-              type: 'route',
-              route: {
-                start: routeInfo.start,
-                end: routeInfo.end,
-                geometry: routeResult.geometry,
-                distance: routeResult.distance,
-                duration: routeResult.duration
-              }
-            });
-          } catch (error) {
-            console.error(`Chyba při získávání trasy z ${routeInfo.start.name} do ${routeInfo.end.name}:`, error);
-
-            // V případě chyby přidáme základní trasu bez geometrie
-            newItems.push({
-              title: routeInfo.title,
-              description: `${routeInfo.description} (bez detailní trasy)`,
-              time: routeInfo.time,
-              completed: false,
-              type: 'route',
-              route: {
-                start: routeInfo.start,
-                end: routeInfo.end
-              }
-            });
-          }
-        }
-
-        // Přidání úkolů do plánu
-        if (newItems.length > 0) {
-          // Přidání ID k položkám
-          const itemsWithIds = newItems.map(item => ({
-            ...item,
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-          }));
-
-          // Aktualizace plánu
-          const updatedPlan = {
-            ...newPlan,
-            items: itemsWithIds,
-            updatedAt: new Date()
-          };
-
-          // Aktualizace plánu v seznamu plánů
-          // Nejprve odstraníme původní plán a pak přidáme aktualizovaný
-          const filteredPlans = plans.filter(p => p.id !== newPlanId);
-          const finalPlans = [...filteredPlans, updatedPlan];
-
-          // Aktualizace plánů v localStorage pro okamžité zobrazení
-          localStorage.setItem('plans', JSON.stringify(finalPlans));
-
-          // Aktualizace stavu - použijeme funkci, která nezávisí na aktuálním stavu
-          setPlans(prevPlans => {
-            console.log('Aktualizace stavu plánů po přidání položek - předchozí plány:',
-              prevPlans.map(p => ({ id: p.id, title: p.title })));
-            return [...finalPlans];
-          });
-
-          // Nastavení aktivního plánu
-          setActivePlan({...updatedPlan});
-
-          // Logování pro debugging
-          console.log('Plán aktualizován s položkami:', updatedPlan);
-          console.log('Finální seznam plánů:', finalPlans);
-
-          // Vynucené překreslení komponenty
-          setTimeout(() => {
-            // Načtení plánů z localStorage pro zajištění konzistence
-            const savedPlans = localStorage.getItem('plans');
-            if (savedPlans) {
-              try {
-                const parsedPlans = JSON.parse(savedPlans);
-                setPlans([...parsedPlans]);
-
-                // Najít aktualizovaný plán v načtených plánech
-                const refreshedPlan = parsedPlans.find((p: Plan) => p.id === newPlanId);
-                if (refreshedPlan) {
-                  setActivePlan({...refreshedPlan});
-                }
-              } catch (error) {
-                console.error('Chyba při načítání plánů z localStorage:', error);
-              }
-            }
-          }, 100);
-
-          // Zobrazení prvního úkolu na mapě
-          if (itemsWithIds.length > 0) {
-            const firstItem = itemsWithIds[0];
-
-            // Zobrazení prvního úkolu na mapě
-            if (firstItem.type === 'location' && firstItem.location) {
-              // Vytvoření události pro animované zaměření na lokaci
-              const focusEvent = new CustomEvent('focusOnLocation', {
-                detail: {
-                  location: firstItem.location,
-                  zoom: 14,
-                  animate: true,
-                  duration: 1.5,
-                  taskId: firstItem.id,
-                  taskTitle: firstItem.title
-                }
-              });
-
-              // Vyvolání události pro zaměření na lokaci
-              window.dispatchEvent(focusEvent);
-
-              // Standardní volání pro kompatibilitu
-              onSelectLocation(firstItem.location);
-            } else if (firstItem.type === 'route' && firstItem.route) {
-              // Vytvoření události pro animované zaměření na trasu
-              const focusEvent = new CustomEvent('focusOnRoute', {
-                detail: {
-                  route: firstItem.route,
-                  animate: true,
-                  duration: 1.5,
-                  taskId: firstItem.id,
-                  taskTitle: firstItem.title,
-                  showPath: true
-                }
-              });
-
-              // Vyvolání události pro zaměření na trasu
-              window.dispatchEvent(focusEvent);
-
-              // Standardní volání pro kompatibilitu
-              onSelectRoute(firstItem.route);
-            }
-          }
-        }
-
-        // Vyvolání události pro informování ostatních komponent o vytvoření plánu
-        const planCreatedEvent = new CustomEvent('planCreated', {
-          detail: {
-            planId: newPlanId,
-            planTitle: planTitle,
-            source: 'chat'
-          }
-        });
-        window.dispatchEvent(planCreatedEvent);
-
-        // Kontrola, zda plán byl skutečně přidán do localStorage
-        const checkSavedPlans = localStorage.getItem('plans');
-        if (checkSavedPlans) {
-          try {
-            const parsedPlans = JSON.parse(checkSavedPlans);
-            const planExists = parsedPlans.some((p: Plan) => p.id === newPlanId);
-
-            if (!planExists) {
-              console.error(`Plán s ID ${newPlanId} nebyl nalezen v localStorage po uložení!`);
-              // Pokusíme se plán znovu přidat
-              parsedPlans.push(updatedPlan);
-              localStorage.setItem('plans', JSON.stringify(parsedPlans));
-              console.log('Plán byl znovu přidán do localStorage');
-
-              // Aktualizace stavu s novým polem plánů
-              setPlans([...parsedPlans]);
-            } else {
-              console.log(`Plán s ID ${newPlanId} byl úspěšně uložen do localStorage`);
-            }
-          } catch (error) {
-            console.error('Chyba při kontrole uložení plánu:', error);
-          }
-        }
-
-        // Vyvolání události pro aktualizaci UI s ID nového plánu
-        const plansUpdatedEvent = new CustomEvent('plansUpdated', {
-          detail: {
-            action: 'create',
-            planId: newPlanId,
-            source: 'chat'
-          }
-        });
-        window.dispatchEvent(plansUpdatedEvent);
-        console.log('Vyvolána událost plansUpdated pro aktualizaci seznamu plánů po vytvoření plánu z chatu');
-
-        // Vždy nastavíme nový plán jako aktivní, bez ohledu na předchozí aktivní plán
-        console.log('Nastavuji nový plán jako aktivní:', newPlanId);
-
-        // Načtení aktuálních plánů z localStorage
-        const savedPlans = localStorage.getItem('plans');
-        if (savedPlans) {
-          try {
-            const parsedPlans = JSON.parse(savedPlans);
-            const newPlan = parsedPlans.find((p: Plan) => p.id === newPlanId);
-
-            if (newPlan) {
-              console.log('Nastavuji nový plán jako aktivní:', newPlan.title);
-              setActivePlan({...newPlan});
-            } else {
-              console.log('Nový plán nebyl nalezen v localStorage');
-            }
-          } catch (error) {
-            console.error('Chyba při načítání plánů z localStorage:', error);
-          }
-        }
-      })();
-
-      return `Plán "${planTitle}" byl vytvořen.`;
+      return `Plán "${planTitle}" byl vytvořen s ${newPlan.items.length} položkami.`;
     };
 
     // Přidání posluchače události
@@ -1357,12 +1042,12 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
     return () => {
       window.removeEventListener('createPlanFromChat', handleCreatePlanFromChat as unknown as EventListener);
     };
-  }, [onSelectLocation, onSelectRoute, activePlan]);
+  }, []);
 
   // Efekt pro poslouchání události aktualizace seznamu plánů
   useEffect(() => {
     // Funkce pro zpracování události aktualizace seznamu plánů
-    const handlePlansUpdated = (event: CustomEvent) => {
+    const handlePlansUpdated = (event: PlansUpdatedEvent) => {
       console.log('Zachycena událost plansUpdated:', event.detail);
       const { action, planId, source, setActive } = event.detail;
 
@@ -1461,7 +1146,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
       // Získání aktuální polohy uživatele z události
       const { location } = event.detail;
 
-      // Najdeme první položku typu 'location' s názvem obsahujícím "Moje aktuální poloha"
+      // Najdeme prvé položku typu 'location' s názvem obsahujícím "Moje aktuální poloha"
       const locationItemIndex = activePlan.items.findIndex(item =>
         item.type === 'location' &&
         item.location &&
@@ -1681,7 +1366,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
     setNewPlanTitle('');
     setShowNewPlanForm(false);
 
-    // Automatické přidání prvního úkolu s lokací
+    // Automatické přidání prvého úkolu s lokací
     try {
       // Vytvoření nového úkolu
       const newItemId = `${newPlanId}-1`;
@@ -1690,8 +1375,8 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
         title: "První úkol",
         description: "Automaticky vytvořený úkol s lokací",
         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        completed: false,
-        type: 'location'
+        type: 'location',
+        completed: false
       };
 
       // Kontrola, zda existuje adresa bydliště
@@ -1835,7 +1520,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
         }
       }
 
-      // Pokud jsme nenašli další nedokončenou položku, zkontrolujeme, zda jsou všechny položky dokončené
+      // Pokud jsme nenašli další nedokončenou položku, zkontrolujeme, zda jsou všechna položky dokončené
       const allItemsCompleted = updatedPlan.items.every(item => item.completed);
 
       if (nextItemIndex !== -1) {
@@ -1865,7 +1550,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
           onSelectRoute(nextItem.route);
         }
       } else if (allItemsCompleted) {
-        // Všechny položky jsou dokončené, zobrazíme oznámení
+        // Všechna položky jsou dokončené, zobrazíme oznámení
         alert('Všechny úkoly v tomto plánu jsou dokončené! 🎉');
 
         // Zkontrolujeme, zda existují další plány s nedokončenými úkoly
@@ -1881,19 +1566,19 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
           );
 
           if (confirmSwitch) {
-            // Najdeme první nedokončený úkol v dalším plánu
+            // Najdeme prvé nedokončený úkol v dalším plánu
             const firstIncompleteItemIndex = nextPlan.items.findIndex(item => !item.completed);
 
             if (firstIncompleteItemIndex !== -1) {
               const firstIncompleteItem = nextPlan.items[firstIncompleteItemIndex];
 
-              // Aktualizujeme plán s novým aktivním indexem
+              // Aktualizace plánu s novým aktivním indexem
               const nextPlanWithActiveItem = {
                 ...nextPlan,
                 activeItemIndex: firstIncompleteItemIndex
               };
 
-              // Aktualizujeme plány
+              // Aktualizace plánu v seznamu plánů
               const plansWithActiveItem = updatedPlans.map(p =>
                 p.id === nextPlan.id ? nextPlanWithActiveItem : p
               );
@@ -1903,17 +1588,17 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
               // Zobrazíme položku na mapě
               if (firstIncompleteItem.type === 'location' && firstIncompleteItem.location) {
-                console.log('Přepínám na první nedokončenou položku v dalším plánu s lokací:', firstIncompleteItem.location);
+                console.log('Přepínám na prvé nedokončenou položku v dalším plánu s lokací:', firstIncompleteItem.location);
                 onSelectLocation(firstIncompleteItem.location);
               } else if (firstIncompleteItem.type === 'route' && firstIncompleteItem.route) {
-                console.log('Přepínám na první nedokončenou položku v dalším plánu s trasou:', firstIncompleteItem.route);
+                console.log('Přepínám na prvé nedokončenou položku v dalším plánu s trasou:', firstIncompleteItem.route);
                 onSelectRoute(firstIncompleteItem.route);
               }
             }
           }
         }
       } else {
-        // Nenašli jsme další nedokončenou položku, ale některé položky jsou stále nedokončené
+        // Nenašli jsme další nedokončenou položku, ale některá položky jsou stále nedokončené
         // Aktualizujeme plány bez změny aktivního indexu
         setPlans(updatedPlans);
         setActivePlan(updatedPlan);
@@ -1969,7 +1654,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
     // Potvrzovací dialog
     if (window.confirm('Opravdu chcete odstranit VŠECHNY plány? Tato akce je nevratná!')) {
-      console.log('Odstraňuji všechny plány...');
+      console.log('Odstraňuji všechna plány...');
 
       // Odstranění plánů z localStorage
       localStorage.removeItem('plans');
@@ -1987,7 +1672,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
       successMessage.className = 'coordinates-display';
       successMessage.innerHTML = `
         <i class="fas fa-check-circle"></i>
-        <span>Všechny plány byly úspěšně odstraněny</span>
+        <span>Všechna plány byly úspěšně odstraněny</span>
       `;
 
       document.body.appendChild(successMessage);
@@ -2000,7 +1685,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
         }, 500);
       }, 2000);
 
-      console.log('Všechny plány byly úspěšně odstraněny');
+      console.log('Všechna plány byly úspěšně odstraněny');
     } else {
       console.log('Odstranění všech plánů bylo zrušeno uživatelem');
     }
@@ -2107,11 +1792,11 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
     });
     setActivePlan(updatedPlan);
 
-    // Zobrazení první položky na mapě bez zobrazení detailů
+    // Zobrazení prvého úkolu na mapě bez zobrazení detailů
     if (updatedPlan.items.length > 0) {
       const firstItem = updatedPlan.items[0];
 
-      // Zobrazení položky na mapě s vylepšeným zaměřením
+      // Zobrazení prvého úkolu na mapě
       if (firstItem.type === 'location' && firstItem.location) {
         console.log('Zobrazuji lokaci na mapě po spuštění navigace:', firstItem.location);
 
@@ -2224,7 +1909,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
     // Kontrola, zda se skutečně posouváme na předchozí položku
     if (prevIndex === plan.activeItemIndex) {
-      console.log('Již jsme na první položce plánu');
+      console.log('Již jsme na prvé položce plánu');
       return;
     }
 
@@ -2393,6 +2078,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
       <i class="fas fa-map-marker-alt"></i>
       <span>Přidávám lokaci "${location.name}" k úkolu "${task.title}"...</span>
     `;
+
     document.body.appendChild(loadingMessage);
 
     // Změna typu úkolu na lokaci
@@ -2692,11 +2378,11 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
               };
 
               // Aktualizace plánu v seznamu plánů
-              const finalPlans = plans.map(p =>
+              const plansWithActiveItem = updatedPlans.map(p =>
                 p.id === planId ? planWithActiveItem : p
               );
 
-              setPlans(finalPlans);
+              setPlans(plansWithActiveItem);
               setActivePlan(planWithActiveItem);
             }
 
@@ -2724,7 +2410,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
             // Zobrazení potvrzení
             alert(`Lokace "${locationName}" byla úspěšně přidána a zobrazena na mapě.`);
           } else {
-            alert('Lokace byla přidána, ale nemá všechny potřebné údaje pro zobrazení na mapě.');
+            alert('Lokace byla přidána, ale nemá všechna potřebná data pro zobrazení na mapě.');
           }
         }
       }
@@ -2809,11 +2495,11 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
               };
 
               // Aktualizace plánu v seznamu plánů
-              const finalPlans = plans.map(p =>
+              const plansWithActiveItem = updatedPlans.map(p =>
                 p.id === planId ? planWithActiveItem : p
               );
 
-              setPlans(finalPlans);
+              setPlans(plansWithActiveItem);
               setActivePlan(planWithActiveItem);
             }
 
@@ -2841,7 +2527,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
             // Zobrazení potvrzení
             alert(`Trasa "${routeDescription}" byla úspěšně přidána a zobrazena na mapě.`);
           } else {
-            alert('Trasa byla přidána, ale nemá všechny potřebné údaje pro zobrazení na mapě.');
+            alert('Trasa byla přidána, ale nemá všechna potřebná data pro zobrazení na mapě.');
           }
         }
       }
@@ -2984,7 +2670,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
             <button
               className="remove-all-plans-button"
               onClick={handleRemoveAllPlans}
-              title="Odstranit všechny plány"
+              title="Odstranit všechna plány"
             >
               <i className="fas fa-trash-alt"></i>
               <span>Odstranit vše</span>
@@ -2992,10 +2678,10 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
           )}
         </div>
         <div className="plan-list-content">
-          {/* Pokud nejsou žádné plány, zobrazíme informaci */}
+          {/* Pokud nejsou žádná plány, zobrazíme informaci */}
           {plans.length === 0 ? (
             <div className="no-plans-message">
-              <p>Žádné plány nebyly nalezeny</p>
+              <p>Žádná plány nebyly nalezeny</p>
               <p>Vytvořte nový plán pomocí tlačítka "Nový plán" nebo použijte chat</p>
             </div>
           ) : (
@@ -3012,12 +2698,12 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
                   console.log('Kliknuto na plán:', plan.title);
                   setActivePlan(plan);
 
-                  // Automatické zobrazení prvního úkolu plánu na mapě
+                  // Automatické zobrazení prvé položky plánu na mapě
                   if (plan.items && plan.items.length > 0) {
                     const firstItem = plan.items[0];
                     const itemIndex = 0;
 
-                    // Zobrazení prvního úkolu na mapě
+                    // Zobrazení prvé položky na mapě
                     handleSelectItem(firstItem, plan.id, itemIndex);
 
                     // Aktualizace aktivního indexu v plánu
@@ -3135,7 +2821,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
 
           {activePlan.description && <p className="plan-description">{activePlan.description}</p>}
 
-          {/* Navigační panel pro krokovou navigaci */}
+          {/* Navigační panel pro krokové zobrazení */}
           {isNavigating && currentNavigationPlan === activePlan.id && activePlan.activeItemIndex !== undefined && (
             <div className="navigation-controls">
               <button
@@ -3203,7 +2889,7 @@ const PlanningPanel: React.FC<PlanningPanelProps> = ({
                   console.log('Testování přesnosti přiřazování lokalit dokončeno:', result);
 
                   // Zobrazení výsledků testování
-                  alert(`Testování přesnosti dokončeno!\n\nCelkem úkolů s lokací: ${result.total}\nOtestováno úkolů: ${result.tested}\nPrůměrná přesnost: ${result.averageAccuracy.toFixed(2)}%`);
+                  alert(`Testování přesnosti dokončeno!\n\nCelkem úkolů s lokací: ${result.total}\nOtestováno úkolů: ${result.tested}\nPřesnost: ${result.averageAccuracy.toFixed(2)}%`);
 
                   setShowLocationAssignmentTester(false);
                 }}

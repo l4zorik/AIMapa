@@ -69,20 +69,20 @@ export const checkAndFixPlansWithoutSubtasks = (plans: any[]): any[] => {
 };
 
 /**
- * Generuje relevantní podúkoly na základě názvu hlavního úkolu
- * @param taskTitle Název hlavního úkolu
+ * Generuje relevantní podúkoly na základě obsahu zprávy
+ * @param message Obsah zprávy z chatu
  * @param planId ID plánu
  * @returns Pole podúkolů
  */
-export const generateRelevantSubtasks = (taskTitle: string, planId: string): any[] => {
-  console.log(`Generuji podúkoly pro úkol "${taskTitle}"`);
+export const generateRelevantSubtasks = (message: string, planId: string): any[] => {
+  console.log(`Generuji podúkoly na základě zprávy: "${message}"`);
 
-  // Detekce klíčových slov v názvu úkolu pro generování relevantních podúkolů
-  const lowerTitle = taskTitle.toLowerCase();
+  // Detekce klíčových slov ve zprávě pro generování relevantních podúkolů
+  const lowerMessage = message.toLowerCase();
 
   // Podúkoly pro výlety a cestování
-  if (lowerTitle.includes('výlet') || lowerTitle.includes('cesta') || lowerTitle.includes('cestování') ||
-      lowerTitle.includes('dovolená') || lowerTitle.includes('návštěva')) {
+  if (lowerMessage.includes('výlet') || lowerMessage.includes('cesta') || lowerMessage.includes('cestování') ||
+      lowerMessage.includes('dovolená') || lowerMessage.includes('návštěva')) {
     return [
       {
         id: `${planId}-1`,
@@ -124,7 +124,7 @@ export const generateRelevantSubtasks = (taskTitle: string, planId: string): any
   }
 
   // Podúkoly pro nalezení bugů v aplikaci
-  if (lowerTitle.includes('bug') || lowerTitle.includes('chyb') || lowerTitle.includes('nalezen')) {
+  if (lowerMessage.includes('bug') || lowerMessage.includes('chyb') || lowerMessage.includes('nalezen')) {
     return [
       {
         id: `${planId}-1`,
@@ -175,7 +175,7 @@ export const generateRelevantSubtasks = (taskTitle: string, planId: string): any
   }
 
   // Podúkoly pro města
-  if (lowerTitle.includes('praha')) {
+  if (lowerMessage.includes('praha')) {
     return [
       {
         id: `${planId}-1`,
@@ -210,7 +210,7 @@ export const generateRelevantSubtasks = (taskTitle: string, planId: string): any
     ];
   }
 
-  if (lowerTitle.includes('brno')) {
+  if (lowerMessage.includes('brno')) {
     return [
       {
         id: `${planId}-1`,
@@ -246,7 +246,7 @@ export const generateRelevantSubtasks = (taskTitle: string, planId: string): any
   }
 
   // Pro získání Lamborghini Aventador
-  if (lowerTitle.includes('lamborghini') || lowerTitle.includes('aventador')) {
+  if (lowerMessage.includes('lamborghini') || lowerMessage.includes('aventador')) {
     return [
       {
         id: `${planId}-1`,
@@ -297,7 +297,7 @@ export const generateRelevantSubtasks = (taskTitle: string, planId: string): any
   }
 
   // Pro opravení chyb v AI mapě
-  if (lowerTitle.includes('opravení chyby') || lowerTitle.includes('ai mapě')) {
+  if (lowerMessage.includes('opravení chyby') || lowerMessage.includes('ai mapě')) {
     return [
       {
         id: `${planId}-1`,
@@ -339,6 +339,46 @@ export const generateRelevantSubtasks = (taskTitle: string, planId: string): any
         id: `${planId}-5`,
         title: 'Nasazení změn',
         description: 'Aplikace opravy do produkčního prostředí',
+        time: '',
+        completed: false,
+        type: 'task',
+        createdAt: new Date()
+      }
+    ];
+  }
+
+  // Pokud zpráva obsahuje "vytvoř úkol", vytvoříme dynamické podúkoly na základě obsahu zprávy
+  if (lowerMessage.includes('vytvoř úkol') || lowerMessage.includes('vytvořit úkol')) {
+    // Extrahujeme název úkolu ze zprávy
+    const taskNameMatch = message.match(/vytvoř(?:it)? úkol[:\s]+(.+?)(?:$|\.|\?)/i);
+    const taskName = taskNameMatch ? taskNameMatch[1].trim() : 'Nový úkol';
+
+    console.log('Extrahovaný název úkolu:', taskName);
+
+    // Vytvoříme dynamické podúkoly na základě názvu úkolu
+    return [
+      {
+        id: `${planId}-1`,
+        title: `Příprava pro: ${taskName}`,
+        description: `Přípravné práce pro úkol: ${taskName}`,
+        time: '',
+        completed: false,
+        type: 'task',
+        createdAt: new Date()
+      },
+      {
+        id: `${planId}-2`,
+        title: `Realizace: ${taskName}`,
+        description: `Hlavní část úkolu: ${taskName}`,
+        time: '',
+        completed: false,
+        type: 'task',
+        createdAt: new Date()
+      },
+      {
+        id: `${planId}-3`,
+        title: `Dokončení: ${taskName}`,
+        description: `Finalizace úkolu: ${taskName}`,
         time: '',
         completed: false,
         type: 'task',
