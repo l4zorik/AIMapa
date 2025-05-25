@@ -103,6 +103,31 @@ router.post('/create-subscription', authenticateUser, async (req, res) => {
             expand: ['latest_invoice.payment_intent']
         });
 
+        // Uložení informací o předplatném do Supabase
+        const { error: insertSubscriptionError } = await supabase
+            .from('subscriptions')
+            .insert([{
+                user_id: userId, // req.user.id could also be used if authenticateUser sets it consistently
+                stripe_subscription_id: subscription.id,
+                plan_id: planId, // The application-specific plan ID
+                price_id: priceId, // The Stripe Price ID
+                status: subscription.status, // e.g., 'incomplete', 'trialing', 'active'
+                start_date: new Date(subscription.current_period_start * 1000).toISOString(),
+                end_date: new Date(subscription.current_period_end * 1000).toISOString(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                auto_renew: true // Typically true for new subscriptions; Stripe manages actual renewal
+            }]);
+
+        if (insertSubscriptionError) {
+            console.error('Chyba při ukládání předplatného do Supabase:', insertSubscriptionError);
+            // Potentially, you might want to try and cancel the Stripe subscription here if this DB write fails,
+            // though that adds complexity (e.g., what if the cancellation also fails?).
+            // For now, we'll log the error and the client might not have a consistent state.
+            // Consider a more robust error handling strategy for production.
+            return res.status(500).json({ error: 'Chyba při ukládání záznamu o předplatném.' });
+        }
+
         // Vrácení client secret pro potvrzení platby
         res.json({
             subscriptionId: subscription.id,

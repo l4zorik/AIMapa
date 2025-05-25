@@ -177,6 +177,7 @@ app.use(supabaseAuthSync.createSyncMiddleware());
 app.use('/api', require('./routes/api'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/stripe', require('./routes/stripe'));
+app.use('/api/usage', require('./routes/usage')); // Mount the new usage routes
 
 // Statické soubory
 app.use(express.static(path.join(__dirname, 'public')));

@@ -28,34 +28,69 @@ Pro správnou funkci Auth0 integrace je potřeba nastavit následující proměn
 AUTH0_DOMAIN=vas-tenant.auth0.com
 AUTH0_CLIENT_ID=vase-client-id
 AUTH0_CLIENT_SECRET=vase-client-secret
+AUTH0_DOMAIN=vas-tenant.auth0.com
+AUTH0_CLIENT_ID=vase-client-id
+AUTH0_CLIENT_SECRET=vase-client-secret
+# Toto je PLNÁ URL adresa, na kterou Auth0 přesměruje uživatele po úspěšném přihlášení.
+# Musí PŘESNĚ odpovídat jedné z URL nakonfigurovaných v Auth0 dashboardu v sekci "Allowed Callback URLs".
+# Aplikace interně používá cestu /callback, takže tato URL by měla být BASE_URL + /callback.
+# Příklad: http://localhost:3000/callback nebo https://vasa-aplikace.com/callback
 AUTH0_CALLBACK_URL=http://localhost:3000/callback
+
+# Toto je PLNÁ URL adresa, na kterou Auth0 může přesměrovat uživatele po úspěšném odhlášení.
+# Musí PŘESNĚ odpovídat jedné z URL nakonfigurovaných v Auth0 dashboardu v sekci "Allowed Logout URLs".
+# Příklad: http://localhost:3000 nebo https://vasa-aplikace.com
 AUTH0_LOGOUT_URL=http://localhost:3000
+
 AUTH0_AUDIENCE=https://vas-tenant.auth0.com/api/v2/
+# Rozsah oprávnění, která vaše aplikace požaduje.
+# 'openid profile email' jsou standardní. Další můžete přidat podle potřeby API.
+AUTH0_SCOPE=openid profile email read:users read:user_idp_tokens
+
+# Základní URL vaší aplikace. Používá se pro konstrukci callback a logout URL, pokud nejsou plně specifikovány jinde.
+# V produkci by to měla být vaše veřejná URL, např. https://remarkable-cajeta-76cfd9.netlify.app
+BASE_URL=http://localhost:3000
 AUTH0_SCOPE=openid profile email read:users read:user_idp_tokens
 ```
 
 ### Auth0 Dashboard
 
-V Auth0 dashboardu je potřeba nastavit:
+V Auth0 dashboardu je potřeba nastavit následující hodnoty, které musí být synchronizovány s konfigurací vaší aplikace (proměnné prostředí a `auth0-service.js`):
 
-1. **Application Login URI**: `https://remarkable-cajeta-76cfd9.netlify.app/login`
-2. **Allowed Callback URLs**: 
-   ```
-   http://localhost:3000/callback,
-   https://remarkable-cajeta-76cfd9.netlify.app/map.html/callback
-   ```
-3. **Allowed Logout URLs**: 
-   ```
-   http://localhost:3000,
-   http://remarkable-cajeta-76cfd9.netlify.app,
-   https://remarkable-cajeta-76cfd9.netlify.app/map.html,
-   https://remarkable-cajeta-76cfd9.netlify.app/netlify/functions/server/logout
-   ```
-4. **Allowed Web Origins**: 
-   ```
-   http://localhost:3000,
-   https://remarkable-cajeta-76cfd9.netlify.app
-   ```
+1.  **Application Login URI**:
+    *   Toto je URL ve vaší aplikaci, kam Auth0 může přesměrovat uživatele k zahájení přihlašovacího procesu (např. při IdP-initiated login).
+    *   Příklad z konfigurace: `https://remarkable-cajeta-76cfd9.netlify.app/login` (pokud máte takovou stránku).
+    *   `auth0-service.js` primárně spoléhá na `baseURL` a `routes.login` (`/login` ve výchozím nastavení) pro generování přihlašovacích URL.
+
+2.  **Allowed Callback URLs**:
+    *   Toto je **kriticky důležité** nastavení pro bezpečnost. Auth0 povolí přesměrování **pouze** na URL uvedené v tomto seznamu.
+    *   Aplikace AIMapa, po úpravě `auth0-service.js`, konzistentně používá callback cestu `/callback`.
+    *   Proto zde musíte uvést PLNÉ callback URL, které odpovídají vašim prostředím:
+        *   Pro lokální vývoj (za předpokladu `BASE_URL=http://localhost:3000`): `http://localhost:3000/callback`
+        *   Pro produkční prostředí (např. Netlify): `https://remarkable-cajeta-76cfd9.netlify.app/callback`
+    *   **Odstraňte nestandardní URL jako `https://remarkable-cajeta-76cfd9.netlify.app/map.html/callback`**, pokud to není specifický a oddělený OAuth tok s vlastní konfigurací. Pro hlavní tok přihlášení použijte standardní `/callback`.
+    *   Ujistěte se, že hodnota proměnné prostředí `AUTH0_CALLBACK_URL` přesně odpovídá jedné z těchto URL.
+
+3.  **Allowed Logout URLs**:
+    *   Sem patří všechny URL, na které může být uživatel přesměrován po odhlášení z Auth0.
+    *   Knihovna `express-openid-connect` standardně přesměruje na `baseURL` aplikace, pokud není specifikováno jinak.
+    *   Doporučené hodnoty (musí odpovídat `AUTH0_LOGOUT_URL` a vašim prostředím):
+        *   Pro lokální vývoj: `http://localhost:3000`
+        *   Pro produkci: `https://remarkable-cajeta-76cfd9.netlify.app`
+    *   Můžete přidat i další specifické stránky, např. `https://remarkable-cajeta-76cfd9.netlify.app/logged-out`.
+    *   **Zkontrolujte a případně zjednodušte seznam:** URL jako `https://remarkable-cajeta-76cfd9.netlify.app/map.html` nebo `https://remarkable-cajeta-76cfd9.netlify.app/netlify/functions/server/logout` by měly být zahrnuty pouze pokud jsou to skutečně zamýšlené cíle po odhlášení.
+
+4.  **Allowed Web Origins**:
+    *   URL, ze kterých jsou povoleny požadavky na Auth0 (typicky pro Cross-Origin Authentication).
+    *   Příklady:
+        *   `http://localhost:3000`
+        *   `https://remarkable-cajeta-76cfd9.netlify.app`
+
+**Důležitá poznámka k `BASE_URL` vs `AUTH0_CALLBACK_URL` a `AUTH0_LOGOUT_URL`:**
+*   `BASE_URL` (nebo `process.env.BASE_URL` v `auth0-service.js`) je základní adresa vaší aplikace (např. `http://localhost:3000`).
+*   `auth0-service.js` používá `baseURL` a nakonfigurovanou cestu pro callback (`/callback`) k sestavení úplné URL pro `redirect_uri` při přihlašování. Tato sestavená URL se musí shodovat s jednou z "Allowed Callback URLs" v Auth0.
+*   Proměnná prostředí `AUTH0_CALLBACK_URL` by měla být nastavena na *přesně tu samou úplnou URL*, která je registrována v Auth0 a kterou aplikace používá. Slouží spíše jako explicitní záznam a pro diagnostiku.
+*   Podobně `AUTH0_LOGOUT_URL` je pro explicitní záznam a pro registraci v Auth0. Skutečné přesměrování po odhlášení řídí `express-openid-connect` (často na `baseURL`).
 
 ## Přihlášení a odhlášení
 
@@ -201,8 +236,8 @@ curl http://localhost:3000/auth/debug
    - Řešení: Použijte HTTPS URL nebo nechte pole prázdné
 
 3. **Chyba "invalid_request: The redirect_uri MUST match the registered callback URL"**
-   - Problém: Callback URL v požadavku neodpovídá URL registrované v Auth0 dashboardu
-   - Řešení: Ujistěte se, že `AUTH0_CALLBACK_URL` odpovídá URL registrované v Auth0 dashboardu
+   - Problém: Callback URL použitá v požadavku na Auth0 (typicky `BASE_URL` + `/callback`) neodpovídá žádné z URL registrovaných v sekci "Allowed Callback URLs" v Auth0 dashboardu.
+   - Řešení: Ujistěte se, že vaše "Allowed Callback URLs" v Auth0 dashboardu PŘESNĚ obsahují URL, kterou vaše aplikace používá (např. `http://localhost:3000/callback` pro lokální vývoj a `https://VASE_PRODUKCNI_URL/callback` pro produkci). Zkontrolujte také hodnotu `BASE_URL` (nebo `AUTH0_CALLBACK_URL`, pokud ji používáte k ověření) ve vaší konfiguraci.
 
 4. **Chyba "invalid_client: Client authentication failed"**
    - Problém: Nesprávné Client ID nebo Client Secret

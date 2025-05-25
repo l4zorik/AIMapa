@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './SubscriptionPlans.css';
 
+import SubscriptionService from '../../services/SubscriptionService'; // Import the service
+// Use the SubscriptionPlan interface from the service
+import { SubscriptionPlan } from '../../services/SubscriptionService';
+
 // Definice typu pro plán předplatného
-export interface SubscriptionPlan {
-  id: string;
+// export interface SubscriptionPlan { // This definition will be removed to use the one from the service
+//   id: string;
   name: string;
   price: number;
   currency: string;
@@ -25,8 +29,10 @@ export interface SubscriptionPlan {
     maxContextLength: number;
     priorityProcessing: boolean;
   };
-  isPopular?: boolean;
-}
+//   isPopular?: boolean;
+//   stripeProductId: string; // Added in previous step, ensure it's here
+//   stripePriceId: string;   // Added in previous step, ensure it's here
+// }
 
 // Rozhraní pro vlastnosti komponenty
 interface SubscriptionPlansProps {
@@ -47,133 +53,18 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
 
   // Načtení plánů předplatného
   useEffect(() => {
-    // V reálné aplikaci by se plány načítaly z API
-    const subscriptionPlans: SubscriptionPlan[] = [
-      {
-        id: 'free',
-        name: 'Zdarma',
-        price: 0,
-        currency: 'CZK',
-        interval: 'měsíčně',
-        features: [
-          'Základní funkce mapy',
-          'Omezený počet API požadavků (10/den)',
-          'Základní modely AI',
-          'Maximálně 10 uložených míst',
-          'Obsahuje reklamy'
-        ],
-        apiLimits: {
-          requestsPerDay: 10,
-          tokensPerMonth: 10000,
-          maxCostPerRequest: 0.05
-        },
-        mapFeatures: {
-          offlineAccess: false,
-          customMarkers: false,
-          routeOptimization: false,
-          maxSavedLocations: 10
-        },
-        aiFeatures: {
-          models: ['Gemini 1.5 Flash'],
-          maxContextLength: 2000,
-          priorityProcessing: false
-        }
-      },
-      {
-        id: 'basic',
-        name: 'Základní',
-        price: 99,
-        currency: 'CZK',
-        interval: 'měsíčně',
-        features: [
-          'Rozšířené funkce mapy',
-          'Více API požadavků (50/den)',
-          'Standardní modely AI',
-          'Maximálně 50 uložených míst',
-          'Méně reklam'
-        ],
-        apiLimits: {
-          requestsPerDay: 50,
-          tokensPerMonth: 50000,
-          maxCostPerRequest: 0.20
-        },
-        mapFeatures: {
-          offlineAccess: false,
-          customMarkers: true,
-          routeOptimization: false,
-          maxSavedLocations: 50
-        },
-        aiFeatures: {
-          models: ['Gemini 1.5 Flash', 'GPT-4o-mini'],
-          maxContextLength: 4000,
-          priorityProcessing: false
-        },
-        isPopular: true
-      },
-      {
-        id: 'premium',
-        name: 'Premium',
-        price: 199,
-        currency: 'CZK',
-        interval: 'měsíčně',
-        features: [
-          'Pokročilé funkce mapy včetně offline přístupu',
-          'Vysoký počet API požadavků (200/den)',
-          'Prémiové modely AI',
-          'Neomezený počet uložených míst',
-          'Bez reklam'
-        ],
-        apiLimits: {
-          requestsPerDay: 200,
-          tokensPerMonth: 200000,
-          maxCostPerRequest: 0.50
-        },
-        mapFeatures: {
-          offlineAccess: true,
-          customMarkers: true,
-          routeOptimization: true,
-          maxSavedLocations: 500
-        },
-        aiFeatures: {
-          models: ['Gemini 1.5 Flash', 'GPT-4o', 'Claude 3'],
-          maxContextLength: 8000,
-          priorityProcessing: true
-        }
-      },
-      {
-        id: 'ultimate',
-        name: 'Ultimate',
-        price: 499,
-        currency: 'CZK',
-        interval: 'měsíčně',
-        features: [
-          'Všechny funkce mapy bez omezení',
-          'Neomezený počet API požadavků',
-          'Všechny dostupné modely AI',
-          'Neomezený počet uložených míst',
-          'Prioritní podpora',
-          'Bez reklam'
-        ],
-        apiLimits: {
-          requestsPerDay: 1000,
-          tokensPerMonth: 1000000,
-          maxCostPerRequest: 2.00
-        },
-        mapFeatures: {
-          offlineAccess: true,
-          customMarkers: true,
-          routeOptimization: true,
-          maxSavedLocations: 9999
-        },
-        aiFeatures: {
-          models: ['Gemini 1.5 Flash', 'GPT-4o', 'Claude 3', 'DeepSeek'],
-          maxContextLength: 16000,
-          priorityProcessing: true
-        }
+    const fetchPlans = async () => {
+      try {
+        // Using the getSubscriptionPlans method from the service
+        const fetchedPlans = await SubscriptionService.getSubscriptionPlans();
+        setPlans(fetchedPlans);
+      } catch (error) {
+        console.error("Failed to fetch subscription plans:", error);
+        // Optionally, set some error state to display to the user
       }
-    ];
+    };
 
-    setPlans(subscriptionPlans);
+    fetchPlans();
   }, []);
 
   // Funkce pro výběr plánu

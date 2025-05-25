@@ -34,13 +34,6 @@ class Auth0Service {
       idpLogout: config.idpLogout !== false
     };
 
-    // Nastavení callback URL
-    if (process.env.AUTH0_CALLBACK_URL) {
-      this.config.routes.callback = {
-        path: '/auth/callback'
-      };
-    }
-
     // Vytvoření Auth0 middleware
     this.middleware = auth(this.config);
 
@@ -103,7 +96,7 @@ class Auth0Service {
   getLoginUrl(returnTo) {
     const params = new URLSearchParams({
       client_id: this.config.clientID,
-      redirect_uri: process.env.AUTH0_CALLBACK_URL || `${this.config.baseURL}/callback`,
+      redirect_uri: `${this.config.baseURL}${this.config.routes.callback}`, // Ensure full URL using baseURL and configured callback path
       response_type: 'code',
       scope: this.config.authorizationParams.scope,
       audience: this.config.authorizationParams.audience
@@ -244,8 +237,11 @@ class Auth0Service {
       domain: process.env.AUTH0_DOMAIN,
       clientIdConfigured: !!process.env.AUTH0_CLIENT_ID,
       clientSecretConfigured: !!process.env.AUTH0_CLIENT_SECRET,
-      callbackUrl: process.env.AUTH0_CALLBACK_URL,
-      logoutUrl: process.env.AUTH0_LOGOUT_URL,
+      // AUTH0_CALLBACK_URL is for dashboard registration. The effective callback is baseURL + routes.callback.
+      // The redirect_uri for login is constructed from baseURL and routes.callback.
+      // AUTH0_LOGOUT_URL is for dashboard registration. Logout redirection is handled by express-openid-connect based on baseURL or returnTo.
+      effectiveCallbackUrl: `${this.config.baseURL}${this.config.routes.callback}`,
+      configuredLogoutUrl: this.config.routes.logout, // This is the path, full URL depends on baseURL
       audience: process.env.AUTH0_AUDIENCE,
       isAuthenticated: this.isAuthenticated(req),
       authLibraryVersion: require('express-openid-connect/package.json').version,

@@ -1,4 +1,34 @@
-import { SubscriptionPlan } from '../components/Subscription/SubscriptionPlans';
+// import { SubscriptionPlan } from '../components/Subscription/SubscriptionPlans'; 
+// Assuming SubscriptionPlan is defined in this file or imported correctly.
+// For the purpose of this change, let's define it here if not already.
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  interval: string;
+  features: string[];
+  apiLimits: {
+    requestsPerDay: number;
+    tokensPerMonth: number;
+    maxCostPerRequest: number;
+  };
+  mapFeatures: {
+    offlineAccess: boolean;
+    customMarkers: boolean;
+    routeOptimization: boolean;
+    maxSavedLocations: number;
+  };
+  aiFeatures: {
+    models: string[];
+    maxContextLength: number;
+    priorityProcessing: boolean;
+  };
+  isPopular?: boolean;
+  stripeProductId: string; // User needs to replace with actual Stripe Product ID
+  stripePriceId: string;   // User needs to replace with actual Stripe Price ID
+}
 
 // Definice typu pro uživatelské předplatné
 export interface UserSubscription {
@@ -64,6 +94,8 @@ class SubscriptionService {
           price: 0,
           currency: 'CZK',
           interval: 'měsíčně',
+          stripeProductId: 'prod_placeholder_free', // User needs to replace with actual Stripe Product ID
+          stripePriceId: 'price_placeholder_free',   // User needs to replace with actual Stripe Price ID (or this plan might be managed without Stripe)
           features: [
             'Základní funkce mapy',
             'Omezený počet API požadavků (10/den)',
@@ -94,6 +126,8 @@ class SubscriptionService {
           price: 99,
           currency: 'CZK',
           interval: 'měsíčně',
+          stripeProductId: 'prod_placeholder_basic', // User needs to replace with actual Stripe Product ID
+          stripePriceId: 'price_placeholder_basic',   // User needs to replace with actual Stripe Price ID
           features: [
             'Rozšířené funkce mapy',
             'Více API požadavků (50/den)',
@@ -125,6 +159,8 @@ class SubscriptionService {
           price: 199,
           currency: 'CZK',
           interval: 'měsíčně',
+          stripeProductId: 'prod_placeholder_premium', // User needs to replace with actual Stripe Product ID
+          stripePriceId: 'price_placeholder_premium',   // User needs to replace with actual Stripe Price ID
           features: [
             'Pokročilé funkce mapy včetně offline přístupu',
             'Vysoký počet API požadavků (200/den)',
@@ -155,6 +191,8 @@ class SubscriptionService {
           price: 499,
           currency: 'CZK',
           interval: 'měsíčně',
+          stripeProductId: 'prod_placeholder_ultimate', // User needs to replace with actual Stripe Product ID
+          stripePriceId: 'price_placeholder_ultimate',   // User needs to replace with actual Stripe Price ID
           features: [
             'Všechny funkce mapy bez omezení',
             'Neomezený počet API požadavků',

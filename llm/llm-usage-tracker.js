@@ -13,6 +13,12 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// IMPORTANT: Regarding the 'cost' parameter for trackUsage:
+// It is STRONGLY RECOMMENDED that the final cost calculation (including any margins or specific pricing logic
+// as defined in docs/PRICING_MODEL.md) is handled authoritatively by the Supabase Edge Function 'llm-usage-tracker'.
+// This Node.js backend function should ideally pass `cost: null` or `cost: baseProviderCost` to the Edge Function.
+// The Edge Function would then be responsible for fetching the base cost if needed and applying all pricing rules.
+// This ensures pricing consistency and centralizes the pricing logic.
 /**
  * Sledování využití LLM
  * @param {Object} options - Možnosti
