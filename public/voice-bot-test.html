@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Bot Test - AIMapa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .command-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .command-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .command-list li {
+            margin: 5px 0;
+        }
+        #testResults {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎤 Voice Bot Test - AIMapa</h1>
+        <p>Tato stránka slouží k testování funkcí Voice Bot modulu před integrací do hlavní aplikace.</p>
+
+        <div class="test-section">
+            <h3>1. Kontrola podpory prohlížeče</h3>
+            <div id="browserSupport" class="status info">Kontroluji podporu...</div>
+            <button onclick="checkBrowserSupport()">Znovu zkontrolovat</button>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Test mikrofonu</h3>
+            <div id="microphoneStatus" class="status info">Připraven k testu</div>
+            <button onclick="testMicrophone()" id="micTest">Test mikrofonu</button>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Test rozpoznávání řeči</h3>
+            <div id="speechStatus" class="status info">Připraven k testu</div>
+            <button onclick="testSpeechRecognition()" id="speechTest">Spustit test řeči</button>
+            <button onclick="stopSpeechTest()" id="stopSpeech" disabled>Zastavit test</button>
+            <div id="recognizedText" style="margin-top: 10px; font-style: italic;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Test syntézy řeči</h3>
+            <div id="speechSynthesisStatus" class="status info">Připraven k testu</div>
+            <button onclick="testSpeechSynthesis()">Test hlasového výstupu</button>
+            <input type="text" id="testText" placeholder="Text k přečtení" value="Ahoj, toto je test hlasového výstupu." style="width: 300px; padding: 5px; margin: 5px;">
+        </div>
+
+        <div class="test-section">
+            <h3>5. Test hlasových příkazů</h3>
+            <div class="command-list">
+                <strong>Zkuste říct tyto příkazy:</strong>
+                <ul>
+                    <li>"přidat bod" - test mapového příkazu</li>
+                    <li>"vypočítat trasu" - test výpočtu trasy</li>
+                    <li>"nápověda" - test nápovědy</li>
+                    <li>"stop" - test zastavení</li>
+                </ul>
+            </div>
+            <div id="commandStatus" class="status info">Připraven k testu příkazů</div>
+            <button onclick="startCommandTest()" id="commandTest">Spustit test příkazů</button>
+            <button onclick="stopCommandTest()" id="stopCommand" disabled>Zastavit test</button>
+        </div>
+
+        <div id="testResults">
+            <h3>Výsledky testů</h3>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        let recognition = null;
+        let synthesis = window.speechSynthesis;
+        let isTestingCommands = false;
+        let testResults = [];
+
+        // Test podpory prohlížeče
+        function checkBrowserSupport() {
+            const supportDiv = document.getElementById('browserSupport');
+            
+            const hasSpeechRecognition = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+            const hasSpeechSynthesis = 'speechSynthesis' in window;
+            
+            if (hasSpeechRecognition && hasSpeechSynthesis) {
+                supportDiv.className = 'status success';
+                supportDiv.textContent = '✅ Prohlížeč podporuje Web Speech API (rozpoznávání i syntéza řeči)';
+                addResult('Podpora prohlížeče', 'PASS', 'Web Speech API je plně podporováno');
+            } else if (hasSpeechRecognition) {
+                supportDiv.className = 'status error';
+                supportDiv.textContent = '⚠️ Prohlížeč podporuje pouze rozpoznávání řeči, syntéza není dostupná';
+                addResult('Podpora prohlížeče', 'PARTIAL', 'Pouze rozpoznávání řeči');
+            } else if (hasSpeechSynthesis) {
+                supportDiv.className = 'status error';
+                supportDiv.textContent = '⚠️ Prohlížeč podporuje pouze syntézu řeči, rozpoznávání není dostupné';
+                addResult('Podpora prohlížeče', 'PARTIAL', 'Pouze syntéza řeči');
+            } else {
+                supportDiv.className = 'status error';
+                supportDiv.textContent = '❌ Prohlížeč nepodporuje Web Speech API';
+                addResult('Podpora prohlížeče', 'FAIL', 'Web Speech API není podporováno');
+            }
+        }
+
+        // Test mikrofonu
+        function testMicrophone() {
+            const statusDiv = document.getElementById('microphoneStatus');
+            const button = document.getElementById('micTest');
+            
+            statusDiv.className = 'status info';
+            statusDiv.textContent = 'Žádám o povolení mikrofonu...';
+            button.disabled = true;
+            
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ Mikrofon je dostupný a povolený';
+                    addResult('Test mikrofonu', 'PASS', 'Mikrofon funguje správně');
+                    
+                    // Zastavení streamu
+                    stream.getTracks().forEach(track => track.stop());
+                    button.disabled = false;
+                })
+                .catch(error => {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = `❌ Chyba mikrofonu: ${error.message}`;
+                    addResult('Test mikrofonu', 'FAIL', error.message);
+                    button.disabled = false;
+                });
+        }
+
+        // Test rozpoznávání řeči
+        function testSpeechRecognition() {
+            const statusDiv = document.getElementById('speechStatus');
+            const textDiv = document.getElementById('recognizedText');
+            const startBtn = document.getElementById('speechTest');
+            const stopBtn = document.getElementById('stopSpeech');
+            
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ Rozpoznávání řeči není podporováno';
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'cs-CZ';
+            
+            recognition.onstart = () => {
+                statusDiv.className = 'status info';
+                statusDiv.textContent = '🎤 Naslouchám... Řekněte něco!';
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+            };
+            
+            recognition.onresult = (event) => {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                textDiv.innerHTML = `
+                    <strong>Rozpoznáno:</strong> ${finalTranscript}<br>
+                    <em>Průběžně:</em> ${interimTranscript}
+                `;
+                
+                if (finalTranscript) {
+                    addResult('Rozpoznávání řeči', 'PASS', `Rozpoznáno: "${finalTranscript}"`);
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Chyba rozpoznávání: ${event.error}`;
+                addResult('Rozpoznávání řeči', 'FAIL', event.error);
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            };
+            
+            recognition.onend = () => {
+                statusDiv.className = 'status info';
+                statusDiv.textContent = 'Rozpoznávání ukončeno';
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            };
+            
+            recognition.start();
+        }
+
+        function stopSpeechTest() {
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+
+        // Test syntézy řeči
+        function testSpeechSynthesis() {
+            const statusDiv = document.getElementById('speechSynthesisStatus');
+            const textInput = document.getElementById('testText');
+            
+            if (!synthesis) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ Syntéza řeči není podporována';
+                return;
+            }
+            
+            const text = textInput.value || 'Toto je test hlasového výstupu';
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            utterance.lang = 'cs-CZ';
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            
+            utterance.onstart = () => {
+                statusDiv.className = 'status info';
+                statusDiv.textContent = '🔊 Přehrávám text...';
+            };
+            
+            utterance.onend = () => {
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ Text byl úspěšně přečten';
+                addResult('Syntéza řeči', 'PASS', 'Hlasový výstup funguje');
+            };
+            
+            utterance.onerror = (event) => {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Chyba syntézy: ${event.error}`;
+                addResult('Syntéza řeči', 'FAIL', event.error);
+            };
+            
+            synthesis.speak(utterance);
+        }
+
+        // Test hlasových příkazů
+        function startCommandTest() {
+            const statusDiv = document.getElementById('commandStatus');
+            const startBtn = document.getElementById('commandTest');
+            const stopBtn = document.getElementById('stopCommand');
+            
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ Rozpoznávání řeči není podporováno';
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'cs-CZ';
+            
+            const testCommands = ['přidat bod', 'vypočítat trasu', 'nápověda', 'stop'];
+            
+            recognition.onstart = () => {
+                statusDiv.className = 'status info';
+                statusDiv.textContent = '🎤 Naslouchám příkazům... Zkuste říct jeden z testovacích příkazů';
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                isTestingCommands = true;
+            };
+            
+            recognition.onresult = (event) => {
+                let finalTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                
+                if (finalTranscript) {
+                    const command = finalTranscript.toLowerCase().trim();
+                    const matchedCommand = testCommands.find(cmd => command.includes(cmd));
+                    
+                    if (matchedCommand) {
+                        statusDiv.className = 'status success';
+                        statusDiv.textContent = `✅ Rozpoznán příkaz: "${matchedCommand}"`;
+                        addResult('Hlasové příkazy', 'PASS', `Příkaz "${matchedCommand}" byl rozpoznán`);
+                        
+                        // Simulace odpovědi
+                        const utterance = new SpeechSynthesisUtterance(`Příkaz ${matchedCommand} byl rozpoznán`);
+                        utterance.lang = 'cs-CZ';
+                        synthesis.speak(utterance);
+                    } else {
+                        statusDiv.className = 'status info';
+                        statusDiv.textContent = `Rozpoznáno: "${command}" - není testovací příkaz`;
+                    }
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Chyba: ${event.error}`;
+                addResult('Hlasové příkazy', 'FAIL', event.error);
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                isTestingCommands = false;
+            };
+            
+            recognition.onend = () => {
+                if (isTestingCommands) {
+                    statusDiv.className = 'status info';
+                    statusDiv.textContent = 'Test příkazů ukončen';
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    isTestingCommands = false;
+                }
+            };
+            
+            recognition.start();
+        }
+
+        function stopCommandTest() {
+            if (recognition) {
+                recognition.stop();
+                isTestingCommands = false;
+            }
+        }
+
+        // Přidání výsledku testu
+        function addResult(testName, status, details) {
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.push({ testName, status, details, timestamp });
+            updateResultsDisplay();
+        }
+
+        function updateResultsDisplay() {
+            const resultsDiv = document.getElementById('results');
+            
+            if (testResults.length === 0) {
+                resultsDiv.innerHTML = '<p>Zatím nebyly provedeny žádné testy.</p>';
+                return;
+            }
+            
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr style="background: #f8f9fa;"><th style="padding: 8px; border: 1px solid #ddd;">Test</th><th style="padding: 8px; border: 1px solid #ddd;">Stav</th><th style="padding: 8px; border: 1px solid #ddd;">Detaily</th><th style="padding: 8px; border: 1px solid #ddd;">Čas</th></tr>';
+            
+            testResults.forEach(result => {
+                const statusColor = result.status === 'PASS' ? '#28a745' : 
+                                  result.status === 'FAIL' ? '#dc3545' : '#ffc107';
+                html += `<tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${result.testName}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; color: ${statusColor}; font-weight: bold;">${result.status}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${result.details}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${result.timestamp}</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            resultsDiv.innerHTML = html;
+        }
+
+        // Automatická kontrola při načtení stránky
+        window.addEventListener('load', () => {
+            checkBrowserSupport();
+        });
+    </script>
+</body>
+</html>
