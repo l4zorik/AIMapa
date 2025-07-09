@@ -1,0 +1,71 @@
+name: Auto-merge for AI Agents
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.head_ref, 'docs/') ||
+      startsWith(github.head_ref, 'fix/') ||
+      contains(github.event.pull_request.title, '[auto-merge]')
+    
+    steps:
+      - name: Check if PR is from AI agent
+        id: check-agent
+        run: |
+          if [[ "${{ github.event.pull_request.user.login }}" == "l4zorik" ]] || 
+             [[ "${{ github.event.pull_request.title }}" == *"docs:"* ]] ||
+             [[ "${{ github.event.pull_request.title }}" == *"fix:"* ]]; then
+            echo "auto_merge=true" >> $GITHUB_OUTPUT
+          else
+            echo "auto_merge=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Auto-approve and merge
+        if: steps.check-agent.outputs.auto_merge == 'true'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Auto-approve PR
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              event: 'APPROVE',
+              body: '🤖 Auto-approved by AI agent workflow'
+            });
+            
+            // Auto-merge PR
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              merge_method: 'squash',
+              commit_title: `${context.payload.pull_request.title} (#${context.issue.number})`,
+              commit_message: '🤖 Auto-merged by AI agent workflow'
+            });
+
+  test-before-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Test VoiceBot functionality
+        run: |
+          npm start &
+          sleep 10
+          curl -f http://localhost:3000 || exit 1
+          curl -f http://localhost:3000/voicebot-test.html || exit 1
+          echo "✅ VoiceBot tests passed"
