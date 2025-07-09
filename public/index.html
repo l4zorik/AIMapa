@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Map - Into the known v0.3.8.5</title>
+    <title>AI Map - Into the known v0.3.8.6 - VoiceBot Edition</title>
     <link rel="icon" href="app/icons8-favicon.gif" type="image/gif">
     <link rel="stylesheet" href="app/styles.css">
     <!-- Leaflet CSS pro mapu -->
@@ -23,6 +23,7 @@
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
 
     <!-- CSS pro novinky a další funkce -->
+    <link rel="stylesheet" href="app/voicebot.css">
     <link rel="stylesheet" href="app/updates-notification.css">
     <link rel="stylesheet" href="app/user-progress.css">
     <link rel="stylesheet" href="app/route-utils.css">
@@ -375,22 +376,36 @@
         });
     </script>
 
-    <!-- Moduly aplikace -->
+    <!-- Optimalizované moduly aplikace -->
+    <!-- Výkonnostní optimalizace -->
+    <script src="app/performance-optimizer.js"></script>
+
+    <!-- Hlavní moduly -->
+    <script src="app/voicebot.js"></script>
+    <script src="app/voicebot-advanced.js"></script>
+    <script src="app/app-core.js"></script>
+
+    <!-- Základní funkce -->
     <script src="app/user-progress.js"></script>
     <script src="app/user-progress-extensions.js"></script>
+    <script src="app/virtual-work.js"></script>
+    <script src="app/reward-system.js"></script>
+    <script src="app/task-system.js"></script>
+    <script src="app/achievements.js"></script>
+    <script src="app/commands-menu.js"></script>
+
+    <!-- Služby -->
     <script src="app/transport-connections.js"></script>
-    <script src="app/feedback-survey.js"></script>
     <script src="app/food-services.js"></script>
     <script src="app/medical-services.js"></script>
     <script src="app/transport-services.js"></script>
+    <script src="app/housing-services.js"></script>
+
+    <!-- UI a efekty -->
     <script src="app/dark-sky-effects.js"></script>
     <script src="app/draggable-elements.js"></script>
-    <script src="app/task-system.js"></script>
+    <script src="app/feedback-survey.js"></script>
     <script src="app/car-sales.js"></script>
-    <script src="app/virtual-work.js"></script>
-    <script src="app/reward-system.js"></script>
-    <script src="app/commands-menu.js"></script>
-    <script src="app/fix-menu.js"></script>
     <script src="app/business-markers.js"></script>
     <script src="app/business-data-loader.js"></script>
     <script src="app/money-indicator-enhanced.js"></script>

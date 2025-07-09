@@ -4,12 +4,16 @@ Interaktivní mapa s AI funkcemi a virtuální prací.
 
 ## Popis
 
-AIMapa je webová aplikace, která kombinuje interaktivní mapu s funkcemi umělé inteligence a virtuální práce. Aplikace umožňuje uživatelům:
+AIMapa je pokročilá webová aplikace, která kombinuje interaktivní mapu s funkcemi umělé inteligence, virtuální práce a revolučního VoiceBot systému. Aplikace umožňuje uživatelům:
 
-- Procházet interaktivní mapu
-- Virtuálně pracovat a vydělávat virtuální peníze
-- Sledovat body na mapě a ukládat cesty
-- Využívat AI funkce pro navigaci a doporučení
+- **🗺️ Interaktivní mapa** - Procházet mapu s pokročilými funkcemi
+- **🎤 VoiceBot ovládání** - Kompletní hlasové ovládání všech funkcí
+- **💼 Virtuální práce** - Vydělávat virtuální peníze a plnit úkoly
+- **🧭 Inteligentní navigace** - AI asistované směrování a vyhledávání
+- **🏆 Systém achievementů** - Odemykání úspěchů a sledování postupu
+- **🛍️ Služby** - Objednání jídla, taxi, lékařské a další služby
+- **🌙 Tmavý režim** - Moderní design s podporou tmavého tématu
+- **📱 Mobilní optimalizace** - Plná funkcionalita na všech zařízeních
 
 ## Technologie
 
@@ -67,7 +71,17 @@ AIMapa je integrována s Supabase pro ukládání dat v cloudu a autentizaci už
 
 ## Verze
 
-Aktuální verze: 0.3.8.4
+Aktuální verze: 0.3.8.6 - VoiceBot Edition
+
+### 🎤 Nové funkce ve verzi 0.3.8.6
+
+- **VoiceBot systém** - Kompletní hlasové ovládání aplikace
+- **Rozpoznávání řeči** - Česká hlasová příkazy
+- **Syntéza řeči** - AI asistent mluví česky
+- **Hlasové ovládání mapy** - Přiblížení, oddálení, navigace
+- **Hlasová virtuální práce** - Spuštění a řízení práce hlasem
+- **Hlasové služby** - Objednání jídla, taxi, lékařské služby
+- **Optimalizace výkonu** - Rychlejší načítání a lepší responzivita
 
 Podrobný seznam změn najdete v souboru [CHANGELOG.md](CHANGELOG.md).
 

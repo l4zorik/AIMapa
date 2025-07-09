@@ -2,6 +2,47 @@
 
 Všechny významné změny v projektu AIMapa budou dokumentovány v tomto souboru.
 
+## [0.3.8.6] - 2025-07-09 - VOICEBOT A OPTIMALIZACE APLIKACE
+
+### Nové funkce - VoiceBot
+- **Kompletní VoiceBot systém** s rozpoznáváním řeči a syntézou řeči
+- **Hlasové ovládání mapy** - přiblížení, oddálení, střed, fullscreen, glóbus
+- **Hlasové navigační příkazy** - vypočítej trasu, vymaž trasu, najdi místo
+- **Hlasové ovládání virtuální práce** - spuštění, dokončení, přidání úkolů
+- **Hlasový AI chat** - přirozená konverzace s AI asistentem
+- **Kontextové hlasové odpovědi** - inteligentní odpovědi na základě situace
+- **Hlasové čtení achievementů** - informace o úspěších a postupu
+- **Hlasové ovládání služeb** - objednání jídla, taxi, lékařské služby
+- **Pokročilé hlasové příkazy** - čas, datum, počasí, statistiky
+
+### Optimalizace aplikace
+- **Vyčištění kódu** - odstranění duplicitních a nepoužívaných souborů
+- **Optimalizovaný hlavní modul** (app-core.js) pro lepší výkon
+- **Modulární architektura** - lepší organizace a načítání modulů
+- **Vylepšená inicializace** - rychlejší a spolehlivější spuštění aplikace
+- **Optimalizované CSS** - lepší výkon a responzivní design
+- **Klávesové zkratky** - Ctrl+V pro VoiceBot, Ctrl+F pro fullscreen, atd.
+
+### Vylepšení uživatelského rozhraní
+- **Moderní VoiceBot panel** s animacemi a efekty
+- **Responzivní design** - optimalizace pro mobilní zařízení
+- **Tmavý režim** - plná podpora pro VoiceBot komponenty
+- **Přístupnost** - podpora pro screen readery a klávesové ovládání
+- **Notifikace** - elegantní systém oznámení o stavu aplikace
+
+### Technické vylepšení
+- **Speech Recognition API** - moderní webové API pro rozpoznávání řeči
+- **Speech Synthesis API** - kvalitní syntéza řeči v češtině
+- **Kontextové zpracování** - inteligentní porozumění příkazům
+- **Event-driven architektura** - lepší komunikace mezi moduly
+- **Optimalizace výkonu** - pozastavení náročných operací při neaktivitě
+
+### Opravy
+- Opravena inicializace mapy při různých podmínkách načítání
+- Vylepšena kompatibilita s různými prohlížeči
+- Opraveny problémy s načítáním modulů
+- Vylepšena správa paměti a výkon aplikace
+
 ## [0.3.8.5] - 2025-07-12 - LOKÁLNÍ NODE.JS SERVER S PŘIHLAŠOVACÍM SYSTÉMEM
 
 ### Nové funkce

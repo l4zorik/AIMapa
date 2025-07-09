@@ -5,10 +5,31 @@
 
 const UpdatesNotification = {
     // Aktuální verze aplikace
-    currentVersion: '0.3.8.5',
+    currentVersion: '0.3.8.6',
 
     // Informace o aktualizacích
     updates: [
+        {
+            version: '0.3.8.6',
+            date: '2025-07-09',
+            title: 'VoiceBot a optimalizace aplikace',
+            description: 'Přidán kompletní VoiceBot systém a provedena optimalizace celé aplikace',
+            changes: [
+                '🎤 Nový VoiceBot systém s rozpoznáváním řeči a syntézou řeči',
+                '🗣️ Hlasové ovládání mapy (přiblíž, oddal, střed, fullscreen, glóbus)',
+                '🧭 Hlasové navigační příkazy (vypočítej trasu, najdi místo)',
+                '💼 Hlasové ovládání virtuální práce a úkolů',
+                '🤖 Hlasový AI chat s přirozenou konverzací',
+                '📊 Hlasové čtení achievementů a statistik',
+                '🍔 Hlasové ovládání služeb (jídlo, taxi, lékařské služby)',
+                '⚡ Optimalizace výkonu a vyčištění kódu',
+                '🎨 Moderní responzivní design VoiceBot panelu',
+                '⌨️ Klávesové zkratky (Ctrl+V, Ctrl+F, Ctrl+D, Ctrl+G)',
+                '🌙 Plná podpora tmavého režimu pro VoiceBot',
+                '📱 Optimalizace pro mobilní zařízení',
+                '♿ Vylepšená přístupnost a podpora screen readerů'
+            ]
+        },
         {
             version: '0.3.8.5',
             date: '2025-07-20',
