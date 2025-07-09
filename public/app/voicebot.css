@@ -1,0 +1,380 @@
+/**
+ * VoiceBot CSS Styles
+ * Verze 0.3.8.6 - Optimalizované styly pro VoiceBot
+ */
+
+/* Hlavní kontejner VoiceBot */
+.voicebot-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 220px;
+    max-width: 300px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.voicebot-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Tmavý režim */
+[data-theme="dark"] .voicebot-container {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Panel VoiceBot */
+.voicebot-panel {
+    padding: 20px;
+}
+
+/* Hlavička */
+.voicebot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .voicebot-header {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.voicebot-title {
+    font-weight: 600;
+    font-size: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+[data-theme="dark"] .voicebot-title {
+    background: linear-gradient(135deg, #8b9dc3 0%, #9b7bb8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Tlačítko nastavení */
+.voicebot-settings-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+.voicebot-settings-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+[data-theme="dark"] .voicebot-settings-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Ovládací prvky */
+.voicebot-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.voicebot-btn {
+    padding: 14px 12px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.voicebot-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.voicebot-btn:hover::before {
+    left: 100%;
+}
+
+.voicebot-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.voicebot-btn:active {
+    transform: translateY(0);
+}
+
+/* Tlačítko naslouchání */
+.voicebot-listen-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.voicebot-listen-btn:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+.voicebot-listen-btn.listening {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    animation: voicebot-pulse 1.5s infinite;
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+}
+
+.voicebot-listen-btn.listening:hover {
+    background: linear-gradient(135deg, #d32f2f, #c62828);
+}
+
+/* Tlačítko zastavení */
+.voicebot-stop-btn {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+}
+
+.voicebot-stop-btn:hover {
+    background: linear-gradient(135deg, #f57c00, #ef6c00);
+    box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+}
+
+/* Ikony a text */
+.voicebot-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.voicebot-text {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status */
+.voicebot-status {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .voicebot-status {
+    color: #ccc;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.voicebot-status.active {
+    color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+[data-theme="dark"] .voicebot-status.active {
+    color: #81C784;
+    background: rgba(76, 175, 80, 0.15);
+}
+
+/* Animace */
+@keyframes voicebot-pulse {
+    0% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.8; 
+        transform: scale(1.02);
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+}
+
+@keyframes voicebot-listening {
+    0% { box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4); }
+    50% { box-shadow: 0 4px 25px rgba(244, 67, 54, 0.6); }
+    100% { box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4); }
+}
+
+.voicebot-listen-btn.listening {
+    animation: voicebot-pulse 1.5s infinite, voicebot-listening 2s infinite;
+}
+
+/* Rozšířený panel (pro budoucí funkce) */
+.voicebot-expanded {
+    max-width: 400px;
+}
+
+.voicebot-expanded .voicebot-controls {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Notifikace VoiceBot */
+.voicebot-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 10001;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 13px;
+    max-width: 250px;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+}
+
+.voicebot-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+[data-theme="dark"] .voicebot-notification {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Responzivní design */
+@media (max-width: 768px) {
+    .voicebot-container {
+        top: 10px;
+        right: 10px;
+        min-width: 200px;
+        max-width: 250px;
+    }
+    
+    .voicebot-panel {
+        padding: 16px;
+    }
+    
+    .voicebot-controls {
+        gap: 10px;
+    }
+    
+    .voicebot-btn {
+        padding: 12px 10px;
+        font-size: 12px;
+    }
+    
+    .voicebot-icon {
+        font-size: 18px;
+    }
+    
+    .voicebot-text {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .voicebot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        top: auto;
+        min-width: 180px;
+    }
+    
+    .voicebot-controls {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .voicebot-btn {
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+}
+
+/* Přístupnost */
+.voicebot-btn:focus {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+[data-theme="dark"] .voicebot-btn:focus {
+    outline-color: #81C784;
+}
+
+/* Redukce animací pro uživatele s preferencí */
+@media (prefers-reduced-motion: reduce) {
+    .voicebot-container,
+    .voicebot-btn,
+    .voicebot-status,
+    .voicebot-notification {
+        transition: none;
+    }
+    
+    .voicebot-listen-btn.listening {
+        animation: none;
+    }
+    
+    .voicebot-btn:hover {
+        transform: none;
+    }
+}
+
+/* Vysoký kontrast */
+@media (prefers-contrast: high) {
+    .voicebot-container {
+        border: 2px solid #000;
+        background: #fff;
+    }
+    
+    [data-theme="dark"] .voicebot-container {
+        border: 2px solid #fff;
+        background: #000;
+    }
+    
+    .voicebot-btn {
+        border: 1px solid #000;
+    }
+    
+    [data-theme="dark"] .voicebot-btn {
+        border: 1px solid #fff;
+    }
+}
