@@ -1,0 +1,39 @@
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--current-color-background); /* Použití globální proměnné */
+}
+
+.appHeader {
+  background-color: var(--current-color-surface); /* Může být surface nebo specifická barva pro header */
+  color: var(--current-color-text-primary);
+  padding: var(--space-md);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  border-bottom: 1px solid var(--current-color-border);
+}
+
+.appHeader h1 {
+  margin: 0;
+  font-size: 1.75rem; /* Mírně menší než defaultní h1 */
+  color: var(--current-color-primary); /* Použití primární barvy pro nadpis */
+}
+
+.appMainContent {
+  flex-grow: 1;
+  padding: var(--space-md);
+  /* Pro testování můžeme přidat max-width a centrování */
+  /* max-width: 1200px; */
+  /* margin-left: auto; */
+  /* margin-right: auto; */
+}
+
+.appFooter {
+  background-color: var(--current-color-surface);
+  color: var(--current-color-text-secondary);
+  padding: var(--space-md);
+  text-align: center;
+  font-size: 0.875rem;
+  border-top: 1px solid var(--current-color-border);
+}
