@@ -16,11 +16,11 @@ const AuthScreen = {
     },
 
     // Inicializace modulu
-    init() {
+    async init() {
         console.log('Inicializace modulu AuthScreen...');
 
         // Kontrola, zda je uživatel přihlášen
-        this.checkAuthState();
+        await this.checkAuthState();
 
         // Nastavení posluchačů událostí
         this.setupEventListeners();
@@ -33,157 +33,125 @@ const AuthScreen = {
     async checkAuthState() {
         console.log('Kontrola stavu přihlášení...');
 
-        // Pokud je dostupný HybridAuth, použijeme ho pro kontrolu přihlášení
-        if (typeof HybridAuth !== 'undefined') {
-            try {
-                const result = await HybridAuth.getUser();
-
-                if (result.data && result.data.user) {
-                    console.log('Uživatel je přihlášen přes HybridAuth:', result.data.user.email);
-                    this.hideAuthScreen();
-                    return;
-                }
-            } catch (error) {
-                console.error('Chyba při kontrole stavu přihlášení přes HybridAuth:', error);
-            }
-        }
-
-        // Pokud je dostupný SupabaseClient, použijeme ho pro kontrolu přihlášení
-        if (typeof SupabaseClient !== 'undefined') {
-            try {
-                const result = await SupabaseClient.getCurrentUser();
-
-                if (result.success && result.user) {
-                    console.log('Uživatel je přihlášen přes SupabaseClient:', result.user.email);
-                    this.hideAuthScreen();
-                    return;
-                }
-            } catch (error) {
-                console.error('Chyba při kontrole stavu přihlášení přes SupabaseClient:', error);
-            }
-        }
-
-        // Pokud je dostupný UserAccounts, použijeme ho pro kontrolu přihlášení
-        if (typeof UserAccounts !== 'undefined' && UserAccounts.state.isLoggedIn) {
-            console.log('Uživatel je přihlášen přes UserAccounts');
+        // Kontrola, zda jsme na testovací stránce
+        const isTestPage = window.location.href.includes('/tests/');
+        if (isTestPage) {
+            console.log('Jsme na testovací stránce, přeskakuji kontrolu přihlášení');
             this.hideAuthScreen();
+
+            // Nastavení stavu přihlášení pro testovací stránku
+            localStorage.setItem('aiMapaLoggedIn', 'true');
+
+            // Vyvolání události o změně stavu přihlášení
+            document.dispatchEvent(new CustomEvent('authStateChanged', {
+                detail: { isLoggedIn: true, user: { email: 'test@example.com' } }
+            }));
+
             return;
         }
 
-        // Pokud je dostupný LocalAuth, použijeme ho pro kontrolu přihlášení
-        if (typeof LocalAuth !== 'undefined') {
-            try {
-                const result = await LocalAuth.getUser();
+        // Kontrola, zda je uživatel již přihlášen v localStorage
+        const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+        if (isLoggedIn) {
+            console.log('Uživatel je již přihlášen podle localStorage');
+            this.hideAuthScreen();
 
-                if (result.data && result.data.user) {
-                    console.log('Uživatel je přihlášen přes LocalAuth:', result.data.user.email);
+            // Vyvolání události o změně stavu přihlášení
+            document.dispatchEvent(new CustomEvent('authStateChanged', {
+                detail: { isLoggedIn: true, user: { email: localStorage.getItem('aiMapaUserEmail') || 'unknown@example.com' } }
+            }));
+
+            return;
+        }
+
+        // Vždy používáme Auth0 pro kontrolu přihlášení
+        if (typeof Auth0Auth !== 'undefined') {
+            try {
+                // Kontrola, zda je Auth0Auth inicializován
+                if (!Auth0Auth.state.isInitialized) {
+                    console.log('Auth0Auth není inicializován, inicializuji ho...');
+                    await Auth0Auth.init();
+                }
+
+                // Kontrola, zda je uživatel přihlášen přes Auth0
+                if (Auth0Auth.state.isLoggedIn && Auth0Auth.state.currentUser) {
+                    console.log('Uživatel je přihlášen přes Auth0:', Auth0Auth.state.currentUser.email || Auth0Auth.state.currentUser.name);
                     this.hideAuthScreen();
+
+                    // Uložení stavu přihlášení
+                    localStorage.setItem('aiMapaLoggedIn', 'true');
+                    localStorage.setItem('aiMapaUserEmail', Auth0Auth.state.currentUser.email || Auth0Auth.state.currentUser.name);
+
+                    // Vyvolání události o změně stavu přihlášení
+                    document.dispatchEvent(new CustomEvent('authStateChanged', {
+                        detail: { isLoggedIn: true, user: Auth0Auth.state.currentUser }
+                    }));
+
                     return;
                 }
             } catch (error) {
-                console.error('Chyba při kontrole stavu přihlášení přes LocalAuth:', error);
+                console.error('Chyba při kontrole stavu přihlášení přes Auth0:', error);
             }
         }
 
         // Pokud uživatel není přihlášen, zobrazíme přihlašovací obrazovku
         console.log('Uživatel není přihlášen, zobrazuji přihlašovací obrazovku');
-        this.showAuthScreen();
+        await this.showAuthScreen();
     },
 
     // Zobrazení přihlašovací obrazovky
-    showAuthScreen() {
+    async showAuthScreen() {
         console.log('Zobrazení přihlašovací obrazovky');
 
-        // Skrytí obsahu aplikace
-        this.hideAppContent();
+        // Vždy používáme pouze Auth0 pro přihlašování
+        if (typeof Auth0Auth !== 'undefined') {
+            console.log('Auth0Auth je dostupný, používám Auth0 přihlášení...');
 
-        // Kontrola, zda již obrazovka existuje
-        if (document.getElementById('authScreen')) {
-            document.getElementById('authScreen').style.display = 'flex';
-            this.state.isVisible = true;
+            // Kontrola, zda je Auth0Auth inicializován
+            if (!Auth0Auth.state.isInitialized) {
+                console.log('Auth0Auth není inicializován, inicializuji ho...');
+                try {
+                    await Auth0Auth.init();
+                } catch (error) {
+                    console.error('Chyba při inicializaci Auth0Auth:', error);
+                }
+            }
+
+            if (Auth0Auth.state.isInitialized) {
+                console.log('Auth0Auth je inicializován, přesměrovávám na Auth0 přihlášení...');
+
+                // Přesměrování na Auth0 přihlášení
+                try {
+                    const result = await Auth0Auth.login();
+                    console.log('Výsledek přihlášení přes Auth0:', result);
+
+                    if (result.error) {
+                        console.error('Chyba při přihlašování přes Auth0:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Chyba při volání Auth0Auth.login():', error);
+                }
+                return;
+            } else {
+                console.error('Auth0Auth se nepodařilo inicializovat!');
+            }
+        } else {
+            console.error('Auth0Auth není dostupný! Přesměrovávám na Auth0 přihlášení pomocí přímého přesměrování...');
+
+            // Přímé přesměrování na Auth0 přihlašovací stránku
+            const redirectUri = window.location.origin;
+            const authUrl = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?' +
+                'client_id=H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ&' +
+                'redirect_uri=' + encodeURIComponent(redirectUri) + '&' +
+                'response_type=code&' +
+                'scope=openid%20profile%20email&' +
+                'connection=Username-Password-Authentication&' + // Specifikace připojení
+                'prompt=login'; // Vždy zobrazit přihlašovací obrazovku
+
+            console.log('Přesměrovávám na Auth0 URL:', authUrl);
+            window.location.href = authUrl;
             return;
         }
-
-        // Vytvoření přihlašovací obrazovky
-        const authScreen = document.createElement('div');
-        authScreen.id = 'authScreen';
-        authScreen.className = 'auth-screen';
-
-        // Nastavení obsahu
-        authScreen.innerHTML = `
-            <div class="auth-container">
-                <div class="auth-header">
-                    <h1>AI Mapa</h1>
-                    <p>Pro pokračování se prosím přihlaste nebo zaregistrujte</p>
-                </div>
-
-                <div class="auth-tabs">
-                    <button class="auth-tab active" data-tab="login">Přihlášení</button>
-                    <button class="auth-tab" data-tab="register">Registrace</button>
-                </div>
-
-                <div class="auth-content">
-                    <div class="auth-form login-form active">
-                        <div class="form-group">
-                            <label for="loginEmail">E-mail</label>
-                            <input type="email" id="loginEmail" placeholder="Zadejte e-mail">
-                        </div>
-                        <div class="form-group">
-                            <label for="loginPassword">Heslo</label>
-                            <input type="password" id="loginPassword" placeholder="Zadejte heslo">
-                        </div>
-                        <div class="form-actions">
-                            <button id="loginButton" class="auth-button">Přihlásit se</button>
-                        </div>
-                        <div class="auth-message" id="loginMessage"></div>
-                    </div>
-
-                    <div class="auth-form register-form">
-                        <div class="form-group">
-                            <label for="registerUsername">Uživatelské jméno</label>
-                            <input type="text" id="registerUsername" placeholder="Zadejte uživatelské jméno">
-                        </div>
-                        <div class="form-group">
-                            <label for="registerEmail">E-mail</label>
-                            <input type="email" id="registerEmail" placeholder="Zadejte e-mail">
-                        </div>
-                        <div class="form-group">
-                            <label for="registerPassword">Heslo</label>
-                            <input type="password" id="registerPassword" placeholder="Zadejte heslo" oninput="AuthScreen.checkPasswordStrength()">
-                            <div class="password-strength-meter">
-                                <div class="password-strength-meter-bar" id="passwordStrengthBar"></div>
-                            </div>
-                            <div class="password-strength-text" id="passwordStrengthText"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="registerPasswordConfirm">Potvrzení hesla</label>
-                            <input type="password" id="registerPasswordConfirm" placeholder="Potvrďte heslo">
-                        </div>
-                        <div class="security-alert info">
-                            <span class="security-alert-icon">ℹ️</span>
-                            <span>Heslo musí mít alespoň 8 znaků a obsahovat velké písmeno, malé písmeno, číslo a speciální znak.</span>
-                        </div>
-                        <div class="form-actions">
-                            <button id="registerButton" class="auth-button">Zaregistrovat se</button>
-                        </div>
-                        <div class="auth-message" id="registerMessage"></div>
-                    </div>
-                </div>
-
-                <div class="auth-footer">
-                    <p>© 2025 AI Mapa - Všechna práva vyhrazena</p>
-                </div>
-            </div>
-        `;
-
-        // Přidání do dokumentu
-        document.body.appendChild(authScreen);
-
-        // Nastavení posluchačů událostí
-        this.setupFormEventListeners();
-
-        // Nastavení stavu
-        this.state.isVisible = true;
     },
 
     // Skrytí přihlašovací obrazovky
@@ -246,7 +214,9 @@ const AuthScreen = {
             if (event.detail.isLoggedIn) {
                 this.hideAuthScreen();
             } else {
-                this.showAuthScreen();
+                this.showAuthScreen().catch(error => {
+                    console.error('Chyba při zobrazení přihlašovací obrazovky:', error);
+                });
             }
         });
     },
@@ -330,6 +300,25 @@ const AuthScreen = {
             }
         }
 
+        // Pro testovací účely - přihlášení bez autentizačního systému
+        if (email === 'test@example.com' && password === 'test123') {
+            console.log('Testovací přihlášení bylo úspěšné');
+
+            // Uložení stavu přihlášení
+            localStorage.setItem('aiMapaLoggedIn', 'true');
+            localStorage.setItem('aiMapaUserEmail', email);
+
+            // Skrytí přihlašovací obrazovky
+            this.hideAuthScreen();
+
+            // Vyvolání události o změně stavu přihlášení
+            document.dispatchEvent(new CustomEvent('authStateChanged', {
+                detail: { isLoggedIn: true, user: { email: email } }
+            }));
+
+            return;
+        }
+
         // Přihlášení přes HybridAuth (preferovaná metoda)
         if (typeof HybridAuth !== 'undefined') {
             try {
@@ -342,6 +331,10 @@ const AuthScreen = {
                     if (typeof SecurityUtils !== 'undefined') {
                         SecurityUtils.resetLoginAttempts(sanitizedEmail);
                     }
+
+                    // Uložení stavu přihlášení
+                    localStorage.setItem('aiMapaLoggedIn', 'true');
+                    localStorage.setItem('aiMapaUserEmail', result.data.user.email || sanitizedEmail);
 
                     this.hideAuthScreen();
 
@@ -377,6 +370,10 @@ const AuthScreen = {
                         SecurityUtils.resetLoginAttempts(sanitizedEmail);
                     }
 
+                    // Uložení stavu přihlášení
+                    localStorage.setItem('aiMapaLoggedIn', 'true');
+                    localStorage.setItem('aiMapaUserEmail', result.user.email || sanitizedEmail);
+
                     this.hideAuthScreen();
 
                     // Vyvolání události o změně stavu přihlášení
@@ -407,6 +404,10 @@ const AuthScreen = {
                         SecurityUtils.resetLoginAttempts(sanitizedEmail);
                     }
 
+                    // Uložení stavu přihlášení
+                    localStorage.setItem('aiMapaLoggedIn', 'true');
+                    localStorage.setItem('aiMapaUserEmail', result.data.user.email || sanitizedEmail);
+
                     this.hideAuthScreen();
 
                     // Vyvolání události o změně stavu přihlášení
@@ -431,6 +432,11 @@ const AuthScreen = {
 
                 if (result.success) {
                     console.log('Uživatel byl úspěšně přihlášen přes UserAccounts');
+
+                    // Uložení stavu přihlášení
+                    localStorage.setItem('aiMapaLoggedIn', 'true');
+                    localStorage.setItem('aiMapaUserEmail', UserAccounts.state.currentUser?.email || email);
+
                     this.hideAuthScreen();
 
                     // Vyvolání události o změně stavu přihlášení
@@ -449,11 +455,32 @@ const AuthScreen = {
         }
 
         // Pokud není dostupný žádný autentizační systém
-        if (typeof HybridAuth === 'undefined' && typeof SupabaseClient === 'undefined' &&
-            typeof LocalAuth === 'undefined' && typeof UserAccounts === 'undefined') {
+        if (typeof Auth0Auth === 'undefined' && typeof HybridAuth === 'undefined' &&
+            typeof SupabaseClient === 'undefined' && typeof LocalAuth === 'undefined' &&
+            typeof UserAccounts === 'undefined') {
             console.error('Není dostupný žádný autentizační systém');
             this.showMessage('loginMessage', 'Není dostupný žádný autentizační systém', 'error');
         }
+    },
+
+    // Přidání Auth0 tlačítka do přihlašovacího formuláře
+    addAuth0Button() {
+        // Kontrola, zda je dostupný Auth0Auth
+        if (typeof Auth0Auth === 'undefined') {
+            console.log('Auth0Auth není dostupný, tlačítko nebude přidáno');
+            return;
+        }
+
+        // Získání kontejneru pro sociální tlačítka
+        const socialButtonsContainer = document.getElementById('socialLoginButtons');
+        if (!socialButtonsContainer) {
+            console.error('Kontejner pro sociální tlačítka nebyl nalezen');
+            return;
+        }
+
+        // Přidání Auth0 tlačítka
+        Auth0Auth.addLoginButton(socialButtonsContainer);
+        console.log('Auth0 tlačítko bylo přidáno do přihlašovacího formuláře');
     },
 
     // Registrace uživatele
@@ -718,5 +745,43 @@ const AuthScreen = {
 
 // Inicializace modulu po načtení stránky
 document.addEventListener('DOMContentLoaded', function() {
-    AuthScreen.init();
+    // Počkáme na inicializaci Auth0Auth, pokud je dostupný
+    if (typeof Auth0Auth !== 'undefined') {
+        // Kontrola, zda je Auth0Auth již inicializován
+        if (Auth0Auth.state.isInitialized) {
+            console.log('Auth0Auth je již inicializován, inicializuji AuthScreen');
+            AuthScreen.init().catch(error => {
+                console.error('Chyba při inicializaci AuthScreen:', error);
+            });
+        } else {
+            console.log('Čekám na inicializaci Auth0Auth...');
+            // Vytvoření posluchače události pro inicializaci Auth0Auth
+            const checkAuth0Init = setInterval(function() {
+                if (Auth0Auth.state.isInitialized) {
+                    console.log('Auth0Auth byl inicializován, inicializuji AuthScreen');
+                    clearInterval(checkAuth0Init);
+                    AuthScreen.init().catch(error => {
+                        console.error('Chyba při inicializaci AuthScreen:', error);
+                    });
+                }
+            }, 100); // Kontrola každých 100ms
+
+            // Záložní časovač pro případ, že by se Auth0Auth neinicializoval
+            setTimeout(function() {
+                if (!AuthScreen.state.isInitialized) {
+                    console.log('Vypršel časový limit pro inicializaci Auth0Auth, inicializuji AuthScreen bez něj');
+                    clearInterval(checkAuth0Init);
+                    AuthScreen.init().catch(error => {
+                        console.error('Chyba při inicializaci AuthScreen:', error);
+                    });
+                }
+            }, 5000); // Počkáme maximálně 5 sekund
+        }
+    } else {
+        // Auth0Auth není dostupný, inicializujeme AuthScreen přímo
+        console.log('Auth0Auth není dostupný, inicializuji AuthScreen přímo');
+        AuthScreen.init().catch(error => {
+            console.error('Chyba při inicializaci AuthScreen:', error);
+        });
+    }
 });

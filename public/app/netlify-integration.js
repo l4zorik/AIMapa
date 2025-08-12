@@ -58,8 +58,8 @@ const NetlifyIntegration = {
         } else if (typeof process !== 'undefined' && process.env) {
             // Načtení proměnných prostředí z process.env (pro Node.js)
             this.state.environmentVariables = {
-                SUPABASE_URL: process.env.SUPABASE_DATABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_DATABASE_URL,
-                SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+                SUPABASE_URL: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
+                SUPABASE_ANON_KEY: process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
                 SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
                 SUPABASE_JWT_SECRET: process.env.SUPABASE_JWT_SECRET
             };

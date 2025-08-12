@@ -99,6 +99,18 @@ const CryptoFinances = {
             return;
         }
 
+        // Kontrola, zda má uživatel přístup ke kryptoměnám
+        if (typeof SubscriptionService !== 'undefined' && !SubscriptionService.hasAccess('cryptoAccess')) {
+            // Zobrazení modálního okna s informací o nutnosti předplatného
+            alert('Pro přístup ke kryptoměnám je nutné mít aktivní předplatné. Přejděte do sekce Předplatné a vyberte si plán.');
+
+            // Zobrazení modálního okna předplatného
+            if (typeof SubscriptionService.showSubscriptionModal === 'function') {
+                SubscriptionService.showSubscriptionModal();
+            }
+            return;
+        }
+
         // Nastavení příznaku zobrazení okna
         this.state.financeWindowShown = true;
 
@@ -210,13 +222,13 @@ const CryptoFinances = {
         // Aktualizace cen pro každou kryptoměnu
         Object.keys(this.cryptoState).forEach(symbol => {
             const crypto = this.cryptoState[symbol];
-            
+
             // Výpočet náhodné změny ceny
             const priceChange = (Math.random() * 2 - 1) * this.config.priceFluctuation;
-            
+
             // Aktualizace ceny
             crypto.price = crypto.price * (1 + priceChange);
-            
+
             // Zaokrouhlení ceny na 2 desetinná místa
             crypto.price = Math.round(crypto.price * 100) / 100;
         });
@@ -284,11 +296,11 @@ const CryptoFinances = {
         function dragMouseDown(e) {
             e = e || window.event;
             e.preventDefault();
-            
+
             // Získání počáteční pozice kurzoru
             pos3 = e.clientX;
             pos4 = e.clientY;
-            
+
             document.onmouseup = closeDragElement;
             document.onmousemove = elementDrag;
         }
@@ -296,13 +308,13 @@ const CryptoFinances = {
         function elementDrag(e) {
             e = e || window.event;
             e.preventDefault();
-            
+
             // Výpočet nové pozice
             pos1 = pos3 - e.clientX;
             pos2 = pos4 - e.clientY;
             pos3 = e.clientX;
             pos4 = e.clientY;
-            
+
             // Nastavení nové pozice elementu
             element.style.top = (element.offsetTop - pos2) + "px";
             element.style.left = (element.offsetLeft - pos1) + "px";

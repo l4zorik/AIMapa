@@ -7,9 +7,11 @@
     <link rel="icon" href="app/icons8-favicon.gif" type="image/gif">
     <link rel="stylesheet" href="app/styles.css">
     <!-- Leaflet CSS pro mapu -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+    <!-- Jednoduché CSS pro mapu -->
+    <link rel="stylesheet" href="app/simple-map.css">
     <!-- Leaflet Routing Machine CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <!-- OSM Buildings CSS -->
     <link rel="stylesheet" href="https://cdn.osmbuildings.org/4.1.1/OSMBuildings.css">
     <!-- Three.js pro 3D glóbus -->
@@ -17,10 +19,10 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
     <!-- Globe.gl pro 3D glóbus -->
-    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.32.1/dist/globe.gl.min.js"></script>
     <!-- Cesium CSS a JS (ponecháno pro zpětnou kompatibilitu) -->
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/cesium@1.111.0/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/cesium@1.111.0/Build/Cesium/Cesium.js"></script>
 
     <!-- CSS pro novinky a další funkce -->
     <link rel="stylesheet" href="app/voicebot.css">
@@ -31,7 +33,6 @@
     <link rel="stylesheet" href="app/virtual-work.css">
     <link rel="stylesheet" href="app/work-history-icons.css">
     <link rel="stylesheet" href="app/task-definition.css">
-    <link rel="stylesheet" href="app/money-indicator-enhanced.css">
     <link rel="stylesheet" href="app/housing-services.css">
     <link rel="stylesheet" href="app/achievements.css">
     <link rel="stylesheet" href="app/idle-detection.css">
@@ -39,13 +40,31 @@
     <link rel="stylesheet" href="app/user-accounts.css">
     <link rel="stylesheet" href="app/simple-work-dialog.css">
     <!-- Supabase integrace -->
-    <link rel="stylesheet" href="app/supabase-auth.css">
+    <link rel="stylesheet" href="app/services/supabase-auth.css">
     <!-- Přihlašovací obrazovka -->
     <link rel="stylesheet" href="app/auth-screen.css">
     <!-- Bezpečnostní utility -->
     <link rel="stylesheet" href="app/security-utils.css">
+    <!-- Auth0 integrace -->
+    <link rel="stylesheet" href="app/auth0-auth.css">
+    <!-- Jednotný autentizační modul -->
+    <link rel="stylesheet" href="app/auth/auth-service.css">
+    <!-- Uživatelský profil -->
+    <link rel="stylesheet" href="app/user-profile.css">
+    <!-- Předplatné -->
+    <link rel="stylesheet" href="app/services/subscription-service.css">
+    <!-- Odhlašovací tlačítko -->
+    <link rel="stylesheet" href="app/logout-button.css">
+    <!-- Denní odměna -->
+    <link rel="stylesheet" href="app/daily-reward.css">
+    <!-- Vyhledávání -->
+    <link rel="stylesheet" href="app/search.css">
+    <!-- Font Awesome pro ikony -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <!-- Supabase klient -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Auth0 klient -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 </head>
 <body>
     <!-- Ikona pro zobrazení novinek a aktualizací byla odstraněna - novinky jsou nyní dostupné přes menu příkazů -->
@@ -53,13 +72,18 @@
     <div class="container">
         <header>
             <h1>AI Map - Into the known</h1>
-            <button id="settingsButton" class="settings-button" aria-label="Nastavení">
-                <i class="icon">⚙️</i>
-            </button>
+            <div class="header-buttons">
+                <button id="loginButton" class="login-button" aria-label="Přihlásit se">
+                    <i class="icon">👤</i> Přihlásit
+                </button>
+                <button id="settingsButton" class="settings-button" aria-label="Nastavení">
+                    <i class="icon">⚙️</i>
+                </button>
+            </div>
         </header>
 
         <main>
-            <div class="map-container">
+            <div class="map-container" id="map-container">
                 <div class="status-bar">
                     <span class="status-icon">✓</span>
                     Všechno je funkční
@@ -67,19 +91,24 @@
 
                 <h2>Mapa aktivit</h2>
                 <div class="map-wrapper">
+                    <!-- Hlavní mapa -->
                     <div id="map"></div>
-                    <div id="cesiumContainer" class="cesium-container"></div>
-                    <div id="threeGlobeContainer" class="three-globe-container"></div>
+                    <!-- Ovládací prvky mapy -->
                     <button id="fullscreenButton" class="map-control-btn" title="Fullscreen režim">
                         <i class="icon">⛶</i>
                     </button>
-                    <button id="toggleGlobeMode" class="map-control-btn" title="Glóbus režim">
-                        <i class="icon">🌎</i>
-                    </button>
-                    <button id="exitGlobeMode" class="map-control-btn" title="Zpět na mapu" style="display: none;">
-                        <i class="icon">🗺️</i>
-                    </button>
                     <div id="coordinates" class="coordinates-display"></div>
+
+                    <!-- Vyhledávací pole -->
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Vyhledat místo...">
+                        <button id="searchButton" class="search-btn">
+                            <i class="icon">🔍</i>
+                        </button>
+                    </div>
+
+                    <!-- Výsledky vyhledávání -->
+                    <div id="searchResults" class="search-results"></div>
                 </div>
                 <div class="fullscreen-overlay"></div>
 
@@ -121,11 +150,11 @@
                 <div class="chat-content">
                     <div class="chat-messages" id="chatMessages">
                         <div class="message ai">
-                            Trasa bude vypočítána po silnicích. Toto je simulace - v reálné aplikaci by byla použita přesná silniční data.
+                            Vítejte v AI Mapě! Jak vám mohu pomoci? Můžete se mě zeptat na vyhledání trasy, místa nebo informace o dopravě.
                         </div>
                     </div>
                     <div class="chat-input">
-                        <input type="text" id="messageInput" placeholder="Napište zprávu...">
+                        <input type="text" id="aiInput" placeholder="Napište zprávu...">
                         <button class="send-btn" id="sendMessage">➤</button>
                     </div>
                 </div>
@@ -351,15 +380,363 @@
         </div>
     </div>
 
-    <!-- Leaflet JS pro mapu - přidáno defer=false a async=false pro zajištění správného pořadí načítání -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer="false" async="false"></script>
+    <!-- Auth0 SPA SDK - načtení před ostatními skripty bez defer -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js" id="auth0-spa-script"></script>
+    <!-- Záložní zdroj pro Auth0 SDK v případě, že primární zdroj selže -->
+    <script>
+        // Kontrola, zda se Auth0 SDK správně načetl
+        setTimeout(function() {
+            if (typeof createAuth0Client === 'undefined') {
+                console.error('Auth0 SDK se nenačetl z primárního zdroje, načítám záložní zdroj...');
+
+                // Odstranění původního skriptu
+                const originalScript = document.getElementById('auth0-spa-script');
+                if (originalScript) {
+                    originalScript.remove();
+                }
+
+                // Načtení z alternativního CDN
+                const backupScript = document.createElement('script');
+                backupScript.id = 'auth0-spa-script-backup';
+                backupScript.src = 'https://cdn.jsdelivr.net/npm/@auth0/auth0-spa-js@2.0/dist/auth0-spa-js.production.js';
+                backupScript.async = false;
+
+                backupScript.onload = function() {
+                    console.log('Auth0 SDK byl úspěšně načten ze záložního zdroje');
+
+                    // Vyvolání události o načtení Auth0 SDK
+                    document.dispatchEvent(new CustomEvent('auth0SDKLoaded'));
+                };
+
+                document.head.appendChild(backupScript);
+            } else {
+                console.log('Auth0 SDK byl úspěšně načten z primárního zdroje');
+
+                // Vyvolání události o načtení Auth0 SDK
+                document.dispatchEvent(new CustomEvent('auth0SDKLoaded'));
+            }
+        }, 500);
+    </script>
+    <script>
+        // Ignorování chyb souvisejících s ethereum
+        try {
+            // Vytvoření proxy objektu pro window.ethereum, aby se zabránilo chybám
+            Object.defineProperty(window, 'ethereum', {
+                configurable: true,
+                get: function() {
+                    return window._ethereum || {};
+                },
+                set: function(value) {
+                    window._ethereum = value;
+                }
+            });
+        } catch (e) {
+            console.warn('Nepodařilo se vytvořit proxy pro ethereum:', e);
+        }
+
+        // Skrytí obsahu aplikace dokud není uživatel přihlášen
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kontrola, zda je uživatel již přihlášen
+            const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+            const authOverlayRemoved = localStorage.getItem('aiMapaAuthOverlayRemoved') === 'true';
+
+            // Kontrola, zda jsme v procesu přihlašování
+            const query = window.location.search;
+            const hasAuthCode = query.includes('code=') && query.includes('state=');
+            const hash = window.location.hash;
+            const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+            // Pokud je uživatel již přihlášen nebo jsme v procesu přihlašování, nezobrazujeme překryvnou vrstvu
+            if (isLoggedIn || hasAuthCode || hasAuthTokens || authOverlayRemoved) {
+                console.log('Uživatel je již přihlášen nebo v procesu přihlašování, nezobrazuji překryvnou vrstvu');
+                return;
+            }
+
+            // Vytvoření překryvné vrstvy pro blokování přístupu
+            const authOverlay = document.createElement('div');
+            authOverlay.id = 'auth-overlay';
+            authOverlay.style.position = 'fixed';
+            authOverlay.style.top = '0';
+            authOverlay.style.left = '0';
+            authOverlay.style.width = '100%';
+            authOverlay.style.height = '100%';
+            authOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
+            authOverlay.style.zIndex = '9999';
+            authOverlay.style.display = 'flex';
+            authOverlay.style.flexDirection = 'column';
+            authOverlay.style.justifyContent = 'center';
+            authOverlay.style.alignItems = 'center';
+            authOverlay.style.color = 'white';
+            authOverlay.style.textAlign = 'center';
+            authOverlay.style.padding = '20px';
+            authOverlay.style.backdropFilter = 'blur(5px)';
+
+            // Přidání obsahu překryvné vrstvy
+            authOverlay.innerHTML = `
+                <div style="background-color: rgba(44, 62, 80, 0.9); padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 500px; width: 90%;">
+                    <h2 style="font-size: 28px; margin-bottom: 20px; color: #fff;">Přístup k AI Mapě vyžaduje přihlášení</h2>
+                    <p style="font-size: 18px; margin-bottom: 30px; color: #ddd;">Pro pokračování se prosím přihlaste pomocí Auth0.</p>
+                    <div id="auth-overlay-spinner" style="border: 5px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 5px solid #ff4f1f; width: 50px; height: 50px; animation: auth-spin 1s linear infinite; margin: 0 auto 30px;"></div>
+                    <p id="auth-overlay-status" style="font-size: 16px; color: #aaa;">Inicializace přihlašování...</p>
+                    <p style="margin-top: 30px; font-size: 14px; color: #888;">Budete přesměrováni na přihlašovací stránku Auth0...</p>
+                </div>
+            `;
+
+            // Přidání animace pro spinner
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes auth-spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Přidání překryvné vrstvy do dokumentu
+            document.body.appendChild(authOverlay);
+
+            // Funkce pro aktualizaci stavu přihlašování
+            function updateAuthStatus(message) {
+                const statusElement = document.getElementById('auth-overlay-status');
+                if (statusElement) {
+                    statusElement.textContent = message;
+                }
+            }
+
+            // Funkce pro odstranění překryvné vrstvy po přihlášení
+            function removeAuthOverlay() {
+                const overlay = document.getElementById('auth-overlay');
+                if (overlay) {
+                    // Aktualizace zprávy před odstraněním
+                    const statusElement = document.getElementById('auth-overlay-status');
+                    if (statusElement) {
+                        statusElement.textContent = 'Přihlášení úspěšné! Načítám aplikaci...';
+                        statusElement.style.color = '#4CAF50';
+                    }
+
+                    // Animace zmizení
+                    overlay.style.opacity = '0';
+                    overlay.style.transition = 'opacity 0.8s ease';
+
+                    // Odstranění po dokončení animace
+                    setTimeout(() => {
+                        overlay.remove();
+                        console.log('Překryvná vrstva byla odstraněna');
+
+                        // Vyvolání události o odstranění překryvné vrstvy
+                        document.dispatchEvent(new CustomEvent('authOverlayRemoved'));
+
+                        // Odstranění parametrů z URL
+                        if (window.location.search.includes('code=') || window.location.hash.includes('access_token=')) {
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+
+                        // Nastavení příznaku, že uživatel je přihlášen a překryvná vrstva byla odstraněna
+                        localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+                        localStorage.setItem('aiMapaLoggedIn', 'true');
+                    }, 800);
+                }
+            }
+
+            // Posluchač události pro změnu stavu přihlášení
+            document.addEventListener('authStateChanged', function(event) {
+                if (event.detail.isLoggedIn) {
+                    console.log('Uživatel je přihlášen, odstraňuji překryvnou vrstvu...');
+                    removeAuthOverlay();
+
+                    // Vyvolání události o odstranění překryvné vrstvy
+                    document.dispatchEvent(new CustomEvent('authOverlayRemoved'));
+
+                    // Odstranění parametrů z URL
+                    if (window.location.search.includes('code=') || window.location.hash.includes('access_token=')) {
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                } else {
+                    console.log('Uživatel není přihlášen, ponechávám překryvnou vrstvu...');
+                }
+            });
+
+            // Funkce pro inicializaci Auth0
+            function initAuth0() {
+                console.log('Inicializace Auth0...');
+                updateAuthStatus('Inicializuji Auth0 přihlašování...');
+
+                // Kontrola, zda je Auth0Auth modul načten
+                if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.init === 'function') {
+                    console.log('Auth0Auth modul je dostupný, inicializuji...');
+
+                    Auth0Auth.init().then(function() {
+                        console.log('Auth0Auth byl úspěšně inicializován');
+
+                        // Kontrola, zda je uživatel přihlášen
+                        if (!Auth0Auth.state.isLoggedIn) {
+                            // Kontrola, zda jsme v procesu přihlašování
+                            const query = window.location.search;
+                            const hasAuthCode = query.includes('code=') && query.includes('state=');
+                            const hash = window.location.hash;
+                            const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                            if (!hasAuthCode && !hasAuthTokens) {
+                                console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
+                                updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
+                                setTimeout(function() {
+                                    Auth0Auth.login();
+                                }, 1000);
+                            } else {
+                                console.log('Detekován autorizační kód nebo tokeny v URL, čekám na zpracování callbacku...');
+                                updateAuthStatus('Zpracovávám přihlášení...');
+                            }
+                        } else {
+                            console.log('Uživatel je již přihlášen, odstraňuji překryvnou vrstvu...');
+                            removeAuthOverlay();
+                        }
+                    }).catch(function(error) {
+                        console.error('Chyba při inicializaci Auth0Auth:', error);
+                        updateAuthStatus('Chyba při inicializaci přihlašování. Zkouším přímé přihlášení...');
+
+                        // Přímé přesměrování na Auth0 přihlašovací stránku
+                        directAuth0Login();
+                    });
+                } else {
+                    console.error('Auth0Auth modul není dostupný, načítám ho...');
+                    updateAuthStatus('Načítám Auth0Auth modul...');
+
+                    // Načtení Auth0Auth modulu
+                    const auth0AuthScript = document.createElement('script');
+                    auth0AuthScript.src = 'app/auth0-auth.js';
+                    auth0AuthScript.onload = function() {
+                        console.log('Auth0Auth modul byl úspěšně načten');
+
+                        // Krátká pauza pro zajištění, že modul je plně inicializován
+                        setTimeout(function() {
+                            if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.init === 'function') {
+                                console.log('Auth0Auth modul je nyní dostupný, inicializuji...');
+
+                                Auth0Auth.init().then(function() {
+                                    console.log('Auth0Auth byl úspěšně inicializován po načtení modulu');
+
+                                    // Kontrola, zda je uživatel přihlášen
+                                    if (!Auth0Auth.state.isLoggedIn) {
+                                        // Kontrola, zda jsme v procesu přihlašování
+                                        const query = window.location.search;
+                                        const hasAuthCode = query.includes('code=') && query.includes('state=');
+                                        const hash = window.location.hash;
+                                        const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                                        if (!hasAuthCode && !hasAuthTokens) {
+                                            console.log('Uživatel není přihlášen, přesměrovávám na přihlašovací stránku...');
+                                            updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
+                                            setTimeout(function() {
+                                                Auth0Auth.login();
+                                            }, 1000);
+                                        } else {
+                                            console.log('Detekován autorizační kód nebo tokeny v URL, čekám na zpracování callbacku...');
+                                            updateAuthStatus('Zpracovávám přihlášení...');
+                                        }
+                                    } else {
+                                        console.log('Uživatel je již přihlášen, odstraňuji překryvnou vrstvu...');
+                                        removeAuthOverlay();
+                                    }
+                                }).catch(function(error) {
+                                    console.error('Chyba při inicializaci Auth0Auth po načtení modulu:', error);
+                                    updateAuthStatus('Chyba při inicializaci přihlašování. Zkouším přímé přihlášení...');
+
+                                    // Přímé přesměrování na Auth0 přihlašovací stránku
+                                    directAuth0Login();
+                                });
+                            } else {
+                                console.error('Auth0Auth modul stále není dostupný po načtení, používám přímé přihlášení');
+                                updateAuthStatus('Auth0Auth modul není dostupný. Zkouším přímé přihlášení...');
+
+                                // Přímé přesměrování na Auth0 přihlašovací stránku
+                                directAuth0Login();
+                            }
+                        }, 500);
+                    };
+
+                    auth0AuthScript.onerror = function(error) {
+                        console.error('Chyba při načítání Auth0Auth modulu:', error);
+                        updateAuthStatus('Chyba při načítání Auth0Auth modulu. Zkouším přímé přihlášení...');
+
+                        // Přímé přesměrování na Auth0 přihlašovací stránku
+                        directAuth0Login();
+                    };
+
+                    document.head.appendChild(auth0AuthScript);
+                }
+            }
+
+            // Funkce pro přímé přihlášení přes Auth0
+            function directAuth0Login() {
+                console.log('Používám přímé přihlášení přes Auth0...');
+                updateAuthStatus('Přesměrovávám na přihlašovací stránku Auth0...');
+
+                // Okamžité přesměrování bez čekání
+                const redirectUri = window.location.origin + '/callback';
+                const authUrl = 'https://dev-zxj8pir0moo4pdk7.us.auth0.com/authorize?' +
+                    'client_id=H6ISWfg3rYoJbCFucezi0wzi5kLnfoTZ&' +
+                    'redirect_uri=' + encodeURIComponent(redirectUri) + '&' +
+                    'response_type=code&' +
+                    'scope=openid%20profile%20email%20read%3Ausers%20read%3Auser_idp_tokens&' +
+                    'audience=https%3A%2F%2Fdev-zxj8pir0moo4pdk7.us.auth0.com%2Fapi%2Fv2%2F&' +
+                    'connection=Username-Password-Authentication&' + // Specifikace připojení
+                    'prompt=login'; // Vždy zobrazit přihlašovací obrazovku
+
+                console.log('Přesměrovávám na Auth0 URL:', authUrl);
+                window.location.href = authUrl;
+            }
+
+            // Kontrola, zda je Auth0 SDK správně načten
+            if (typeof createAuth0Client === 'undefined') {
+                console.log('Auth0 SDK není dostupný, čekám na jeho načtení...');
+                updateAuthStatus('Čekám na načtení Auth0 SDK...');
+
+                // Posluchač události pro načtení Auth0 SDK
+                document.addEventListener('auth0SDKLoaded', function() {
+                    console.log('Auth0 SDK byl načten, pokračuji s inicializací Auth0...');
+                    updateAuthStatus('Auth0 SDK načten, inicializuji přihlašování...');
+
+                    // Inicializace Auth0
+                    initAuth0();
+                });
+
+                // Záložní časovač pro případ, že událost nebude vyvolána
+                setTimeout(function() {
+                    if (typeof createAuth0Client === 'undefined') {
+                        console.error('Auth0 SDK stále není dostupný, používám přímé přihlášení...');
+                        updateAuthStatus('Auth0 SDK není dostupný. Zkouším přímé přihlášení...');
+
+                        // Přímé přesměrování na Auth0 přihlašovací stránku
+                        directAuth0Login();
+                    } else if (!document.auth0Initialized) {
+                        console.log('Auth0 SDK je dostupný, ale nebyl inicializován, inicializuji Auth0...');
+                        initAuth0();
+                    }
+                }, 3000);
+            } else {
+                console.log('Auth0 SDK je dostupný, inicializuji Auth0...');
+                updateAuthStatus('Auth0 SDK je připraven, inicializuji přihlašování...');
+
+                // Inicializace Auth0
+                initAuth0();
+
+                // Označení, že Auth0 byl inicializován
+                document.auth0Initialized = true;
+            }
+        });
+    </script>
+
+    <!-- Leaflet JS pro mapu -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <!-- OpenRouteService API pro přesné směrování po silnicích -->
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js" defer="false" async="false"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js" defer></script>
     <!-- OSM Buildings JS pro 3D budovy -->
-    <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js" defer="false" async="false"></script>
+    <script src="https://cdn.osmbuildings.org/classic/0.2.2b/OSMBuildings-Leaflet.js" defer></script>
     <!-- Cesium JS je již načten v hlavičce -->
     <!-- Přímá implementace Globe.gl -->
-    <script src="app/globe-simple.js"></script>
+    <script src="app/globe-simple.js" defer></script>
+    <!-- Jednoduchá inicializace mapy -->
+    <script src="app/simple-map.js" defer></script>
     <!-- Hlavní skript aplikace - přidáno defer pro zajištění, že se načte až po Leaflet.js -->
     <script src="app/script.js" defer></script>
     <!-- Skripty pro novinky a menu příkazů -->
@@ -406,9 +783,19 @@
     <script src="app/draggable-elements.js"></script>
     <script src="app/feedback-survey.js"></script>
     <script src="app/car-sales.js"></script>
+<<<<<<< HEAD
     <script src="app/business-markers.js"></script>
     <script src="app/business-data-loader.js"></script>
     <script src="app/money-indicator-enhanced.js"></script>
+=======
+    <script src="app/virtual-work.js"></script>
+    <script src="app/reward-system.js"></script>
+    <script src="app/commands-menu.js"></script>
+    <script src="app/fix-menu.js"></script>
+    <script src="app/business-markers.js" defer></script>
+    <script src="app/business-data-loader.js" defer></script>
+    <script src="app/money-indicator.js"></script>
+>>>>>>> origin/0.3.8.2
     <script src="app/triple-click-handler.js"></script>
     <script src="app/bug-reporter.js"></script>
     <script src="app/housing-services.js"></script>
@@ -417,15 +804,264 @@
     <script src="app/crypto-finances.js"></script>
     <script src="app/user-accounts.js"></script>
     <script src="app/simple-work-dialog.js"></script>
-    <!-- Supabase a Netlify integrace -->
-    <script src="app/supabase-client.js"></script>
-    <script src="app/supabase-auth.js"></script>
-    <script src="app/netlify-integration.js"></script>
+    <!-- Bezpečnostní a autentizační moduly -->
     <script src="app/security-utils.js"></script>
-    <script src="app/local-auth.js"></script>
-    <script src="app/hybrid-auth.js"></script>
-    <script src="app/auth-screen.js"></script>
+
+    <!-- Auth0 autentizace - načtení před ostatními autentizačními moduly -->
+    <script src="app/auth0-auth.js"></script>
+
+    <!-- Supabase klient -->
+    <script src="app/services/supabase-client.js"></script>
+
+    <!-- Uživatelský profil -->
+    <script src="app/user-profile.js"></script>
+
+    <!-- Předplatné -->
+    <script src="app/services/subscription-service.js"></script>
+
+    <!-- Autentizační služba -->
+    <script src="app/auth/auth-service.js"></script>
+    <script src="app/auth/user-profile-service.js"></script>
+    <script src="app/services/subscription-service-stripe.js"></script>
+
+    <!-- Zachování zpětné kompatibility -->
+    <script src="app/netlify-integration.js"></script>
     <!-- Debugovací skript pro mapu -->
-    <script src="app/map-debug.js"></script>
+    <script src="app/map-debug.js" defer></script>
+
+    <!-- Testovací skripty (pouze pro lokální vývoj) -->
+    <script>
+        // Kontrola, zda jsme v lokálním vývojovém prostředí
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Načtení testovacích skriptů
+            const testScripts = [
+                '/tests/auth-test.js',
+                '/tests/supabase-test.js',
+                '/tests/form-test.js',
+                '/tests/csp-test.js'
+            ];
+
+            testScripts.forEach(script => {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script;
+                document.head.appendChild(scriptElement);
+            });
+
+            // Přidání odkazu na testovací stránku
+            document.addEventListener('DOMContentLoaded', () => {
+                const testLink = document.createElement('a');
+                testLink.href = '/tests/index.html';
+                testLink.target = '_blank';
+                testLink.textContent = 'Otevřít testovací stránku';
+                testLink.style.position = 'fixed';
+                testLink.style.bottom = '10px';
+                testLink.style.right = '10px';
+                testLink.style.padding = '8px 16px';
+                testLink.style.backgroundColor = '#6d28d9';
+                testLink.style.color = 'white';
+                testLink.style.borderRadius = '4px';
+                testLink.style.textDecoration = 'none';
+                testLink.style.zIndex = '9999';
+                document.body.appendChild(testLink);
+            });
+        }
+    </script>
+
+    <!-- Inicializace Auth0 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kontrola, zda je v URL autorizační kód z Auth0
+            const query = window.location.search;
+            const hasAuthCode = query.includes('code=') && query.includes('state=');
+
+            // Kontrola, zda je uživatel již přihlášen podle localStorage
+            const isLoggedIn = localStorage.getItem('aiMapaLoggedIn') === 'true';
+
+            if (isLoggedIn) {
+                console.log('Uživatel je již přihlášen podle localStorage, odstraňuji překryvnou vrstvu...');
+                // Odstranění překryvné vrstvy, pokud existuje
+                const authOverlay = document.getElementById('auth-overlay');
+                if (authOverlay) {
+                    authOverlay.style.opacity = '0';
+                    authOverlay.style.transition = 'opacity 0.8s ease';
+                    setTimeout(() => {
+                        authOverlay.remove();
+                        console.log('Překryvná vrstva byla odstraněna (rychlá kontrola při načtení)');
+
+                        // Nastavení příznaku, že překryvná vrstva byla odstraněna
+                        localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+
+                        // Zobrazení profilu uživatele, pokud je k dispozici Auth0Auth
+                        if (typeof Auth0Auth !== 'undefined') {
+                            Auth0Auth.displayUserProfile();
+                        }
+                    }, 800);
+                } else {
+                    // Nastavení příznaku, že překryvná vrstva byla odstraněna
+                    localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+
+                    // Zobrazení profilu uživatele, pokud je k dispozici Auth0Auth
+                    if (typeof Auth0Auth !== 'undefined') {
+                        Auth0Auth.displayUserProfile();
+                    }
+                }
+            }
+
+            if (hasAuthCode) {
+                console.log('Detekován autorizační kód v URL, prioritně inicializuji Auth0...');
+            }
+
+            // Funkce pro kontrolu přihlášení a případné přesměrování
+            function checkLoginAndRedirect() {
+                if (typeof Auth0Auth !== 'undefined') {
+                    Auth0Auth.checkCurrentUser().then(isLoggedIn => {
+                        console.log('Kontrola přihlášení uživatele:', isLoggedIn ? 'Přihlášen' : 'Nepřihlášen');
+
+                        if (!isLoggedIn) {
+                            // Kontrola, zda jsme v procesu přihlašování
+                            const query = window.location.search;
+                            const hasAuthCode = query.includes('code=') && query.includes('state=');
+                            const hash = window.location.hash;
+                            const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                            if (!hasAuthCode && !hasAuthTokens) {
+                                console.log('Uživatel není přihlášen, přesměrovávám na Auth0...');
+                                // Přímé přesměrování na Auth0
+                                directAuth0Login();
+                            } else {
+                                console.log('Detekován autorizační kód nebo tokeny v URL, čekám na zpracování callbacku...');
+                                // Aktualizace stavu překryvné vrstvy
+                                const statusElement = document.getElementById('auth-overlay-status');
+                                if (statusElement) {
+                                    statusElement.textContent = 'Zpracovávám přihlášení...';
+                                }
+                            }
+                        } else {
+                            console.log('Uživatel je přihlášen, zobrazuji aplikaci...');
+                            // Odstranění překryvné vrstvy, pokud existuje
+                            if (typeof removeAuthOverlay === 'function') {
+                                removeAuthOverlay();
+                            }
+
+                            // Zobrazení profilu uživatele
+                            if (typeof Auth0Auth.displayUserProfile === 'function') {
+                                Auth0Auth.displayUserProfile();
+                            }
+
+                            // Nastavení příznaku, že uživatel je přihlášen a překryvná vrstva byla odstraněna
+                            localStorage.setItem('aiMapaAuthOverlayRemoved', 'true');
+                            localStorage.setItem('aiMapaLoggedIn', 'true');
+                        }
+                    }).catch(error => {
+                        console.error('Chyba při kontrole přihlášení:', error);
+
+                        // Kontrola, zda jsme v procesu přihlašování
+                        const query = window.location.search;
+                        const hasAuthCode = query.includes('code=') && query.includes('state=');
+                        const hash = window.location.hash;
+                        const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                        if (!hasAuthCode && !hasAuthTokens) {
+                            directAuth0Login();
+                        }
+                    });
+                } else {
+                    console.error('Auth0Auth modul není dostupný, používám přímé přihlášení...');
+
+                    // Kontrola, zda jsme v procesu přihlašování
+                    const query = window.location.search;
+                    const hasAuthCode = query.includes('code=') && query.includes('state=');
+                    const hash = window.location.hash;
+                    const hasAuthTokens = hash.includes('access_token=') && hash.includes('id_token=');
+
+                    if (!hasAuthCode && !hasAuthTokens) {
+                        directAuth0Login();
+                    }
+                }
+            }
+
+            // Inicializace Auth0 modulu
+            if (typeof Auth0Auth !== 'undefined') {
+                console.log('Inicializace Auth0 modulu...');
+
+                // Inicializace Auth0
+                Auth0Auth.init().then(() => {
+                    console.log('Auth0 modul byl úspěšně inicializován');
+                    // Kontrola přihlášení a případné přesměrování
+                    checkLoginAndRedirect();
+                }).catch(error => {
+                    console.error('Chyba při inicializaci Auth0 modulu:', error);
+                    directAuth0Login();
+                });
+
+                // Přidání tlačítka pro přímé přihlášení přes Auth0 (pro testování)
+                const authButton = document.createElement('button');
+                authButton.id = 'directAuth0LoginButton';
+                authButton.textContent = 'Přihlásit přes Auth0';
+                authButton.style.position = 'fixed';
+                authButton.style.top = '10px';
+                authButton.style.right = '10px';
+                authButton.style.zIndex = '9999';
+                authButton.style.padding = '8px 16px';
+                authButton.style.backgroundColor = '#ff4081';
+                authButton.style.color = 'white';
+                authButton.style.border = 'none';
+                authButton.style.borderRadius = '4px';
+                authButton.style.cursor = 'pointer';
+
+                authButton.addEventListener('click', function() {
+                    console.log('Kliknutí na tlačítko přímého přihlášení přes Auth0');
+                    directAuth0Login();
+                });
+
+                document.body.appendChild(authButton);
+            } else {
+                console.error('Auth0Auth modul nebyl nalezen!');
+
+                // Pokus o načtení Auth0 knihovny
+                console.log('Pokouším se načíst Auth0 knihovnu...');
+                const script = document.createElement('script');
+                script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
+                script.onload = function() {
+                    console.log('Auth0 knihovna byla úspěšně načtena');
+
+                    // Pokus o načtení Auth0Auth modulu
+                    const auth0AuthScript = document.createElement('script');
+                    auth0AuthScript.src = 'app/auth0-auth.js';
+                    auth0AuthScript.onload = function() {
+                        console.log('Auth0Auth modul byl úspěšně načten');
+
+                        if (typeof Auth0Auth !== 'undefined') {
+                            Auth0Auth.init().then(() => {
+                                console.log('Auth0 modul byl úspěšně inicializován po načtení');
+                                checkLoginAndRedirect();
+                            }).catch(error => {
+                                console.error('Chyba při inicializaci Auth0Auth po načtení:', error);
+                                directAuth0Login();
+                            });
+                        } else {
+                            directAuth0Login();
+                        }
+                    };
+                    document.head.appendChild(auth0AuthScript);
+                };
+                document.head.appendChild(script);
+            }
+        });
+    </script>
+
+    <!-- Skripty aplikace -->
+    <script src="app/map.js" defer></script>
+    <script src="app/globe-simple.js" defer></script>
+    <script src="app/auth0-auth.js" defer></script>
+    <script src="app/supabase-client.js" defer></script>
+    <script src="app/user-profile.js" defer></script>
+    <script src="app/logout-button.js" defer></script>
+    <script src="app/logout-button-v2.js" defer></script>
+    <script src="app/daily-reward.js" defer></script>
+    <script src="app/route-search.js" defer></script>
+    <script src="app/map-controls.js" defer></script>
+    <script src="app/ai-assistant.js" defer></script>
+    <script src="app/script.js" defer></script>
 </body>
 </html>
