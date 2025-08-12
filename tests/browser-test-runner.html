@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMapa - Testovací prostředí</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        h1, h2, h3 {
+            color: #6d28d9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .test-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #6d28d9;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #5b21b6;
+        }
+
+        .results {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .success {
+            border-color: #10b981;
+            background-color: #ecfdf5;
+        }
+
+        .error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .nav-links {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            color: #6d28d9;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f9ff;
+            border-radius: 4px;
+            border: 1px solid #bae6fd;
+        }
+
+        .summary h3 {
+            margin-top: 0;
+            color: #0284c7;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: #10b981;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AIMapa - Testovací prostředí</h1>
+        <p>Tato stránka slouží k testování různých funkcí aplikace AIMapa verze 0.3.8.6.</p>
+
+        <div class="nav-links">
+            <a href="/" target="_blank">Otevřít aplikaci</a>
+            <a href="/tests/index.html">Zpět na hlavní testovací stránku</a>
+        </div>
+
+        <div class="summary">
+            <h3>Souhrn testů</h3>
+            <div id="testSummary">
+                <p>Spusťte testy pro zobrazení souhrnu.</p>
+            </div>
+            <div class="progress-bar">
+                <div id="progressBar" class="progress" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Unit testy</h2>
+            <p>Testy pro ověření jednotlivých komponent a funkcí.</p>
+
+            <div class="test-buttons">
+                <button onclick="runUnitTest('distance')">Test výpočtu vzdálenosti</button>
+                <button onclick="runUnitTest('coordinates')">Test parsování souřadnic</button>
+                <button onclick="runUnitTest('validation')">Test validace souřadnic</button>
+                <button onclick="runUnitTest('all')">Spustit všechny unit testy</button>
+            </div>
+
+            <div id="unit-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Integrační testy</h2>
+            <p>Testy pro ověření interakce mezi moduly a externími API.</p>
+
+            <div class="test-buttons">
+                <button onclick="runIntegrationTest('osm')">Test OpenStreetMap API</button>
+                <button onclick="runIntegrationTest('google')">Test Google Maps API</button>
+                <button onclick="runIntegrationTest('directions')">Test vyhledávání tras</button>
+                <button onclick="runIntegrationTest('all')">Spustit všechny integrační testy</button>
+            </div>
+
+            <div id="integration-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>End-to-end testy</h2>
+            <p>Testy pro ověření celého workflow aplikace.</p>
+
+            <div class="test-buttons">
+                <button onclick="runE2ETest('route')">Test vyhledání trasy</button>
+                <button onclick="runE2ETest('poi')">Test bodů zájmu</button>
+                <button onclick="runE2ETest('globe')">Test glóbus režimu</button>
+                <button onclick="runE2ETest('ai')">Test AI asistenta</button>
+                <button onclick="runE2ETest('all')">Spustit všechny E2E testy</button>
+            </div>
+
+            <div id="e2e-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>AI model testy</h2>
+            <p>Testy pro ověření AI modelu a jeho výkonu.</p>
+
+            <div class="test-buttons">
+                <button onclick="runAITest('classification')">Test klasifikace míst</button>
+                <button onclick="runAITest('prediction')">Test predikce času cesty</button>
+                <button onclick="runAITest('recommendation')">Test doporučení míst</button>
+                <button onclick="runAITest('bias')">Test bias a fairness</button>
+                <button onclick="runAITest('all')">Spustit všechny AI testy</button>
+            </div>
+
+            <div id="ai-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Všechny testy</h2>
+            <p>Spuštění všech testů najednou.</p>
+
+            <div class="test-buttons">
+                <button onclick="runAllTests()">Spustit všechny testy</button>
+            </div>
+
+            <div id="all-results" class="results">Výsledky testů se zobrazí zde...</div>
+        </div>
+    </div>
+
+    <!-- Načtení testovacích skriptů -->
+    <script src="unit/map-utils.test.js"></script>
+    <script src="integration/map-api.test.js"></script>
+    <script src="e2e/map-workflow.test.js"></script>
+    <script src="ai/model-evaluation.test.js"></script>
+
+    <script>
+        // Globální objekt pro ukládání výsledků testů
+        const testResults = {
+            unit: null,
+            integration: null,
+            e2e: null,
+            ai: null
+        };
+
+        // Funkce pro formátování výsledků testů
+        function formatResults(results) {
+            return JSON.stringify(results, null, 2);
+        }
+
+        // Funkce pro aktualizaci souhrnu testů
+        function updateTestSummary() {
+            const summaryElement = document.getElementById('testSummary');
+            const progressBar = document.getElementById('progressBar');
+            
+            let totalTests = 0;
+            let passedTests = 0;
+            let failedTests = 0;
+            
+            // Unit testy
+            if (testResults.unit && testResults.unit.summary) {
+                totalTests += testResults.unit.summary.total;
+                passedTests += testResults.unit.summary.passed;
+                failedTests += testResults.unit.summary.failed;
+            }
+            
+            // Integrační testy
+            if (testResults.integration && testResults.integration.summary) {
+                totalTests += testResults.integration.summary.total;
+                passedTests += testResults.integration.summary.passed;
+                failedTests += testResults.integration.summary.failed;
+            }
+            
+            // E2E testy
+            if (testResults.e2e && testResults.e2e.summary) {
+                totalTests += testResults.e2e.summary.total;
+                passedTests += testResults.e2e.summary.passed;
+                failedTests += testResults.e2e.summary.failed;
+            }
+            
+            // Pokud jsou nějaké testy
+            if (totalTests > 0) {
+                const successRate = (passedTests / totalTests * 100).toFixed(2);
+                
+                summaryElement.innerHTML = `
+                    <p><strong>Celkem testů:</strong> ${totalTests}</p>
+                    <p><strong>Úspěšné testy:</strong> ${passedTests}</p>
+                    <p><strong>Neúspěšné testy:</strong> ${failedTests}</p>
+                    <p><strong>Úspěšnost:</strong> ${successRate}%</p>
+                `;
+                
+                progressBar.style.width = `${successRate}%`;
+            } else {
+                summaryElement.innerHTML = `<p>Spusťte testy pro zobrazení souhrnu.</p>`;
+                progressBar.style.width = '0%';
+            }
+        }
+
+        // Funkce pro spuštění unit testů
+        async function runUnitTest(testType) {
+            const resultsElement = document.getElementById('unit-results');
+            resultsElement.textContent = 'Spouštění testů...';
+            resultsElement.className = 'results';
+
+            try {
+                let result;
+
+                switch (testType) {
+                    case 'distance':
+                        result = MapUtilsTest.testDistanceCalculation();
+                        break;
+                    case 'coordinates':
+                        result = MapUtilsTest.testCoordinateParsing();
+                        break;
+                    case 'validation':
+                        result = MapUtilsTest.testCoordinateValidation();
+                        break;
+                    case 'all':
+                        result = MapUtilsTest.runAllTests();
+                        break;
+                    default:
+                        throw new Error('Neznámý typ testu');
+                }
+
+                resultsElement.textContent = formatResults(result);
+                resultsElement.classList.add('success');
+                
+                // Uložení výsledků
+                testResults.unit = result;
+                updateTestSummary();
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění unit testů:', error);
+            }
+        }
+
+        // Funkce pro spuštění integračních testů
+        async function runIntegrationTest(testType) {
+            const resultsElement = document.getElementById('integration-results');
+            resultsElement.textContent = 'Spouštění testů...';
+            resultsElement.className = 'results';
+
+            try {
+                let result;
+
+                switch (testType) {
+                    case 'osm':
+                        result = await MapApiTest.testOpenStreetMapGeocoding();
+                        break;
+                    case 'google':
+                        result = await MapApiTest.testGoogleMapsGeocoding();
+                        break;
+                    case 'directions':
+                        result = await MapApiTest.testGoogleMapsDirections();
+                        break;
+                    case 'all':
+                        result = await MapApiTest.runAllTests();
+                        break;
+                    default:
+                        throw new Error('Neznámý typ testu');
+                }
+
+                resultsElement.textContent = formatResults(result);
+                resultsElement.classList.add('success');
+                
+                // Uložení výsledků
+                testResults.integration = result;
+                updateTestSummary();
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění integračních testů:', error);
+            }
+        }
+
+        // Funkce pro spuštění E2E testů
+        async function runE2ETest(testType) {
+            const resultsElement = document.getElementById('e2e-results');
+            resultsElement.textContent = 'Spouštění testů...';
+            resultsElement.className = 'results';
+
+            try {
+                let result;
+
+                switch (testType) {
+                    case 'route':
+                        result = await MapWorkflowTest.runScenario(0);
+                        break;
+                    case 'poi':
+                        result = await MapWorkflowTest.runScenario(1);
+                        break;
+                    case 'globe':
+                        result = await MapWorkflowTest.runScenario(2);
+                        break;
+                    case 'ai':
+                        result = await MapWorkflowTest.runScenario(3);
+                        break;
+                    case 'all':
+                        result = await MapWorkflowTest.runAllScenarios();
+                        break;
+                    default:
+                        throw new Error('Neznámý typ testu');
+                }
+
+                resultsElement.textContent = formatResults(result);
+                resultsElement.classList.add('success');
+                
+                // Uložení výsledků
+                testResults.e2e = result;
+                updateTestSummary();
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění E2E testů:', error);
+            }
+        }
+
+        // Funkce pro spuštění AI testů
+        async function runAITest(testType) {
+            const resultsElement = document.getElementById('ai-results');
+            resultsElement.textContent = 'Spouštění testů...';
+            resultsElement.className = 'results';
+
+            try {
+                let result;
+
+                switch (testType) {
+                    case 'classification':
+                        result = AIModelTest.testPlaceClassification();
+                        break;
+                    case 'prediction':
+                        result = AIModelTest.testTravelTimePrediction();
+                        break;
+                    case 'recommendation':
+                        result = AIModelTest.testPlaceRecommendation();
+                        break;
+                    case 'bias':
+                        result = AIModelTest.testBiasAndFairness();
+                        break;
+                    case 'all':
+                        result = AIModelTest.runAllTests();
+                        break;
+                    default:
+                        throw new Error('Neznámý typ testu');
+                }
+
+                resultsElement.textContent = formatResults(result);
+                resultsElement.classList.add('success');
+                
+                // Uložení výsledků
+                testResults.ai = result;
+                updateTestSummary();
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění AI testů:', error);
+            }
+        }
+
+        // Funkce pro spuštění všech testů
+        async function runAllTests() {
+            const resultsElement = document.getElementById('all-results');
+            resultsElement.textContent = 'Spouštění všech testů...';
+            resultsElement.className = 'results';
+
+            try {
+                // Unit testy
+                testResults.unit = MapUtilsTest.runAllTests();
+                
+                // Integrační testy
+                testResults.integration = await MapApiTest.runAllTests();
+                
+                // E2E testy
+                testResults.e2e = await MapWorkflowTest.runAllScenarios();
+                
+                // AI testy
+                testResults.ai = AIModelTest.runAllTests();
+                
+                // Aktualizace souhrnu
+                updateTestSummary();
+                
+                // Zobrazení výsledků
+                const allResults = {
+                    timestamp: new Date().toISOString(),
+                    version: '0.3.8.6',
+                    unit: testResults.unit,
+                    integration: testResults.integration,
+                    e2e: testResults.e2e,
+                    ai: testResults.ai
+                };
+                
+                resultsElement.textContent = 'Všechny testy byly dokončeny. Podrobné výsledky najdete v jednotlivých sekcích.';
+                resultsElement.classList.add('success');
+            } catch (error) {
+                resultsElement.textContent = `Chyba: ${error.message}`;
+                resultsElement.classList.add('error');
+                console.error('Chyba při spouštění všech testů:', error);
+            }
+        }
+    </script>
+</body>
+</html>

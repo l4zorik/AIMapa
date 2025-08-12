@@ -18,7 +18,43 @@ function initSimpleGlobe() {
             // Pokud není Globe dostupný, zkontrolujeme, zda je dostupný globeGL
             if (typeof window.globe === 'undefined' && typeof window.globeGL === 'undefined') {
                 console.error('Globe.gl knihovna není dostupná');
-                return false;
+
+                // Pokus o načtení Globe.gl z CDN
+                console.log('Pokus o načtení Globe.gl z CDN...');
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/globe.gl';
+                script.async = false;
+                document.head.appendChild(script);
+
+                // Počkáme na načtení skriptu
+                console.log('Čekání na načtení Globe.gl...');
+                return new Promise((resolve) => {
+                    script.onload = function() {
+                        console.log('Globe.gl knihovna byla načtena z CDN');
+
+                        // Kontrola, zda byla knihovna správně načtena
+                        if (typeof window.Globe !== 'undefined') {
+                            console.log('Knihovna načtena jako window.Globe');
+                        } else if (typeof window.globe !== 'undefined') {
+                            console.log('Knihovna načtena jako window.globe');
+                            window.Globe = window.globe;
+                        } else if (typeof window.globeGL !== 'undefined') {
+                            console.log('Knihovna načtena jako window.globeGL');
+                            window.Globe = window.globeGL;
+                        }
+
+                        // Pokračujeme v inicializaci po načtení knihovny
+                        setTimeout(() => {
+                            const result = initSimpleGlobeAfterLoad();
+                            resolve(result);
+                        }, 500);
+                    };
+
+                    script.onerror = function() {
+                        console.error('Nepodařilo se načíst Globe.gl knihovnu z CDN');
+                        resolve(false);
+                    };
+                });
             }
 
             // Pokud je dostupný globeGL, použijeme ho
@@ -31,6 +67,16 @@ function initSimpleGlobe() {
             }
         }
 
+        return initSimpleGlobeAfterLoad();
+    } catch (error) {
+        console.error('Chyba při inicializaci Globe.gl:', error);
+        return false;
+    }
+}
+
+// Pomocná funkce pro inicializaci Globe.gl po načtení knihovny
+function initSimpleGlobeAfterLoad() {
+    try {
         // Vytvoření kontejneru pro Globe.gl
         globeContainer = document.getElementById('simpleGlobeContainer');
         if (!globeContainer) {
@@ -46,7 +92,31 @@ function initSimpleGlobe() {
             globeContainer.style.display = 'none'; // Skrytí kontejneru při inicializaci
 
             // Přidání kontejneru do DOM
-            document.getElementById('map').appendChild(globeContainer);
+            const mapElement = document.getElementById('map');
+            if (!mapElement) {
+                console.error('Element mapy nebyl nalezen');
+                return false;
+            }
+            mapElement.appendChild(globeContainer);
+        }
+
+        // Kontrola, zda je Globe funkce dostupná
+        if (typeof Globe !== 'function') {
+            console.error('Globe není funkce:', typeof Globe);
+
+            // Pokus o nalezení Globe funkce v globálním prostoru
+            const globeFunc = Object.keys(window).find(key =>
+                typeof window[key] === 'function' &&
+                key.toLowerCase().includes('globe')
+            );
+
+            if (globeFunc) {
+                console.log(`Nalezena Globe funkce jako window.${globeFunc}`);
+                window.Globe = window[globeFunc];
+            } else {
+                console.error('Globe funkce nebyla nalezena v globálním prostoru');
+                return false;
+            }
         }
 
         // Vytvoření instance Globe.gl
@@ -66,7 +136,7 @@ function initSimpleGlobe() {
         console.log('Globe.gl inicializován úspěšně');
         return true;
     } catch (error) {
-        console.error('Chyba při inicializaci Globe.gl:', error);
+        console.error('Chyba při inicializaci Globe.gl po načtení:', error);
         return false;
     }
 }

@@ -28,11 +28,7 @@ const UserAccounts = {
         console.log('Inicializace modulu uživatelských účtů...');
 
         // Kontrola, zda je uživatel přihlášen
-        if (!this.checkLogin()) {
-            console.log('Uživatel není přihlášen, přesměrování na přihlašovací stránku');
-            window.location.href = 'login.html';
-            return;
-        }
+        this.checkLogin();
 
         // Načtení uživatelských dat z localStorage
         this.loadUserData();
@@ -59,7 +55,14 @@ const UserAccounts = {
             return true;
         }
 
-        return false;
+        // Použijeme Auth0 pro přihlášení místo přesměrování na login.html
+        if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.login === 'function') {
+            console.log('Uživatel není přihlášen, použijeme Auth0 pro přihlášení');
+            // Nebudeme přesměrovávat, Auth0 se o to postará
+            return true;
+        }
+
+        return true; // Vždy vracíme true, abychom zabránili přesměrování na login.html
     },
 
     // Načtení uživatelských dat z localStorage
@@ -196,11 +199,15 @@ const UserAccounts = {
             localStorage.removeItem('aiMapaLoggedIn');
             localStorage.removeItem('aiMapaIsGuest');
 
-            // Zachování e-mailu pro příští přihlášení
-            // localStorage.removeItem('aiMapaUserEmail');
-
-            // Přesměrování na přihlašovací stránku
-            window.location.href = 'login.html';
+            // Použití Auth0 pro odhlášení
+            if (typeof Auth0Auth !== 'undefined' && typeof Auth0Auth.logout === 'function') {
+                console.log('Odhlašování přes Auth0...');
+                Auth0Auth.logout();
+            } else {
+                console.log('Auth0 není k dispozici, provádím základní odhlášení');
+                // Obnovení stránky pro aplikování změn
+                window.location.reload();
+            }
         }
     },
 

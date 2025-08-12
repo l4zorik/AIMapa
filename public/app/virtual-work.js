@@ -934,6 +934,24 @@ class VirtualWorkClass {
             skipSavedWorkCheck
         });
 
+        // Kontrola, zda má uživatel přístup k virtuální práci
+        if (typeof SubscriptionService !== 'undefined') {
+            // Získání limitu projektů pro aktuální plán
+            const projectLimit = SubscriptionService.getLimit('virtualWorkProjects');
+
+            // Kontrola, zda uživatel nepřekročil limit projektů
+            if (this.workHistory.length >= projectLimit) {
+                // Zobrazení modálního okna s informací o nutnosti předplatného
+                alert(`Dosáhli jste limitu ${projectLimit} projektů virtuální práce pro váš aktuální plán. Pro vytvoření více projektů si prosím upgradujte předplatné.`);
+
+                // Zobrazení modálního okna předplatného
+                if (typeof SubscriptionService.showSubscriptionModal === 'function') {
+                    SubscriptionService.showSubscriptionModal();
+                }
+                return;
+            }
+        }
+
         // Kontrola, zda je dialog již otevřený a není předán existující dialog
         const existingWorkDialog = document.querySelector('.virtual-work-dialog');
         if (!existingDialog && existingWorkDialog) {

@@ -346,6 +346,13 @@ const BusinessMarkers = {
         // Kontrola, zda existuje mapa a Leaflet
         if (typeof map === 'undefined') {
             console.error('Mapa není inicializována');
+
+            // Pokus o inicializaci mapy pomocí SimpleMap
+            if (window.SimpleMap && typeof window.SimpleMap.init === 'function') {
+                console.log('Pokus o inicializaci mapy pomocí SimpleMap...');
+                window.SimpleMap.init();
+            }
+
             // Zkusíme znovu za 2 sekundy
             setTimeout(() => this.addBusinessesToMap(), 2000);
             return;
@@ -354,6 +361,34 @@ const BusinessMarkers = {
         // Kontrola, zda je Leaflet načten
         if (typeof L === 'undefined') {
             console.error('Leaflet není načten');
+
+            // Pokus o načtení Leaflet.js
+            const leafletScript = document.createElement('script');
+            leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+
+            // Po načtení Leaflet zkusíme znovu
+            leafletScript.onload = () => {
+                console.log('Leaflet.js byl úspěšně načten, zkouším znovu přidat firmy na mapu...');
+                setTimeout(() => this.addBusinessesToMap(), 500);
+            };
+
+            document.head.appendChild(leafletScript);
+
+            // Zkusíme znovu za 3 sekundy
+            setTimeout(() => this.addBusinessesToMap(), 3000);
+            return;
+        }
+
+        // Kontrola, zda je mapa instance Leaflet.Map
+        if (typeof L !== 'undefined' && !(map instanceof L.Map)) {
+            console.error('Objekt map není instance Leaflet.Map!');
+
+            // Pokus o reinicializaci mapy pomocí SimpleMap
+            if (window.SimpleMap && typeof window.SimpleMap.init === 'function') {
+                console.log('Pokus o reinicializaci mapy pomocí SimpleMap...');
+                window.SimpleMap.init();
+            }
+
             // Zkusíme znovu za 2 sekundy
             setTimeout(() => this.addBusinessesToMap(), 2000);
             return;
@@ -375,6 +410,49 @@ const BusinessMarkers = {
         // Kontrola, zda je Leaflet načten
         if (typeof L === 'undefined') {
             console.error('Leaflet není načten při přidávání firmy na mapu');
+
+            // Pokus o načtení Leaflet.js
+            const leafletScript = document.createElement('script');
+            leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+
+            // Po načtení Leaflet zkusíme znovu
+            leafletScript.onload = () => {
+                console.log('Leaflet.js byl úspěšně načten, zkouším znovu přidat firmu na mapu...');
+                setTimeout(() => this.addBusinessToMap(business), 500);
+            };
+
+            document.head.appendChild(leafletScript);
+
+            // Zkusíme znovu za 2 sekundy
+            setTimeout(() => this.addBusinessToMap(business), 2000);
+            return;
+        }
+
+        // Kontrola, zda je mapa inicializována
+        if (typeof map === 'undefined') {
+            console.error('Mapa není inicializována při přidávání firmy na mapu');
+
+            // Pokus o inicializaci mapy pomocí SimpleMap
+            if (window.SimpleMap && typeof window.SimpleMap.init === 'function') {
+                console.log('Pokus o inicializaci mapy pomocí SimpleMap...');
+                window.SimpleMap.init();
+            }
+
+            // Zkusíme znovu za 2 sekundy
+            setTimeout(() => this.addBusinessToMap(business), 2000);
+            return;
+        }
+
+        // Kontrola, zda je mapa instance Leaflet.Map
+        if (!(map instanceof L.Map)) {
+            console.error('Objekt map není instance Leaflet.Map při přidávání firmy na mapu!');
+
+            // Pokus o reinicializaci mapy pomocí SimpleMap
+            if (window.SimpleMap && typeof window.SimpleMap.init === 'function') {
+                console.log('Pokus o reinicializaci mapy pomocí SimpleMap...');
+                window.SimpleMap.init();
+            }
+
             // Zkusíme znovu za 2 sekundy
             setTimeout(() => this.addBusinessToMap(business), 2000);
             return;
@@ -604,17 +682,54 @@ const BusinessMarkers = {
 
 // Inicializace modulu po načtení stránky
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('BusinessMarkers: DOMContentLoaded - inicializace...');
+
     // Kontrola, zda existuje mapa
     if (typeof map !== 'undefined') {
+        console.log('BusinessMarkers: Mapa je již inicializována, inicializuji BusinessMarkers...');
         // Inicializace modulu
         BusinessMarkers.init();
     } else {
+        console.log('BusinessMarkers: Mapa není inicializována, čekám na inicializaci...');
+
+        // Pokus o inicializaci mapy pomocí SimpleMap
+        if (window.SimpleMap && typeof window.SimpleMap.init === 'function') {
+            console.log('BusinessMarkers: Pokus o inicializaci mapy pomocí SimpleMap...');
+            window.SimpleMap.init();
+        }
+
         // Čekání na inicializaci mapy
         const mapInitInterval = setInterval(() => {
             if (typeof map !== 'undefined') {
+                console.log('BusinessMarkers: Mapa byla inicializována, inicializuji BusinessMarkers...');
                 clearInterval(mapInitInterval);
                 BusinessMarkers.init();
             }
         }, 500);
+
+        // Záložní časovač pro případ, že by se mapa neinicializovala
+        setTimeout(() => {
+            if (typeof map === 'undefined') {
+                console.log('BusinessMarkers: Mapa nebyla inicializována ani po 10 sekundách, pokus o inicializaci BusinessMarkers bez mapy...');
+                BusinessMarkers.init();
+            }
+        }, 10000);
+    }
+});
+
+// Inicializace modulu po kompletním načtení stránky
+window.addEventListener('load', () => {
+    console.log('BusinessMarkers: Window load - kontrola inicializace...');
+
+    // Kontrola, zda je modul inicializován
+    if (!BusinessMarkers.isInitialized) {
+        console.log('BusinessMarkers: Modul není inicializován, inicializuji...');
+        BusinessMarkers.init();
+    } else {
+        console.log('BusinessMarkers: Modul je již inicializován, aktualizuji firmy na mapě...');
+        // Aktualizace firem na mapě
+        setTimeout(() => {
+            BusinessMarkers.addBusinessesToMap();
+        }, 1000);
     }
 });
